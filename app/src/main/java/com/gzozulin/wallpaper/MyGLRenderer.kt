@@ -12,14 +12,16 @@ class MyGLRenderer : GLSurfaceView.Renderer {
             attribute vec4 vPosition;
             void main() {
               gl_Position = uMvp * vPosition;
-            }"""
+            }
+            """
 
     private val fragmentShaderCode = """
             precision mediump float;
             uniform vec4 uColor;
             void main() {
               gl_FragColor = uColor;
-            }"""
+            }
+            """
 
     private lateinit var program: GLProgram
     private lateinit var triangles: Triangle
