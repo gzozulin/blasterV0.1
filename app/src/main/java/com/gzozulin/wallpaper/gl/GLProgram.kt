@@ -7,11 +7,11 @@ enum class ShaderType(val type: Int) {
     FRAGMENT_SHADER(GLES20.GL_FRAGMENT_SHADER)
 }
 
-enum class ShaderAttribute(val label: String) {
-    ATTRIBUTE_POSITION("vPosition")
+enum class GLAttribute(val label: String, val size: Int) {
+    ATTRIBUTE_POSITION("vPosition", 3)
 }
 
-enum class ShaderUniform(val label: String) {
+enum class GLUniform(val label: String) {
     UNIFORM_MVP("uMvp"),
     UNIFORM_COLOR("uColor")
 }
@@ -32,8 +32,8 @@ class GLShader(val type: ShaderType, source: String) {
 class GLProgram(vertexShader: GLShader, fragmentShader: GLShader) {
     private val handle =  GLES20.glCreateProgram().also { checkForGLError() }
 
-    private val attributes = HashMap<ShaderAttribute, Int>()
-    private val uniforms = HashMap<ShaderUniform, Int>()
+    private val attributes = HashMap<GLAttribute, Int>()
+    private val uniforms = HashMap<GLUniform, Int>()
 
     init {
         check(vertexShader.type == ShaderType.VERTEX_SHADER)
@@ -46,7 +46,7 @@ class GLProgram(vertexShader: GLShader, fragmentShader: GLShader) {
     }
 
     private fun cacheAttributes() {
-        ShaderAttribute.values().forEach {
+        GLAttribute.values().forEach {
             val location = GLES20.glGetAttribLocation(handle, it.label)
             if (location != -1) {
                 attributes[it] = location
@@ -55,7 +55,7 @@ class GLProgram(vertexShader: GLShader, fragmentShader: GLShader) {
     }
 
     private fun cacheUniforms() {
-        ShaderUniform.values().forEach {
+        GLUniform.values().forEach {
             val location = GLES20.glGetUniformLocation(handle, it.label)
             if (location != -1) {
                 uniforms[it] = location
@@ -71,15 +71,15 @@ class GLProgram(vertexShader: GLShader, fragmentShader: GLShader) {
         GLES20.glUseProgram(handle).also { checkForGLError() }
     }
 
-    fun sendUniform(uniform: ShaderUniform, value: Float) {
+    fun sendUniform(uniform: GLUniform, value: Float) {
         GLES20.glUniform1f(uniforms[uniform]!!, value).also { checkForGLError() }
     }
 
-    fun sendUniform(uniform: ShaderUniform, value: Vector4f) {
+    fun sendUniform(uniform: GLUniform, value: Vector4f) {
         GLES20.glUniform4fv(uniforms[uniform]!!, 1, value.values, 0).also { checkForGLError() }
     }
 
-    fun sendUniform(uniform: ShaderUniform, value: Matrix4f) {
+    fun sendUniform(uniform: GLUniform, value: Matrix4f) {
         GLES20.glUniformMatrix4fv(uniforms[uniform]!!, 1, false, value.values, 0).also { checkForGLError() }
     }
 }
