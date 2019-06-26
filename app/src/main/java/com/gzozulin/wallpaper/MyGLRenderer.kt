@@ -4,34 +4,36 @@ import android.content.Context
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import com.gzozulin.wallpaper.gl.*
-import java.util.*
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     private var shaderLib = ShaderLib(ctx)
 
+    private lateinit var program: GLProgram
+
+    private val bufferAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_COLOR)
     private val triangleVertices = floatArrayOf(
              0f,  1f, 0f,     1f, 0f, 0f,
             -1f, -1f, 0f,     0f, 1f, 0f,
              1f, -1f, 0f,     0f, 0f, 1f
     )
-
     private val triangleIndices = intArrayOf(0, 1, 2)
 
-    private lateinit var program: GLProgram
+    private lateinit var verticesBuffer: GLBuffer
+    private lateinit var indicesBuffer: GLBuffer
 
     private val modelMatrix = Matrix4f()
     private val projectionMatrix = Matrix4f()
     private val viewMatrix = Matrix4f()
 
-    private lateinit var geometry: GLGeometry
-
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
-        GLES20.glCullFace(GLES20.GL_FRONT_AND_BACK)
-        program = shaderLib.loadShader("shaders/simple.vert", "shaders/simple.frag")
-        geometry = GLGeometry(triangleVertices, triangleIndices, GLES20.GL_TRIANGLES)
+        program = shaderLib.loadProgram("shaders/simple.vert", "shaders/simple.frag")
+        verticesBuffer = GLBuffer(GLES20.GL_ARRAY_BUFFER, triangleVertices)
+        indicesBuffer = GLBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, triangleIndices)
+        verticesBuffer.bind()
+        program.setAttributes(bufferAttributes)
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -42,18 +44,31 @@ class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     }
 
     var last = System.currentTimeMillis()
-
-    override fun onDrawFrame(gl: GL10?) {
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+    private fun calculateMvp(): Matrix4f {
         val current = System.currentTimeMillis()
         val elapsed = current - last
         last = current
         modelMatrix.rotateInplace(0.1f * elapsed.toFloat(), Vector3f(0f, 1f, 0f))
-        val mvpMatrix = projectionMatrix * viewMatrix * modelMatrix
-        geometry.bind()
+        return projectionMatrix * viewMatrix * modelMatrix
+    }
+
+    private fun bind() {
         program.bind()
-        program.sendAttributes(listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_COLOR))
-        program.sendUniform(GLUniform.UNIFORM_MVP, mvpMatrix)
-        geometry.draw()
+        verticesBuffer.bind()
+        indicesBuffer.bind()
+    }
+
+    override fun onDrawFrame(gl: GL10?) {
+        bind()
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        program.setUniform(GLUniform.UNIFORM_MVP, calculateMvp())
+        GLES20.glDrawElements(GLES20.GL_TRIANGLES, triangleIndices.size, GLES20.GL_UNSIGNED_INT, 0).also { checkForGLError() }
+        unbind()
+    }
+
+    private fun unbind() {
+        verticesBuffer.unbind()
+        indicesBuffer.unbind()
+        program.unbind()
     }
 }
