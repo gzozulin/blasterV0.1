@@ -1,5 +1,11 @@
+#version 100
+
+#define IN varying
+
 precision mediump float;
-uniform vec4 uColor;
+
+IN vec3 vColor;
+
 void main() {
-    gl_FragColor = uColor;
+    gl_FragColor = vec4(vColor, 1f);
 }

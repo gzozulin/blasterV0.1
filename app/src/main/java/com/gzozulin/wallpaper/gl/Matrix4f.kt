@@ -18,12 +18,16 @@ data class Matrix4f(val values: FloatArray) {
         check(false) { "Implement me!" }
     }
 
-    fun makeLookAt(eye: Vector4f, center: Vector4f, up: Vector4f) {
+    fun makeLookAt(eye: Vector3f, center: Vector3f, up: Vector3f) {
         Matrix.setLookAtM(values, 0,
                 eye.values[0], eye.values[1], eye.values[2],
                 center.values[0], center.values[1], center.values[2],
                 up.values[0], up.values[1], up.values[2]
         )
+    }
+
+    fun rotateInplace(radians: Float, axis: Vector3f) {
+        Matrix.rotateM(values, 0, radians, axis.values[0], axis.values[1], axis.values[2])
     }
 
     operator fun times(other: Matrix4f): Matrix4f {

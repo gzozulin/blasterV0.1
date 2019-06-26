@@ -1,5 +1,16 @@
+#version 100
+
+#define IN attribute
+#define OUT varying
+
+IN vec3 aPosition;
+IN vec3 aColor;
+
+OUT vec3 vColor;
+
 uniform mat4 uMvp;
-attribute vec4 vPosition;
+
 void main() {
-    gl_Position = uMvp * vPosition;
+    gl_Position = uMvp * vec4(aPosition, 1f);
+    vColor = aColor;
 }
