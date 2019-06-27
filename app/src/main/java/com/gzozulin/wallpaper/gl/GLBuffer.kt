@@ -14,13 +14,13 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
 
     init {
         val handles = IntArray(1)
-        glCall { GLES20.glGenBuffers(1, handles, 0) }
+        glCheck { GLES20.glGenBuffers(1, handles, 0) }
         handle = handles[0]
         check(handle > 0)
     }
 
     init {
-        glCall {
+        glCheck {
             GLES20.glBindBuffer(type, handle)
             GLES20.glBufferData(type, size, buffer, GLES20.GL_STATIC_DRAW)
             GLES20.glBindBuffer(type, 0)
@@ -41,8 +41,8 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
 
 
     override fun bind(action: () -> Unit) {
-        glCall { GLES20.glBindBuffer(type, handle) }
+        glCheck { GLES20.glBindBuffer(type, handle) }
         action.invoke()
-        glCall { GLES20.glBindBuffer(type, 0) }
+        glCheck { GLES20.glBindBuffer(type, 0) }
     }
 }

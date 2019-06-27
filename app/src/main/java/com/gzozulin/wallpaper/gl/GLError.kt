@@ -10,6 +10,6 @@ fun checkForGLError() {
     }
 }
 
-fun glCall(action: () -> Unit) {
+fun glCheck(action: () -> Unit) {
     action.invoke().also { checkForGLError() }
 }

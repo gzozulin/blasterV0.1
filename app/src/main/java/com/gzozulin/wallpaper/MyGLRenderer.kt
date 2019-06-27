@@ -28,7 +28,7 @@ class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     private val viewMatrix = Matrix4f()
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        glCall { GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f) }
+        glCheck { GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f) }
         program = shaderLib.loadProgram("shaders/simple.vert", "shaders/simple.frag")
         verticesBuffer = GLBuffer(GLES20.GL_ARRAY_BUFFER, triangleVertices)
         indicesBuffer = GLBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, triangleIndices)
@@ -38,7 +38,7 @@ class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        glCall { GLES20.glViewport(0, 0, width, height) }
+        glCheck { GLES20.glViewport(0, 0, width, height) }
         val ratio = width.toFloat() / height.toFloat()
         projectionMatrix.makeFrustum(-ratio, ratio, -1f, 1f, 1f, 5f)
         viewMatrix.makeLookAt(Vector3f(0f, 0f, 2.5f), Vector3f(), Vector3f(0f, 1f, 0f))
@@ -54,12 +54,12 @@ class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        glCall { GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT) }
+        glCheck { GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT) }
         indicesBuffer.bind {
             verticesBuffer.bind {
                 program.bind {
                     program.setUniform(GLUniform.UNIFORM_MVP, calculateMvp())
-                    glCall { GLES20.glDrawElements(GLES20.GL_TRIANGLES, triangleIndices.size, GLES20.GL_UNSIGNED_INT, 0) }
+                    glCheck { GLES20.glDrawElements(GLES20.GL_TRIANGLES, triangleIndices.size, GLES20.GL_UNSIGNED_INT, 0) }
                 }
             }
         }

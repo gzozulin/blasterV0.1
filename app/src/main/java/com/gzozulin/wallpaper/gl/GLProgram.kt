@@ -22,7 +22,7 @@ class GLShader(val type: GLShaderType, source: String) {
     val handle = GLES20.glCreateShader(type.type).also { checkForGLError() }
 
     init {
-        glCall {
+        glCheck {
             GLES20.glShaderSource(handle, source)
             GLES20.glCompileShader(handle)
         }
@@ -34,7 +34,7 @@ class GLShader(val type: GLShaderType, source: String) {
     }
 
     fun delete() {
-        glCall { GLES20.glDeleteShader(handle) }
+        glCheck { GLES20.glDeleteShader(handle) }
     }
 }
 
@@ -49,7 +49,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     init {
         check(vertexShader.type == GLShaderType.VERTEX_SHADER)
         check(fragmentShader.type == GLShaderType.FRAGMENT_SHADER)
-        glCall {
+        glCheck {
             GLES20.glAttachShader(handle, vertexShader.handle)
             GLES20.glAttachShader(handle, fragmentShader.handle)
             GLES20.glLinkProgram(handle)
@@ -95,26 +95,26 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun delete() {
-        glCall { GLES20.glDeleteProgram(handle) }
+        glCheck { GLES20.glDeleteProgram(handle) }
         vertexShader.delete()
         fragmentShader.delete()
     }
 
     override fun bind(action: () -> Unit) {
-        glCall { GLES20.glUseProgram(handle) }
+        glCheck { GLES20.glUseProgram(handle) }
         action.invoke()
-        glCall { GLES20.glUseProgram(0) }
+        glCheck { GLES20.glUseProgram(0) }
     }
 
     fun setUniform(uniform: GLUniform, value: Float) {
-        glCall { GLES20.glUniform1f(uniformLocations[uniform]!!, value) }
+        glCheck { GLES20.glUniform1f(uniformLocations[uniform]!!, value) }
     }
 
     fun setUniform(uniform: GLUniform, value: Vector3f) {
-        glCall { GLES20.glUniform3fv(uniformLocations[uniform]!!, 1, value.values, 0) }
+        glCheck { GLES20.glUniform3fv(uniformLocations[uniform]!!, 1, value.values, 0) }
     }
 
     fun setUniform(uniform: GLUniform, value: Matrix4f) {
-        glCall { GLES20.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, value.values, 0) }
+        glCheck { GLES20.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, value.values, 0) }
     }
 }
