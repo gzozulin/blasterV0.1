@@ -39,7 +39,7 @@ class GLShader(val type: GLShaderType, source: String) {
 }
 
 
-// todo we can check if the program is bound before sending uniforms
+// todo we can check if the program is bound before sending uniforms, etc
 class GLProgram(private val vertexShader: GLShader, private val fragmentShader: GLShader) : GLBindable {
     private val handle =  GLES20.glCreateProgram().also { checkForGLError() }
 
