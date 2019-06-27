@@ -7,7 +7,7 @@ import com.gzozulin.wallpaper.gl.*
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
+class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     private var shaderLib = ShaderLib(ctx)
 
     private lateinit var program: GLProgram
@@ -44,7 +44,7 @@ class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
         viewMatrix.makeLookAt(Vector3f(0f, 0f, 2.5f), Vector3f(), Vector3f(0f, 1f, 0f))
     }
 
-    var last = System.currentTimeMillis()
+    private var last = System.currentTimeMillis()
     private fun calculateMvp(): Matrix4f {
         val current = System.currentTimeMillis()
         val elapsed = current - last
