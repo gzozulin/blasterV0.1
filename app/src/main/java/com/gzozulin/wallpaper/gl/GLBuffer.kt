@@ -5,7 +5,7 @@ import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class GLBuffer(private val type: Int, buffer: Buffer, size: Int) {
+class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
     private val handle: Int
 
     init {
@@ -14,14 +14,17 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) {
 
     init {
         val handles = IntArray(1)
-        GLES20.glGenBuffers(1, handles, 0).also { checkForGLError() }
+        glCall { GLES20.glGenBuffers(1, handles, 0) }
         handle = handles[0]
         check(handle > 0)
     }
 
     init {
-        GLES20.glBindBuffer(type, handle).also { checkForGLError() }
-        GLES20.glBufferData(type, size, buffer, GLES20.GL_STATIC_DRAW).also { checkForGLError() }
+        glCall {
+            GLES20.glBindBuffer(type, handle)
+            GLES20.glBufferData(type, size, buffer, GLES20.GL_STATIC_DRAW)
+            GLES20.glBindBuffer(type, 0)
+        }
     }
 
     constructor(type: Int, floats: FloatArray) : this(type, ByteBuffer.allocateDirect(floats.size * 4)
@@ -37,11 +40,9 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) {
             .position(0), ints.size * 4)
 
 
-    fun bind() {
-        GLES20.glBindBuffer(type, handle).also { checkForGLError() }
-    }
-
-    fun unbind() {
-        GLES20.glBindBuffer(type, 0).also { checkForGLError() }
+    override fun bind(action: () -> Unit) {
+        glCall { GLES20.glBindBuffer(type, handle) }
+        action.invoke()
+        glCall { GLES20.glBindBuffer(type, 0) }
     }
 }

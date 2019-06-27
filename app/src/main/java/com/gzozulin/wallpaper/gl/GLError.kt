@@ -9,3 +9,7 @@ fun checkForGLError() {
         "We have a GL error: ${GLU.gluErrorString(errorCode)}"
     }
 }
+
+fun glCall(action: () -> Unit) {
+    action.invoke().also { checkForGLError() }
+}

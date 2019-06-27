@@ -22,8 +22,10 @@ class GLShader(val type: GLShaderType, source: String) {
     val handle = GLES20.glCreateShader(type.type).also { checkForGLError() }
 
     init {
-        GLES20.glShaderSource(handle, source).also { checkForGLError() }
-        GLES20.glCompileShader(handle).also { checkForGLError() }
+        glCall {
+            GLES20.glShaderSource(handle, source)
+            GLES20.glCompileShader(handle)
+        }
         val isCompiled = IntArray(1)
         GLES20.glGetShaderiv(handle, GLES20.GL_COMPILE_STATUS, isCompiled, 0)
         if (isCompiled[0] == GLES20.GL_FALSE) {
@@ -32,11 +34,13 @@ class GLShader(val type: GLShaderType, source: String) {
     }
 
     fun delete() {
-        GLES20.glDeleteShader(handle).also { checkForGLError() }
+        glCall { GLES20.glDeleteShader(handle) }
     }
 }
 
-class GLProgram(private val vertexShader: GLShader, private val fragmentShader: GLShader) {
+
+// todo we can check if the program is bound before sending uniforms
+class GLProgram(private val vertexShader: GLShader, private val fragmentShader: GLShader) : GLBindable {
     private val handle =  GLES20.glCreateProgram().also { checkForGLError() }
 
     private val attribLocations = HashMap<GLAttribute, Int>()
@@ -45,9 +49,11 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     init {
         check(vertexShader.type == GLShaderType.VERTEX_SHADER)
         check(fragmentShader.type == GLShaderType.FRAGMENT_SHADER)
-        GLES20.glAttachShader(handle, vertexShader.handle).also { checkForGLError() }
-        GLES20.glAttachShader(handle, fragmentShader.handle).also { checkForGLError() }
-        GLES20.glLinkProgram(handle).also { checkForGLError() }
+        glCall {
+            GLES20.glAttachShader(handle, vertexShader.handle)
+            GLES20.glAttachShader(handle, fragmentShader.handle)
+            GLES20.glLinkProgram(handle)
+        }
         val isLinked = IntArray(1)
         GLES20.glGetProgramiv(handle, GLES20.GL_LINK_STATUS, isLinked, 0)
         if (isLinked[0] == GLES20.GL_FALSE) {
@@ -89,28 +95,26 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun delete() {
-        GLES20.glDeleteProgram(handle).also { checkForGLError() }
+        glCall { GLES20.glDeleteProgram(handle) }
         vertexShader.delete()
         fragmentShader.delete()
     }
 
-    fun bind() {
-        GLES20.glUseProgram(handle).also { checkForGLError() }
-    }
-
-    fun unbind() {
-        GLES20.glUseProgram(0).also { checkForGLError() }
+    override fun bind(action: () -> Unit) {
+        glCall { GLES20.glUseProgram(handle) }
+        action.invoke()
+        glCall { GLES20.glUseProgram(0) }
     }
 
     fun setUniform(uniform: GLUniform, value: Float) {
-        GLES20.glUniform1f(uniformLocations[uniform]!!, value).also { checkForGLError() }
+        glCall { GLES20.glUniform1f(uniformLocations[uniform]!!, value) }
     }
 
     fun setUniform(uniform: GLUniform, value: Vector3f) {
-        GLES20.glUniform3fv(uniformLocations[uniform]!!, 1, value.values, 0).also { checkForGLError() }
+        glCall { GLES20.glUniform3fv(uniformLocations[uniform]!!, 1, value.values, 0) }
     }
 
     fun setUniform(uniform: GLUniform, value: Matrix4f) {
-        GLES20.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, value.values, 0).also { checkForGLError() }
+        glCall { GLES20.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, value.values, 0) }
     }
 }
