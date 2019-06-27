@@ -39,10 +39,11 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
             .put(ints)
             .position(0), ints.size * 4)
 
-
-    override fun bind(action: () -> Unit) {
+    override fun bind() {
         glCheck { GLES20.glBindBuffer(type, handle) }
-        action.invoke()
+    }
+
+    override fun unbind() {
         glCheck { GLES20.glBindBuffer(type, 0) }
     }
 }

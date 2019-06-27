@@ -19,7 +19,7 @@ enum class GLUniform(val label: String) {
 }
 
 class GLShader(val type: GLShaderType, source: String) {
-    val handle = GLES20.glCreateShader(type.type).also { checkForGLError() }
+    val handle = glCheck { GLES20.glCreateShader(type.type) }
 
     init {
         glCheck {
@@ -41,7 +41,7 @@ class GLShader(val type: GLShaderType, source: String) {
 
 // todo we can check if the program is bound before sending uniforms
 class GLProgram(private val vertexShader: GLShader, private val fragmentShader: GLShader) : GLBindable {
-    private val handle =  GLES20.glCreateProgram().also { checkForGLError() }
+    private val handle = glCheck { GLES20.glCreateProgram() }
 
     private val attribLocations = HashMap<GLAttribute, Int>()
     private val uniformLocations = HashMap<GLUniform, Int>()
@@ -65,7 +65,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
 
     private fun cacheAttributes() {
         GLAttribute.values().forEach {
-            val location = GLES20.glGetAttribLocation(handle, it.label).also { checkForGLError() }
+            val location = glCheck { GLES20.glGetAttribLocation(handle, it.label) }
             if (location != -1) {
                 attribLocations[it] = location
             }
@@ -74,7 +74,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
 
     private fun cacheUniforms() {
         GLUniform.values().forEach {
-            val location = GLES20.glGetUniformLocation(handle, it.label).also { checkForGLError() }
+            val location = glCheck { GLES20.glGetUniformLocation(handle, it.label) }
             if (location != -1) {
                 uniformLocations[it] = location
             }
@@ -87,8 +87,10 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         var offset = 0
         attributes.forEach { stride += it.size * 4 }
         attributes.forEach {
-            GLES20.glEnableVertexAttribArray(index).also { checkForGLError() }
-            GLES20.glVertexAttribPointer(attribLocations[it]!!, 3, GLES20.GL_FLOAT, false, stride, offset).also { checkForGLError() }
+            glCheck {
+                GLES20.glEnableVertexAttribArray(index)
+                GLES20.glVertexAttribPointer(attribLocations[it]!!, 3, GLES20.GL_FLOAT, false, stride, offset)
+            }
             index++
             offset += it.size * 4
         }
@@ -100,9 +102,11 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         fragmentShader.delete()
     }
 
-    override fun bind(action: () -> Unit) {
+    override fun bind() {
         glCheck { GLES20.glUseProgram(handle) }
-        action.invoke()
+    }
+
+    override fun unbind() {
         glCheck { GLES20.glUseProgram(0) }
     }
 

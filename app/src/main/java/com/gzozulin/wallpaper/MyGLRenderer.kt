@@ -32,7 +32,7 @@ class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
         program = shaderLib.loadProgram("shaders/simple.vert", "shaders/simple.frag")
         verticesBuffer = GLBuffer(GLES20.GL_ARRAY_BUFFER, triangleVertices)
         indicesBuffer = GLBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, triangleIndices)
-        verticesBuffer.bind {
+        glBind(verticesBuffer) {
             program.setAttributes(bufferAttributes)
         }
     }
@@ -55,13 +55,9 @@ class MyGLRenderer(ctx: Context) : GLSurfaceView.Renderer  {
 
     override fun onDrawFrame(gl: GL10?) {
         glCheck { GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT) }
-        indicesBuffer.bind {
-            verticesBuffer.bind {
-                program.bind {
-                    program.setUniform(GLUniform.UNIFORM_MVP, calculateMvp())
-                    glCheck { GLES20.glDrawElements(GLES20.GL_TRIANGLES, triangleIndices.size, GLES20.GL_UNSIGNED_INT, 0) }
-                }
-            }
+        glBind(listOf(verticesBuffer, indicesBuffer, program)) {
+            program.setUniform(GLUniform.UNIFORM_MVP, calculateMvp())
+            glCheck { GLES20.glDrawElements(GLES20.GL_TRIANGLES, triangleIndices.size, GLES20.GL_UNSIGNED_INT, 0) }
         }
     }
 }
