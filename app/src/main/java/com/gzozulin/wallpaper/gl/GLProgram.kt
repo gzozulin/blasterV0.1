@@ -9,13 +9,17 @@ enum class GLShaderType(val type: Int) {
 }
 
 enum class GLAttribute(val label: String, val size: Int) {
-    ATTRIBUTE_POSITION("aPosition", 3),
-    ATTRIBUTE_COLOR("aColor", 3),
+    ATTRIBUTE_POSITION(     "aPosition", 3),
+    ATTRIBUTE_COLOR(        "aColor", 3),
+    ATTRIBUTE_TEXCOORD(     "aTexcoord", 2),
 }
 
 enum class GLUniform(val label: String) {
-    UNIFORM_MVP("uMvp"),
-    UNIFORM_COLOR("uColor")
+    UNIFORM_MVP(            "uMvp"),
+    UNIFORM_COLOR(          "uColor"),
+    UNIFORM_MODEL(          "uModel"),
+    UNIFORM_PROJECTION(     "uProjection"),
+    UNIFORM_VIEW(           "uView")
 }
 
 class GLShader(val type: GLShaderType, source: String) {
@@ -108,6 +112,10 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
 
     override fun unbind() {
         glCheck { GLES30.glUseProgram(0) }
+    }
+
+    fun setUniform(uniform: GLUniform, value: Int) {
+        glCheck { GLES30.glUniform1i(uniformLocations[uniform]!!, value) }
     }
 
     fun setUniform(uniform: GLUniform, value: Float) {

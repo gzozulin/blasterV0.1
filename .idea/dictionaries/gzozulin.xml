@@ -2,6 +2,7 @@
   <dictionary name="gzozulin">
     <words>
       <w>shaders</w>
+      <w>texcoord</w>
       <w>vert</w>
     </words>
   </dictionary>

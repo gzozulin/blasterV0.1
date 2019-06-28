@@ -4,6 +4,7 @@ import android.opengl.GLES30
 import java.nio.Buffer
 
 class GLTexture(
+        private val active: Int = GLES30.GL_TEXTURE0,
         val target: Int = GLES30.GL_TEXTURE_2D,
         internalFormat: Int = GLES30.GL_RGBA,
         private val minFilter: Int = GLES30.GL_NEAREST,
@@ -34,10 +35,16 @@ class GLTexture(
     }
 
     override fun bind() {
-        glCheck { GLES30.glBindTexture(target, handle) }
+        glCheck {
+            GLES30.glActiveTexture(active)
+            GLES30.glBindTexture(target, handle)
+        }
     }
 
     override fun unbind() {
-        glCheck { GLES30.glBindTexture(target, 0) }
+        glCheck {
+            GLES30.glActiveTexture(active)
+            GLES30.glBindTexture(target, 0)
+        }
     }
 }

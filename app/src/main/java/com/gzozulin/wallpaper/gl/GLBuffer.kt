@@ -8,6 +8,7 @@ import java.nio.ByteOrder
 class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
     private val handle: Int
 
+    // todo make two different constructors for indices/vertices
     init {
         check(type == GLES30.GL_ARRAY_BUFFER || type == GLES30.GL_ELEMENT_ARRAY_BUFFER)
     }
