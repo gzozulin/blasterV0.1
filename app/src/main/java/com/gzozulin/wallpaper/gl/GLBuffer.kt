@@ -1,6 +1,6 @@
 package com.gzozulin.wallpaper.gl
 
-import android.opengl.GLES20
+import android.opengl.GLES30
 import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -9,21 +9,21 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
     private val handle: Int
 
     init {
-        check(type == GLES20.GL_ARRAY_BUFFER || type == GLES20.GL_ELEMENT_ARRAY_BUFFER)
+        check(type == GLES30.GL_ARRAY_BUFFER || type == GLES30.GL_ELEMENT_ARRAY_BUFFER)
     }
 
     init {
         val handles = IntArray(1)
-        glCheck { GLES20.glGenBuffers(1, handles, 0) }
+        glCheck { GLES30.glGenBuffers(1, handles, 0) }
         handle = handles[0]
         check(handle > 0)
     }
 
     init {
         glCheck {
-            GLES20.glBindBuffer(type, handle)
-            GLES20.glBufferData(type, size, buffer, GLES20.GL_STATIC_DRAW)
-            GLES20.glBindBuffer(type, 0)
+            GLES30.glBindBuffer(type, handle)
+            GLES30.glBufferData(type, size, buffer, GLES30.GL_STATIC_DRAW)
+            GLES30.glBindBuffer(type, 0)
         }
     }
 
@@ -40,10 +40,10 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
             .position(0), ints.size * 4)
 
     override fun bind() {
-        glCheck { GLES20.glBindBuffer(type, handle) }
+        glCheck { GLES30.glBindBuffer(type, handle) }
     }
 
     override fun unbind() {
-        glCheck { GLES20.glBindBuffer(type, 0) }
+        glCheck { GLES30.glBindBuffer(type, 0) }
     }
 }

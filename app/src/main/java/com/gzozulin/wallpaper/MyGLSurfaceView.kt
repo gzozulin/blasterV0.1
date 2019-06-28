@@ -7,6 +7,8 @@ import android.util.AttributeSet
 class MyGLSurfaceView(context: Context?, attrs: AttributeSet?) : GLSurfaceView(context, attrs) {
     init {
         setEGLContextClientVersion(2)
-        setRenderer(DeferredRenderer(context!!))
+        val renderer = SimpleRenderer(context!!)
+        //val renderer = DeferredRenderer(context!!)
+        setRenderer(renderer)
     }
 }
