@@ -3,8 +3,7 @@ package com.gzozulin.wallpaper.gl
 import android.opengl.GLES30
 
 class GLRenderBuffer(
-        private val target: Int = GLES30.GL_RENDERBUFFER,
-        private val component: Int = GLES30.GL_DEPTH_COMPONENT,
+        private val component: Int = GLES30.GL_DEPTH_COMPONENT24,
         private val width: Int, private val height: Int) : GLBindable {
 
     val handle: Int
@@ -15,19 +14,18 @@ class GLRenderBuffer(
         handle = handles[0]
         check(handle > 0)
     }
+
     init {
-        glCheck {
-            GLES30.glBindRenderbuffer(target, handle)
-            GLES30.glRenderbufferStorage(target, component, width, height)
-            GLES30.glBindRenderbuffer(target, 0)
-        }
+        glCheck { GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, handle) }
+        glCheck { GLES30.glRenderbufferStorage(GLES30.GL_RENDERBUFFER, component, width, height) }
+        glCheck { GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, 0) }
     }
 
     override fun bind() {
-        glCheck { GLES30.glBindRenderbuffer(target, handle) }
+        glCheck { GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, handle) }
     }
 
     override fun unbind() {
-        glCheck { GLES30.glBindRenderbuffer(target, 0) }
+        glCheck { GLES30.glBindRenderbuffer(GLES30.GL_RENDERBUFFER, 0) }
     }
 }

@@ -11,7 +11,7 @@ enum class GLShaderType(val type: Int) {
 enum class GLAttribute(val label: String, val size: Int) {
     ATTRIBUTE_POSITION(     "aPosition", 3),
     ATTRIBUTE_COLOR(        "aColor", 3),
-    ATTRIBUTE_TEXCOORD(     "aTexcoord", 2),
+    ATTRIBUTE_TEXCOORDS(    "aTexCoords", 2),
 }
 
 enum class GLUniform(val label: String) {
@@ -33,7 +33,14 @@ class GLShader(val type: GLShaderType, source: String) {
         val isCompiled = IntArray(1)
         GLES30.glGetShaderiv(handle, GLES30.GL_COMPILE_STATUS, isCompiled, 0)
         if (isCompiled[0] == GLES30.GL_FALSE) {
-            throw IllegalStateException(GLES30.glGetShaderInfoLog(handle))
+            var index = 1
+            val sb = StringBuffer()
+            source.lines().forEach {
+                sb.append("$index $it\n")
+                index++
+            }
+            val reason = "Failed to compile shader:\n\n$sb\n\nWith reason:\n\n${GLES30.glGetShaderInfoLog(handle)}"
+            throw IllegalStateException(reason)
         }
     }
 

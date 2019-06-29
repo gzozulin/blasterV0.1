@@ -21,7 +21,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var triVerticesBuffer: GLBuffer
     private lateinit var triIndicesBuffer: GLBuffer
 
-    private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
+    private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORDS)
     private val quadVertices = floatArrayOf(
             -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
             -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -48,6 +48,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var projectionMatrix: Matrix4f
     private val modelMatrix = Matrix4f()
 
+    private val lightConstant = 1.0f
     private val lightLinear = 1.8f
     private val lightQuadratic = 1.8f
 
@@ -63,6 +64,9 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+        val ratio = width.toFloat() / height.toFloat()
+        projectionMatrix.makeFrustum(-ratio, ratio, -1f, 1f, 1f, 5f)
+        viewMatrix.makeLookAt(Vector3f(0f, 0f, 2.5f), Vector3f(), Vector3f(0f, 1f, 0f))
         glCheck { GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f) }
         texPosition = GLTexture(
                 active = GLES30.GL_TEXTURE0,
@@ -81,16 +85,13 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT0, texPosition)
             framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT1, texNormal)
             framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT2, texAlbedoSpec)
+            glCheck {
+                val attachments = intArrayOf(GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_COLOR_ATTACHMENT1, GLES30.GL_COLOR_ATTACHMENT2)
+                GLES30.glDrawBuffers(attachments.size, attachments, 0)
+            }
             framebuffer.setRenderBuffer(GLES30.GL_DEPTH_ATTACHMENT, depthBuffer)
             framebuffer.checkIsComplete()
         }
-        glCheck {
-            val attachments = intArrayOf(GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_COLOR_ATTACHMENT1, GLES30.GL_COLOR_ATTACHMENT2)
-            GLES30.glDrawBuffers(attachments.size, attachments, 0)
-        }
-        val ratio = width.toFloat() / height.toFloat()
-        projectionMatrix.makeFrustum(-ratio, ratio, -1f, 1f, 1f, 5f)
-        viewMatrix.makeLookAt(Vector3f(0f, 0f, 2.5f), Vector3f(), Vector3f(0f, 1f, 0f))
     }
 
     override fun onDrawFrame(gl: GL10?) {
