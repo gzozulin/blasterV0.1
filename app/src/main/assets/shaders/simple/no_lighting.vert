@@ -1,16 +1,15 @@
-#version 100
+#version 300 es
 
-#define IN attribute
-#define OUT varying
+precision mediump float;
 
-IN vec3 aPosition;
-IN vec3 aColor;
+layout (location = 0) in vec3 aPosition;
+layout (location = 2) in vec2 aTexCoord;
 
-OUT vec3 vColor;
+uniform mat4 uMvpM;
 
-uniform mat4 uMvp;
+out vec2 vTexCoord;
 
 void main() {
-    gl_Position = uMvp * vec4(aPosition, 1.0);
-    vColor = aColor;
+    vTexCoord = aTexCoord;
+    gl_Position = uMvpM * vec4(aPosition, 1.0);
 }

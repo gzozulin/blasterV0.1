@@ -1,11 +1,13 @@
-#version 100
-
-#define IN varying
+#version 300 es
 
 precision mediump float;
 
-IN vec3 vColor;
+in vec2 vTexCoord;
+
+uniform sampler2D uTexture0;
+
+out vec4 oFragColor;
 
 void main() {
-    gl_FragColor = vec4(vColor, 1.0);
+    oFragColor = texture(uTexture0, vTexCoord);
 }

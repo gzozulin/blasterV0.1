@@ -11,9 +11,9 @@ class GLTexture(
         private val magFilter: Int = GLES30.GL_NEAREST,
         private val width: Int,
         private val height: Int,
-        pixels: Buffer? = null,
-        pixelFormat: Int = GLES30.GL_RGB,
-        pixelType: Int = GLES30.GL_FLOAT) : GLBindable {
+        pixelFormat: Int = GLES30.GL_RGBA,
+        pixelType: Int = GLES30.GL_UNSIGNED_BYTE,
+        pixels: Buffer? = null) : GLBindable {
 
     val handle: Int
 
@@ -25,13 +25,11 @@ class GLTexture(
     }
 
     init {
-        glCheck {
-            GLES30.glBindTexture(target, handle)
-            GLES30.glTexImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, pixels)
-            GLES30.glTexParameteri(target, GLES30.GL_TEXTURE_MIN_FILTER, minFilter)
-            GLES30.glTexParameteri(target, GLES30.GL_TEXTURE_MAG_FILTER, magFilter)
-            GLES30.glBindTexture(target, 0)
-        }
+        glCheck {GLES30.glBindTexture(target, handle) }
+        glCheck {GLES30.glTexImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, pixels) }
+        glCheck {GLES30.glTexParameteri(target, GLES30.GL_TEXTURE_MIN_FILTER, minFilter) }
+        glCheck {GLES30.glTexParameteri(target, GLES30.GL_TEXTURE_MAG_FILTER, magFilter) }
+        glCheck {GLES30.glBindTexture(target, 0) }
     }
 
     override fun bind() {

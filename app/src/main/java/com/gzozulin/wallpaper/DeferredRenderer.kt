@@ -21,7 +21,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var triVerticesBuffer: GLBuffer
     private lateinit var triIndicesBuffer: GLBuffer
 
-    private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORDS)
+    private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val quadVertices = floatArrayOf(
             -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
             -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,

@@ -4,24 +4,29 @@ import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import com.gzozulin.wallpaper.gl.*
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
-    private var shaderLib = ShaderLib(ctx)
+    private val shaderLib = ShaderLib(ctx)
+    private val textureLib = TextureLib(ctx)
 
     private lateinit var program: GLProgram
 
-    private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_COLOR)
+    private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val triangleVertices = floatArrayOf(
-             0f,  1f, 0f,     1f, 0f, 0f,
-            -1f, -1f, 0f,     0f, 1f, 0f,
-             1f, -1f, 0f,     0f, 0f, 1f
+             0f,  1f, 0f,     0.5f, 0f,
+            -1f, -1f, 0f,     0f,   1f,
+             1f, -1f, 0f,     1f,   1f
     )
     private val triangleIndices = intArrayOf(0, 1, 2)
 
     private lateinit var verticesBuffer: GLBuffer
     private lateinit var indicesBuffer: GLBuffer
+
+    private lateinit var texture: GLTexture
 
     private val modelMatrix = Matrix4f()
     private val projectionMatrix = Matrix4f()
@@ -35,6 +40,13 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
         glBind(verticesBuffer) {
             program.setAttributes(triangleAttributes)
         }
+        //texture = textureLib.loadTexture("textures/winner.png")
+        val buffer = ByteBuffer.allocateDirect(4 * 4).order(ByteOrder.nativeOrder()).put(byteArrayOf(
+                1, 0, 0, 1,
+                0, 1, 0, 1,
+                0, 0, 1, 1
+        )).position(0)
+        texture = GLTexture(width = 2, height = 2, pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE, pixels = buffer)
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -55,7 +67,8 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
 
     override fun onDrawFrame(gl: GL10?) {
         glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT) }
-        glBind(listOf(verticesBuffer, indicesBuffer, program)) {
+        glBind(listOf(verticesBuffer, indicesBuffer, program, texture)) {
+            program.setTexture(GLUniform.UNIFORM_TEXTURE0, texture)
             program.setUniform(GLUniform.UNIFORM_MVP, calculateMvp())
             glCheck { GLES30.glDrawElements(GLES30.GL_TRIANGLES, triangleIndices.size, GLES30.GL_UNSIGNED_INT, 0) }
         }

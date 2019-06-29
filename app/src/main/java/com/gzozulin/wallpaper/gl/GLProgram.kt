@@ -8,18 +8,20 @@ enum class GLShaderType(val type: Int) {
     FRAGMENT_SHADER(GLES30.GL_FRAGMENT_SHADER)
 }
 
-enum class GLAttribute(val label: String, val size: Int) {
-    ATTRIBUTE_POSITION(     "aPosition", 3),
-    ATTRIBUTE_COLOR(        "aColor", 3),
-    ATTRIBUTE_TEXCOORDS(    "aTexCoords", 2),
+enum class GLAttribute(val label: String, val size: Int, val location: Int) {
+    ATTRIBUTE_POSITION(     "aPosition",    3, 0),
+    ATTRIBUTE_NORMAL(       "aNormal",      3, 1),
+    ATTRIBUTE_TEXCOORD(     "aTexCoord",    2, 2),
+    ATTRIBUTE_COLOR(        "aColor",       3, 3),
 }
 
 enum class GLUniform(val label: String) {
-    UNIFORM_MVP(            "uMvp"),
+    UNIFORM_MVP(            "uMvpM"),
     UNIFORM_COLOR(          "uColor"),
-    UNIFORM_MODEL(          "uModel"),
-    UNIFORM_PROJECTION(     "uProjection"),
-    UNIFORM_VIEW(           "uView")
+    UNIFORM_MODEL(          "uModelM"),
+    UNIFORM_PROJECTION(     "uProjectionM"),
+    UNIFORM_VIEW(           "uViewM"),
+    UNIFORM_TEXTURE0(       "uTexture0")
 }
 
 class GLShader(val type: GLShaderType, source: String) {
@@ -49,12 +51,11 @@ class GLShader(val type: GLShaderType, source: String) {
     }
 }
 
-// todo look for better ways to map attributes in shader (GLES > 3)
+// todo use explicit locations for uniforms
 // todo we can check if the program is bound before sending uniforms
 class GLProgram(private val vertexShader: GLShader, private val fragmentShader: GLShader) : GLBindable {
     private val handle = glCheck { GLES30.glCreateProgram() }
 
-    private val attribLocations = HashMap<GLAttribute, Int>()
     private val uniformLocations = HashMap<GLUniform, Int>()
 
     init {
@@ -70,17 +71,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         if (isLinked[0] == GLES30.GL_FALSE) {
             throw IllegalStateException(GLES30.glGetProgramInfoLog(handle))
         }
-        cacheAttributes()
         cacheUniforms()
-    }
-
-    private fun cacheAttributes() {
-        GLAttribute.values().forEach {
-            val location = glCheck { GLES30.glGetAttribLocation(handle, it.label) }
-            if (location != -1) {
-                attribLocations[it] = location
-            }
-        }
     }
 
     private fun cacheUniforms() {
@@ -93,16 +84,14 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun setAttributes(attributes: List<GLAttribute>) {
-        var index = 0
         var stride = 0
         var offset = 0
         attributes.forEach { stride += it.size * 4 }
         attributes.forEach {
             glCheck {
-                GLES30.glEnableVertexAttribArray(index)
-                GLES30.glVertexAttribPointer(attribLocations[it]!!, 3, GLES30.GL_FLOAT, false, stride, offset)
+                GLES30.glEnableVertexAttribArray(it.location)
+                GLES30.glVertexAttribPointer(it.location, it.size, GLES30.GL_FLOAT, false, stride, offset)
             }
-            index++
             offset += it.size * 4
         }
     }
@@ -119,6 +108,10 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
 
     override fun unbind() {
         glCheck { GLES30.glUseProgram(0) }
+    }
+
+    fun setTexture(uniform: GLUniform, texture: GLTexture) {
+        setUniform(uniform, texture.handle)
     }
 
     fun setUniform(uniform: GLUniform, value: Int) {
