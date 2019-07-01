@@ -10,18 +10,16 @@ enum class GLShaderType(val type: Int) {
 
 enum class GLAttribute(val label: String, val size: Int, val location: Int) {
     ATTRIBUTE_POSITION(     "aPosition",    3, 0),
-    ATTRIBUTE_NORMAL(       "aNormal",      3, 1),
-    ATTRIBUTE_TEXCOORD(     "aTexCoord",    2, 2),
+    ATTRIBUTE_TEXCOORD(     "aTexCoord",    2, 1),
+    ATTRIBUTE_NORMAL(       "aNormal",      3, 2),
     ATTRIBUTE_COLOR(        "aColor",       3, 3),
 }
 
 enum class GLUniform(val label: String) {
-    UNIFORM_MVP(            "uMvpM"),
-    UNIFORM_COLOR(          "uColor"),
-    UNIFORM_MODEL(          "uModelM"),
-    UNIFORM_PROJECTION(     "uProjectionM"),
-    UNIFORM_VIEW(           "uViewM"),
-    UNIFORM_TEXTURE0(       "uTexture0")
+    UNIFORM_MODEL(              "uModelM"),
+    UNIFORM_PROJECTION(         "uProjectionM"),
+    UNIFORM_VIEW(               "uViewM"),
+    UNIFORM_TEXTURE_DIFFUSE(    "uTextureDiffuse")
 }
 
 class GLShader(val type: GLShaderType, source: String) {
@@ -83,19 +81,6 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         }
     }
 
-    fun setAttributes(attributes: List<GLAttribute>) {
-        var stride = 0
-        var offset = 0
-        attributes.forEach { stride += it.size * 4 }
-        attributes.forEach {
-            glCheck {
-                GLES30.glEnableVertexAttribArray(it.location)
-                GLES30.glVertexAttribPointer(it.location, it.size, GLES30.GL_FLOAT, false, stride, offset)
-            }
-            offset += it.size * 4
-        }
-    }
-
     fun delete() {
         glCheck { GLES30.glDeleteProgram(handle) }
         vertexShader.delete()
@@ -111,7 +96,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun setTexture(uniform: GLUniform, texture: GLTexture) {
-        setUniform(uniform, texture.handle)
+        setUniform(uniform, texture.unit)
     }
 
     fun setUniform(uniform: GLUniform, value: Int) {

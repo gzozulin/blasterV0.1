@@ -65,20 +65,20 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         val ratio = width.toFloat() / height.toFloat()
-        projectionMatrix.makeFrustum(-ratio, ratio, -1f, 1f, 1f, 5f)
-        viewMatrix.makeLookAt(Vector3f(0f, 0f, 2.5f), Vector3f(), Vector3f(0f, 1f, 0f))
+        projectionMatrix.frustumInplace(-ratio, ratio, -1f, 1f, 1f, 5f)
+        viewMatrix.lookAtInplace(Vector3f(0f, 0f, 2.5f), Vector3f(), Vector3f(0f, 1f, 0f))
         glCheck { GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f) }
         texPosition = GLTexture(
-                active = GLES30.GL_TEXTURE0,
-                internalFormat = GLES30.GL_RGB16F, width = width, height = height,
+                unit = GLES30.GL_TEXTURE0,
+                width = width, height = height, internalFormat = GLES30.GL_RGB16F,
                 pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
         texNormal = GLTexture(
-                active = GLES30.GL_TEXTURE1,
-                internalFormat = GLES30.GL_RGB16F, width = width, height = height,
+                unit = GLES30.GL_TEXTURE1,
+                width = width, height = height, internalFormat = GLES30.GL_RGB16F,
                 pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
         texAlbedoSpec = GLTexture(
-                active = GLES30.GL_TEXTURE2,
-                internalFormat = GLES30.GL_RGBA, width = width, height = height,
+                unit = GLES30.GL_TEXTURE2,
+                width = width, height = height, internalFormat = GLES30.GL_RGBA,
                 pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE)
         depthBuffer = GLRenderBuffer(width = width, height = height)
         glBind(framebuffer) {
@@ -104,7 +104,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
                 programGeomPass.setUniform(GLUniform.UNIFORM_VIEW, viewMatrix)
                 programGeomPass.setUniform(GLUniform.UNIFORM_MODEL, modelMatrix)
                 glBind(listOf(triVerticesBuffer, triIndicesBuffer)) {
-                    programGeomPass.setAttributes(triangleAttributes)
+                    //programGeomPass.setAttributes(triangleAttributes)
                     glCheck { GLES30.glDrawElements(GLES30.GL_TRIANGLES, triangleIndices.size, GLES30.GL_UNSIGNED_INT, 0) }
                 }
             }
@@ -113,7 +113,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
         glBind(listOf(programLightPass, texPosition, texNormal, texAlbedoSpec, quadVerticesBuffer, quadIndicesBuffer)) {
             glCheck {
-                programLightPass.setAttributes(quadAttributes)
+                //programLightPass.setAttributes(quadAttributes)
                 GLES30.glDrawElements(GLES30.GL_TRIANGLES, quadIndices.size, GLES30.GL_UNSIGNED_INT, 0)
             }
         }

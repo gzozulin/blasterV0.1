@@ -2,7 +2,7 @@ package com.gzozulin.wallpaper.gl
 
 import android.opengl.Matrix
 
-data class Matrix4f(val values: FloatArray) {
+class Matrix4f(val values: FloatArray) {
     constructor() : this(floatArrayOf(
             1f, 0f, 0f, 0f,
             0f, 1f, 0f, 0f,
@@ -10,15 +10,11 @@ data class Matrix4f(val values: FloatArray) {
             0f, 0f, 0f, 1f
     ))
 
-    fun makeFrustum(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) {
+    fun frustumInplace(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) {
         Matrix.frustumM(values, 0, left, right, bottom, top, near, far)
     }
 
-    fun makePerspective() {
-        check(false) { "Implement me!" }
-    }
-
-    fun makeLookAt(eye: Vector3f, center: Vector3f, up: Vector3f) {
+    fun lookAtInplace(eye: Vector3f, center: Vector3f, up: Vector3f) {
         Matrix.setLookAtM(values, 0,
                 eye.values[0], eye.values[1], eye.values[2],
                 center.values[0], center.values[1], center.values[2],
@@ -28,6 +24,14 @@ data class Matrix4f(val values: FloatArray) {
 
     fun rotateInplace(radians: Float, axis: Vector3f) {
         Matrix.rotateM(values, 0, radians, axis.values[0], axis.values[1], axis.values[2])
+    }
+
+    fun translateInplace(vector: Vector3f) {
+        Matrix.translateM(values, 0, vector.values[0], vector.values[1], vector.values[2])
+    }
+
+    fun scaleInplace(vector: Vector3f) {
+        Matrix.scaleM(values, 0, vector.values[0], vector.values[1], vector.values[2])
     }
 
     operator fun times(other: Matrix4f): Matrix4f {

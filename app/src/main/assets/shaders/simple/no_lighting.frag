@@ -4,10 +4,13 @@ precision mediump float;
 
 in vec2 vTexCoord;
 
-uniform sampler2D uTexture0;
+uniform sampler2D uTextureDiffuse;
 
-out vec4 oFragColor;
+layout (location = 0) out vec4 oFragColor;
 
 void main() {
-    oFragColor = texture(uTexture0, vTexCoord);
+    oFragColor = texture(uTextureDiffuse, vTexCoord);
+    if (oFragColor.a < 0.1) {
+        discard;
+    }
 }

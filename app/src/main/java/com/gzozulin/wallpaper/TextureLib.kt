@@ -13,12 +13,13 @@ class TextureLib (private val ctx: Context) {
         val options = BitmapFactory.Options()
         options.inPreferredConfig = Bitmap.Config.ARGB_8888
         val decoded = BitmapFactory.decodeStream(ctx.assets.open(filename), null, options)
-        val buffer = ByteBuffer
-                .allocateDirect(decoded!!.byteCount)
-                .order(ByteOrder.nativeOrder())
+        val buffer = ByteBuffer.allocateDirect(decoded!!.byteCount).order(ByteOrder.nativeOrder())
         decoded.copyPixelsToBuffer(buffer)
         buffer.position(0)
-        val tex = GLTexture(width = decoded.width, height = decoded.height, pixelFormat = GLES30.GL_RGBA, pixels = buffer)
+        val tex = GLTexture(
+                width = decoded.width, height = decoded.height,
+                pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE,
+                pixels = buffer)
         decoded.recycle()
         return tex
     }
