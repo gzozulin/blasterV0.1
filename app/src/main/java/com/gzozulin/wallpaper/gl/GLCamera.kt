@@ -17,11 +17,11 @@ class GLNode(private val parent: GLNode? = null) {
     private val modelM = Matrix4f()
 
     fun calculateViewM(): Matrix4f =
-            if (parent == null) { modelM } else { modelM * parent.calculateViewM() }
+            if (parent == null) { modelM } else { parent.calculateViewM() * modelM }
 
     fun once() {
         modelM.translateInplace(Vector3f(x = 1f))
-        modelM.scaleInplace(Vector3f(0.7f))
+        modelM.scaleInplace(Vector3f(0.3f))
     }
 
     fun tick() {
