@@ -7,34 +7,33 @@ import com.gzozulin.wallpaper.assets.ShaderLib
 import com.gzozulin.wallpaper.assets.TextureLib
 import com.gzozulin.wallpaper.gl.*
 import com.gzozulin.wallpaper.math.SceneCamera
-import com.gzozulin.wallpaper.math.Matrix4f
+import com.gzozulin.wallpaper.math.SceneNode
 import com.gzozulin.wallpaper.math.Vector3f
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
+class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val shaderLib = ShaderLib(context)
     private val textureLib = TextureLib(context)
 
-    private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_COLOR)
+    private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD, GLAttribute.ATTRIBUTE_NORMAL)
     private val triangleVertices = floatArrayOf(
-             0f,  1f, 0f,     1f, 0f, 0f,
-            -1f, -1f, 0f,     0f, 1f, 0f,
-             1f, -1f, 0f,     0f, 0f, 1f
+             0f,  1f, 0f,     0.5f, 0f,      0f, 1f, 0f,
+            -1f, -1f, 0f,     0f,   1f,      0f, 1f, 0f,
+             1f, -1f, 0f,     1f,   1f,      0f, 1f, 0f
     )
     private val triangleIndices = intArrayOf(0, 1, 2)
 
-    private lateinit var triangleMesh :GLMesh
-
     private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val quadVertices = floatArrayOf(
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f
+            -1.0f,  1.0f, 0.0f,     0.0f, 0.0f,
+            -1.0f, -1.0f, 0.0f,     0.0f, 1.0f,
+             1.0f,  1.0f, 0.0f,     1.0f, 0.0f,
+             1.0f, -1.0f, 0.0f,     1.0f, 1.0f
     )
-    private val quadIndices = intArrayOf(1, 3, 2, 3, 4, 2)
+    private val quadIndices = intArrayOf(0, 2, 1, 2, 3, 1)
 
+    private lateinit var triangleMesh :GLMesh
     private lateinit var quadMesh: GLMesh
 
     private lateinit var textureDiffuse: GLTexture
@@ -52,8 +51,7 @@ class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private lateinit var camera: SceneCamera
     private val eye = Vector3f(z = 3f)
-
-    private val modelM = Matrix4f()
+    private val node = SceneNode()
 
     private val lightPosition = eye
     private val lightColor = Vector3f(z = 3f)
@@ -63,21 +61,21 @@ class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
         glCheck { GLES30.glClearColor(1f, 1f, 1f, 1.0f) }
         triangleMesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
-        programGeomPass = shaderLib.loadProgram("shaders/deferred_multipass/geom_pass.vert", "shaders/deferred_multipass/geom_pass.frag")
-        programLightPass = shaderLib.loadProgram("shaders/deferred_multipass/light_pass.vert", "shaders/deferred_multipass/light_pass_debug.frag")
         textureDiffuse = textureLib.loadTexture("textures/winner.png")
         textureSpecular = textureLib.loadTexture("textures/winner.png")
+        programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
+        programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass_debug.frag")
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         camera = SceneCamera(width.toFloat() / height.toFloat())
         positionTexture = GLTexture(
                 unit = 0,
-                width = width, height = height, internalFormat = GLES30.GL_RGB,
+                width = width, height = height, internalFormat = GLES30.GL_RGB16F,
                 pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
         normalTexture = GLTexture(
                 unit = 1,
-                width = width, height = height, internalFormat = GLES30.GL_RGB,
+                width = width, height = height, internalFormat = GLES30.GL_RGB16F,
                 pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
         albedoSpecTexture = GLTexture(
                 unit = 2,
@@ -94,7 +92,7 @@ class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
             framebuffer.checkIsComplete()
         }
         glBind(programGeomPass) {
-            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL, modelM)
+            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL, node.calculateViewM())
             programGeomPass.setUniform(GLUniform.UNIFORM_VIEW, camera.viewM)
             programGeomPass.setUniform(GLUniform.UNIFORM_PROJECTION, camera.projectionM)
             programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, textureDiffuse)
@@ -111,12 +109,12 @@ class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        glBind(listOf(framebuffer, programGeomPass, triangleMesh, textureDiffuse, textureSpecular)) {
+        glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
+        glBind(listOf(programGeomPass, triangleMesh, framebuffer, textureDiffuse, textureSpecular)) {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
             triangleMesh.draw()
         }
-        glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
-        glBind(listOf(programLightPass, positionTexture, normalTexture, albedoSpecTexture, quadMesh)) {
+        glBind(listOf(programLightPass, quadMesh, positionTexture, normalTexture, albedoSpecTexture)) {
             quadMesh.draw()
         }
     }

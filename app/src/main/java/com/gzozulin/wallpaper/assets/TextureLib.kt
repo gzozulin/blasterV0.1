@@ -9,7 +9,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 class TextureLib (private val ctx: Context) {
-    fun loadTexture(filename: String): GLTexture {
+    fun loadTexture(filename: String, unit: Int = 0): GLTexture {
         val options = BitmapFactory.Options()
         options.inPreferredConfig = Bitmap.Config.ARGB_8888
         val decoded = BitmapFactory.decodeStream(ctx.assets.open(filename), null, options)
@@ -17,6 +17,7 @@ class TextureLib (private val ctx: Context) {
         decoded.copyPixelsToBuffer(buffer)
         buffer.position(0)
         val tex = GLTexture(
+                unit = unit,
                 width = decoded.width, height = decoded.height,
                 pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE,
                 pixels = buffer)

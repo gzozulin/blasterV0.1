@@ -1,17 +1,15 @@
 #version 300 es
 
-precision highp float;
-
-layout (location = 0) out vec3 oPosition;
-layout (location = 1) out vec3 oNormal;
-layout (location = 2) out vec4 oAlbedoSpec;
-
 in vec2 vTexCoord;
 in vec3 vFragPosition;
 in vec3 vNormal;
 
 uniform sampler2D uTextureDiffuse;
 uniform sampler2D uTextureSpecular;
+
+layout (location = 0) out vec3 oPosition;
+layout (location = 1) out vec3 oNormal;
+layout (location = 2) out vec4 oAlbedoSpec;
 
 void main()
 {
