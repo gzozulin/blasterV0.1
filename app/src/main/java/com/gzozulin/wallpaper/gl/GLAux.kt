@@ -32,9 +32,3 @@ fun glBind(bindables: List<GLBindable>, action: () -> Unit) {
     action.invoke()
     bindables.reversed().forEach { it.unbind() }
 }
-
-fun getMaxFramebufferAttachments(): Int {
-    val result = IntArray(1)
-    GLES30.glGetIntegerv(GLES30.GL_MAX_COLOR_ATTACHMENTS, result, 0)
-    return result[0]
-}

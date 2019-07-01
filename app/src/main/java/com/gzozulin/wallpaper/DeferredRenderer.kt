@@ -55,9 +55,8 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val lightColor = Vector3f(z = 3f)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        Log.i("DeferredRenderer", "Max framebuffer attachements: ${getMaxFramebufferAttachments()}")
         glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
-        glCheck { GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f) }
+        glCheck { GLES30.glClearColor(1f, 1f, 1f, 1.0f) }
         triangleMesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
@@ -70,12 +69,12 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         camera = GLCamera(width.toFloat() / height.toFloat())
         positionTexture = GLTexture(
                 unit = 0,
-                width = width, height = height, internalFormat = GLES30.GL_RGBA,
-                pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE)
+                width = width, height = height, internalFormat = GLES30.GL_RGB,
+                pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
         normalTexture = GLTexture(
                 unit = 1,
-                width = width, height = height, internalFormat = GLES30.GL_RGBA,
-                pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE)
+                width = width, height = height, internalFormat = GLES30.GL_RGB,
+                pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
         albedoSpecTexture = GLTexture(
                 unit = 2,
                 width = width, height = height, internalFormat = GLES30.GL_RGBA,
@@ -108,7 +107,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        glBind(listOf(framebuffer, programGeomPass, triangleMesh)) {
+        glBind(listOf(framebuffer, programGeomPass, triangleMesh, textureDiffuse, textureSpecular)) {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
             triangleMesh.draw()
         }
