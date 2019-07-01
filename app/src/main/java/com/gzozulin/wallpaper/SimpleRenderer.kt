@@ -33,7 +33,7 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     private lateinit var texture: GLTexture
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        //glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
+        glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
         glCheck { GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f) }
         program = shaderLib.loadProgram("shaders/simple/no_lighting.vert", "shaders/simple/no_lighting.frag")
         mesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
@@ -53,7 +53,7 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     override fun onDrawFrame(gl: GL10?) {
         node1.tick()
         node2.tick()
-        glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT) }
+        glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
         glBind(listOf(program, mesh, texture)) {
             program.setUniform(GLUniform.UNIFORM_VIEW, camera.viewM)
             program.setUniform(GLUniform.UNIFORM_PROJECTION, camera.projectionM)
