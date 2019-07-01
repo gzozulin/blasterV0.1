@@ -26,10 +26,10 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val quadVertices = floatArrayOf(
-            -1.0f,  1.0f, 0.0f,     0.0f, 0.0f,
-            -1.0f, -1.0f, 0.0f,     0.0f, 1.0f,
-             1.0f,  1.0f, 0.0f,     1.0f, 0.0f,
-             1.0f, -1.0f, 0.0f,     1.0f, 1.0f
+            -1f,  1f, 0f,     0f, 0f,
+            -1f, -1f, 0f,     0f, 1f,
+             1f,  1f, 0f,     1f, 0f,
+             1f, -1f, 0f,     1f, 1f
     )
     private val quadIndices = intArrayOf(0, 2, 1, 2, 3, 1)
 
@@ -69,6 +69,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         camera = SceneCamera(width.toFloat() / height.toFloat())
+        camera.lookAt(eye, Vector3f())
         positionTexture = GLTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = GLES30.GL_RGB16F,
@@ -83,7 +84,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
                 pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE)
         depthBuffer = GLRenderBuffer(width = width, height = height)
         framebuffer = GLFrameBuffer()
-        glBind(framebuffer) {
+        glBind(listOf(framebuffer)) {
             framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT0, positionTexture)
             framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT1, normalTexture)
             framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT2, albedoSpecTexture)
@@ -109,12 +110,15 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
         glBind(listOf(programGeomPass, triangleMesh, framebuffer, textureDiffuse, textureSpecular)) {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
             triangleMesh.draw()
         }
-        glBind(listOf(programLightPass, quadMesh, positionTexture, normalTexture, albedoSpecTexture)) {
+        glBind(listOf(
+                programLightPass, quadMesh,
+                positionTexture, normalTexture, albedoSpecTexture, depthBuffer
+        )) {
+            glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
             quadMesh.draw()
         }
     }
