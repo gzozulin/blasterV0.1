@@ -1,6 +1,8 @@
 package com.gzozulin.wallpaper.gl
 
 import android.opengl.GLES30
+import com.gzozulin.wallpaper.math.Matrix4f
+import com.gzozulin.wallpaper.math.Vector3f
 import java.lang.IllegalStateException
 
 enum class GLShaderType(val type: Int) {

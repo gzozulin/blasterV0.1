@@ -6,6 +6,9 @@ import android.opengl.GLSurfaceView
 import com.gzozulin.wallpaper.assets.ShaderLib
 import com.gzozulin.wallpaper.assets.TextureLib
 import com.gzozulin.wallpaper.gl.*
+import com.gzozulin.wallpaper.math.SceneCamera
+import com.gzozulin.wallpaper.math.Matrix4f
+import com.gzozulin.wallpaper.math.Vector3f
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -47,7 +50,7 @@ class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private lateinit var depthBuffer: GLRenderBuffer
 
-    private lateinit var camera: GLCamera
+    private lateinit var camera: SceneCamera
     private val eye = Vector3f(z = 3f)
 
     private val modelM = Matrix4f()
@@ -67,7 +70,7 @@ class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        camera = GLCamera(width.toFloat() / height.toFloat())
+        camera = SceneCamera(width.toFloat() / height.toFloat())
         positionTexture = GLTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = GLES30.GL_RGB,

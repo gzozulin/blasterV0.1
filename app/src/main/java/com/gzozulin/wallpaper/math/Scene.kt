@@ -1,6 +1,6 @@
-package com.gzozulin.wallpaper.gl
+package com.gzozulin.wallpaper.math
 
-class GLCamera(aspectRatio: Float) {
+class SceneCamera(aspectRatio: Float) {
     val viewM = Matrix4f()
     val projectionM = Matrix4f()
 
@@ -14,7 +14,7 @@ class GLCamera(aspectRatio: Float) {
 }
 
 // todo add versions or just straight compare
-class GLNode(private val parent: GLNode? = null) {
+class SceneNode(private val parent: SceneNode? = null) {
     private val modelM = Matrix4f()
 
     fun calculateViewM(): Matrix4f =

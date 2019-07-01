@@ -1,4 +1,4 @@
-package com.gzozulin.wallpaper.gl
+package com.gzozulin.wallpaper.math
 
 data class Vector3f(val values: FloatArray) {
     constructor() : this(floatArrayOf(0f, 0f, 0f))

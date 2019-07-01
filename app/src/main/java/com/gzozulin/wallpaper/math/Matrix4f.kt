@@ -1,4 +1,4 @@
-package com.gzozulin.wallpaper.gl
+package com.gzozulin.wallpaper.math
 
 import android.opengl.Matrix
 
