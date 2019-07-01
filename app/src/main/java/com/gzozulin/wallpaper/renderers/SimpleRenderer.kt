@@ -1,11 +1,11 @@
-package com.gzozulin.wallpaper
+package com.gzozulin.wallpaper.renderers
 
 import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
+import com.gzozulin.wallpaper.assets.ShaderLib
+import com.gzozulin.wallpaper.assets.TextureLib
 import com.gzozulin.wallpaper.gl.*
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

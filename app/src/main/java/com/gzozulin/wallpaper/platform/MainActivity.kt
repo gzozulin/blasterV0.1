@@ -1,7 +1,8 @@
-package com.gzozulin.wallpaper
+package com.gzozulin.wallpaper.platform
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.gzozulin.wallpaper.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

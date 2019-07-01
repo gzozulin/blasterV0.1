@@ -1,14 +1,15 @@
-package com.gzozulin.wallpaper
+package com.gzozulin.wallpaper.renderers
 
 import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
-import android.util.Log
+import com.gzozulin.wallpaper.assets.ShaderLib
+import com.gzozulin.wallpaper.assets.TextureLib
 import com.gzozulin.wallpaper.gl.*
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
+class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
     private val shaderLib = ShaderLib(context)
     private val textureLib = TextureLib(context)
 

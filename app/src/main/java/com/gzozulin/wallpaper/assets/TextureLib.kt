@@ -1,4 +1,4 @@
-package com.gzozulin.wallpaper
+package com.gzozulin.wallpaper.assets
 
 import android.content.Context
 import android.graphics.Bitmap
