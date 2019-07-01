@@ -19,7 +19,14 @@ enum class GLUniform(val label: String) {
     UNIFORM_MODEL(              "uModelM"),
     UNIFORM_PROJECTION(         "uProjectionM"),
     UNIFORM_VIEW(               "uViewM"),
-    UNIFORM_TEXTURE_DIFFUSE(    "uTextureDiffuse")
+    UNIFORM_VIEW_POSITION(      "uViewPosition"),
+    UNIFORM_TEXTURE_DIFFUSE(    "uTextureDiffuse"),
+    UNIFORM_TEXTURE_SPECULAR(   "uTextureSpecular"),
+    UNIFORM_TEXTURE_POSITION(   "uTexturePosition"),
+    UNIFORM_TEXTURE_NORMAL(     "uTextureNormal"),
+    UNIFORM_TEXTURE_ALBEDO_SPEC("uTextureAlbedoSpec"),
+    UNIFORM_LIGHT_POS(          "uLightPos"),
+    UNIFORM_LIGHT_COLOR(        "uLightColor")
 }
 
 class GLShader(val type: GLShaderType, source: String) {
@@ -99,7 +106,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         setUniform(uniform, texture.unit)
     }
 
-    fun setUniform(uniform: GLUniform, value: Int) {
+    private fun setUniform(uniform: GLUniform, value: Int) {
         glCheck { GLES30.glUniform1i(uniformLocations[uniform]!!, value) }
     }
 

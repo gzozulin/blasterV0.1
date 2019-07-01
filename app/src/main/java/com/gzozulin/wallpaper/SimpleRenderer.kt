@@ -41,13 +41,13 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
         glBind(program) {
             program.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, texture)
         }
+        node2.once()
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         glCheck { GLES30.glViewport(0, 0, width, height) }
         camera = GLCamera(width.toFloat() / height.toFloat())
         camera.lookAt(Vector3f(z = 2.5f), Vector3f())
-        node2.once()
     }
 
     override fun onDrawFrame(gl: GL10?) {

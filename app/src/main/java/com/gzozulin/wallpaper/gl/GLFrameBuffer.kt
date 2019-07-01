@@ -2,7 +2,7 @@ package com.gzozulin.wallpaper.gl
 
 import android.opengl.GLES30
 
-class GLFrameBuffer(private val target: Int = GLES30.GL_FRAMEBUFFER) : GLBindable {
+class GLFrameBuffer : GLBindable {
     private val handle: Int
 
     init {
@@ -13,19 +13,23 @@ class GLFrameBuffer(private val target: Int = GLES30.GL_FRAMEBUFFER) : GLBindabl
     }
 
     override fun bind() {
-        glCheck { GLES30.glBindFramebuffer(target, handle) }
+        glCheck { GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, handle) }
     }
 
     override fun unbind() {
-        glCheck { GLES30.glBindFramebuffer(target, 0) }
+        glCheck { GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0) }
     }
 
     fun setTexture(attachement: Int, texture: GLTexture) {
-        glCheck { GLES30.glFramebufferTexture2D(target, attachement, texture.target, texture.handle, 0) } // 0 - level
+        glCheck { GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, attachement, texture.target, texture.handle, 0) } // 0 - level
     }
 
     fun setRenderBuffer(attachement: Int, renderBuffer: GLRenderBuffer) {
         glCheck { GLES30.glFramebufferRenderbuffer(GLES30.GL_FRAMEBUFFER, attachement, GLES30.GL_RENDERBUFFER, renderBuffer.handle) }
+    }
+
+    fun setOutputs(outputs: IntArray) {
+        glCheck { GLES30.glDrawBuffers(outputs.size, outputs, 0) }
     }
 
     fun checkIsComplete() {

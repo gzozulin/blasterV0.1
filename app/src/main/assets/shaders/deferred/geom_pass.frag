@@ -7,20 +7,20 @@ layout (location = 1) out vec3 oNormal;
 layout (location = 2) out vec4 oAlbedoSpec;
 
 in vec2 vTexCoord;
-in vec3 vFragPos;
+in vec3 vFragPosition;
 in vec3 vNormal;
 
-//uniform sampler2D texture_diffuse1;
-//uniform sampler2D texture_specular1;
+uniform sampler2D uTextureDiffuse;
+uniform sampler2D uTextureSpecular;
 
 void main()
 {
     // store the fragment position vector in the first gbuffer texture
-    oPosition = vFragPos;
+    oPosition = vFragPosition;
     // also store the per-fragment normals into the gbuffer
     oNormal = normalize(vNormal);
     // and the diffuse per-fragment color
-    oAlbedoSpec.rgb = texture(texture_diffuse1, vTexCoord).rgb;
+    oAlbedoSpec.rgb = texture(uTextureDiffuse, vTexCoord).rgb;
     // store specular intensity in gAlbedoSpec's alpha component
-    oAlbedoSpec.a = texture(texture_specular1, vTexCoord).r;
+    oAlbedoSpec.a = texture(uTextureSpecular, vTexCoord).r;
 }

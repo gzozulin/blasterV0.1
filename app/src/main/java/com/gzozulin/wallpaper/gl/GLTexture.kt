@@ -33,10 +33,8 @@ class GLTexture(
     }
 
     override fun bind() {
-        glCheck {
-            GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + unit)
-            GLES30.glBindTexture(target, handle)
-        }
+        glCheck { GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + unit) } // passing GL_TEXTURE1?
+        glCheck { GLES30.glBindTexture(target, handle) }
     }
 
     override fun unbind() {

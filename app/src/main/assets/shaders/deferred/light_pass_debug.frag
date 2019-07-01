@@ -1,0 +1,14 @@
+#version 300 es
+
+precision highp float;
+
+out vec4 oFragColor;
+
+in vec2 vTexCoord;
+
+uniform sampler2D uTexturePosition;
+
+void main()
+{
+    oFragColor = texture(uTexturePosition, vTexCoord);
+}

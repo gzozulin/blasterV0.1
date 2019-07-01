@@ -13,6 +13,7 @@ class GLCamera(aspectRatio: Float) {
     }
 }
 
+// todo add versions or just straight compare
 class GLNode(private val parent: GLNode? = null) {
     private val modelM = Matrix4f()
 
