@@ -60,8 +60,8 @@ class DeferredMultipassRenderer(context: Context) : GLSurfaceView.Renderer {
         glCheck { GLES30.glClearColor(1f, 1f, 1f, 1.0f) }
         triangleMesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
-        programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
-        programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass_debug.frag")
+        programGeomPass = shaderLib.loadProgram("shaders/deferred_multipass/geom_pass.vert", "shaders/deferred_multipass/geom_pass.frag")
+        programLightPass = shaderLib.loadProgram("shaders/deferred_multipass/light_pass.vert", "shaders/deferred_multipass/light_pass_debug.frag")
         textureDiffuse = textureLib.loadTexture("textures/winner.png")
         textureSpecular = textureLib.loadTexture("textures/winner.png")
     }
