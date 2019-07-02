@@ -24,6 +24,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     )
     private val triangleIndices = intArrayOf(0, 2, 1)
 
+    // todo: upside down
     private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val quadVertices = floatArrayOf(
             -1f,  1f, 0f,     0f, 1f,
