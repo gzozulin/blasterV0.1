@@ -2,8 +2,6 @@
 
 precision highp float;
 
-out vec4 oFragColor;
-
 in vec2 vTexCoord;
 
 uniform sampler2D uTexturePosition;
@@ -15,9 +13,12 @@ uniform vec3 uLightColor;
 
 uniform vec3 uViewPosition;
 
+const float lightAmbient = 0.1f;
 const float lightConstantAttennuation = 1.0f;
-const float lightLinearAttennuation = 0.7f;
-const float lightQuadraticAttennuation = 1.8f;
+const float lightLinearAttennuation = 0.6f;
+const float lightQuadraticAttennuation = 1.5f;
+
+out vec4 oFragColor;
 
 void main()
 {
@@ -28,7 +29,7 @@ void main()
     float specularIn = texture(uTextureAlbedoSpec, vTexCoord).a;
 
     // then calculate lighting as usual
-    vec3 lighting  = diffuseIn * 0.1; // hard-coded ambient component
+    vec3 lighting  = diffuseIn * lightAmbient; // hard-coded ambient component
     vec3 viewDir  = normalize(uViewPosition - fragPosIn);
 
     // diffuse
@@ -46,5 +47,6 @@ void main()
     diffuse *= attenuation;
     specular *= attenuation;
     lighting += diffuse + specular;
+
     oFragColor = vec4(lighting, 1.0);
 }

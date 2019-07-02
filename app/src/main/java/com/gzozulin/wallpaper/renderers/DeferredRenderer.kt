@@ -51,7 +51,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var depthBuffer: GLRenderBuffer
 
     private lateinit var camera: SceneCamera
-    private val eye = Vector3f(z = 5f)
+    private val eye = Vector3f(z = 3f)
     private val node = SceneNode()
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
@@ -62,7 +62,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         textureDiffuse = textureLib.loadTexture("textures/winner.png")
         textureSpecular = textureLib.loadTexture("textures/winner.png")
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
-        programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass_debug.frag")
+        programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -100,11 +100,11 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         }
         glBind(programLightPass) {
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionTexture)
-            //programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalTexture)
-            //programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_ALBEDO_SPEC, albedoSpecTexture)
-            //programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_POS, lightPosition)
-            //programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_COLOR, lightColor)
-            //programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, eye)
+            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalTexture)
+            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_ALBEDO_SPEC, albedoSpecTexture)
+            programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_POS, Vector3f(y = 1f, z = 1f))
+            programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_COLOR, Vector3f(1f))
+            programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, eye)
         }
     }
 

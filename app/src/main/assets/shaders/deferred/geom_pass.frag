@@ -15,12 +15,18 @@ layout (location = 2) out vec4 oAlbedoSpec;
 
 void main()
 {
+    vec4 diffuse = texture(uTextureDiffuse, vTexCoord);
+    if (diffuse.a < 0.1) {
+        discard;
+    }
+
+    oAlbedoSpec.rgb = diffuse.rgb;
+
     // store the fragment position vector in the first gbuffer texture
     oPosition = vFragPosition;
     // also store the per-fragment normals into the gbuffer
     oNormal = normalize(vNormal);
-    // and the diffuse per-fragment color
-    oAlbedoSpec.rgb = texture(uTextureDiffuse, vTexCoord).rgb;
+
     // store specular intensity in gAlbedoSpec's alpha component
     oAlbedoSpec.a = texture(uTextureSpecular, vTexCoord).r;
 }
