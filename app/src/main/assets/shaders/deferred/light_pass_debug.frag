@@ -10,5 +10,6 @@ out vec4 oFragColor;
 
 void main()
 {
-    oFragColor = vec4(texture(uTexturePosition, vTexCoord).rgb, 1);
+    vec3 position = texture(uTexturePosition, vTexCoord).rgb;
+    oFragColor = vec4(position, 1);
 }

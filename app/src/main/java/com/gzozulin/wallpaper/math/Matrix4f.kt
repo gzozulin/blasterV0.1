@@ -14,6 +14,10 @@ class Matrix4f(val values: FloatArray) {
         Matrix.frustumM(values, 0, left, right, bottom, top, near, far)
     }
 
+    fun perspectiveInplace(fovyDegrees: Float, aspect: Float, zNear: Float, zFar: Float) {
+        Matrix.perspectiveM(values, 0, fovyDegrees, aspect, zNear, zFar)
+    }
+
     fun lookAtInplace(eye: Vector3f, center: Vector3f, up: Vector3f) {
         Matrix.setLookAtM(values, 0,
                 eye.values[0], eye.values[1], eye.values[2],

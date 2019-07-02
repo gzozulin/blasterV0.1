@@ -10,27 +10,6 @@ enum class GLShaderType(val type: Int) {
     FRAGMENT_SHADER(GLES30.GL_FRAGMENT_SHADER)
 }
 
-enum class GLAttribute(val label: String, val size: Int, val location: Int) {
-    ATTRIBUTE_POSITION(     "aPosition",    3, 0),
-    ATTRIBUTE_TEXCOORD(     "aTexCoord",    2, 1),
-    ATTRIBUTE_NORMAL(       "aNormal",      3, 2),
-    ATTRIBUTE_COLOR(        "aColor",       3, 3),
-}
-
-enum class GLUniform(val label: String) {
-    UNIFORM_MODEL(              "uModelM"),
-    UNIFORM_PROJECTION(         "uProjectionM"),
-    UNIFORM_VIEW(               "uViewM"),
-    UNIFORM_VIEW_POSITION(      "uViewPosition"),
-    UNIFORM_TEXTURE_DIFFUSE(    "uTextureDiffuse"),
-    UNIFORM_TEXTURE_SPECULAR(   "uTextureSpecular"),
-    UNIFORM_TEXTURE_POSITION(   "uTexturePosition"),
-    UNIFORM_TEXTURE_NORMAL(     "uTextureNormal"),
-    UNIFORM_TEXTURE_ALBEDO_SPEC("uTextureAlbedoSpec"),
-    UNIFORM_LIGHT_POS(          "uLightPos"),
-    UNIFORM_LIGHT_COLOR(        "uLightColor")
-}
-
 class GLShader(val type: GLShaderType, source: String) {
     val handle = glCheck { GLES30.glCreateShader(type.type) }
 

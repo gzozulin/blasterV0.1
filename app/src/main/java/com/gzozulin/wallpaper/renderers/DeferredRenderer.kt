@@ -22,14 +22,14 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             -1f, -1f, 0f,     0f,   1f,      0f, 1f, 0f,
              1f, -1f, 0f,     1f,   1f,      0f, 1f, 0f
     )
-    private val triangleIndices = intArrayOf(0, 1, 2)
+    private val triangleIndices = intArrayOf(0, 2, 1)
 
     private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val quadVertices = floatArrayOf(
-            -1f,  1f, 0f,     0f, 0f,
-            -1f, -1f, 0f,     0f, 1f,
-             1f,  1f, 0f,     1f, 0f,
-             1f, -1f, 0f,     1f, 1f
+            -1f,  1f, 0f,     0f, 1f,
+            -1f, -1f, 0f,     0f, 0f,
+             1f,  1f, 0f,     1f, 1f,
+             1f, -1f, 0f,     1f, 0f
     )
     private val quadIndices = intArrayOf(0, 2, 1, 2, 3, 1)
 
@@ -50,15 +50,12 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var depthBuffer: GLRenderBuffer
 
     private lateinit var camera: SceneCamera
-    private val eye = Vector3f(z = 3f)
+    private val eye = Vector3f(z = 5f)
     private val node = SceneNode()
-
-    private val lightPosition = eye
-    private val lightColor = Vector3f(z = 3f)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
-        glCheck { GLES30.glClearColor(1f, 1f, 1f, 1.0f) }
+        glCheck { GLES30.glClearColor(1f, 1f, 1f, 1f) }
         triangleMesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         textureDiffuse = textureLib.loadTexture("textures/winner.png")
@@ -68,6 +65,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+        glCheck { GLES30.glViewport(0, 0, width, height) }
         camera = SceneCamera(width.toFloat() / height.toFloat())
         camera.lookAt(eye, Vector3f())
         positionTexture = GLTexture(
@@ -93,9 +91,9 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             framebuffer.checkIsComplete()
         }
         glBind(programGeomPass) {
-            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL, node.calculateViewM())
-            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW, camera.viewM)
-            programGeomPass.setUniform(GLUniform.UNIFORM_PROJECTION, camera.projectionM)
+            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
+            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.viewM)
+            programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
             programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, textureDiffuse)
             programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_SPECULAR, textureSpecular)
         }
@@ -105,15 +103,19 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             //programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_ALBEDO_SPEC, albedoSpecTexture)
             //programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_POS, lightPosition)
             //programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_COLOR, lightColor)
-            //programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POSITION, eye)
+            //programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, eye)
         }
     }
 
-    override fun onDrawFrame(gl: GL10?) {
+    private fun geometryPass() {
         glBind(listOf(programGeomPass, triangleMesh, framebuffer, textureDiffuse, textureSpecular)) {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
+            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
             triangleMesh.draw()
         }
+    }
+
+    private fun lightingPass() {
         glBind(listOf(
                 programLightPass, quadMesh,
                 positionTexture, normalTexture, albedoSpecTexture, depthBuffer
@@ -121,5 +123,11 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
             quadMesh.draw()
         }
+    }
+
+    override fun onDrawFrame(gl: GL10?) {
+        node.tick()
+        geometryPass()
+        lightingPass()
     }
 }

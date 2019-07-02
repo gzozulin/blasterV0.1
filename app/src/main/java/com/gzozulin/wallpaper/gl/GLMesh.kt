@@ -4,7 +4,7 @@ import android.opengl.GLES30
 
 class GLMesh(
         vertices: FloatArray, indices: IntArray,
-        attributes: List<GLAttribute>,
+        private val attributes: List<GLAttribute>,
         private val mode: Int = GLES30.GL_TRIANGLES) : GLBindable {
 
     private val verticesBuffer: GLBuffer = GLBuffer(GLES30.GL_ARRAY_BUFFER, vertices)
@@ -12,27 +12,33 @@ class GLMesh(
 
     private val indicesCount = indices.size
 
-    init {
-        glBind(verticesBuffer) {
-            var stride = 0
-            var offset = 0
-            attributes.forEach { stride += it.size * 4 }
-            attributes.forEach {
-                glCheck {
-                    GLES30.glEnableVertexAttribArray(it.location)
-                    GLES30.glVertexAttribPointer(it.location, it.size, GLES30.GL_FLOAT, false, stride, offset)
-                }
-                offset += it.size * 4
+    private fun bindVertexPointers() {
+        var stride = 0
+        var offset = 0
+        attributes.forEach { stride += it.size * 4 }
+        attributes.forEach {
+            glCheck {
+                GLES30.glEnableVertexAttribArray(it.location)
+                GLES30.glVertexAttribPointer(it.location, it.size, GLES30.GL_FLOAT, false, stride, offset)
             }
+            offset += it.size * 4
+        }
+    }
+
+    private fun disableVertexPointers() {
+        attributes.forEach {
+            glCheck { GLES30.glDisableVertexAttribArray(it.location) }
         }
     }
 
     override fun bind() {
-        verticesBuffer.bind()
         indicesBuffer.bind()
+        verticesBuffer.bind()
+        bindVertexPointers()
     }
 
     override fun unbind() {
+        disableVertexPointers()
         verticesBuffer.unbind()
         indicesBuffer.unbind()
     }

@@ -3,6 +3,9 @@
     <words>
       <w>coord</w>
       <w>coords</w>
+      <w>fovy</w>
+      <w>inplace</w>
+      <w>proj</w>
       <w>texcoords</w>
     </words>
   </dictionary>

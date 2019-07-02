@@ -44,7 +44,6 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
         glBind(program) {
             program.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, texture)
         }
-        node2.once()
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -58,11 +57,11 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
         node2.tick()
         glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
         glBind(listOf(program, mesh, texture)) {
-            program.setUniform(GLUniform.UNIFORM_VIEW, camera.viewM)
-            program.setUniform(GLUniform.UNIFORM_PROJECTION, camera.projectionM)
-            program.setUniform(GLUniform.UNIFORM_MODEL, node1.calculateViewM())
+            program.setUniform(GLUniform.UNIFORM_VIEW_M, camera.viewM)
+            program.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
+            program.setUniform(GLUniform.UNIFORM_MODEL_M, node1.calculateViewM())
             mesh.draw()
-            program.setUniform(GLUniform.UNIFORM_MODEL, node2.calculateViewM())
+            program.setUniform(GLUniform.UNIFORM_MODEL_M, node2.calculateViewM())
             mesh.draw()
         }
     }

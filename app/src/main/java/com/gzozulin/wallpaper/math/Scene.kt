@@ -5,7 +5,7 @@ class SceneCamera(aspectRatio: Float) {
     val projectionM = Matrix4f()
 
     init {
-        projectionM.frustumInplace(-aspectRatio, aspectRatio, -1f, 1f, 1f, 5f)
+        projectionM.perspectiveInplace(90f, aspectRatio, 1f, 100f)
     }
 
     fun lookAt(from: Vector3f, to: Vector3f) {
@@ -19,11 +19,6 @@ class SceneNode(private val parent: SceneNode? = null) {
 
     fun calculateViewM(): Matrix4f =
             if (parent == null) { modelM } else { parent.calculateViewM() * modelM }
-
-    fun once() {
-        modelM.translateInplace(Vector3f(x = 1f))
-        modelM.scaleInplace(Vector3f(0.3f))
-    }
 
     fun tick() {
         modelM.rotateInplace(1f, Vector3f(0f, 1f, 0f))
