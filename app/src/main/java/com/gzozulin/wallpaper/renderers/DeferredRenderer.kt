@@ -3,6 +3,7 @@ package com.gzozulin.wallpaper.renderers
 import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
+import android.util.Log
 import com.gzozulin.wallpaper.assets.ShaderLib
 import com.gzozulin.wallpaper.assets.TextureLib
 import com.gzozulin.wallpaper.gl.*
@@ -132,9 +133,22 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         }
     }
 
+    private var fps = 0
+    private var last = System.currentTimeMillis()
+    private fun printFps() {
+        fps++
+        val current = System.currentTimeMillis()
+        if (current - last >= 1000L) {
+            Log.i("DeferredRenderer", "Frames per last second: $fps")
+            fps = 0
+            last = current
+        }
+    }
+
     override fun onDrawFrame(gl: GL10?) {
         node.tick()
         geometryPass()
         lightingPass()
+        printFps()
     }
 }

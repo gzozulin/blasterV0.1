@@ -4,12 +4,12 @@ precision highp float;
 
 in vec2 vTexCoord;
 
-uniform sampler2D uTexturePosition;
+uniform sampler2D uTexPosition;
 
 out vec4 oFragColor;
 
 void main()
 {
-    vec3 position = texture(uTexturePosition, vTexCoord).rgb;
+    vec3 position = texture(uTexPosition, vTexCoord).rgb;
     oFragColor = vec4(position, 1);
 }
