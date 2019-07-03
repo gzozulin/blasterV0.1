@@ -29,32 +29,30 @@ out vec4 oFragColor;
 
 void main()
 {
-    vec3 fragPosIn = texture(uTexPosition, vTexCoord).rgb;
-    vec3 normalIn = texture(uTexNormal, vTexCoord).rgb;
-    vec4 albedoSpecIn = texture(uTexAlbedoSpec, vTexCoord);
-    vec3 diffuseIn = albedoSpecIn.rgb;
-    float specularIn = albedoSpecIn.a;
-
-    vec3 lighting  = diffuseIn * lightAmbient;
-    vec3 viewDir  = normalize(uViewPosition - fragPosIn);
-
+    vec3 fragPosition = texture(uTexPosition, vTexCoord).rgb;
+    vec3 fragNormal = texture(uTexNormal, vTexCoord).rgb;
+    vec4 fragAlbedoSpec = texture(uTexAlbedoSpec, vTexCoord);
+    vec3 fragDiffuse = fragAlbedoSpec.rgb;
+    float fragSpecular = fragAlbedoSpec.a;
+    vec3 lighting  = fragDiffuse * lightAmbient;
+    vec3 viewDir  = normalize(uViewPosition - fragPosition);
     for (int i = 0; i < LIGHTS_CNT; ++i) {
-        // diffuse
-        vec3 lightDir = normalize(uLights[i].position - fragPosIn);
-        vec3 diffuse = max(dot(normalIn, lightDir), 0.0) * diffuseIn * uLights[i].color;
-
-        // specular
-        vec3 halfwayDir = normalize(lightDir + viewDir);
-        float spec = pow(max(dot(normalIn, halfwayDir), 0.0), specularPower);
-        vec3 specular = uLights[i].color * spec * specularIn;
-
-        // attenuation
-        float distance = length(uLights[i].position - fragPosIn);
+        float distance = length(uLights[i].position - fragPosition);
         float attenuation = 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
-        diffuse *= attenuation;
-        specular *= attenuation;
-        lighting += diffuse + specular;
+        if (attenuation > 0.1) {
+            // diffuse
+            vec3 lightDir = normalize(uLights[i].position - fragPosition);
+            float diffuseTerm = dot(fragNormal, lightDir);
+            if (diffuseTerm > 0.1) {
+                lighting += diffuseTerm * fragDiffuse * uLights[i].color * attenuation;
+            }
+            // specular
+            vec3 halfwayDir = normalize(lightDir + viewDir);
+            float specularTerm = dot(fragNormal, halfwayDir);
+            if (specularTerm > 0.1) {
+                lighting += pow(specularTerm, specularPower) * uLights[i].color * fragSpecular * attenuation;
+            }
+        }
     }
-
     oFragColor = vec4(lighting, 1.0);
 }
