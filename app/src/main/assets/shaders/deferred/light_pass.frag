@@ -34,23 +34,27 @@ void main()
     vec4 fragAlbedoSpec = texture(uTexAlbedoSpec, vTexCoord);
     vec3 fragDiffuse = fragAlbedoSpec.rgb;
     float fragSpecular = fragAlbedoSpec.a;
+
     vec3 lighting  = fragDiffuse * lightAmbient;
     vec3 viewDir  = normalize(uViewPosition - fragPosition);
+
     for (int i = 0; i < LIGHTS_CNT; ++i) {
         float distance = length(uLights[i].position - fragPosition);
         float attenuation = 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
+
         if (attenuation > 0.1) {
             // diffuse
             vec3 lightDir = normalize(uLights[i].position - fragPosition);
             float diffuseTerm = dot(fragNormal, lightDir);
-            if (diffuseTerm > 0.1) {
-                lighting += diffuseTerm * fragDiffuse * uLights[i].color * attenuation;
+            if (diffuseTerm > 0.0) {
+                lighting += diffuseTerm * fragDiffuse * uLights[i].color * attenuation; // todo floats first, then vectors
             }
+
             // specular
             vec3 halfwayDir = normalize(lightDir + viewDir);
             float specularTerm = dot(fragNormal, halfwayDir);
-            if (specularTerm > 0.1) {
-                lighting += pow(specularTerm, specularPower) * uLights[i].color * fragSpecular * attenuation;
+            if (specularTerm > 0.0) {
+                lighting += pow(specularTerm, specularPower) * fragSpecular * uLights[i].color * attenuation; // todo floats first, then vectors
             }
         }
     }
