@@ -145,6 +145,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         }
     }
 
+    // todo measure and print average percent for geom/lighting passes
     override fun onDrawFrame(gl: GL10?) {
         node.tick()
         geometryPass()
