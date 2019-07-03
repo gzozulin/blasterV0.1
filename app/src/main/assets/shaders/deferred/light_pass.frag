@@ -28,7 +28,7 @@ const float specularPower       = 16.0;
 out vec4 oFragColor;
 
 
-// todo calculate all light first, and the multiply on texture's albedo
+// todo calculate all light first, and the multiply on texture's albedo once
 // todo remove specular texture?
 void main()
 {
