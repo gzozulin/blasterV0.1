@@ -12,6 +12,7 @@ import com.gzozulin.wallpaper.math.SceneNode
 import com.gzozulin.wallpaper.math.Vector3f
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.system.measureNanoTime
 
 class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val shaderLib = ShaderLib(context)
@@ -57,7 +58,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
-        glCheck { GLES30.glClearColor(1f, 1f, 1f, 1f) }
+        glCheck { GLES30.glClearColor(1f, 1f, 1f, 0f) }
         triangleMesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         textureDiffuse = textureLib.loadTexture("textures/winner.png")
@@ -72,8 +73,8 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         camera.lookAt(eye, Vector3f())
         positionTexture = GLTexture(
                 unit = 0,
-                width = width, height = height, internalFormat = GLES30.GL_RGB16F,
-                pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
+                width = width, height = height, internalFormat = GLES30.GL_RGBA16F,
+                pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_FLOAT)
         normalTexture = GLTexture(
                 unit = 1,
                 width = width, height = height, internalFormat = GLES30.GL_RGB16F,
@@ -135,21 +136,21 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private var fps = 0
     private var last = System.currentTimeMillis()
-    private fun printFps() {
+
+    private fun printFps(relation: Float) {
         fps++
         val current = System.currentTimeMillis()
         if (current - last >= 1000L) {
-            Log.i("DeferredRenderer", "Frames per last second: $fps")
+            Log.i("DeferredRenderer", "Frames per last second: $fps, the relation was " + String.format("%.2f", relation))
             fps = 0
             last = current
         }
     }
 
-    // todo measure and print average percent for geom/lighting passes
     override fun onDrawFrame(gl: GL10?) {
         node.tick()
-        geometryPass()
-        lightingPass()
-        printFps()
+        val geometryTime = measureNanoTime { geometryPass() }
+        val lightingTime = measureNanoTime {  lightingPass() }
+        printFps(geometryTime.toFloat() / lightingTime.toFloat())
     }
 }

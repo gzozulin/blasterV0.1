@@ -8,9 +8,6 @@ uniform sampler2D uTexAlbedoSpec;
 
 uniform vec3 uViewPosition;
 
-uniform vec3 uLightPos;
-uniform vec3 uLightColor;
-
 struct Light {
     vec3 position;
     vec3 color;
@@ -19,47 +16,57 @@ struct Light {
 const int LIGHTS_CNT = 16;
 uniform Light uLights[LIGHTS_CNT];
 
-const float lightAmbient        = 0.1f;
-const float lightConstantAtt    = 1.0f;
-const float lightLinearAtt      = 0.8f;
-const float lightQuadraticAtt   = 0.2f;
+const float ambientTerm         = 0.1;
+const float lightConstantAtt    = 1.0;
+const float lightLinearAtt      = 0.8;
+const float lightQuadraticAtt   = 0.2;
 const float specularPower       = 16.0;
 
 out vec4 oFragColor;
 
-
-// todo calculate all light first, and the multiply on texture's albedo once
-// todo remove specular texture?
 void main()
 {
-    vec3 fragPosition = texture(uTexPosition, vTexCoord).rgb;
+    vec4 positionLookup = texture(uTexPosition, vTexCoord);
+    if (positionLookup.a != 1.0) {
+        discard;
+    }
+
+    vec3 fragPosition = positionLookup.rgb;
     vec3 fragNormal = texture(uTexNormal, vTexCoord).rgb;
     vec4 fragAlbedoSpec = texture(uTexAlbedoSpec, vTexCoord);
     vec3 fragDiffuse = fragAlbedoSpec.rgb;
     float fragSpecular = fragAlbedoSpec.a;
 
-    vec3 lighting  = fragDiffuse * lightAmbient;
     vec3 viewDir  = normalize(uViewPosition - fragPosition);
+
+    vec3 ambientContribution  = vec3(ambientTerm);
+    vec3 diffuseContribution = vec3(0);
+    vec3 specularContribution = vec3(0);
 
     for (int i = 0; i < LIGHTS_CNT; ++i) {
         float distance = length(uLights[i].position - fragPosition);
         float attenuation = 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
-
         if (attenuation > 0.1) {
-            // diffuse
+            vec3 attenuatedLight = uLights[i].color * attenuation;
             vec3 lightDir = normalize(uLights[i].position - fragPosition);
+
+            // diffuse
             float diffuseTerm = dot(fragNormal, lightDir);
             if (diffuseTerm > 0.0) {
-                lighting += diffuseTerm * fragDiffuse * uLights[i].color * attenuation; // todo floats first, then vectors
+                diffuseContribution += diffuseTerm * attenuatedLight;
             }
 
             // specular
             vec3 halfwayDir = normalize(lightDir + viewDir);
             float specularTerm = dot(fragNormal, halfwayDir);
             if (specularTerm > 0.0) {
-                lighting += pow(specularTerm, specularPower) * fragSpecular * uLights[i].color * attenuation; // todo floats first, then vectors
+                specularContribution += pow(specularTerm, specularPower) * attenuatedLight;
             }
         }
     }
-    oFragColor = vec4(lighting, 1.0);
+
+    ambientContribution *= fragDiffuse;
+    diffuseContribution *= fragDiffuse;
+    specularContribution *= fragSpecular;
+    oFragColor = vec4(ambientContribution + diffuseContribution + specularContribution, 1.0);
 }

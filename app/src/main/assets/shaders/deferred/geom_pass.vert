@@ -8,14 +8,14 @@ uniform mat4 uModelM;
 uniform mat4 uViewM;
 uniform mat4 uProjectionM;
 
-out vec3 vFragPosition;
+out vec4 vFragPosition;
 out vec2 vTexCoord;
 out vec3 vNormal;
 
 void main()
 {
     vec4 worldPos = uModelM * vec4(aPosition, 1.0);
-    vFragPosition = worldPos.xyz;
+    vFragPosition = worldPos;
 
     vTexCoord = aTexCoord;
 
