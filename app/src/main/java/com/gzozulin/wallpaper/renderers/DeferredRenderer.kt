@@ -102,9 +102,15 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionTexture)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalTexture)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_ALBEDO_SPEC, albedoSpecTexture)
-            programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_POS, Vector3f(y = 1f, z = 1f))
-            programLightPass.setUniform(GLUniform.UNIFORM_LIGHT_COLOR, Vector3f(1f))
             programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, eye)
+            setupLights()
+        }
+    }
+
+    private fun setupLights() {
+        for (i in 0..15) {
+            programLightPass.setUniform(uniformLightPosition(i), Vector3f().randomize(5f))
+            programLightPass.setUniform(uniformLightColor(i), Vector3f().randomize(1f))
         }
     }
 
