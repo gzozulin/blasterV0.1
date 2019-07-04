@@ -4,6 +4,7 @@ import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.util.Log
+import com.gzozulin.wallpaper.assets.ModelsLib
 import com.gzozulin.wallpaper.assets.ShadersLib
 import com.gzozulin.wallpaper.assets.TexturesLib
 import com.gzozulin.wallpaper.gl.*
@@ -17,6 +18,7 @@ import kotlin.system.measureNanoTime
 class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val shaderLib = ShadersLib(context)
     private val textureLib = TexturesLib(context)
+    private val modelsLib = ModelsLib(context, textureLib)
 
     private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD, GLAttribute.ATTRIBUTE_NORMAL)
     private val triangleVertices = floatArrayOf(
@@ -63,6 +65,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         meshDiffuse = textureLib.loadTexture("textures/winner.png")
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
+        modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
