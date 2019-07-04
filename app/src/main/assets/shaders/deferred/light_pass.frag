@@ -4,7 +4,7 @@ in vec2 vTexCoord;
 
 uniform sampler2D uTexPosition;
 uniform sampler2D uTexNormal;
-uniform sampler2D uTexAlbedoSpec;
+uniform sampler2D uTexDiffuse;
 
 uniform vec3 uViewPosition;
 
@@ -33,15 +33,10 @@ void main()
 
     vec3 fragPosition = positionLookup.rgb;
     vec3 fragNormal = texture(uTexNormal, vTexCoord).rgb;
-    vec4 fragAlbedoSpec = texture(uTexAlbedoSpec, vTexCoord);
-    vec3 fragDiffuse = fragAlbedoSpec.rgb;
-    float fragSpecular = fragAlbedoSpec.a;
+    vec3 fragDiffuse = texture(uTexDiffuse, vTexCoord).rgb;
 
     vec3 viewDir  = normalize(uViewPosition - fragPosition);
-
-    vec3 ambientContribution  = vec3(ambientTerm);
-    vec3 diffuseContribution = vec3(0);
-    vec3 specularContribution = vec3(0);
+    vec3 lighting  = vec3(ambientTerm);
 
     for (int i = 0; i < LIGHTS_CNT; ++i) {
         float distance = length(uLights[i].position - fragPosition);
@@ -53,20 +48,18 @@ void main()
             // diffuse
             float diffuseTerm = dot(fragNormal, lightDir);
             if (diffuseTerm > 0.0) {
-                diffuseContribution += diffuseTerm * attenuatedLight;
+                lighting += diffuseTerm * attenuatedLight;
             }
 
             // specular
             vec3 halfwayDir = normalize(lightDir + viewDir);
             float specularTerm = dot(fragNormal, halfwayDir);
             if (specularTerm > 0.0) {
-                specularContribution += pow(specularTerm, specularPower) * attenuatedLight;
+                lighting += pow(specularTerm, specularPower) * attenuatedLight;
             }
         }
     }
 
-    ambientContribution *= fragDiffuse;
-    diffuseContribution *= fragDiffuse;
-    specularContribution *= fragSpecular;
-    oFragColor = vec4(ambientContribution + diffuseContribution + specularContribution, 1.0);
+    lighting *= fragDiffuse;
+    oFragColor = vec4(lighting, 1.0);
 }

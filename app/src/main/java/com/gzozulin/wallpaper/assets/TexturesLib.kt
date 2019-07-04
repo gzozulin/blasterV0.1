@@ -8,7 +8,7 @@ import com.gzozulin.wallpaper.gl.GLTexture
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class TextureLib (private val ctx: Context) {
+class TexturesLib (private val ctx: Context) {
     fun loadTexture(filename: String, unit: Int = 0): GLTexture {
         val options = BitmapFactory.Options()
         options.inPreferredConfig = Bitmap.Config.ARGB_8888

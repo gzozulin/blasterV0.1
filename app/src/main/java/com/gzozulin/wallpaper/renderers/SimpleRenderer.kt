@@ -3,8 +3,8 @@ package com.gzozulin.wallpaper.renderers
 import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
-import com.gzozulin.wallpaper.assets.ShaderLib
-import com.gzozulin.wallpaper.assets.TextureLib
+import com.gzozulin.wallpaper.assets.ShadersLib
+import com.gzozulin.wallpaper.assets.TexturesLib
 import com.gzozulin.wallpaper.gl.*
 import com.gzozulin.wallpaper.math.SceneCamera
 import com.gzozulin.wallpaper.math.SceneNode
@@ -13,8 +13,8 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
-    private val shaderLib = ShaderLib(ctx)
-    private val textureLib = TextureLib(ctx)
+    private val shaderLib = ShadersLib(ctx)
+    private val textureLib = TexturesLib(ctx)
 
     private lateinit var program: GLProgram
 

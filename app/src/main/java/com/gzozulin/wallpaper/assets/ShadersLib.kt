@@ -8,7 +8,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
-class ShaderLib(private val ctx: Context) {
+class ShadersLib(private val ctx: Context) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GLProgram = GLProgram(
                 GLShader(GLShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
                 GLShader(GLShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))

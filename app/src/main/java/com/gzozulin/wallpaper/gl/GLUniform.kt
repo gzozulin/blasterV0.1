@@ -5,11 +5,10 @@ enum class GLUniform(val label: String) {
     UNIFORM_PROJ_M(             "uProjectionM"),
     UNIFORM_VIEW_M(             "uViewM"),
     UNIFORM_VIEW_POS(           "uViewPosition"),
-    UNIFORM_TEXTURE_DIFFUSE(    "uTexDiffuse"),
-    UNIFORM_TEXTURE_SPECULAR(   "uTexSpecular"),
+
     UNIFORM_TEXTURE_POSITION(   "uTexPosition"),
     UNIFORM_TEXTURE_NORMAL(     "uTexNormal"),
-    UNIFORM_TEXTURE_ALBEDO_SPEC("uTexAlbedoSpec"),
+    UNIFORM_TEXTURE_DIFFUSE(    "uTexDiffuse"),
 
     UNIFORM_LIGHT_0_POS(        "uLights[0].position"),
     UNIFORM_LIGHT_0_COLOR(      "uLights[0].color"),

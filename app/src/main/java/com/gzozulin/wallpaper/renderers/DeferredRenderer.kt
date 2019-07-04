@@ -4,8 +4,8 @@ import android.content.Context
 import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.util.Log
-import com.gzozulin.wallpaper.assets.ShaderLib
-import com.gzozulin.wallpaper.assets.TextureLib
+import com.gzozulin.wallpaper.assets.ShadersLib
+import com.gzozulin.wallpaper.assets.TexturesLib
 import com.gzozulin.wallpaper.gl.*
 import com.gzozulin.wallpaper.math.SceneCamera
 import com.gzozulin.wallpaper.math.SceneNode
@@ -15,8 +15,8 @@ import javax.microedition.khronos.opengles.GL10
 import kotlin.system.measureNanoTime
 
 class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
-    private val shaderLib = ShaderLib(context)
-    private val textureLib = TextureLib(context)
+    private val shaderLib = ShadersLib(context)
+    private val textureLib = TexturesLib(context)
 
     private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD, GLAttribute.ATTRIBUTE_NORMAL)
     private val triangleVertices = floatArrayOf(
@@ -39,16 +39,15 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var triangleMesh :GLMesh
     private lateinit var quadMesh: GLMesh
 
-    private lateinit var textureDiffuse: GLTexture
-    private lateinit var textureSpecular: GLTexture
+    private lateinit var meshDiffuse: GLTexture
 
     private lateinit var programGeomPass: GLProgram
     private lateinit var programLightPass: GLProgram
 
     private lateinit var framebuffer: GLFrameBuffer
-    private lateinit var positionTexture: GLTexture
-    private lateinit var normalTexture: GLTexture
-    private lateinit var albedoSpecTexture: GLTexture
+    private lateinit var positionStorage: GLTexture
+    private lateinit var normalStorage: GLTexture
+    private lateinit var diffuseStorage: GLTexture
 
     private lateinit var depthBuffer: GLRenderBuffer
 
@@ -61,8 +60,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         glCheck { GLES30.glClearColor(1f, 1f, 1f, 0f) }
         triangleMesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
-        textureDiffuse = textureLib.loadTexture("textures/winner.png")
-        textureSpecular = textureLib.loadTexture("textures/winner.png")
+        meshDiffuse = textureLib.loadTexture("textures/winner.png")
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
     }
@@ -71,24 +69,24 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         glCheck { GLES30.glViewport(0, 0, width, height) }
         camera = SceneCamera(width.toFloat() / height.toFloat())
         camera.lookAt(eye, Vector3f())
-        positionTexture = GLTexture(
+        positionStorage = GLTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = GLES30.GL_RGBA16F,
                 pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_FLOAT)
-        normalTexture = GLTexture(
+        normalStorage = GLTexture(
                 unit = 1,
                 width = width, height = height, internalFormat = GLES30.GL_RGB16F,
                 pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
-        albedoSpecTexture = GLTexture(
+        diffuseStorage = GLTexture(
                 unit = 2,
                 width = width, height = height, internalFormat = GLES30.GL_RGBA,
                 pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE)
         depthBuffer = GLRenderBuffer(width = width, height = height)
         framebuffer = GLFrameBuffer()
         glBind(listOf(framebuffer)) {
-            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT0, positionTexture)
-            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT1, normalTexture)
-            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT2, albedoSpecTexture)
+            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT0, positionStorage)
+            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT1, normalStorage)
+            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT2, diffuseStorage)
             framebuffer.setOutputs(intArrayOf(GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_COLOR_ATTACHMENT1, GLES30.GL_COLOR_ATTACHMENT2))
             framebuffer.setRenderBuffer(GLES30.GL_DEPTH_ATTACHMENT, depthBuffer)
             framebuffer.checkIsComplete()
@@ -97,13 +95,12 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
             programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.viewM)
             programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
-            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, textureDiffuse)
-            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_SPECULAR, textureSpecular)
+            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, meshDiffuse)
         }
         glBind(programLightPass) {
-            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionTexture)
-            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalTexture)
-            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_ALBEDO_SPEC, albedoSpecTexture)
+            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
+            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
+            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
             programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, eye)
             setupLights()
         }
@@ -117,7 +114,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     private fun geometryPass() {
-        glBind(listOf(programGeomPass, triangleMesh, framebuffer, textureDiffuse, textureSpecular)) {
+        glBind(listOf(programGeomPass, triangleMesh, framebuffer, meshDiffuse)) {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
             programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
             triangleMesh.draw()
@@ -127,7 +124,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private fun lightingPass() {
         glBind(listOf(
                 programLightPass, quadMesh,
-                positionTexture, normalTexture, albedoSpecTexture, depthBuffer
+                positionStorage, normalStorage, diffuseStorage, depthBuffer
         )) {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
             quadMesh.draw()
@@ -135,21 +132,26 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     private var fps = 0
+    private var ratio = 0f
     private var last = System.currentTimeMillis()
 
-    private fun printFps(relation: Float) {
+    private fun printFps(rel: Float) {
         fps++
+        ratio += rel
         val current = System.currentTimeMillis()
         if (current - last >= 1000L) {
-            Log.i("DeferredRenderer", "Frames per last second: $fps, the relation was " + String.format("%.2f", relation))
+            Log.i("DeferredRenderer", "Fps: $fps, geometry/lighting time ratio: ${String.format("%.2f", ratio / fps.toFloat())}")
             fps = 0
+            ratio = 0f
             last = current
         }
     }
 
     override fun onDrawFrame(gl: GL10?) {
-        node.tick()
-        val geometryTime = measureNanoTime { geometryPass() }
+        val geometryTime = measureNanoTime {
+            node.tick()
+            geometryPass()
+        }
         val lightingTime = measureNanoTime {  lightingPass() }
         printFps(geometryTime.toFloat() / lightingTime.toFloat())
     }
