@@ -20,13 +20,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val textureLib = TexturesLib(context)
     private val modelsLib = ModelsLib(context, textureLib)
 
-    private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD, GLAttribute.ATTRIBUTE_NORMAL)
-    private val triangleVertices = floatArrayOf(
-             0f,  1f, 0f,     0.5f, 0f,      0f, 1f, 0f,
-            -1f, -1f, 0f,     0f,   1f,      0f, 1f, 0f,
-             1f, -1f, 0f,     1f,   1f,      0f, 1f, 0f
-    )
-    private val triangleIndices = intArrayOf(0, 2, 1)
+    private lateinit var model: GLModel
 
     // todo: upside down
     private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
@@ -38,10 +32,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     )
     private val quadIndices = intArrayOf(0, 2, 1, 2, 3, 1)
 
-    private lateinit var triangleMesh :GLMesh
     private lateinit var quadMesh: GLMesh
-
-    private lateinit var meshDiffuse: GLTexture
 
     private lateinit var programGeomPass: GLProgram
     private lateinit var programLightPass: GLProgram
@@ -54,18 +45,15 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var depthBuffer: GLRenderBuffer
 
     private lateinit var camera: SceneCamera
-    private val eye = Vector3f(z = 3f)
-    private val node = SceneNode()
+    private val eye = Vector3f(z = 2000f)
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
         glCheck { GLES30.glClearColor(1f, 1f, 1f, 0f) }
-        triangleMesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
-        meshDiffuse = textureLib.loadTexture("textures/winner.png")
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
+        model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -95,10 +83,10 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             framebuffer.checkIsComplete()
         }
         glBind(programGeomPass) {
-            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
+            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, model.node.calculateViewM())
             programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.viewM)
             programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
-            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, meshDiffuse)
+            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, model.diffuse)
         }
         glBind(programLightPass) {
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
@@ -117,10 +105,10 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     private fun geometryPass() {
-        glBind(listOf(programGeomPass, triangleMesh, framebuffer, meshDiffuse)) {
+        glBind(listOf(programGeomPass, model.mesh, framebuffer, model.diffuse)) {
             glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
-            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
-            triangleMesh.draw()
+            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, model.node.calculateViewM())
+            model.mesh.draw()
         }
     }
 
@@ -152,7 +140,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     override fun onDrawFrame(gl: GL10?) {
         val geometryTime = measureNanoTime {
-            node.tick()
+            model.node.tick()
             geometryPass()
         }
         val lightingTime = measureNanoTime {  lightingPass() }

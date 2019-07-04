@@ -5,7 +5,7 @@ class SceneCamera(aspectRatio: Float) {
     val projectionM = Matrix4f()
 
     init {
-        projectionM.perspectiveInplace(90f, aspectRatio, 1f, 100f)
+        projectionM.perspectiveInplace(90f, aspectRatio, 1f, 4000f)
     }
 
     fun lookAt(from: Vector3f, to: Vector3f) {
