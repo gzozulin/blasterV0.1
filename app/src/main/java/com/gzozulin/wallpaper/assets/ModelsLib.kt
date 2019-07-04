@@ -13,17 +13,14 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
 
-    private val attributesPerVertex =
-            GLAttribute.ATTRIBUTE_POSITION.size +
-            GLAttribute.ATTRIBUTE_TEXCOORD.size +
-            GLAttribute.ATTRIBUTE_NORMAL.size
-
     private val currentVertexList = ArrayList<Float>()
     private val currentTexCoordList = ArrayList<Float>()
     private val currentNormalList = ArrayList<Float>()
 
-    private val vertices = ArrayList<Float>()
+    private val currentVertices = ArrayList<Float>()
+    private val currentIndices = ArrayList<Int>()
 
+    // todo create Ntive(Float)Buffer directly, instead of copying arrays
     fun loadModel(meshFilename: String, diffuseFilename: String): GLModel {
         val inputStream = ctx.assets.open(meshFilename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
@@ -34,20 +31,14 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
                 line = bufferedReader.readLine()
             }
         }
-        val verticesArray = vertices.toFloatArray()
-        val verticesCnt = verticesArray.size / attributesPerVertex
-        val indicesArray = IntArray(verticesCnt)
-        for (i in 0 until verticesCnt) {
-            indicesArray[i] = i
-        }
-        val mesh = GLMesh(verticesArray, indicesArray,
+        val mesh = GLMesh(currentVertices.toFloatArray(), currentIndices.toIntArray(),
                 listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD, GLAttribute.ATTRIBUTE_NORMAL))
-        val diffuse = texturesLib.loadTexture(diffuseFilename)
         currentVertexList.clear()
         currentTexCoordList.clear()
         currentNormalList.clear()
-        vertices.clear()
-        return GLModel(mesh, diffuse, SceneNode())
+        currentVertices.clear()
+        currentIndices.clear()
+        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), SceneNode())
     }
 
     private fun parseLine(line: String) {
@@ -102,28 +93,41 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         addVertex(split[1].split(slashRegex))
         addVertex(split[2].split(slashRegex))
         addVertex(split[3].split(slashRegex))
+        addIndex()
+        addIndex()
+        addIndex()
     }
 
     private fun parseQuadrilateral(split: List<String>) {
         addVertex(split[1].split(slashRegex))
         addVertex(split[2].split(slashRegex))
-        addVertex(split[4].split(slashRegex))
-        addVertex(split[2].split(slashRegex))
         addVertex(split[3].split(slashRegex))
         addVertex(split[4].split(slashRegex))
+        val nextInd = currentIndices.size
+        addIndex(nextInd + 0)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 3)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 2)
+        addIndex(nextInd + 3)
     }
 
-    private fun addVertex(split: List<String>) {
-        val vertIndex = split[0].toInt()
-        val texIndex = split[1].toInt()
-        val normIndex = split[2].toInt()
-        vertices.add(currentVertexList  [vertIndex + 0])
-        vertices.add(currentVertexList  [vertIndex + 1])
-        vertices.add(currentVertexList  [vertIndex + 2])
-        vertices.add(currentTexCoordList[texIndex  + 0])
-        vertices.add(currentTexCoordList[texIndex  + 1])
-        vertices.add(currentNormalList  [normIndex + 0])
-        vertices.add(currentNormalList  [normIndex + 1])
-        vertices.add(currentNormalList  [normIndex + 2])
+    private fun addVertex(vertSplit: List<String>) {
+        // Faces are defined using lists of vertex, texture and normal indices which start at 1
+        val vertIndex = vertSplit[0].toInt() - 1
+        val texIndex = vertSplit[1].toInt() - 1
+        val normIndex = vertSplit[2].toInt() - 1
+        currentVertices.add(currentVertexList  [vertIndex + 0])
+        currentVertices.add(currentVertexList  [vertIndex + 1])
+        currentVertices.add(currentVertexList  [vertIndex + 2])
+        currentVertices.add(currentTexCoordList[texIndex  + 0])
+        currentVertices.add(currentTexCoordList[texIndex  + 1])
+        currentVertices.add(currentNormalList  [normIndex + 0])
+        currentVertices.add(currentNormalList  [normIndex + 1])
+        currentVertices.add(currentNormalList  [normIndex + 2])
+    }
+
+    private fun addIndex(index: Int = currentIndices.size) {
+        currentIndices.add(index)
     }
 }
