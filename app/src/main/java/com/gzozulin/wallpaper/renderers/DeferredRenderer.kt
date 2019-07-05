@@ -13,6 +13,7 @@ import com.gzozulin.wallpaper.math.Vector3f
 import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.system.measureNanoTime
 
 class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val shaderLib = ShadersLib(context)
@@ -21,7 +22,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private lateinit var model: GLModel
 
-    // todo: upside down
+    // todo: upside down, normalized device space?
     private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val quadVertices = floatArrayOf(
             -1f,  1f, 0f,     0f, 1f,
@@ -44,22 +45,25 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var depthBuffer: GLRenderBuffer
 
     private lateinit var camera: SceneCamera
-    private val eye = Vector3f(y = 10f, z = 15f)
 
-    // todo face culling
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
         glCheck { GLES30.glClearColor(1f, 1f, 1f, 0f) }
+        glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
+        //glCheck { GLES30.glFrontFace(GLES30.GL_CW) }
+        //glCheck { GLES30.glEnable(GLES30.GL_CULL_FACE) }
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
+        val modelNanos = measureNanoTime {
+            model = modelsLib.loadModel("models/scene/space.obj", "models/akai/akai.png")
+        }
+        Log.i("DeferredRenderer", "Model loaded in ${TimeUnit.NANOSECONDS.toMillis(modelNanos)} millis")
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         glCheck { GLES30.glViewport(0, 0, width, height) }
         camera = SceneCamera(width.toFloat() / height.toFloat())
-        camera.lookAt(eye, Vector3f())
+        camera.lookAt(model.aabb)
         positionStorage = GLTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = GLES30.GL_RGBA16F,
@@ -92,7 +96,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
-            programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, eye)
+            programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, camera.eye)
             setupLights()
         }
     }

@@ -3,14 +3,13 @@ package com.gzozulin.wallpaper.gl
 import android.opengl.GLES30
 
 class GLMesh(
-        vertices: FloatArray, indices: IntArray,
-        private val attributes: List<GLAttribute>,
-        private val mode: Int = GLES30.GL_TRIANGLES) : GLBindable {
+        private val verticesBuffer: GLBuffer,
+        private val indicesBuffer: GLBuffer,
+        private val indicesCount: Int,
+        private val attributes: List<GLAttribute>) : GLBindable {
 
-    private val verticesBuffer: GLBuffer = GLBuffer(GLES30.GL_ARRAY_BUFFER, vertices)
-    private val indicesBuffer: GLBuffer = GLBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, indices)
-
-    private val indicesCount = indices.size
+    constructor(vertices: FloatArray, indices: IntArray, attributes: List<GLAttribute>)
+            : this(GLBuffer(GLES30.GL_ARRAY_BUFFER, vertices), GLBuffer(GLES30.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size, attributes)
 
     private fun bindVertexPointers() {
         var stride = 0
@@ -43,7 +42,7 @@ class GLMesh(
         indicesBuffer.unbind()
     }
 
-    fun draw() {
+    fun draw(mode: Int = GLES30.GL_TRIANGLES) {
         glCheck { GLES30.glDrawElements(mode, indicesCount, GLES30.GL_UNSIGNED_INT, 0) }
     }
 }

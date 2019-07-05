@@ -1,5 +1,7 @@
 #version 300 es
 
+precision highp float;
+
 in vec4 vFragPosition;
 in vec2 vTexCoord;
 in vec3 vNormal;

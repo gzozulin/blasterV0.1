@@ -1,5 +1,7 @@
 #version 300 es
 
+precision highp float;
+
 in vec2 vTexCoord;
 
 uniform sampler2D uTexPosition;
@@ -16,7 +18,7 @@ struct Light {
 const int LIGHTS_CNT = 16;
 uniform Light uLights[LIGHTS_CNT];
 
-const float ambientTerm         = 0.1;
+const float ambientTerm         = 0.7;
 const float lightConstantAtt    = 1.0;
 const float lightLinearAtt      = 0.8;
 const float lightQuadraticAtt   = 0.2;

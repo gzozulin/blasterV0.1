@@ -4,12 +4,12 @@ import android.content.Context
 import com.gzozulin.wallpaper.gl.GLAttribute
 import com.gzozulin.wallpaper.gl.GLMesh
 import com.gzozulin.wallpaper.gl.GLModel
+import com.gzozulin.wallpaper.math.AABB
 import com.gzozulin.wallpaper.math.SceneNode
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
-// todo: generic triangle fan for every poly count via indices
 // todo: generate bounding box, and have a method in camera to insert it
 class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
@@ -22,8 +22,11 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
     private val currentVertices = ArrayList<Float>()
     private val currentIndices = ArrayList<Int>()
 
-    // todo create Ntive(Float)Buffer directly, instead of copying arrays
+    private lateinit var currentAABB: AABB
+
+    // todo: create Native(Float)Buffer directly, instead of copying arrays
     fun loadModel(meshFilename: String, diffuseFilename: String): GLModel {
+        currentAABB = AABB()
         val inputStream = ctx.assets.open(meshFilename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
         bufferedReader.use {
@@ -40,7 +43,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), SceneNode())
+        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), SceneNode(), currentAABB)
     }
 
     private fun parseLine(line: String) {
@@ -72,7 +75,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
     private fun parseTexCoordinate(line: String) {
         val split = line.split(whitespaceRegex)
         currentTexCoordList.add(split[1].toFloat())
-        currentTexCoordList.add(split[2].toFloat())
+        currentTexCoordList.add(1f - split[2].toFloat())
     }
 
     private fun parseNormal(line: String) {
@@ -83,114 +86,22 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
     }
 
     private fun parseFace(line: String) {
-        val split = line.split(whitespaceRegex)
-        when (split.size) {
-            4 -> parseTriangle(split)
-            5 -> parsePolygon4(split)
-            6 -> parsePolygon5(split)
-            7 -> parsePolygon6(split)
-            8 -> parsePolygon7(split)
-            else -> throw IllegalStateException("Unknown geometry type! $line")
-        }
+        parsePolygon(line.split(whitespaceRegex))
     }
 
-    private fun parseTriangle(split: List<String>) {
-        addVertex(split[1].split(slashRegex))
-        addVertex(split[2].split(slashRegex))
-        addVertex(split[3].split(slashRegex))
-        addIndex()
-        addIndex()
-        addIndex()
-    }
-
-    private fun parsePolygon4(split: List<String>) {
-        addVertex(split[1].split(slashRegex))
-        addVertex(split[2].split(slashRegex))
-        addVertex(split[3].split(slashRegex))
-        addVertex(split[4].split(slashRegex))
-        val nextInd = currentIndices.size
-        addIndex(nextInd + 0)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 3)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 2)
-        addIndex(nextInd + 3)
-    }
-
-    private fun parsePolygon5(split: List<String>) {
-        addVertex(split[1].split(slashRegex))
-        addVertex(split[2].split(slashRegex))
-        addVertex(split[3].split(slashRegex))
-        addVertex(split[4].split(slashRegex))
-        addVertex(split[5].split(slashRegex))
-        val nextInd = currentIndices.size
-        addIndex(nextInd + 0)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 4)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 2)
-        addIndex(nextInd + 3)
-        addIndex(nextInd + 3)
-        addIndex(nextInd + 4)
-        addIndex(nextInd + 1)
-    }
-
-    private fun parsePolygon6(split: List<String>) {
-        addVertex(split[1].split(slashRegex))
-        addVertex(split[2].split(slashRegex))
-        addVertex(split[3].split(slashRegex))
-        addVertex(split[4].split(slashRegex))
-        addVertex(split[5].split(slashRegex))
-        addVertex(split[6].split(slashRegex))
-        val nextInd = currentIndices.size
-        addIndex(nextInd + 0)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 5)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 4)
-        addIndex(nextInd + 7)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 2)
-        addIndex(nextInd + 4)
-        addIndex(nextInd + 2)
-        addIndex(nextInd + 3)
-        addIndex(nextInd + 4)
-    }
-
-    private fun parsePolygon7(split: List<String>) {
-        addVertex(split[1].split(slashRegex))
-        addVertex(split[2].split(slashRegex))
-        addVertex(split[3].split(slashRegex))
-        addVertex(split[4].split(slashRegex))
-        addVertex(split[5].split(slashRegex))
-        addVertex(split[6].split(slashRegex))
-        addVertex(split[7].split(slashRegex))
-        val nextInd = currentIndices.size
-        addIndex(nextInd + 0)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 6)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 2)
-        addIndex(nextInd + 3)
-        addIndex(nextInd + 3)
-        addIndex(nextInd + 4)
-        addIndex(nextInd + 5)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 3)
-        addIndex(nextInd + 5)
-        addIndex(nextInd + 1)
-        addIndex(nextInd + 5)
-        addIndex(nextInd + 6)
-    }
-
-    private fun addVertex(vertSplit: List<String>) {
-        // Faces are defined using lists of vertex, texture and normal indices which start at 1
+    // Faces are defined using lists of vertex, texture and normal indices which start at 1
+    private fun addVertex(vertex: String) {
+        val vertSplit = vertex.split(slashRegex)
         val vertIndex = vertSplit[0].toInt() - 1
-        val texIndex = vertSplit[1].toInt() - 1
+        val texIndex = vertSplit[1].toInt()  - 1
         val normIndex = vertSplit[2].toInt() - 1
-        currentVertices.add(currentVertexList  [vertIndex * 3 + 0])
-        currentVertices.add(currentVertexList  [vertIndex * 3 + 1])
-        currentVertices.add(currentVertexList  [vertIndex * 3 + 2])
+        val vx = currentVertexList  [vertIndex * 3 + 0]
+        val vy = currentVertexList  [vertIndex * 3 + 1]
+        val vz = currentVertexList  [vertIndex * 3 + 2]
+        updateAABB(vx, vy, vz)
+        currentVertices.add(vx)
+        currentVertices.add(vy)
+        currentVertices.add(vz)
         currentVertices.add(currentTexCoordList[texIndex  * 2 + 0])
         currentVertices.add(currentTexCoordList[texIndex  * 2 + 1])
         currentVertices.add(currentNormalList  [normIndex * 3 + 0])
@@ -198,7 +109,39 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentVertices.add(currentNormalList  [normIndex * 3 + 2])
     }
 
-    private fun addIndex(index: Int = currentIndices.size) {
-        currentIndices.add(index)
+    private fun updateAABB(vx: Float, vy: Float, vz: Float) {
+        if (vx < currentAABB.min.x) {
+            currentAABB.min.x = vx
+        }
+        if (vx > currentAABB.max.x) {
+            currentAABB.max.x = vx
+        }
+        if (vy < currentAABB.min.y) {
+            currentAABB.min.y = vy
+        }
+        if (vy > currentAABB.max.y) {
+            currentAABB.max.y = vy
+        }
+        if (vz < currentAABB.min.z) {
+            currentAABB.min.z = vz
+        }
+        if (vz > currentAABB.max.z) {
+            currentAABB.max.z = vz
+        }
+    }
+
+    private fun parsePolygon(split: List<String>) {
+        val verticesCnt = split.size - 1
+        val indices = IntArray(verticesCnt)
+        for (vertex in 0 until verticesCnt) {
+            addVertex(split[vertex + 1])
+            indices[vertex] = currentIndices.size + vertex
+        }
+        val trianglesCnt = verticesCnt - 2
+        for (triangle in 0 until trianglesCnt) {
+            currentIndices.add(indices[0]) // triangle fan
+            currentIndices.add(indices[triangle + 1])
+            currentIndices.add(indices[triangle + 2])
+        }
     }
 }
