@@ -9,6 +9,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
+// todo: generate bounding box, and have a method in camera to insert it
 class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
@@ -84,7 +85,10 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         val split = line.split(whitespaceRegex)
         when (split.size) {
             4 -> parseTriangle(split)
-            5 -> parseQuadrilateral(split)
+            5 -> parsePolygon4(split)
+            6 -> parsePolygon5(split)
+            7 -> parsePolygon6(split)
+            8 -> parsePolygon7(split)
             else -> throw IllegalStateException("Unknown geometry type! $line")
         }
     }
@@ -98,7 +102,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         addIndex()
     }
 
-    private fun parseQuadrilateral(split: List<String>) {
+    private fun parsePolygon4(split: List<String>) {
         addVertex(split[1].split(slashRegex))
         addVertex(split[2].split(slashRegex))
         addVertex(split[3].split(slashRegex))
@@ -110,6 +114,72 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         addIndex(nextInd + 1)
         addIndex(nextInd + 2)
         addIndex(nextInd + 3)
+    }
+
+    private fun parsePolygon5(split: List<String>) {
+        addVertex(split[1].split(slashRegex))
+        addVertex(split[2].split(slashRegex))
+        addVertex(split[3].split(slashRegex))
+        addVertex(split[4].split(slashRegex))
+        addVertex(split[5].split(slashRegex))
+        val nextInd = currentIndices.size
+        addIndex(nextInd + 0)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 4)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 2)
+        addIndex(nextInd + 3)
+        addIndex(nextInd + 3)
+        addIndex(nextInd + 4)
+        addIndex(nextInd + 1)
+    }
+
+    private fun parsePolygon6(split: List<String>) {
+        addVertex(split[1].split(slashRegex))
+        addVertex(split[2].split(slashRegex))
+        addVertex(split[3].split(slashRegex))
+        addVertex(split[4].split(slashRegex))
+        addVertex(split[5].split(slashRegex))
+        addVertex(split[6].split(slashRegex))
+        val nextInd = currentIndices.size
+        addIndex(nextInd + 0)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 5)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 4)
+        addIndex(nextInd + 7)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 2)
+        addIndex(nextInd + 4)
+        addIndex(nextInd + 2)
+        addIndex(nextInd + 3)
+        addIndex(nextInd + 4)
+    }
+
+    private fun parsePolygon7(split: List<String>) {
+        addVertex(split[1].split(slashRegex))
+        addVertex(split[2].split(slashRegex))
+        addVertex(split[3].split(slashRegex))
+        addVertex(split[4].split(slashRegex))
+        addVertex(split[5].split(slashRegex))
+        addVertex(split[6].split(slashRegex))
+        addVertex(split[7].split(slashRegex))
+        val nextInd = currentIndices.size
+        addIndex(nextInd + 0)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 6)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 2)
+        addIndex(nextInd + 3)
+        addIndex(nextInd + 3)
+        addIndex(nextInd + 4)
+        addIndex(nextInd + 5)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 3)
+        addIndex(nextInd + 5)
+        addIndex(nextInd + 1)
+        addIndex(nextInd + 5)
+        addIndex(nextInd + 6)
     }
 
     private fun addVertex(vertSplit: List<String>) {
