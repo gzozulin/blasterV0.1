@@ -117,14 +117,14 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         val vertIndex = vertSplit[0].toInt() - 1
         val texIndex = vertSplit[1].toInt() - 1
         val normIndex = vertSplit[2].toInt() - 1
-        currentVertices.add(currentVertexList  [vertIndex + 0])
-        currentVertices.add(currentVertexList  [vertIndex + 1])
-        currentVertices.add(currentVertexList  [vertIndex + 2])
-        currentVertices.add(currentTexCoordList[texIndex  + 0])
-        currentVertices.add(currentTexCoordList[texIndex  + 1])
-        currentVertices.add(currentNormalList  [normIndex + 0])
-        currentVertices.add(currentNormalList  [normIndex + 1])
-        currentVertices.add(currentNormalList  [normIndex + 2])
+        currentVertices.add(currentVertexList  [vertIndex * 3 + 0])
+        currentVertices.add(currentVertexList  [vertIndex * 3 + 1])
+        currentVertices.add(currentVertexList  [vertIndex * 3 + 2])
+        currentVertices.add(currentTexCoordList[texIndex  * 2 + 0])
+        currentVertices.add(currentTexCoordList[texIndex  * 2 + 1])
+        currentVertices.add(currentNormalList  [normIndex * 3 + 0])
+        currentVertices.add(currentNormalList  [normIndex * 3 + 1])
+        currentVertices.add(currentNormalList  [normIndex * 3 + 2])
     }
 
     private fun addIndex(index: Int = currentIndices.size) {

@@ -11,6 +11,7 @@ import com.gzozulin.wallpaper.gl.*
 import com.gzozulin.wallpaper.math.SceneCamera
 import com.gzozulin.wallpaper.math.SceneNode
 import com.gzozulin.wallpaper.math.Vector3f
+import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.system.measureNanoTime
@@ -54,7 +55,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        model = modelsLib.loadModel("models/akai/test.obj", "models/akai/akai.png")
+        model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
@@ -124,27 +125,30 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     private var fps = 0
-    private var ratio = 0f
     private var last = System.currentTimeMillis()
 
-    private fun printFps(rel: Float) {
+    private fun printFps() {
         fps++
-        ratio += rel
         val current = System.currentTimeMillis()
         if (current - last >= 1000L) {
-            Log.i("DeferredRenderer", "Fps: $fps, geometry/lighting time ratio: ${String.format("%.2f", ratio / fps.toFloat())}")
+            Log.i("DeferredRenderer", "Fps: $fps")
             fps = 0
-            ratio = 0f
             last = current
         }
     }
 
+    private val nanosForFrame = TimeUnit.MILLISECONDS.toNanos(16)
+
     override fun onDrawFrame(gl: GL10?) {
-        val geometryTime = measureNanoTime {
-            model.node.tick()
-            geometryPass()
-        }
-        val lightingTime = measureNanoTime {  lightingPass() }
-        printFps(geometryTime.toFloat() / lightingTime.toFloat())
+        //var nanos = nanosForFrame
+        //while (nanos > 0) {
+            //val took = measureNanoTime {
+                model.node.tick()
+                geometryPass()
+                lightingPass()
+                printFps()
+            //}
+            //nanos -= took
+        //}
     }
 }
