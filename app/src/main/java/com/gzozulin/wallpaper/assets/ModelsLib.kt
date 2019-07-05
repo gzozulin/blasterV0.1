@@ -9,6 +9,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
+// todo: generic triangle fan for every poly count via indices
 // todo: generate bounding box, and have a method in camera to insert it
 class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
@@ -47,12 +48,12 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
             return
         }
         when (line[0]) {
-            'v' -> parseVectorAttribute(line)
+            'v' -> parseVertexAttribute(line)
             'f' -> parseFace(line)
         }
     }
 
-    private fun parseVectorAttribute(line: String) {
+    private fun parseVertexAttribute(line: String) {
         when (line[1]) {
             ' ' -> parseVertex(line)
             't' -> parseTexCoordinate(line)
