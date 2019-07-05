@@ -9,12 +9,10 @@ import com.gzozulin.wallpaper.assets.ShadersLib
 import com.gzozulin.wallpaper.assets.TexturesLib
 import com.gzozulin.wallpaper.gl.*
 import com.gzozulin.wallpaper.math.SceneCamera
-import com.gzozulin.wallpaper.math.SceneNode
 import com.gzozulin.wallpaper.math.Vector3f
 import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
-import kotlin.system.measureNanoTime
 
 class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val shaderLib = ShadersLib(context)
