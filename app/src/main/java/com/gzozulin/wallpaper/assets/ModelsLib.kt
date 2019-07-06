@@ -10,7 +10,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
-// todo: generate bounding box, and have a method in camera to insert it
 class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
@@ -89,15 +88,31 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         parsePolygon(line.split(whitespaceRegex))
     }
 
+    private fun parsePolygon(split: List<String>) {
+        val verticesCnt = split.size - 1
+        val indices = ArrayList<Int>()
+        var nextIndex = currentIndices.size
+        for (vertex in 0 until verticesCnt) {
+            addVertex(split[vertex + 1])
+            indices.add(nextIndex++)
+        }
+        val trianglesCnt = verticesCnt - 2
+        for (triangle in 0 until trianglesCnt) {
+            currentIndices.add(indices[0]) // triangle fan
+            currentIndices.add(indices[triangle + 1])
+            currentIndices.add(indices[triangle + 2])
+        }
+    }
+
     // Faces are defined using lists of vertex, texture and normal indices which start at 1
     private fun addVertex(vertex: String) {
         val vertSplit = vertex.split(slashRegex)
         val vertIndex = vertSplit[0].toInt() - 1
         val texIndex = vertSplit[1].toInt()  - 1
         val normIndex = vertSplit[2].toInt() - 1
-        val vx = currentVertexList  [vertIndex * 3 + 0]
-        val vy = currentVertexList  [vertIndex * 3 + 1]
-        val vz = currentVertexList  [vertIndex * 3 + 2]
+        val vx = currentVertexList[vertIndex * 3 + 0]
+        val vy = currentVertexList[vertIndex * 3 + 1]
+        val vz = currentVertexList[vertIndex * 3 + 2]
         updateAABB(vx, vy, vz)
         currentVertices.add(vx)
         currentVertices.add(vy)
@@ -127,21 +142,6 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         }
         if (vz > currentAABB.max.z) {
             currentAABB.max.z = vz
-        }
-    }
-
-    private fun parsePolygon(split: List<String>) {
-        val verticesCnt = split.size - 1
-        val indices = IntArray(verticesCnt)
-        for (vertex in 0 until verticesCnt) {
-            addVertex(split[vertex + 1])
-            indices[vertex] = currentIndices.size + vertex
-        }
-        val trianglesCnt = verticesCnt - 2
-        for (triangle in 0 until trianglesCnt) {
-            currentIndices.add(indices[0]) // triangle fan
-            currentIndices.add(indices[triangle + 1])
-            currentIndices.add(indices[triangle + 2])
         }
     }
 }

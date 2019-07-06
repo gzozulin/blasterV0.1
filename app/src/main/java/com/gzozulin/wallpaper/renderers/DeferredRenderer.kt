@@ -55,7 +55,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
         val modelNanos = measureNanoTime {
-            model = modelsLib.loadModel("models/scene/space.obj", "models/akai/akai.png")
+            model = modelsLib.loadModel("models/scene/space.obj", "models/scene/mars.png")
         }
         Log.i("DeferredRenderer", "Model loaded in ${TimeUnit.NANOSECONDS.toMillis(modelNanos)} millis")
     }
