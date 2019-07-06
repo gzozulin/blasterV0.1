@@ -49,13 +49,13 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         glCheck { GLES30.glClearColor(1f, 1f, 1f, 0f) }
         glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
-        //glCheck { GLES30.glFrontFace(GLES30.GL_CCW) }
-        glCheck { GLES30.glDisable(GLES30.GL_CULL_FACE) }
+        glCheck { GLES30.glFrontFace(GLES30.GL_CCW) }
+        glCheck { GLES30.glEnable(GLES30.GL_CULL_FACE) }
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
         val modelNanos = measureNanoTime {
-            model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
+            model = modelsLib.loadModel("models/scene/space.obj", "models/scene/mars.png")
         }
         Log.i("DeferredRenderer", "Model loaded in ${TimeUnit.NANOSECONDS.toMillis(modelNanos)} millis")
     }
