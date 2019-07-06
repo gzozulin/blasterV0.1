@@ -9,7 +9,9 @@ import com.gzozulin.wallpaper.math.SceneNode
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
+import java.nio.file.Files.size
 
+// todo: info about model: vert/ind count, times, progress loading, etc
 class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
@@ -51,7 +53,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         }
         when (line[0]) {
             'v' -> parseVertexAttribute(line)
-            'f' -> parseFace(line)
+            'f' -> parsePolygon(line)
         }
     }
 
@@ -84,23 +86,19 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentNormalList.add(split[3].toFloat())
     }
 
-    private fun parseFace(line: String) {
-        parsePolygon(line.split(whitespaceRegex))
-    }
-
-    private fun parsePolygon(split: List<String>) {
+    private fun parsePolygon(line: String) {
+        val split = line.split(whitespaceRegex)
         val verticesCnt = split.size - 1
         val indices = ArrayList<Int>()
-        var nextIndex = currentIndices.size
+        var nextIndex = currentVertices.size / 8 // position, texcoord, normal
         for (vertex in 0 until verticesCnt) {
             addVertex(split[vertex + 1])
-            indices.add(nextIndex++)
+            indices.add(nextIndex)
+            nextIndex++
         }
-        val trianglesCnt = verticesCnt - 2
-        for (triangle in 0 until trianglesCnt) {
-            currentIndices.add(indices[0]) // triangle fan
-            currentIndices.add(indices[triangle + 1])
-            currentIndices.add(indices[triangle + 2])
+        val triangleCnt = verticesCnt - 2
+        for (triangle in 0 until triangleCnt) {
+            addTriangle(indices[0], indices[triangle + 1], indices[triangle + 2])
         }
     }
 
@@ -108,40 +106,36 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
     private fun addVertex(vertex: String) {
         val vertSplit = vertex.split(slashRegex)
         val vertIndex = vertSplit[0].toInt() - 1
-        val texIndex = vertSplit[1].toInt()  - 1
-        val normIndex = vertSplit[2].toInt() - 1
         val vx = currentVertexList[vertIndex * 3 + 0]
         val vy = currentVertexList[vertIndex * 3 + 1]
         val vz = currentVertexList[vertIndex * 3 + 2]
-        updateAABB(vx, vy, vz)
         currentVertices.add(vx)
         currentVertices.add(vy)
         currentVertices.add(vz)
-        currentVertices.add(currentTexCoordList[texIndex  * 2 + 0])
-        currentVertices.add(currentTexCoordList[texIndex  * 2 + 1])
-        currentVertices.add(currentNormalList  [normIndex * 3 + 0])
-        currentVertices.add(currentNormalList  [normIndex * 3 + 1])
-        currentVertices.add(currentNormalList  [normIndex * 3 + 2])
+        currentAABB.include(vx, vy, vz)
+        if (vertSplit[1].isNotEmpty()) {
+            val texIndex = vertSplit[1].toInt()  - 1
+            currentVertices.add(currentTexCoordList[texIndex  * 2 + 0])
+            currentVertices.add(currentTexCoordList[texIndex  * 2 + 1])
+        } else {
+            currentVertices.add(0f)
+            currentVertices.add(0f)
+        }
+        if (vertSplit[2].isNotEmpty()) {
+            val normIndex = vertSplit[2].toInt() - 1
+            currentVertices.add(currentNormalList  [normIndex * 3 + 0])
+            currentVertices.add(currentNormalList  [normIndex * 3 + 1])
+            currentVertices.add(currentNormalList  [normIndex * 3 + 2])
+        } else {
+            currentVertices.add(0f)
+            currentVertices.add(0f)
+            currentVertices.add(0f)
+        }
     }
 
-    private fun updateAABB(vx: Float, vy: Float, vz: Float) {
-        if (vx < currentAABB.min.x) {
-            currentAABB.min.x = vx
-        }
-        if (vx > currentAABB.max.x) {
-            currentAABB.max.x = vx
-        }
-        if (vy < currentAABB.min.y) {
-            currentAABB.min.y = vy
-        }
-        if (vy > currentAABB.max.y) {
-            currentAABB.max.y = vy
-        }
-        if (vz < currentAABB.min.z) {
-            currentAABB.min.z = vz
-        }
-        if (vz > currentAABB.max.z) {
-            currentAABB.max.z = vz
-        }
+    private fun addTriangle(ind0: Int, ind1: Int, ind2: Int) {
+        currentIndices.add(ind0)
+        currentIndices.add(ind1)
+        currentIndices.add(ind2)
     }
 }

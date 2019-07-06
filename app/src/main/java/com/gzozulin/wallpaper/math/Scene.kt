@@ -26,7 +26,7 @@ class SceneCamera(aspectRatio: Float) {
             maxValue = aabb.depth
         }
         val center = aabb.center
-        val from = center + Vector3f(y = maxValue, z = maxValue)
+        val from = center + Vector3f(y = maxValue / 2f, z = maxValue)
         lookAt(from, center)
     }
 }
