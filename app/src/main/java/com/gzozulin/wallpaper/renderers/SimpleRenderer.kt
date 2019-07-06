@@ -6,9 +6,9 @@ import android.opengl.GLSurfaceView
 import com.gzozulin.wallpaper.assets.ShadersLib
 import com.gzozulin.wallpaper.assets.TexturesLib
 import com.gzozulin.wallpaper.gl.*
-import com.gzozulin.wallpaper.math.SceneCamera
-import com.gzozulin.wallpaper.math.SceneNode
-import com.gzozulin.wallpaper.math.Vector3f
+import com.gzozulin.wallpaper.math.Camera
+import com.gzozulin.wallpaper.math.Node
+import com.gzozulin.wallpaper.math.Vec3
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -20,10 +20,10 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
 
     private lateinit var mesh: GLMesh
 
-    private lateinit var camera: SceneCamera
+    private lateinit var camera: Camera
 
-    private val node1 = SceneNode()
-    private val node2 = SceneNode(node1)
+    private val node1 = Node()
+    private val node2 = Node(node1)
 
     private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val triangleVertices = floatArrayOf(
@@ -48,8 +48,8 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         glCheck { GLES30.glViewport(0, 0, width, height) }
-        camera = SceneCamera(width.toFloat() / height.toFloat())
-        camera.lookAt(Vector3f(z = 2.5f), Vector3f())
+        camera = Camera(width.toFloat() / height.toFloat())
+        camera.lookAt(Vec3(z = 2.5f), Vec3())
     }
 
     override fun onDrawFrame(gl: GL10?) {

@@ -8,8 +8,8 @@ import com.gzozulin.wallpaper.assets.ModelsLib
 import com.gzozulin.wallpaper.assets.ShadersLib
 import com.gzozulin.wallpaper.assets.TexturesLib
 import com.gzozulin.wallpaper.gl.*
-import com.gzozulin.wallpaper.math.SceneCamera
-import com.gzozulin.wallpaper.math.Vector3f
+import com.gzozulin.wallpaper.math.Camera
+import com.gzozulin.wallpaper.math.Vec3
 import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -44,7 +44,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private lateinit var depthBuffer: GLRenderBuffer
 
-    private lateinit var camera: SceneCamera
+    private lateinit var camera: Camera
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
         glCheck { GLES30.glClearColor(1f, 1f, 1f, 0f) }
@@ -62,7 +62,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         glCheck { GLES30.glViewport(0, 0, width, height) }
-        camera = SceneCamera(width.toFloat() / height.toFloat())
+        camera = Camera(width.toFloat() / height.toFloat())
         camera.lookAt(model.aabb)
         positionStorage = GLTexture(
                 unit = 0,
@@ -103,8 +103,8 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private fun setupLights() {
         for (i in 0..15) {
-            programLightPass.setUniform(uniformLightPosition(i), Vector3f().randomize(5f))
-            programLightPass.setUniform(uniformLightColor(i), Vector3f().randomize(1f))
+            programLightPass.setUniform(uniformLightPosition(i), Vec3().randomize(5f))
+            programLightPass.setUniform(uniformLightColor(i), Vec3().randomize(1f))
         }
     }
 

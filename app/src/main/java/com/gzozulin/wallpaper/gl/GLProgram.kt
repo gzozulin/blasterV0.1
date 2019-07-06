@@ -1,8 +1,8 @@
 package com.gzozulin.wallpaper.gl
 
 import android.opengl.GLES30
-import com.gzozulin.wallpaper.math.Matrix4f
-import com.gzozulin.wallpaper.math.Vector3f
+import com.gzozulin.wallpaper.math.Mat4
+import com.gzozulin.wallpaper.math.Vec3
 import java.lang.IllegalStateException
 
 enum class GLShaderType(val type: Int) {
@@ -95,11 +95,11 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         glCheck { GLES30.glUniform1f(uniformLocations[uniform]!!, value) }
     }
 
-    fun setUniform(uniform: GLUniform, value: Vector3f) {
+    fun setUniform(uniform: GLUniform, value: Vec3) {
         glCheck { GLES30.glUniform3fv(uniformLocations[uniform]!!, 1, value.values, 0) }
     }
 
-    fun setUniform(uniform: GLUniform, value: Matrix4f) {
+    fun setUniform(uniform: GLUniform, value: Mat4) {
         glCheck { GLES30.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, value.values, 0) }
     }
 }

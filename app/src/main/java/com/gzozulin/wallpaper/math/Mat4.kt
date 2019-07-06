@@ -2,7 +2,7 @@ package com.gzozulin.wallpaper.math
 
 import android.opengl.Matrix
 
-class Matrix4f(val values: FloatArray) {
+class Mat4(val values: FloatArray) {
     constructor() : this(floatArrayOf(
             1f, 0f, 0f, 0f,
             0f, 1f, 0f, 0f,
@@ -18,7 +18,7 @@ class Matrix4f(val values: FloatArray) {
         Matrix.perspectiveM(values, 0, fovyDegrees, aspect, zNear, zFar)
     }
 
-    fun lookAtInplace(eye: Vector3f, center: Vector3f, up: Vector3f) {
+    fun lookAtInplace(eye: Vec3, center: Vec3, up: Vec3) {
         Matrix.setLookAtM(values, 0,
                 eye.values[0], eye.values[1], eye.values[2],
                 center.values[0], center.values[1], center.values[2],
@@ -26,21 +26,21 @@ class Matrix4f(val values: FloatArray) {
         )
     }
 
-    fun rotateInplace(radians: Float, axis: Vector3f) {
+    fun rotateInplace(radians: Float, axis: Vec3) {
         Matrix.rotateM(values, 0, radians, axis.values[0], axis.values[1], axis.values[2])
     }
 
-    fun translateInplace(vector: Vector3f) {
-        Matrix.translateM(values, 0, vector.values[0], vector.values[1], vector.values[2])
+    fun translateInplace(vec: Vec3) {
+        Matrix.translateM(values, 0, vec.values[0], vec.values[1], vec.values[2])
     }
 
-    fun scaleInplace(vector: Vector3f) {
-        Matrix.scaleM(values, 0, vector.values[0], vector.values[1], vector.values[2])
+    fun scaleInplace(vec: Vec3) {
+        Matrix.scaleM(values, 0, vec.values[0], vec.values[1], vec.values[2])
     }
 
-    operator fun times(other: Matrix4f): Matrix4f {
+    operator fun times(other: Mat4): Mat4 {
         val result = FloatArray(16)
         Matrix.multiplyMM(result, 0, values, 0, other.values, 0)
-        return Matrix4f(result)
+        return Mat4(result)
     }
 }

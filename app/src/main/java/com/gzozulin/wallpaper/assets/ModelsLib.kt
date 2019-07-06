@@ -5,13 +5,13 @@ import com.gzozulin.wallpaper.gl.GLAttribute
 import com.gzozulin.wallpaper.gl.GLMesh
 import com.gzozulin.wallpaper.gl.GLModel
 import com.gzozulin.wallpaper.math.AABB
-import com.gzozulin.wallpaper.math.SceneNode
+import com.gzozulin.wallpaper.math.Node
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
-import java.nio.file.Files.size
 
 // todo: info about model: vert/ind count, times, progress loading, etc
+// todo: load material from *.mtl
 class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
@@ -44,7 +44,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), SceneNode(), currentAABB)
+        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), currentAABB)
     }
 
     private fun parseLine(line: String) {
