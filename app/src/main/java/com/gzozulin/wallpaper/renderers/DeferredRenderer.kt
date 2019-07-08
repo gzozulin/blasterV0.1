@@ -136,8 +136,6 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         }
     }
 
-    private val nanosForFrame = TimeUnit.MILLISECONDS.toNanos(16)
-
     override fun onDrawFrame(gl: GL10?) {
         model.node.tick()
         geometryPass()
