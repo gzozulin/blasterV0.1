@@ -47,7 +47,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var camera: Camera
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        glCheck { GLES30.glClearColor(1f, 1f, 1f, 0f) }
+        glCheck { GLES30.glClearColor(0.9f, 0.9f, 1f, 0f) }
         glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
         glCheck { GLES30.glFrontFace(GLES30.GL_CCW) }
         glCheck { GLES30.glEnable(GLES30.GL_CULL_FACE) }
@@ -55,7 +55,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
         val modelNanos = measureNanoTime {
-            model = modelsLib.loadModel("models/scene/space.obj", "models/scene/mars.png")
+            model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
         }
         Log.i("DeferredRenderer", "Model loaded in ${TimeUnit.NANOSECONDS.toMillis(modelNanos)} millis")
     }
@@ -139,15 +139,9 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val nanosForFrame = TimeUnit.MILLISECONDS.toNanos(16)
 
     override fun onDrawFrame(gl: GL10?) {
-        //var nanos = nanosForFrame
-        //while (nanos > 0) {
-            //val took = measureNanoTime {
-                model.node.tick()
-                geometryPass()
-                lightingPass()
-                printFps()
-            //}
-            //nanos -= took
-        //}
+        model.node.tick()
+        geometryPass()
+        lightingPass()
+        printFps()
     }
 }
