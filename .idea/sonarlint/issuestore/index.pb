@@ -24,3 +24,5 @@ i
 9offline/src/main/kotlin/com/blaster/scene/CornellScene.kt,b\e\bef312186fc20497e41cf6bead6b6f4b1a3f3cf8
 E
 realtime/build.gradle,a\b\ab275079187d869ba7fd8f71dbc8fad65f5abe7d
+h
+8offline/src/main/kotlin/com/blaster/tracing/Raytracer.kt,3\e\3e67088c4faa3c9581acb1883b434bbfdf7249d2

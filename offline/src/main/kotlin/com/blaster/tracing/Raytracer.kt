@@ -1,8 +1,4 @@
 package com.blaster.tracing
-
-import com.blaster.REGION_CNT
-import com.blaster.WIDTH
-import com.blaster.HEIGHT
 import com.blaster.hitables.Hitable
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
@@ -15,6 +11,8 @@ private const val SAMPLES          = 50
 private const val REFLECTIONS      = 20
 
 class Raytracer(
+    private val height: Int,
+    private val width: Int,
     private val scene: Hitable,
     private val camera: Camera,
     private val ppt: PptFile,
@@ -24,28 +22,28 @@ class Raytracer(
     private var finished = 0
 
     fun render() {
-        Flowable.range(0, REGION_CNT)
+        Flowable.range(0, regionCnt)
             .parallel()
             .runOn(Schedulers.computation())
-            .doOnNext { calculateRegion(scene, it, REGION_CNT) }
+            .doOnNext { calculateRegion(scene, it, regionCnt) }
             .sequential()
             .blockingLast()
         ppt.flush()
     }
 
     private fun calculateRegion(world: Hitable, index: Int, cnt: Int) {
-        if (HEIGHT % cnt != 0) {
+        if (height % cnt != 0) {
             throw IllegalArgumentException("Should split just fine!")
         }
-        val regionLines = HEIGHT / cnt
+        val regionLines = height / cnt
         val regionStart = regionLines * index
         val regionEnd = regionStart + regionLines
         for (y in (regionEnd - 1) downTo regionStart) {
-            for (x in 0 until WIDTH) {
+            for (x in 0 until width) {
                 var color = Vec3()
                 for (i in 0..SAMPLES) {
-                    val u = (x.toFloat() + Math.random().toFloat()) / WIDTH.toFloat()
-                    val v = (y.toFloat() + Math.random().toFloat()) / HEIGHT.toFloat()
+                    val u = (x.toFloat() + Math.random().toFloat()) / width.toFloat()
+                    val v = (y.toFloat() + Math.random().toFloat()) / height.toFloat()
                     val ray = camera.getRay(u, v)
                     color += color(ray, world, 0)
                 }
