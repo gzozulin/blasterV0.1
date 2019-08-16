@@ -1,20 +1,26 @@
 
-P
- app/src/main/AndroidManifest.xml,8\c\8c55c3ccc257e5907959013f99656e4c8ec3903e
-@
-app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
-h
-8app/src/main/java/com/gzozulin/wallpaper/gl/GLProgram.kt,6\6\66a704c3d56c0d7b7f71af5a5c53c85a605df16b
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
-m
-=app/src/main/java/com/gzozulin/wallpaper/gl/GLRenderBuffer.kt,7\a\7a9115c5d4cbf062fee481e12d7dc83d0f595114
-d
-4app/src/main/java/com/gzozulin/wallpaper/gl/GLAux.kt,3\7\37cdb84f9a6bfdae91f84bd57d980682c787fa63
+q
+Arealtime/src/main/java/com/gzozulin/wallpaper/assets/ModelsLib.kt,4\c\4cfe7e8d89b3d4a8e5d904e9728360b9f0187c06
+j
+:realtime/src/main/java/com/gzozulin/wallpaper/gl/GLMesh.kt,3\a\3ab68997b368b4ae8a2a56f1892b03a6eb021de7
+o
+?realtime/src/main/java/com/gzozulin/wallpaper/gl/GLAttribute.kt,5\3\53c9f90bee6433e3b187e374295af96ab9d28e19
+{
+Krealtime/src/main/java/com/gzozulin/wallpaper/renderers/DeferredRenderer.kt,a\5\a5e285b406471b7d5dc3a69c80e9be3de40a3ae4
 l
-<app/src/main/java/com/gzozulin/wallpaper/gl/GLFrameBuffer.kt,b\8\b88d932338a5b5dbc28484a795732cb493723ddf
-g
-7app/src/main/java/com/gzozulin/wallpaper/gl/GLBuffer.kt,8\9\899d26fd8bd4384ec8f74e75927265fd6a54d57d
-h
-8app/src/main/java/com/gzozulin/wallpaper/gl/GLTexture.kt,2\d\2df6084c6dd845c8cd00e5d2da98f080c8a4fb0f
+<realtime/src/main/java/com/gzozulin/wallpaper/gl/GLBuffer.kt,9\b\9b84a783932d1ec6bd22a121813c5c02c223ca07
+<
+build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
+D
+offline/build.gradle,1\1\1119f096374fa7c8ed1f20c67cb4d4b7f4bf6d3a
+[
++offline/src/main/kotlin/com/blaster/Main.kt,2\8\28c43d329799f2f27d2ab444829c015acaa07dfe
+k
+;offline/src/main/kotlin/com/blaster/texture/ImageTexture.kt,a\8\a85d49785ac7b709b1c7f0877caacded814b0981
+i
+9offline/src/main/kotlin/com/blaster/scene/CornellScene.kt,b\e\bef312186fc20497e41cf6bead6b6f4b1a3f3cf8
+E
+realtime/build.gradle,a\b\ab275079187d869ba7fd8f71dbc8fad65f5abe7d
