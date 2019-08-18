@@ -8,20 +8,34 @@ import com.blaster.scene.CornellScene
 import kotlin.system.measureNanoTime
 
 fun main() {
-    // header h1 Creating an offline raytracer.
+    // header h1 Creating a software raytracer in Kotlin.
 
-    /* In the modern day and age, there is probably no human being, who have an access to the internet and did not saw any computer
-    generated graphics. Since you obviously are online, I am assuming, that you are not the one :)
-    Computer graphics is a widely adopted way to generate images on the screen, or even sequences of images. If you will add
-    an interactivity to the mix - you will have a full blown video game. */
+    // header h2 A picture is worth a thousand words.
 
-    /* In this demo, we will have a look at a subset of all possible graphics generators - the offline raytracer. There are two main
-    approaches: online and offline. The difference is substantial: offline renderers can produce much better imagery at the expense of the
-    speed. Such software can be used to produce film-quality material, but video games are out of the reach. Non the less - it is a very
-    interesting project to accomplish and it can showcase the most important concept of Computer Graphics - how the light interacts with
-    the surface and the resulting image is produced. */
+    /* Hello and welcome to our demo! */
 
-    // Here is a sneak peak on our expected results:
+    /* Computer Graphics is ever-present nowadays. You can find it in movies, video games,
+    interactive presentations - almost everywhere. But what actually happens behind the scenes? In
+    this demo, we will go step by step through the process of the creation of an image from the
+    scene description. */
+
+    /* Let's start with basics: there is a multitude of formats in which an image can be represented
+    on a computer system. Most commonly known are jpeg, png, bmp, gif formats. Most of those image
+    formats include some kind of compression or animation or both. For our demo, we will choose a
+    slightly less common format - a ppt file. What is good about it - is the fact that it is
+    human-readable. We also can modify it easily, without elaborate compression routines. The code
+    for it will be shown later on. */
+
+    /* Next step from a standalone image is an animation. The difference is very simple - while an
+    image represents a static scene, the animation is a sequence of images - snapshots of the same
+    scene, happened during a timeframe. We can even make those animations interactive - by adding
+    user input. And voila - we have a video game. */
+
+    /* In this demo, we will be working on a software raytracer. This means that our raytracer will
+    not be using specialized hardware - which is known as Graphics Processing Unit (or GPU in
+    short). */
+
+    // Here are some of the results produced by our end-product:
     // include picture Raytraced image; This image was produced with the raytracer explained in this article;https://camo.githubusercontent.com/e0c2987577fb4a962731d007e5151ab351862144/68747470733a2f2f692e696d6775722e636f6d2f6b464d546375382e6a7067
 
     // header h2 The Raytracer class.
