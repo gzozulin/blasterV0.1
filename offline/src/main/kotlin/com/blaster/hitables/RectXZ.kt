@@ -14,7 +14,7 @@ data class RectXZ(
 ) : Hitable {
 
     private val aabb =
-        AABB(Vec3(x0, k - 0.0001f, z0), Vec3(x1, k + 0.0001f, z1))
+            AABB(Vec3(x0, k - 0.0001f, z0), Vec3(x1, k + 0.0001f, z1))
 
     override fun aabb(): AABB = aabb
 

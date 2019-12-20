@@ -1,23 +1,15 @@
 plugins {
+    id 'java-library'
     id 'org.jetbrains.kotlin.jvm'
 }
 
-group 'raytracer'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    implementation project(':math')
-
-    testImplementation 'junit:junit:4.12'
-    
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-
-    compile 'io.reactivex.rxjava2:rxjava:2.2.2'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }
+
+sourceCompatibility = "7"
+targetCompatibility = "7"
 
 compileKotlin {
     kotlinOptions {
@@ -28,4 +20,7 @@ compileKotlin {
 }
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
+}
+repositories {
+    mavenCentral()
 }
