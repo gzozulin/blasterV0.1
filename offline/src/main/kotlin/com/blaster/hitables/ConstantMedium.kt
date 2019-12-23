@@ -9,8 +9,7 @@ import java.util.*
 
 private val random = Random()
 
-data class ConstantMedium(val boundary: Hitable, val density: Float, val texture: Texture) :
-    Hitable {
+data class ConstantMedium(val boundary: Hitable, val density: Float, val texture: Texture) : Hitable {
     private val phaseFunction = Isotropic(texture)
 
     override fun aabb() = boundary.aabb()

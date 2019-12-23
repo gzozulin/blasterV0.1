@@ -2,16 +2,6 @@
 :
 
 .gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
-q
-Arealtime/src/main/java/com/gzozulin/wallpaper/assets/ModelsLib.kt,4\c\4cfe7e8d89b3d4a8e5d904e9728360b9f0187c06
-j
-:realtime/src/main/java/com/gzozulin/wallpaper/gl/GLMesh.kt,3\a\3ab68997b368b4ae8a2a56f1892b03a6eb021de7
-o
-?realtime/src/main/java/com/gzozulin/wallpaper/gl/GLAttribute.kt,5\3\53c9f90bee6433e3b187e374295af96ab9d28e19
-{
-Krealtime/src/main/java/com/gzozulin/wallpaper/renderers/DeferredRenderer.kt,a\5\a5e285b406471b7d5dc3a69c80e9be3de40a3ae4
-l
-<realtime/src/main/java/com/gzozulin/wallpaper/gl/GLBuffer.kt,9\b\9b84a783932d1ec6bd22a121813c5c02c223ca07
 <
 build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
 D
@@ -28,47 +18,3 @@ h
 8offline/src/main/kotlin/com/blaster/tracing/Raytracer.kt,3\e\3e67088c4faa3c9581acb1883b434bbfdf7249d2
 ;
 blaster.iml,c\a\ca15dac979587d43f57e9997c35d614542007774
-P
- articles/blaster_1_triangle.html,f\8\f85f871e007320e1461b702d799de2de7a4459fd
-L
-scenarios/blaster_1_triangle,0\8\08be41359dd3fea55a549b0ad24bfe633d53fca1
-r
-Brealtime/src/main/java/com/gzozulin/wallpaper/assets/ShadersLib.kt,5\4\548dfb49ea4432dcf81274c5276058b882688aa7
-s
-Crealtime/src/main/java/com/gzozulin/wallpaper/assets/TexturesLib.kt,5\9\5921afa0c9960adbb07a9075e53f729cbe34ab74
-i
-9realtime/src/main/java/com/gzozulin/wallpaper/gl/GLAux.kt,6\9\69b38ab5965e7b2cffbef7527fd3011d2be5f734
-q
-Arealtime/src/main/java/com/gzozulin/wallpaper/gl/GLFrameBuffer.kt,f\5\f5d60f06918244f2529a1a5a45d8a79be5ea21b6
-k
-;realtime/src/main/java/com/gzozulin/wallpaper/gl/GLLight.kt,f\b\fbd2ef21e35f114c06ac6eca9240650da17dbeca
-n
->realtime/src/main/java/com/gzozulin/wallpaper/gl/GLMaterial.kt,b\6\b6e2ecd45ecc09fef45e9f63a33c5df666a425ad
-k
-;realtime/src/main/java/com/gzozulin/wallpaper/gl/GLModel.kt,8\3\8342b338b1b2e8a76fb5ec55e425811aa3a0041d
-m
-=realtime/src/main/java/com/gzozulin/wallpaper/gl/GLProgram.kt,6\a\6ade018dd029260adf9fba630eb7bc834e7eedb8
-r
-Brealtime/src/main/java/com/gzozulin/wallpaper/gl/GLRenderBuffer.kt,9\1\91b51b9cd7ac048840d7bebf7799a58f48504b23
-m
-=realtime/src/main/java/com/gzozulin/wallpaper/gl/GLTexture.kt,4\0\409658a7de58f87f6e1c015db070367b8ad8e5aa
-m
-=realtime/src/main/java/com/gzozulin/wallpaper/gl/GLUniform.kt,5\0\503fd3f51e50d8a06289175a2e94517810908ef2
-j
-:realtime/src/main/java/com/gzozulin/wallpaper/math/AABB.kt,0\e\0e697562513490b7019983bb10c8f5f3979a9246
-l
-<realtime/src/main/java/com/gzozulin/wallpaper/math/Camera.kt,1\c\1cb39cd9ece0dcca8b63ceb15e70d61bcb0b0608
-l
-<realtime/src/main/java/com/gzozulin/wallpaper/math/Common.kt,b\c\bcc6949a632ccc35dc3bca646bb3e487b805e66a
-j
-:realtime/src/main/java/com/gzozulin/wallpaper/math/Mat4.kt,b\e\be349b94954784df76bc2a61c31459e5b5f1a725
-j
-:realtime/src/main/java/com/gzozulin/wallpaper/math/Node.kt,9\9\99e774158a2cc449d7857e8a7197f5f504fb5af1
-j
-:realtime/src/main/java/com/gzozulin/wallpaper/math/Vec3.kt,a\4\a4fdc525dd1b096e88e49f927df6ad7de4a959c2
-v
-Frealtime/src/main/java/com/gzozulin/wallpaper/platform/MainActivity.kt,e\6\e68c62cfe6d9bafbd98570ce5396298bf1915be1
-y
-Irealtime/src/main/java/com/gzozulin/wallpaper/platform/MyGLSurfaceView.kt,e\f\ef96c01b6e0ce2b8f8b33cbac5a341dfedc0f40f
-y
-Irealtime/src/main/java/com/gzozulin/wallpaper/renderers/SimpleRenderer.kt,9\f\9f7e0e65ff8d8c8fc1bf309a4ea50865123db0e8

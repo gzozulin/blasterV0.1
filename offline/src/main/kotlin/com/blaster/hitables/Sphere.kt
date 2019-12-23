@@ -9,11 +9,9 @@ import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
-data class Sphere(val center: Vec3, val radius: Float, val material: Material) :
-    Hitable {
+data class Sphere(val center: Vec3, val radius: Float, val material: Material) : Hitable {
 
-    private val aabb =
-            AABB(center - Vec3(radius), center + Vec3(radius))
+    private val aabb = AABB(center - Vec3(radius), center + Vec3(radius))
 
     override fun hit(ray: Ray, tMin: Float, tMax: Float): HitRecord? {
         if (!aabb.hit(ray, tMin, tMax)) {

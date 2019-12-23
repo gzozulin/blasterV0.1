@@ -13,8 +13,7 @@ data class RectYZ(
     val material: Material
 ) : Hitable {
 
-    private val aabb =
-            AABB(Vec3(k - 0.0001f, y0, z0), Vec3(k + 0.0001f, y1, z1))
+    private val aabb = AABB(Vec3(k - 0.0001f, y0, z0), Vec3(k + 0.0001f, y1, z1))
 
     override fun aabb(): AABB = aabb
 

@@ -14,8 +14,8 @@ data class Box(
     val frontMaterial: Material, val backMaterial: Material
 ) : Hitable {
 
-    constructor(min: Vec3, max: Vec3, material: Material) : this(
-        min, max, material, material, material, material, material, material)
+    constructor(min: Vec3, max: Vec3, material: Material)
+            : this(min, max, material, material, material, material, material, material)
 
     private val aabb = AABB(min, max)
 
