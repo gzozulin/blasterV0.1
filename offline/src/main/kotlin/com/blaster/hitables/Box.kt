@@ -22,7 +22,7 @@ data class Box(
     private val node: BVHNode
 
     init {
-        val hitables = ArrayList<Hitable>()
+        val hitables = mutableListOf<Hitable>()
         hitables.add(RectXY(min.x, max.x, min.y, max.y, max.z, backMaterial))
         hitables.add(FlipNormals(RectXY(min.x, max.x, min.y, max.y, min.z, frontMaterial)))
         hitables.add(RectXZ(min.x, max.x, min.z, max.z, max.y, topMaterial))

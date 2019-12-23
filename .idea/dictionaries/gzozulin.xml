@@ -2,6 +2,8 @@
   <dictionary name="gzozulin">
     <words>
       <w>decl</w>
+      <w>hitable</w>
+      <w>hitables</w>
       <w>raytracer</w>
       <w>renderers</w>
       <w>shaders</w>

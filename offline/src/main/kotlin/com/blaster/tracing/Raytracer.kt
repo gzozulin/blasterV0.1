@@ -31,9 +31,7 @@ class Raytracer(
     }
 
     private fun calculateRegion(world: Hitable, index: Int, cnt: Int) {
-        if (height % cnt != 0) {
-            throw IllegalArgumentException("Should split just fine!")
-        }
+        check(height % cnt == 0) { "Should split just fine!" }
         val regionLines = height / cnt
         val regionStart = regionLines * index
         val regionEnd = regionStart + regionLines

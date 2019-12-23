@@ -11,9 +11,7 @@ class BVHNode(hitables: List<Hitable>) : Hitable {
     private val aabb: AABB
 
     init {
-        if (hitables.isEmpty()) {
-            throw RuntimeException("wtf?!")
-        }
+        check(hitables.isNotEmpty())
         var accumulator = hitables.first().aabb()
         for (hitable in hitables) {
             accumulator += hitable.aabb()
