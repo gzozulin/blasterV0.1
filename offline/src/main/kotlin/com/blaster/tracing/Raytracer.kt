@@ -3,8 +3,8 @@ import com.blaster.hitables.Hitable
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
 import com.blaster.scene.Camera
-import io.reactivex.Flowable
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.*
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.sqrt
 
 private const val SAMPLES          = 50
@@ -21,13 +21,12 @@ class Raytracer(
     @Volatile
     private var finished = 0
 
-    fun render() {
-        Flowable.range(0, regionCnt)
-            .parallel()
-            .runOn(Schedulers.computation())
-            .doOnNext { calculateRegion(scene, it, regionCnt) }
-            .sequential()
-            .blockingLast()
+    fun render() = runBlocking {
+        val results = ConcurrentLinkedQueue<Job>()
+        (0 until regionCnt).forEach {
+            results.add(launch (Dispatchers.IO) { calculateRegion(scene, it, regionCnt) })
+        }
+        results.joinAll()
         ppt.flush()
     }
 
