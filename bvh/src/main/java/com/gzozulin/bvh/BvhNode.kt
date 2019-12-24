@@ -5,8 +5,6 @@ import com.blaster.Hitable
 import com.blaster.scene.Aabb
 import com.blaster.scene.Ray
 
-private const val BVH_THRESHOLD = 20
-
 class BvhNode(hitables: List<Hitable>) : Hitable {
     private val aabb: Aabb
 
@@ -80,5 +78,9 @@ class BvhNode(hitables: List<Hitable>) : Hitable {
                 return null
             }
         }
+    }
+
+    private companion object {
+        private const val BVH_THRESHOLD = 20
     }
 }

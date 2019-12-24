@@ -1,4 +1,5 @@
 package com.blaster.tracing
+
 import com.blaster.Hitable
 import com.blaster.scene.Ray
 import com.blaster.scene.Vec3
@@ -6,9 +7,6 @@ import com.blaster.scene.Camera
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.sqrt
-
-private const val SAMPLES          = 50
-private const val REFLECTIONS      = 20
 
 class Raytracer(
         private val height: Int,
@@ -69,5 +67,10 @@ class Raytracer(
         finished++
         val format = String.format("%.2f", finished.toFloat() / regionCnt.toFloat())
         println(format)
+    }
+
+    private companion object {
+        private const val SAMPLES          = 50
+        private const val REFLECTIONS      = 20
     }
 }
