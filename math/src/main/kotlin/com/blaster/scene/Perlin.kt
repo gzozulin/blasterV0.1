@@ -2,8 +2,6 @@ package com.blaster.scene
 
 import java.util.*
 
-private val random = Random()
-
 // todo: This has some problems
 class Perlin {
     private val ranfloat: FloatArray = perlinGenerate()
@@ -45,5 +43,9 @@ class Perlin {
         val j = ((4f * point.y).toInt() and 255)
         val k = ((4f * point.z).toInt() and 255)
         return ranfloat[permX[i] xor permY[j] xor permZ[k]]
+    }
+
+    private companion object {
+        private val random = Random()
     }
 }
