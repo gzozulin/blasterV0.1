@@ -4,7 +4,7 @@ import android.content.Context
 import com.blaster.gl.GLAttribute
 import com.blaster.gl.GLMesh
 import com.blaster.gl.GLModel
-import com.blaster.math.AABB
+import com.blaster.math.Aabb
 import com.blaster.math.Node
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -23,11 +23,11 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
     private val currentVertices = ArrayList<Float>()
     private val currentIndices = ArrayList<Int>()
 
-    private lateinit var currentAABB: AABB
+    private lateinit var currentAabb: Aabb
 
     // todo: create Native(Float)Buffer directly, instead of copying arrays
     fun loadModel(meshFilename: String, diffuseFilename: String): GLModel {
-        currentAABB = AABB()
+        currentAabb = Aabb()
         val inputStream = ctx.assets.open(meshFilename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
         bufferedReader.use {
@@ -44,7 +44,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), currentAABB)
+        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), currentAabb)
     }
 
     private fun parseLine(line: String) {
@@ -112,7 +112,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentVertices.add(vx)
         currentVertices.add(vy)
         currentVertices.add(vz)
-        currentAABB = currentAABB.include(vx, vy, vz)
+        currentAabb = currentAabb.include(vx, vy, vz)
         if (vertSplit[1].isNotEmpty()) {
             val texIndex = vertSplit[1].toInt()  - 1
             currentVertices.add(currentTexCoordList[texIndex  * 2 + 0])

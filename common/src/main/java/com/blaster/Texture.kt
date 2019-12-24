@@ -1,4 +1,4 @@
-package com.blaster.texture
+package com.blaster
 
 import com.blaster.math.Vec3
 

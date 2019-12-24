@@ -1,5 +1,6 @@
 package com.blaster.texture
 
+import com.blaster.Texture
 import com.blaster.math.Vec3
 import java.awt.image.BufferedImage
 import java.io.File

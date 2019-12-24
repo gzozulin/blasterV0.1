@@ -1,7 +1,8 @@
 package com.blaster.hitables
 
-import com.blaster.math.AABB
-import com.blaster.tracing.HitRecord
+import com.blaster.HitRecord
+import com.blaster.Hitable
+import com.blaster.math.Aabb
 import com.blaster.math.Ray
 
 data class FlipNormals(val hitable: Hitable) : Hitable {
@@ -13,5 +14,5 @@ data class FlipNormals(val hitable: Hitable) : Hitable {
         return hit
     }
 
-    override fun aabb(): AABB = hitable.aabb()
+    override fun aabb(): Aabb = hitable.aabb()
 }

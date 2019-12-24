@@ -3,7 +3,7 @@ package com.blaster.math
 import kotlin.math.max
 import kotlin.math.min
 
-data class AABB(val min: Vec3 = Vec3(Float.MAX_VALUE), val max: Vec3 = Vec3(-Float.MAX_VALUE)) {
+data class Aabb(val min: Vec3 = Vec3(Float.MAX_VALUE), val max: Vec3 = Vec3(-Float.MAX_VALUE)) {
     val center = min + (max - min) / 2f
 
     val width: Float
@@ -41,7 +41,7 @@ data class AABB(val min: Vec3 = Vec3(Float.MAX_VALUE), val max: Vec3 = Vec3(-Flo
         return true
     }
 
-    fun include(vx: Float, vy: Float, vz: Float): AABB {
+    fun include(vx: Float, vy: Float, vz: Float): Aabb {
         var minX = 0f
         var minY = 0f
         var minZ = 0f
@@ -66,10 +66,10 @@ data class AABB(val min: Vec3 = Vec3(Float.MAX_VALUE), val max: Vec3 = Vec3(-Flo
         if (vz > max.z) {
             maxZ = vz
         }
-        return AABB(Vec3(minX, minY, minZ), Vec3(maxX, maxY, maxZ))
+        return Aabb(Vec3(minX, minY, minZ), Vec3(maxX, maxY, maxZ))
     }
 
-    operator fun plus(other: AABB): AABB {
+    operator fun plus(other: Aabb): Aabb {
         val min = Vec3(
                 min(min.x, other.min.x),
                 min(min.y, other.min.y),
@@ -80,7 +80,7 @@ data class AABB(val min: Vec3 = Vec3(Float.MAX_VALUE), val max: Vec3 = Vec3(-Flo
                 max(max.y, other.max.y),
                 max(max.z, other.max.z)
         )
-        return AABB(min, max)
+        return Aabb(min, max)
     }
 
     fun maxAxisIndex(): Int {

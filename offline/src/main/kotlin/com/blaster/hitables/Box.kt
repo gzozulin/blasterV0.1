@@ -1,25 +1,26 @@
 package com.blaster.hitables
 
-import com.blaster.bvh.BVHNode
-import com.blaster.material.Material
-import com.blaster.math.AABB
+import com.blaster.HitRecord
+import com.blaster.Hitable
+import com.blaster.Material
+import com.blaster.math.Aabb
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
-import com.blaster.tracing.HitRecord
+import com.gzozulin.bvh.BvhNode
 
 data class Box(
-    val min: Vec3, val max: Vec3,
-    val leftMaterial: Material, val rightMaterial: Material,
-    val topMaterial: Material, val bottomMaterial: Material,
-    val frontMaterial: Material, val backMaterial: Material
+        val min: Vec3, val max: Vec3,
+        val leftMaterial: Material, val rightMaterial: Material,
+        val topMaterial: Material, val bottomMaterial: Material,
+        val frontMaterial: Material, val backMaterial: Material
 ) : Hitable {
 
     constructor(min: Vec3, max: Vec3, material: Material)
             : this(min, max, material, material, material, material, material, material)
 
-    private val aabb = AABB(min, max)
+    private val aabb = Aabb(min, max)
 
-    private val node: BVHNode
+    private val node: BvhNode
 
     init {
         val hitables = mutableListOf<Hitable>()
@@ -29,7 +30,7 @@ data class Box(
         hitables.add(FlipNormals(RectXZ(min.x, max.x, min.z, max.z, min.y, bottomMaterial)))
         hitables.add(RectYZ(min.y, max.y, min.z, max.z, max.x, leftMaterial))
         hitables.add(FlipNormals(RectYZ(min.y, max.y, min.z, max.z, min.x, rightMaterial)))
-        node = BVHNode(hitables)
+        node = BvhNode(hitables)
     }
 
     override fun aabb() = aabb

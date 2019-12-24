@@ -1,6 +1,7 @@
 package com.blaster.scene
 
-import com.blaster.bvh.BVHNode
+import com.blaster.HitRecord
+import com.blaster.Hitable
 import com.blaster.hitables.*
 import com.blaster.material.Diffuse
 import com.blaster.material.Lambertian
@@ -8,7 +9,7 @@ import com.blaster.math.Ray
 import com.blaster.math.Vec3
 import com.blaster.texture.ConstantTexture
 import com.blaster.texture.ImageTexture
-import com.blaster.tracing.HitRecord
+import com.gzozulin.bvh.BvhNode
 
 class CornellScene : Hitable {
     private val scene: Hitable = prepare()
@@ -39,7 +40,7 @@ class CornellScene : Hitable {
         )
         val fog = Box(Vec3(), Vec3(555f, 100f, 555f), white)
         hitables.add(ConstantMedium(fog, 0.01f, ConstantTexture(Vec3(0.1f, 0.1f, 0.3f))))
-        return BVHNode(hitables)
+        return BvhNode(hitables)
     }
 
     override fun hit(ray: Ray, tMin: Float, tMax: Float): HitRecord? = scene.hit(ray, tMin, tMax)

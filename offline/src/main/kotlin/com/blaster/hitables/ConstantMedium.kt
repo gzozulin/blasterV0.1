@@ -1,8 +1,9 @@
 package com.blaster.hitables
 
-import com.blaster.tracing.HitRecord
+import com.blaster.HitRecord
+import com.blaster.Hitable
+import com.blaster.Texture
 import com.blaster.material.Isotropic
-import com.blaster.texture.Texture
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
 import java.util.*
@@ -36,11 +37,11 @@ data class ConstantMedium(val boundary: Hitable, val density: Float, val texture
                 if (hitDistance < distanceInsideBoundary) {
                     val t = hit1.t + hitDistance / ray.direction.length()
                     return HitRecord(
-                        t,
-                        ray.pointAtParameter(t),
-                        0f, 0f,
-                        Vec3(1f, 0f, 0f),
-                        phaseFunction
+                            t,
+                            ray.pointAtParameter(t),
+                            0f, 0f,
+                            Vec3(1f, 0f, 0f),
+                            phaseFunction
                     )
                 }
             }

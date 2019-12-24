@@ -17,7 +17,7 @@ class Camera(aspectRatio: Float) {
         center = to
     }
 
-    fun lookAt(aabb: AABB) {
+    fun lookAt(aabb: Aabb) {
         var maxValue = aabb.width
         if (aabb.height > maxValue) {
             maxValue = aabb.height

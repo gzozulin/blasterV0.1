@@ -1,14 +1,14 @@
-package com.blaster.bvh
+package com.gzozulin.bvh
 
-import com.blaster.tracing.HitRecord
-import com.blaster.hitables.Hitable
-import com.blaster.math.AABB
+import com.blaster.HitRecord
+import com.blaster.Hitable
+import com.blaster.math.Aabb
 import com.blaster.math.Ray
 
 private const val BVH_THRESHOLD = 20
 
-class BVHNode(hitables: List<Hitable>) : Hitable {
-    private val aabb: AABB
+class BvhNode(hitables: List<Hitable>) : Hitable {
+    private val aabb: Aabb
 
     init {
         check(hitables.isNotEmpty())
@@ -19,8 +19,8 @@ class BVHNode(hitables: List<Hitable>) : Hitable {
         aabb = accumulator
     }
 
-    private val left: BVHNode?
-    private val right: BVHNode?
+    private val left: BvhNode?
+    private val right: BvhNode?
 
     private val children: Array<Hitable>?
 
@@ -38,8 +38,8 @@ class BVHNode(hitables: List<Hitable>) : Hitable {
                     rightPart.add(hitable)
                 }
             }
-            left = if (leftPart.isNotEmpty()) BVHNode(leftPart) else null
-            right = if (rightPart.isNotEmpty()) BVHNode(rightPart) else null
+            left = if (leftPart.isNotEmpty()) BvhNode(leftPart) else null
+            right = if (rightPart.isNotEmpty()) BvhNode(rightPart) else null
         } else {
             children = hitables.toTypedArray()
             left = null
@@ -47,7 +47,7 @@ class BVHNode(hitables: List<Hitable>) : Hitable {
         }
     }
 
-    override fun aabb(): AABB {
+    override fun aabb(): Aabb {
         return aabb
     }
 

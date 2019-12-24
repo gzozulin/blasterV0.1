@@ -1,5 +1,5 @@
 package com.blaster.tracing
-import com.blaster.hitables.Hitable
+import com.blaster.Hitable
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
 import com.blaster.scene.Camera
@@ -11,12 +11,12 @@ private const val SAMPLES          = 50
 private const val REFLECTIONS      = 20
 
 class Raytracer(
-    private val height: Int,
-    private val width: Int,
-    private val scene: Hitable,
-    private val camera: Camera,
-    private val ppt: PptFile,
-    private val regionCnt: Int
+        private val height: Int,
+        private val width: Int,
+        private val scene: Hitable,
+        private val camera: Camera,
+        private val ppt: PptFile,
+        private val regionCnt: Int
 ) {
     @Volatile
     private var finished = 0

@@ -1,10 +1,11 @@
 package com.blaster.hitables
 
-import com.blaster.material.Material
-import com.blaster.math.AABB
+import com.blaster.HitRecord
+import com.blaster.Hitable
+import com.blaster.Material
+import com.blaster.math.Aabb
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
-import com.blaster.tracing.HitRecord
 
 data class RectXY(
     val x0: Float, val x1: Float,
@@ -13,9 +14,9 @@ data class RectXY(
     val material: Material
 ) : Hitable {
 
-    private val aabb = AABB(Vec3(x0, y0, k - 0.0001f), Vec3(x1, y1, k + 0.0001f))
+    private val aabb = Aabb(Vec3(x0, y0, k - 0.0001f), Vec3(x1, y1, k + 0.0001f))
 
-    override fun aabb(): AABB = aabb
+    override fun aabb(): Aabb = aabb
 
     override fun hit(ray: Ray, tMin: Float, tMax: Float): HitRecord? {
         val t = (k - ray.origin.z) / ray.direction.z

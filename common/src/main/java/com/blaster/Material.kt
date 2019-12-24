@@ -1,7 +1,5 @@
-package com.blaster.material
+package com.blaster
 
-import com.blaster.tracing.HitRecord
-import com.blaster.tracing.ScatterResult
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
 

@@ -1,4 +1,4 @@
-package com.blaster.tracing
+package com.blaster
 
 import com.blaster.math.Ray
 import com.blaster.math.Vec3

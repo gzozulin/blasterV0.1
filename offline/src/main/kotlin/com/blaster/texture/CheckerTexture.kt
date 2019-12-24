@@ -1,5 +1,6 @@
 package com.blaster.texture
 
+import com.blaster.Texture
 import com.blaster.math.Vec3
 import kotlin.math.sin
 

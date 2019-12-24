@@ -1,17 +1,18 @@
 package com.blaster.hitables
 
-import com.blaster.material.Material
-import com.blaster.math.AABB
+import com.blaster.HitRecord
+import com.blaster.Hitable
+import com.blaster.Material
+import com.blaster.math.Aabb
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
-import com.blaster.tracing.HitRecord
 import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
 data class Sphere(val center: Vec3, val radius: Float, val material: Material) : Hitable {
 
-    private val aabb = AABB(center - Vec3(radius), center + Vec3(radius))
+    private val aabb = Aabb(center - Vec3(radius), center + Vec3(radius))
 
     override fun hit(ray: Ray, tMin: Float, tMax: Float): HitRecord? {
         if (!aabb.hit(ray, tMin, tMax)) {
@@ -43,12 +44,12 @@ data class Sphere(val center: Vec3, val radius: Float, val material: Material) :
         val pointAtParameter = ray.pointAtParameter(t)
         val uv = getSphereUV((pointAtParameter - center) / radius)
         return HitRecord(
-            t,
-            pointAtParameter,
-            uv.first,
-            uv.second,
-            (pointAtParameter - center) / radius,
-            material
+                t,
+                pointAtParameter,
+                uv.first,
+                uv.second,
+                (pointAtParameter - center) / radius,
+                material
         )
     }
 }
