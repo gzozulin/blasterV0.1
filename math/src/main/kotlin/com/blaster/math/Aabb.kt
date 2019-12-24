@@ -41,34 +41,6 @@ data class Aabb(val min: Vec3 = Vec3(Float.MAX_VALUE), val max: Vec3 = Vec3(-Flo
         return true
     }
 
-    fun include(vx: Float, vy: Float, vz: Float): Aabb {
-        var minX = 0f
-        var minY = 0f
-        var minZ = 0f
-        var maxX = 0f
-        var maxY = 0f
-        var maxZ = 0f
-        if (vx < min.x) {
-            minX = vx
-        }
-        if (vx > max.x) {
-            maxX = vx
-        }
-        if (vy < min.y) {
-            minY = vy
-        }
-        if (vy > max.y) {
-            maxY = vy
-        }
-        if (vz < min.z) {
-            minZ = vz
-        }
-        if (vz > max.z) {
-            maxZ = vz
-        }
-        return Aabb(Vec3(minX, minY, minZ), Vec3(maxX, maxY, maxZ))
-    }
-
     operator fun plus(other: Aabb): Aabb {
         val min = Vec3(
                 min(min.x, other.min.x),

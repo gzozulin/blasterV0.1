@@ -6,6 +6,7 @@ import com.blaster.gl.GLMesh
 import com.blaster.gl.GLModel
 import com.blaster.math.Aabb
 import com.blaster.math.Node
+import com.blaster.math.Vec3
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
@@ -23,11 +24,21 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
     private val currentVertices = ArrayList<Float>()
     private val currentIndices = ArrayList<Int>()
 
-    private lateinit var currentAabb: Aabb
+    private var minX = 0f
+    private var minY = 0f
+    private var minZ = 0f
+    private var maxX = 0f
+    private var maxY = 0f
+    private var maxZ = 0f
 
     // todo: create Native(Float)Buffer directly, instead of copying arrays
     fun loadModel(meshFilename: String, diffuseFilename: String): GLModel {
-        currentAabb = Aabb()
+        minX = 0f
+        minY = 0f
+        minZ = 0f
+        maxX = 0f
+        maxY = 0f
+        maxZ = 0f
         val inputStream = ctx.assets.open(meshFilename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
         bufferedReader.use {
@@ -44,7 +55,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), currentAabb)
+        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), Aabb(Vec3(minX, minY, minZ), Vec3(maxX, maxY, maxZ)))
     }
 
     private fun parseLine(line: String) {
@@ -112,7 +123,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentVertices.add(vx)
         currentVertices.add(vy)
         currentVertices.add(vz)
-        currentAabb = currentAabb.include(vx, vy, vz)
+        updateAabb(vx, vy, vz)
         if (vertSplit[1].isNotEmpty()) {
             val texIndex = vertSplit[1].toInt()  - 1
             currentVertices.add(currentTexCoordList[texIndex  * 2 + 0])
@@ -137,5 +148,26 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentIndices.add(ind0)
         currentIndices.add(ind1)
         currentIndices.add(ind2)
+    }
+
+    private fun updateAabb(vx: Float, vy: Float, vz: Float) {
+        if (vx < minX) {
+            minX = vx
+        }
+        if (vx > maxX) {
+            maxX = vx
+        }
+        if (vy < minY) {
+            minY = vy
+        }
+        if (vy > maxY) {
+            maxY = vy
+        }
+        if (vz < minZ) {
+            minZ = vz
+        }
+        if (vz > maxZ) {
+            maxZ = vz
+        }
     }
 }
