@@ -1,4 +1,4 @@
-package com.blaster.math
+package com.blaster.scene
 
 import java.util.*
 

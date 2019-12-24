@@ -6,9 +6,9 @@ import android.opengl.GLSurfaceView
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
-import com.blaster.math.Camera
-import com.blaster.math.Node
-import com.blaster.math.Vec3
+import com.blaster.scene.Camera
+import com.blaster.scene.Node
+import com.blaster.scene.Vec3
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

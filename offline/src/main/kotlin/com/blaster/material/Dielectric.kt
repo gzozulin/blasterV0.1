@@ -3,10 +3,8 @@ package com.blaster.material
 import com.blaster.HitRecord
 import com.blaster.Material
 import com.blaster.ScatterResult
-import com.blaster.math.Ray
-import com.blaster.math.Vec3
-import com.blaster.math.reflect
-import com.blaster.math.refract
+import com.blaster.scene.Ray
+import com.blaster.scene.Vec3
 import java.util.*
 import kotlin.math.pow
 
@@ -14,7 +12,7 @@ private val random = Random()
 
 data class Dielectric(val reflectionIndex: Float) : Material {
     override fun scattered(ray: Ray, hit: HitRecord): ScatterResult? {
-        val reflected = reflect(ray.direction, hit.normal)
+        val reflected = Vec3.reflect(ray.direction, hit.normal)
         val outwardNormal: Vec3
         val niOverNt: Float
         val cosine: Float
@@ -28,7 +26,7 @@ data class Dielectric(val reflectionIndex: Float) : Material {
             niOverNt = 1f / reflectionIndex
             cosine = -ray.direction.dot(hit.normal) / ray.direction.length()
         }
-        val refracted = refract(ray.direction, outwardNormal, niOverNt)
+        val refracted = Vec3.refract(ray.direction, outwardNormal, niOverNt)
         if (refracted != null) {
             val reflectionProbe = schlick(cosine, reflectionIndex)
             if (reflectionProbe <= random.nextFloat()) {

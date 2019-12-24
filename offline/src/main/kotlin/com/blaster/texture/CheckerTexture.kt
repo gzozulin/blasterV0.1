@@ -1,7 +1,7 @@
 package com.blaster.texture
 
 import com.blaster.Texture
-import com.blaster.math.Vec3
+import com.blaster.scene.Vec3
 import kotlin.math.sin
 
 data class CheckerTexture(val odd: Texture, val even: Texture) : Texture {

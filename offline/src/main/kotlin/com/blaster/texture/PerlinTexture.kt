@@ -1,8 +1,8 @@
 package com.blaster.texture
 
 import com.blaster.Texture
-import com.blaster.math.Perlin
-import com.blaster.math.Vec3
+import com.blaster.scene.Perlin
+import com.blaster.scene.Vec3
 
 class PerlinTexture : Texture {
     private val perlin = Perlin()

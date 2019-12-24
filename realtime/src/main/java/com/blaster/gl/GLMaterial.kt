@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-import com.blaster.math.Vec3
+import com.blaster.scene.Vec3
 
 class GLMaterial (
         private val ambient: Vec3,

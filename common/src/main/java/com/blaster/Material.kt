@@ -1,7 +1,7 @@
 package com.blaster
 
-import com.blaster.math.Ray
-import com.blaster.math.Vec3
+import com.blaster.scene.Ray
+import com.blaster.scene.Vec3
 
 interface Material {
     fun scattered(ray: Ray, hit: HitRecord): ScatterResult?

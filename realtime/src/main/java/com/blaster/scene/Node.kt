@@ -1,4 +1,4 @@
-package com.blaster.math
+package com.blaster.scene
 
 // todo add versions or just straight compare
 class Node(private val parent: Node? = null) {

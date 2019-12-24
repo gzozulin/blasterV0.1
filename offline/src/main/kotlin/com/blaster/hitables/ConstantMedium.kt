@@ -4,8 +4,8 @@ import com.blaster.HitRecord
 import com.blaster.Hitable
 import com.blaster.Texture
 import com.blaster.material.Isotropic
-import com.blaster.math.Ray
-import com.blaster.math.Vec3
+import com.blaster.scene.Ray
+import com.blaster.scene.Vec3
 import java.util.*
 
 private val random = Random()

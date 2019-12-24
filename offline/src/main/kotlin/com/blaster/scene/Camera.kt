@@ -1,8 +1,5 @@
 package com.blaster.scene
 
-import com.blaster.math.Ray
-import com.blaster.math.Vec3
-import com.blaster.math.randomInUnitDisk
 import kotlin.math.tan
 
 data class Camera(
@@ -35,7 +32,7 @@ data class Camera(
     }
 
     fun getRay(s: Float, t: Float): Ray {
-        val rd = randomInUnitDisk() * lensRadius
+        val rd = Vec3.randomInUnitDisk() * lensRadius
         val offset = u * rd.x + v * rd.y
         return Ray(origin + offset, lowerLeft + horizontal * s + vertical * t - origin - offset)
     }

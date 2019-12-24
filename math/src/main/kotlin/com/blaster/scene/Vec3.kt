@@ -1,4 +1,4 @@
-package com.blaster.math
+package com.blaster.scene
 
 import java.util.*
 import kotlin.math.sqrt
@@ -48,38 +48,40 @@ class Vec3(x: Float = 0f, y: Float = 0f, z: Float = 0f) {
     fun makeUnit() = this / length()
 
     fun negate() = Vec3(-x, -y, -z)
-}
 
-private val random = Random()
+    companion object {
+        private val random = Random()
 
-fun randomVec3(max: Float) = Vec3(Math.random().toFloat() * max, Math.random().toFloat() * max, Math.random().toFloat() * max)
+        fun randomVec3(max: Float) = Vec3(Math.random().toFloat() * max, Math.random().toFloat() * max, Math.random().toFloat() * max)
 
-fun randomInUnitSphere(): Vec3 {
-    var result: Vec3
-    do {
-        result = Vec3(random.nextFloat(), random.nextFloat(), random.nextFloat()) * 2f - Vec3(1f)
-    } while (result.squaredLength() >= 1f)
-    return result
-}
+        fun randomInUnitSphere(): Vec3 {
+            var result: Vec3
+            do {
+                result = Vec3(random.nextFloat(), random.nextFloat(), random.nextFloat()) * 2f - Vec3(1f)
+            } while (result.squaredLength() >= 1f)
+            return result
+        }
 
-fun randomInUnitDisk(): Vec3 {
-    var result: Vec3
-    do {
-        result = Vec3(random.nextFloat(), random.nextFloat(), 0f) * 2f - Vec3(1f, 1f, 0f)
-    } while (result.dot(result) >= 1f)
-    return result
-}
+        fun randomInUnitDisk(): Vec3 {
+            var result: Vec3
+            do {
+                result = Vec3(random.nextFloat(), random.nextFloat(), 0f) * 2f - Vec3(1f, 1f, 0f)
+            } while (result.dot(result) >= 1f)
+            return result
+        }
 
-fun reflect(vec: Vec3, normal: Vec3): Vec3 {
-    return vec - normal * vec.dot(normal) * 2f
-}
+        fun reflect(vec: Vec3, normal: Vec3): Vec3 {
+            return vec - normal * vec.dot(normal) * 2f
+        }
 
-fun refract(vec: Vec3, normal: Vec3, niOverNt: Float): Vec3? {
-    val uv = vec.makeUnit()
-    val dot = uv.dot(normal)
-    val discriminant = 1f - niOverNt * niOverNt * (1f - dot * dot)
-    if (discriminant <= 0f) {
-        return null
+        fun refract(vec: Vec3, normal: Vec3, niOverNt: Float): Vec3? {
+            val uv = vec.makeUnit()
+            val dot = uv.dot(normal)
+            val discriminant = 1f - niOverNt * niOverNt * (1f - dot * dot)
+            if (discriminant <= 0f) {
+                return null
+            }
+            return (uv - normal * dot) * niOverNt - normal * sqrt(discriminant)
+        }
     }
-    return (uv - normal * dot) * niOverNt - normal * sqrt(discriminant)
 }

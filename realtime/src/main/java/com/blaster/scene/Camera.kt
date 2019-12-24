@@ -1,4 +1,4 @@
-package com.blaster.math
+package com.blaster.scene
 
 class Camera(aspectRatio: Float) {
     val viewM = Mat4()

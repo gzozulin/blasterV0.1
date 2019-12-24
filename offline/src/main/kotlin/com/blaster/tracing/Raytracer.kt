@@ -1,7 +1,7 @@
 package com.blaster.tracing
 import com.blaster.Hitable
-import com.blaster.math.Ray
-import com.blaster.math.Vec3
+import com.blaster.scene.Ray
+import com.blaster.scene.Vec3
 import com.blaster.scene.Camera
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentLinkedQueue

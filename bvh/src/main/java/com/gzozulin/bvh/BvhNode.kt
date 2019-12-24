@@ -2,8 +2,8 @@ package com.gzozulin.bvh
 
 import com.blaster.HitRecord
 import com.blaster.Hitable
-import com.blaster.math.Aabb
-import com.blaster.math.Ray
+import com.blaster.scene.Aabb
+import com.blaster.scene.Ray
 
 private const val BVH_THRESHOLD = 20
 

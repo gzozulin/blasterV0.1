@@ -8,9 +8,8 @@ import com.blaster.assets.ModelsLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
-import com.blaster.math.Camera
-import com.blaster.math.Vec3
-import com.blaster.math.randomVec3
+import com.blaster.scene.Camera
+import com.blaster.scene.randomVec3
 import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10

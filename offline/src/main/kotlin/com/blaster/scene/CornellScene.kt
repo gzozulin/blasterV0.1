@@ -5,8 +5,6 @@ import com.blaster.Hitable
 import com.blaster.hitables.*
 import com.blaster.material.Diffuse
 import com.blaster.material.Lambertian
-import com.blaster.math.Ray
-import com.blaster.math.Vec3
 import com.blaster.texture.ConstantTexture
 import com.blaster.texture.ImageTexture
 import com.gzozulin.bvh.BvhNode

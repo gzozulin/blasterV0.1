@@ -1,4 +1,4 @@
-package com.blaster.math
+package com.blaster.scene
 
 import kotlin.math.max
 import kotlin.math.min
