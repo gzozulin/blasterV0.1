@@ -1,25 +1,26 @@
 package com.blaster.scene
 
+import org.joml.Vector3f
 import java.util.*
 import kotlin.math.sqrt
 
-class Vec3(x: Float = 0f, y: Float = 0f, z: Float = 0f) {
-    val values = floatArrayOf(x, y, z)
-
+data class Vec3(val value: Vector3f = Vector3f()) {
     val x
-        get() = values[0]
+        get() = value.x
 
     val y
-        get() = values[1]
+        get() = value.y
 
     val z
-        get() = values[2]
+        get() = value.z
+
+    constructor(x: Float = 0f, y: Float = 0f, z: Float = 0f) : this (Vector3f(x, y, z))
 
     constructor(f: Float) : this(f, f, f)
 
     constructor(other: Vec3) : this(other.x, other.y, other.z)
 
-    operator fun get(axis: Int) = values[axis]
+    operator fun get(axis: Int) = value[axis]
 
     fun setX(newX: Float) = Vec3(newX, y, z)
     fun setY(newY: Float) = Vec3(x, newY, z)
