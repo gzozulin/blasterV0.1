@@ -20,22 +20,22 @@ class Mat4(val values: FloatArray) {
 
     fun lookAtInplace(eye: Vec3, center: Vec3, up: Vec3) {
         Matrix.setLookAtM(values, 0,
-                eye.values[0], eye.values[1], eye.values[2],
-                center.values[0], center.values[1], center.values[2],
-                up.values[0], up.values[1], up.values[2]
+                eye.value.x, eye.value.y, eye.value.z,
+                center.value.x, center.value.y, center.value.z,
+                up.value.x, up.value.y, up.value.z
         )
     }
 
     fun rotateInplace(radians: Float, axis: Vec3) {
-        Matrix.rotateM(values, 0, radians, axis.values[0], axis.values[1], axis.values[2])
+        Matrix.rotateM(values, 0, radians, axis.value.x, axis.value.y, axis.value.z)
     }
 
     fun translateInplace(vec: Vec3) {
-        Matrix.translateM(values, 0, vec.values[0], vec.values[1], vec.values[2])
+        Matrix.translateM(values, 0, vec.value.x, vec.value.y, vec.value.z)
     }
 
     fun scaleInplace(vec: Vec3) {
-        Matrix.scaleM(values, 0, vec.values[0], vec.values[1], vec.values[2])
+        Matrix.scaleM(values, 0, vec.value.x, vec.value.y, vec.value.z)
     }
 
     operator fun times(other: Mat4): Mat4 {

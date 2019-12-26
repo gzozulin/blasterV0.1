@@ -4,6 +4,8 @@ import android.opengl.GLES30
 import com.blaster.scene.Mat4
 import com.blaster.scene.Vec3
 import java.lang.IllegalStateException
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 enum class GLShaderType(val type: Int) {
     VERTEX_SHADER(GLES30.GL_VERTEX_SHADER),
@@ -96,10 +98,17 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun setUniform(uniform: GLUniform, value: Vec3) {
-        glCheck { GLES30.glUniform3fv(uniformLocations[uniform]!!, 1, value.values, 0) }
+
+        value.value.get(buffer)
+
+        glCheck { GLES30.glUniform3fv(uniformLocations[uniform]!!, 1, buffer) }
     }
 
     fun setUniform(uniform: GLUniform, value: Mat4) {
         glCheck { GLES30.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, value.values, 0) }
     }
+
+    val buffer = ByteBuffer.allocateDirect(4 * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
 }
