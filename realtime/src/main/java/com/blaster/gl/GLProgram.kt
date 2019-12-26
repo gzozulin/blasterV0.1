@@ -46,6 +46,14 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
 
     private val uniformLocations = HashMap<GLUniform, Int>()
 
+    private val bufferVec3 = ByteBuffer.allocateDirect(4 * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
+
+    private val bufferMat4 = ByteBuffer.allocateDirect(16 * 4)
+            .order(ByteOrder.nativeOrder())
+            .asFloatBuffer()
+
     init {
         check(vertexShader.type == GLShaderType.VERTEX_SHADER)
         check(fragmentShader.type == GLShaderType.FRAGMENT_SHADER)
@@ -98,17 +106,12 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun setUniform(uniform: GLUniform, value: Vec3) {
-
-        value.value.get(buffer)
-
-        glCheck { GLES30.glUniform3fv(uniformLocations[uniform]!!, 1, buffer) }
+        value.value.get(bufferVec3)
+        glCheck { GLES30.glUniform3fv(uniformLocations[uniform]!!, 1, bufferVec3) }
     }
 
     fun setUniform(uniform: GLUniform, value: Mat4) {
-        glCheck { GLES30.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, value.values, 0) }
+        value.value.get(bufferMat4)
+        glCheck { GLES30.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
     }
-
-    val buffer = ByteBuffer.allocateDirect(4 * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
 }

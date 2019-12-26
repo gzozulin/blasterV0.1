@@ -5,6 +5,10 @@ import java.util.*
 import kotlin.math.sqrt
 
 data class Vec3(val value: Vector3f = Vector3f()) {
+    constructor(x: Float = 0f, y: Float = 0f, z: Float = 0f) : this (Vector3f(x, y, z))
+    constructor(f: Float) : this(f, f, f)
+    constructor(other: Vec3) : this(other.x, other.y, other.z)
+
     val x
         get() = value.x
 
@@ -14,17 +18,7 @@ data class Vec3(val value: Vector3f = Vector3f()) {
     val z
         get() = value.z
 
-    constructor(x: Float = 0f, y: Float = 0f, z: Float = 0f) : this (Vector3f(x, y, z))
-
-    constructor(f: Float) : this(f, f, f)
-
-    constructor(other: Vec3) : this(other.x, other.y, other.z)
-
     operator fun get(axis: Int) = value[axis]
-
-    fun setX(newX: Float) = Vec3(newX, y, z)
-    fun setY(newY: Float) = Vec3(x, newY, z)
-    fun setZ(newZ: Float) = Vec3(x, y, newZ)
 
     operator fun plus(other: Vec3) = Vec3(x + other.x, y + other.y, z + other.z)
     operator fun plus(f: Float) = Vec3(x + f, y + f, z + f)
@@ -44,29 +38,29 @@ data class Vec3(val value: Vector3f = Vector3f()) {
     )
 
     fun length() = sqrt(x * x + y * y + z * z)
-    fun squaredLength() = x * x + y * y + z * z
+    fun length2() = x * x + y * y + z * z
 
-    fun makeUnit() = this / length()
+    fun normalize() = this / length()
 
     fun negate() = Vec3(-x, -y, -z)
 
     companion object {
-        private val random = Random()
+        private val RANDOM = Random()
 
         fun randomVec3(max: Float) = Vec3(Math.random().toFloat() * max, Math.random().toFloat() * max, Math.random().toFloat() * max)
 
         fun randomInUnitSphere(): Vec3 {
             var result: Vec3
             do {
-                result = Vec3(random.nextFloat(), random.nextFloat(), random.nextFloat()) * 2f - Vec3(1f)
-            } while (result.squaredLength() >= 1f)
+                result = Vec3(RANDOM.nextFloat(), RANDOM.nextFloat(), RANDOM.nextFloat()) * 2f - Vec3(1f)
+            } while (result.length2() >= 1f)
             return result
         }
 
         fun randomInUnitDisk(): Vec3 {
             var result: Vec3
             do {
-                result = Vec3(random.nextFloat(), random.nextFloat(), 0f) * 2f - Vec3(1f, 1f, 0f)
+                result = Vec3(RANDOM.nextFloat(), RANDOM.nextFloat(), 0f) * 2f - Vec3(1f, 1f, 0f)
             } while (result.dot(result) >= 1f)
             return result
         }
@@ -76,7 +70,7 @@ data class Vec3(val value: Vector3f = Vector3f()) {
         }
 
         fun refract(vec: Vec3, normal: Vec3, niOverNt: Float): Vec3? {
-            val uv = vec.makeUnit()
+            val uv = vec.normalize()
             val dot = uv.dot(normal)
             val discriminant = 1f - niOverNt * niOverNt * (1f - dot * dot)
             if (discriminant <= 0f) {

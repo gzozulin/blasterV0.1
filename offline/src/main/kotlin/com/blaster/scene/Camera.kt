@@ -23,8 +23,8 @@ data class Camera(
         val halfHeight = tan(theta / 2f).toFloat()
         val halfWidth = aspect * halfHeight
         origin = eye
-        w = (eye - center).makeUnit()
-        u = up.cross(w).makeUnit()
+        w = (eye - center).normalize()
+        u = up.cross(w).normalize()
         v = w.cross(u)
         lowerLeft = origin - u * halfWidth * focusDist - v * halfHeight * focusDist - w * focusDist
         horizontal = u * halfWidth * focusDist * 2f

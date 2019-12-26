@@ -8,6 +8,6 @@ class Node(private val parent: Node? = null) {
             if (parent == null) { modelM } else { parent.calculateViewM() * modelM }
 
     fun tick() {
-        modelM.rotateInplace(1f, Vec3(0f, 1f, 0f))
+        modelM.rotate(1f, Vec3(0f, 1f, 0f))
     }
 }

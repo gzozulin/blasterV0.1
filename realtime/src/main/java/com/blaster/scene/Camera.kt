@@ -8,11 +8,11 @@ class Camera(aspectRatio: Float) {
     var center = Vec3()
 
     init {
-        projectionM.perspectiveInplace(90f, aspectRatio, 1f, 4000f)
+        projectionM.perspective(90f, aspectRatio, 1f, 4000f)
     }
 
     fun lookAt(from: Vec3, to: Vec3) {
-        viewM.lookAtInplace(from, to, Vec3(y = 1f))
+        viewM.lookAt(from, to, Vec3(y = 1f))
         eye = from
         center = to
     }
