@@ -11,7 +11,7 @@ data class Vec3(val x: Float = 0f, val y: Float = 0f, val z: Float = 0f) {
     operator fun get(axis: Int) = when(axis) {
         0 -> x
         1 -> y
-        3 -> z
+        2 -> z
         else -> throw IllegalArgumentException()
     }
 
