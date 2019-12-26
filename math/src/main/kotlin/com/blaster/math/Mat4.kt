@@ -15,5 +15,9 @@ data class Mat4(val value: Matrix4f = Matrix4f()) {
         value.rotate(radians, axis.x, axis.y, axis.z)
     }
 
-    operator fun times(other: Mat4): Mat4 = Mat4(value.mul(other.value))
+    operator fun times(other: Mat4): Mat4 {
+        val result = Matrix4f()
+        value.mul(other.value, result)
+        return Mat4(result)
+    }
 }
