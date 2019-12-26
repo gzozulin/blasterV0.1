@@ -1,24 +1,19 @@
 package com.blaster.math
 
-import org.joml.Vector3f
 import java.util.*
 import kotlin.math.sqrt
 
-data class Vec3(val value: Vector3f = Vector3f()) {
-    constructor(x: Float = 0f, y: Float = 0f, z: Float = 0f) : this (Vector3f(x, y, z))
+data class Vec3(val x: Float = 0f, val y: Float = 0f, val z: Float = 0f) {
+
     constructor(f: Float) : this(f, f, f)
     constructor(other: Vec3) : this(other.x, other.y, other.z)
 
-    val x
-        get() = value.x
-
-    val y
-        get() = value.y
-
-    val z
-        get() = value.z
-
-    operator fun get(axis: Int) = value[axis]
+    operator fun get(axis: Int) = when(axis) {
+        0 -> x
+        1 -> y
+        3 -> z
+        else -> throw IllegalArgumentException()
+    }
 
     operator fun plus(other: Vec3) = Vec3(x + other.x, y + other.y, z + other.z)
     operator fun plus(f: Float) = Vec3(x + f, y + f, z + f)
