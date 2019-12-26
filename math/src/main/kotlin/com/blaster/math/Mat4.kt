@@ -1,4 +1,4 @@
-package com.blaster.scene
+package com.blaster.math
 
 import org.joml.Matrix4f
 

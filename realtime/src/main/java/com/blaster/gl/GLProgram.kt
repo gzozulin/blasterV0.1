@@ -1,8 +1,8 @@
 package com.blaster.gl
 
 import android.opengl.GLES30
-import com.blaster.scene.Mat4
-import com.blaster.scene.Vec3
+import com.blaster.math.Mat4
+import com.blaster.math.Vec3
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

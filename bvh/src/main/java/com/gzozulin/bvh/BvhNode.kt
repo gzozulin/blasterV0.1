@@ -2,8 +2,8 @@ package com.gzozulin.bvh
 
 import com.blaster.HitRecord
 import com.blaster.Hitable
-import com.blaster.scene.Aabb
-import com.blaster.scene.Ray
+import com.blaster.math.Aabb
+import com.blaster.math.Ray
 
 class BvhNode(hitables: List<Hitable>) : Hitable {
     private val aabb: Aabb

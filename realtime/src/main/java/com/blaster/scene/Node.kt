@@ -1,5 +1,8 @@
 package com.blaster.scene
 
+import com.blaster.math.Mat4
+import com.blaster.math.Vec3
+
 // todo add versions or just straight compare
 class Node(private val parent: Node? = null) {
     private val modelM = Mat4()

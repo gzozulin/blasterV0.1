@@ -1,6 +1,6 @@
 package com.blaster.tracing
 
-import com.blaster.scene.Vec3
+import com.blaster.math.Vec3
 import java.io.File
 
 class PptFile(width: Int, height: Int, regionsCnt: Int) {

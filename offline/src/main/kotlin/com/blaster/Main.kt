@@ -1,6 +1,6 @@
 package com.blaster
 
-import com.blaster.scene.Vec3
+import com.blaster.math.Vec3
 import com.blaster.scene.Camera
 import com.blaster.tracing.Raytracer
 import com.blaster.tracing.PptFile

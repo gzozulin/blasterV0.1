@@ -1,7 +1,7 @@
 package com.blaster.texture
 
 import com.blaster.Texture
-import com.blaster.scene.Vec3
+import com.blaster.math.Vec3
 import java.awt.image.BufferedImage
 import java.io.File
 import java.nio.ByteBuffer
@@ -19,9 +19,9 @@ data class ImageTexture(val filename: String) : Texture {
         val pixel = image.getRGB(x.toInt(), y.toInt())
         val buffer = pixel.bytes()
         return Vec3(
-            (buffer[1].toInt() and 0xFF).toFloat() / 255f,
-            (buffer[2].toInt() and 0xFF).toFloat() / 255f,
-            (buffer[3].toInt() and 0xFF).toFloat() / 255f
+                (buffer[1].toInt() and 0xFF).toFloat() / 255f,
+                (buffer[2].toInt() and 0xFF).toFloat() / 255f,
+                (buffer[3].toInt() and 0xFF).toFloat() / 255f
         )
     }
 

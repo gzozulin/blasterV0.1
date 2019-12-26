@@ -4,8 +4,8 @@ import com.blaster.HitRecord
 import com.blaster.Material
 import com.blaster.ScatterResult
 import com.blaster.Texture
-import com.blaster.scene.Ray
-import com.blaster.scene.Vec3
+import com.blaster.math.Ray
+import com.blaster.math.Vec3
 
 data class DiffuseMaterial(val texture: Texture) : Material {
     override fun scattered(ray: Ray, hit: HitRecord): ScatterResult? = null

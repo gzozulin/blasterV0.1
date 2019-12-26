@@ -3,9 +3,9 @@ package com.blaster.hitables
 import com.blaster.HitRecord
 import com.blaster.Hitable
 import com.blaster.Material
-import com.blaster.scene.Aabb
-import com.blaster.scene.Ray
-import com.blaster.scene.Vec3
+import com.blaster.math.Aabb
+import com.blaster.math.Ray
+import com.blaster.math.Vec3
 
 data class RectYZHitable(
     val y0: Float, val y1: Float,

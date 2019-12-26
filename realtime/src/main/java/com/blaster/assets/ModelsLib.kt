@@ -4,9 +4,9 @@ import android.content.Context
 import com.blaster.gl.GLAttribute
 import com.blaster.gl.GLMesh
 import com.blaster.gl.GLModel
-import com.blaster.scene.Aabb
+import com.blaster.math.Aabb
 import com.blaster.scene.Node
-import com.blaster.scene.Vec3
+import com.blaster.math.Vec3
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset

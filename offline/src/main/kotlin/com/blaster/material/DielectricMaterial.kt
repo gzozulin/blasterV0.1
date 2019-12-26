@@ -3,8 +3,8 @@ package com.blaster.material
 import com.blaster.HitRecord
 import com.blaster.Material
 import com.blaster.ScatterResult
-import com.blaster.scene.Ray
-import com.blaster.scene.Vec3
+import com.blaster.math.Ray
+import com.blaster.math.Vec3
 import java.util.*
 import kotlin.math.pow
 

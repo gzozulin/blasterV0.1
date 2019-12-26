@@ -1,11 +1,13 @@
 package com.blaster.scene
 
+import com.blaster.math.Ray
+import com.blaster.math.Vec3
 import kotlin.math.tan
 
 data class Camera(
-    val eye: Vec3, val center: Vec3, val up: Vec3,
-    val vfov: Float, val aspect: Float,
-    val aperture: Float, val focusDist: Float
+        val eye: Vec3, val center: Vec3, val up: Vec3,
+        val vfov: Float, val aspect: Float,
+        val aperture: Float, val focusDist: Float
 ) {
     private val lensRadius: Float = aperture / 2f
 
