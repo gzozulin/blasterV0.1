@@ -15,7 +15,7 @@ val ppt = PptFile(width, height, regionsCnt)
 
 val scene = CornellScene()
 
-val eye = Vec3(scene.aabb().center.x, scene.aabb().center.y, -800f)
+val eye = scene.aabb().center.copy(z =-800f)
 val center = scene.aabb().center
 val up = Vec3(y = 1f)
 val camera = Camera(eye, center, up, 40f, width.toFloat() / height.toFloat(), 0f, 10f)
