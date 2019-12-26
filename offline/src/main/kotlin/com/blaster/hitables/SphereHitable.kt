@@ -10,7 +10,7 @@ import kotlin.math.asin
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
-data class Sphere(val center: Vec3, val radius: Float, val material: Material) : Hitable {
+data class SphereHitable(val center: Vec3, val radius: Float, val material: Material) : Hitable {
 
     private val aabb = Aabb(center - Vec3(radius), center + Vec3(radius))
 
@@ -52,12 +52,12 @@ data class Sphere(val center: Vec3, val radius: Float, val material: Material) :
                 material
         )
     }
-}
 
-fun getSphereUV(point: Vec3) : Pair<Float, Float> {
-    val phi = atan2(point.z, point.x)
-    val theta = asin(point.y)
-    val u = 1f - (phi + Math.PI.toFloat()) / (2f * Math.PI.toFloat())
-    val v = (theta + Math.PI.toFloat() / 2f) / Math.PI.toFloat()
-    return Pair(u, v)
+    private fun getSphereUV(point: Vec3) : Pair<Float, Float> {
+        val phi = atan2(point.z, point.x)
+        val theta = asin(point.y)
+        val u = 1f - (phi + Math.PI.toFloat()) / (2f * Math.PI.toFloat())
+        val v = (theta + Math.PI.toFloat() / 2f) / Math.PI.toFloat()
+        return Pair(u, v)
+    }
 }

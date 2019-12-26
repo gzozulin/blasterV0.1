@@ -7,7 +7,7 @@ import com.blaster.Texture
 import com.blaster.scene.Ray
 import com.blaster.scene.Vec3
 
-data class Lambertian(val albedo: Texture) : Material {
+data class LambertianMaterial(val albedo: Texture) : Material {
     override fun scattered(ray: Ray, hit: HitRecord): ScatterResult? =
         ScatterResult(
             albedo.value(hit.u, hit.v, hit.point),

@@ -3,15 +3,14 @@ package com.blaster.hitables
 import com.blaster.HitRecord
 import com.blaster.Hitable
 import com.blaster.Texture
-import com.blaster.material.Isotropic
+import com.blaster.material.IsotropicMaterial
 import com.blaster.scene.Ray
 import com.blaster.scene.Vec3
 import java.util.*
+import kotlin.math.ln
 
-private val random = Random()
-
-data class ConstantMedium(val boundary: Hitable, val density: Float, val texture: Texture) : Hitable {
-    private val phaseFunction = Isotropic(texture)
+data class MediumHitable(val boundary: Hitable, val density: Float, val texture: Texture) : Hitable {
+    private val phaseFunction = IsotropicMaterial(texture)
 
     override fun aabb() = boundary.aabb()
 
@@ -33,7 +32,7 @@ data class ConstantMedium(val boundary: Hitable, val density: Float, val texture
                     hit1.t = 0f
                 }
                 val distanceInsideBoundary = (hit2.t - hit1.t) * ray.direction.length()
-                val hitDistance = -(1f / density) * Math.log(random.nextDouble()).toFloat()
+                val hitDistance = -(1f / density) * ln(RANDOM.nextDouble()).toFloat()
                 if (hitDistance < distanceInsideBoundary) {
                     val t = hit1.t + hitDistance / ray.direction.length()
                     return HitRecord(
@@ -47,5 +46,9 @@ data class ConstantMedium(val boundary: Hitable, val density: Float, val texture
             }
         }
         return null
+    }
+
+    private companion object {
+        private val RANDOM = Random()
     }
 }

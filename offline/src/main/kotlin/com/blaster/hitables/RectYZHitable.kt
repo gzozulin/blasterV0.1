@@ -7,7 +7,7 @@ import com.blaster.scene.Aabb
 import com.blaster.scene.Ray
 import com.blaster.scene.Vec3
 
-data class RectYZ(
+data class RectYZHitable(
     val y0: Float, val y1: Float,
     val z0: Float, val z1: Float,
     val k: Float,

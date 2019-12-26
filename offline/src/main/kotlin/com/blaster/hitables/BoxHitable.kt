@@ -8,7 +8,7 @@ import com.blaster.scene.Ray
 import com.blaster.scene.Vec3
 import com.gzozulin.bvh.BvhNode
 
-data class Box(
+data class BoxHitable(
         val min: Vec3, val max: Vec3,
         val leftMaterial: Material, val rightMaterial: Material,
         val topMaterial: Material, val bottomMaterial: Material,
@@ -24,12 +24,12 @@ data class Box(
 
     init {
         val hitables = mutableListOf<Hitable>()
-        hitables.add(RectXY(min.x, max.x, min.y, max.y, max.z, backMaterial))
-        hitables.add(FlipNormals(RectXY(min.x, max.x, min.y, max.y, min.z, frontMaterial)))
-        hitables.add(RectXZ(min.x, max.x, min.z, max.z, max.y, topMaterial))
-        hitables.add(FlipNormals(RectXZ(min.x, max.x, min.z, max.z, min.y, bottomMaterial)))
-        hitables.add(RectYZ(min.y, max.y, min.z, max.z, max.x, leftMaterial))
-        hitables.add(FlipNormals(RectYZ(min.y, max.y, min.z, max.z, min.x, rightMaterial)))
+        hitables.add(RectXYHitable(min.x, max.x, min.y, max.y, max.z, backMaterial))
+        hitables.add(FlipNormals(RectXYHitable(min.x, max.x, min.y, max.y, min.z, frontMaterial)))
+        hitables.add(RectXZHitable(min.x, max.x, min.z, max.z, max.y, topMaterial))
+        hitables.add(FlipNormals(RectXZHitable(min.x, max.x, min.z, max.z, min.y, bottomMaterial)))
+        hitables.add(RectYZHitable(min.y, max.y, min.z, max.z, max.x, leftMaterial))
+        hitables.add(FlipNormals(RectYZHitable(min.y, max.y, min.z, max.z, min.x, rightMaterial)))
         node = BvhNode(hitables)
     }
 

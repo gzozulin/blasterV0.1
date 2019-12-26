@@ -8,9 +8,7 @@ import com.blaster.scene.Vec3
 import java.util.*
 import kotlin.math.pow
 
-private val random = Random()
-
-data class Dielectric(val reflectionIndex: Float) : Material {
+data class DielectricMaterial(val reflectionIndex: Float) : Material {
     override fun scattered(ray: Ray, hit: HitRecord): ScatterResult? {
         val reflected = Vec3.reflect(ray.direction, hit.normal)
         val outwardNormal: Vec3
@@ -29,7 +27,7 @@ data class Dielectric(val reflectionIndex: Float) : Material {
         val refracted = Vec3.refract(ray.direction, outwardNormal, niOverNt)
         if (refracted != null) {
             val reflectionProbe = schlick(cosine, reflectionIndex)
-            if (reflectionProbe <= random.nextFloat()) {
+            if (reflectionProbe <= RANDOM.nextFloat()) {
                 return ScatterResult(attenuation, Ray(hit.point, refracted))
             }
         }
@@ -37,10 +35,14 @@ data class Dielectric(val reflectionIndex: Float) : Material {
     }
 
     override fun emitted(u: Float, v: Float, point: Vec3): Vec3 = Vec3()
-}
 
-fun schlick(cosine: Float, reflectionIndex: Float): Float {
-    val r0 = (1 - reflectionIndex) / (1 + reflectionIndex)
-    val rSq = r0 * r0
-    return rSq + (1 - rSq) * (1f - cosine).toDouble().pow(5.0).toFloat()
+    private fun schlick(cosine: Float, reflectionIndex: Float): Float {
+        val r0 = (1 - reflectionIndex) / (1 + reflectionIndex)
+        val rSq = r0 * r0
+        return rSq + (1 - rSq) * (1f - cosine).toDouble().pow(5.0).toFloat()
+    }
+
+    private companion object {
+        private val RANDOM = Random()
+    }
 }

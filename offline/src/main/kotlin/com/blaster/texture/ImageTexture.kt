@@ -7,8 +7,6 @@ import java.io.File
 import java.nio.ByteBuffer
 import javax.imageio.ImageIO
 
-fun Int.bytes(): ByteBuffer = ByteBuffer.allocate(Integer.BYTES).putInt(this)
-
 data class ImageTexture(val filename: String) : Texture {
     private val image: BufferedImage = ImageIO.read(File(filename))
 
@@ -26,4 +24,6 @@ data class ImageTexture(val filename: String) : Texture {
             (buffer[3].toInt() and 0xFF).toFloat() / 255f
         )
     }
+
+    private fun Int.bytes(): ByteBuffer = ByteBuffer.allocate(Integer.BYTES).putInt(this)
 }

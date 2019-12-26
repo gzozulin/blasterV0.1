@@ -6,7 +6,7 @@ import com.blaster.ScatterResult
 import com.blaster.scene.Ray
 import com.blaster.scene.Vec3
 
-data class Metal(val albedo: Vec3, val fuzz: Float) : Material {
+data class MetalMaterial(val albedo: Vec3, val fuzz: Float) : Material {
     private var actualFuzz = if (fuzz <= 1f) fuzz else 1f
 
     override fun scattered(ray: Ray, hit: HitRecord): ScatterResult? {
