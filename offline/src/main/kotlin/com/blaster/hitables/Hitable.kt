@@ -1,4 +1,4 @@
-package com.blaster
+package com.blaster.hitables
 
 import com.blaster.math.Aabb
 import com.blaster.math.Ray

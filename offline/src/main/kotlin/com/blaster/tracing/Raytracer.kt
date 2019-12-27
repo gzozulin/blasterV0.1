@@ -1,6 +1,6 @@
 package com.blaster.tracing
 
-import com.blaster.Hitable
+import com.blaster.hitables.Hitable
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
 import com.blaster.scene.Camera

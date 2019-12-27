@@ -1,7 +1,5 @@
 package com.blaster.scene
 
-import com.blaster.HitRecord
-import com.blaster.Hitable
 import com.blaster.hitables.*
 import com.blaster.material.DiffuseMaterial
 import com.blaster.material.LambertianMaterial
@@ -9,7 +7,7 @@ import com.blaster.math.Ray
 import com.blaster.math.Vec3
 import com.blaster.texture.ConstantTexture
 import com.blaster.texture.ImageTexture
-import com.gzozulin.bvh.BvhNode
+import com.blaster.bvh.BvhNode
 
 class CornellScene : Hitable {
     private val scene: Hitable = prepare()

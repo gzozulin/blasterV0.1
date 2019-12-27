@@ -109,7 +109,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         glCheck { GLES30.glUniform3fv(uniformLocations[uniform]!!, 1, floatArrayOf(value.x, value.y, value.z), 0) }
     }
 
-    fun setUniform(uniform: GLUniform, value: Mat4) {
+    fun setUniform(uniform: GLUniform, value: com.blaster.math.Mat4) {
         value.value.get(bufferMat4)
         glCheck { GLES30.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
     }

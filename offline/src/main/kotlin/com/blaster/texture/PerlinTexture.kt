@@ -1,6 +1,5 @@
 package com.blaster.texture
 
-import com.blaster.Texture
 import com.blaster.math.Perlin
 import com.blaster.math.Vec3
 

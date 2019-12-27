@@ -1,5 +1,6 @@
-package com.blaster
+package com.blaster.material
 
+import com.blaster.hitables.HitRecord
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
 

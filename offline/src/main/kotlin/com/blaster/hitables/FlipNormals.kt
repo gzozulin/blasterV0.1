@@ -1,7 +1,5 @@
 package com.blaster.hitables
 
-import com.blaster.HitRecord
-import com.blaster.Hitable
 import com.blaster.math.Aabb
 import com.blaster.math.Ray
 

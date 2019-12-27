@@ -1,8 +1,6 @@
 package com.blaster.hitables
 
-import com.blaster.HitRecord
-import com.blaster.Hitable
-import com.blaster.Material
+import com.blaster.material.Material
 import com.blaster.math.Aabb
 import com.blaster.math.Ray
 import com.blaster.math.Vec3

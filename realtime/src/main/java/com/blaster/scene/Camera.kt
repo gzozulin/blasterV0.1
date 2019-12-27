@@ -5,8 +5,8 @@ import com.blaster.math.Mat4
 import com.blaster.math.Vec3
 
 class Camera(aspectRatio: Float) {
-    val viewM = Mat4()
-    val projectionM = Mat4()
+    val viewM = com.blaster.math.Mat4()
+    val projectionM = com.blaster.math.Mat4()
 
     var eye = Vec3()
     var center = Vec3()

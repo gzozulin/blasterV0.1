@@ -5,9 +5,9 @@ import com.blaster.math.Vec3
 
 // todo add versions or just straight compare
 class Node(private val parent: Node? = null) {
-    private val modelM = Mat4()
+    private val modelM = com.blaster.math.Mat4()
 
-    fun calculateViewM(): Mat4 =
+    fun calculateViewM(): com.blaster.math.Mat4 =
             if (parent == null) { modelM } else { parent.calculateViewM() * modelM }
 
     fun tick() {

@@ -1,1 +1,1 @@
-include ':realtime', ':offline', ':math', ':common', ':bvh'
+include ':realtime', ':offline', ':math', ':common', ':bvh', ':desktop'

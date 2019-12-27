@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id=":offline" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" type="JAVA_MODULE" version="4">
+<module external.linked.project.id=":desktop" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/.." external.system.id="GRADLE" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":offline" />
+        <option name="GRADLE_PROJECT_PATH" value=":desktop" />
       </configuration>
     </facet>
     <facet type="java-gradle" name="Java-Gradle">
@@ -19,10 +19,10 @@
         </compilerSettings>
         <compilerArguments>
           <option name="destination" value="$MODULE_DIR$/build/classes/kotlin/main" />
-          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.3.61/e91d61b7cfd9a45566b580fef18bbd5c32d505b5/kotlin-stdlib-jdk8-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core/1.3.3/5bac48cf5828e9b006f3b1ef6e37d2a70c2e7321/kotlinx-coroutines-core-1.3.3.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.3.61/70dffc5f8ac5ea7c34f30deac5b9d8b1d48af066/kotlin-stdlib-jdk7-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.61/4702105e97f7396ae41b113fdbdc180ec1eb1e36/kotlin-stdlib-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.61/65abb71d5afb850b68be03987b08e2c864ca3110/kotlin-stdlib-common-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" />
+          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl/3.0.0a/788064e90fc99d6202b89c487ac525cb336a8dd3/lwjgl-3.0.0a.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/4d92e1b7c9c3077209a8cb2531cd803837b685d5/lwjgl-platform-3.0.0a-natives-windows.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/23d98c0b5a1ca12726d47fe8cccaf323d2ba30a9/lwjgl-platform-3.0.0a-natives-linux.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/85281dee834fb29b530148f354b704699e03c5b7/lwjgl-platform-3.0.0a-natives-osx.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.3.61/e91d61b7cfd9a45566b580fef18bbd5c32d505b5/kotlin-stdlib-jdk8-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.3.61/70dffc5f8ac5ea7c34f30deac5b9d8b1d48af066/kotlin-stdlib-jdk7-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.61/4702105e97f7396ae41b113fdbdc180ec1eb1e36/kotlin-stdlib-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.61/65abb71d5afb850b68be03987b08e2c864ca3110/kotlin-stdlib-common-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" />
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
-          <option name="moduleName" value="offline" />
+          <option name="moduleName" value="desktop" />
           <option name="jvmTarget" value="1.8" />
           <option name="languageVersion" value="1.3" />
           <option name="apiVersion" value="1.3" />
@@ -47,7 +47,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_7">
     <output url="file://$MODULE_DIR$/build/classes/java/main" />
     <output-test url="file://$MODULE_DIR$/build/classes/java/test" />
     <exclude-output />
@@ -55,29 +55,22 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/kotlin" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/kotlin" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="Gradle: lwjgl-3.0.0a" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: lwjgl-platform-3.0.0a-natives-windows" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: lwjgl-platform-3.0.0a-natives-linux" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: lwjgl-platform-3.0.0a-natives-osx" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-jdk8-1.3.61" level="project" />
-    <orderEntry type="library" exported="" name="Gradle: kotlinx-coroutines-core-1.3.3" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-jdk7-1.3.61" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-1.3.61" level="project" />
     <orderEntry type="library" exported="" name="Gradle: kotlin-stdlib-common-1.3.61" level="project" />
     <orderEntry type="library" exported="" name="Gradle: annotations-13.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="Gradle: junit-4.12" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="Gradle: hamcrest-core-1.3" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" exported="" name="offline.offline-1.0-SNAPSHOT" level="project" />
   </component>
 </module>

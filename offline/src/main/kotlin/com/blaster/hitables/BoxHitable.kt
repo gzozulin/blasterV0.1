@@ -1,12 +1,10 @@
 package com.blaster.hitables
 
-import com.blaster.HitRecord
-import com.blaster.Hitable
-import com.blaster.Material
+import com.blaster.material.Material
 import com.blaster.math.Aabb
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
-import com.gzozulin.bvh.BvhNode
+import com.blaster.bvh.BvhNode
 
 data class BoxHitable(
         val min: Vec3, val max: Vec3,

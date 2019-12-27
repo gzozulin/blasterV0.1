@@ -1,7 +1,7 @@
-package com.gzozulin.bvh
+package com.blaster.bvh
 
-import com.blaster.HitRecord
-import com.blaster.Hitable
+import com.blaster.hitables.HitRecord
+import com.blaster.hitables.Hitable
 import com.blaster.math.Aabb
 import com.blaster.math.Ray
 
