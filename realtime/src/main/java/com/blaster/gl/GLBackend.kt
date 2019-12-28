@@ -30,7 +30,6 @@ interface GLBackend {
     fun glBufferData(target: Int, size: Int, data: java.nio.Buffer, usage: Int)
 
     val GL_FRAMEBUFFER: Int
-    val GL_RENDERBUFFER: Int
     val GL_FRAMEBUFFER_COMPLETE: Int
     fun glGenFramebuffers(n: Int, framebuffers: IntArray, offset: Int)
     fun glBindFramebuffer(target: Int, framebuffer: Int)
@@ -69,4 +68,10 @@ interface GLBackend {
     fun glUniform1f(location: Int, x: Float)
     fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int)
     fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: java.nio.FloatBuffer)
+
+    val GL_RENDERBUFFER: Int
+    val GL_DEPTH_COMPONENT24: Int
+    fun glGenRenderbuffers(n: Int, renderbuffers: IntArray, offset: Int)
+    fun glBindRenderbuffer(target: Int, renderbuffer: Int)
+    fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int)
 }
