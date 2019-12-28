@@ -1,12 +1,11 @@
 package com.blaster.gl
 
-import android.opengl.GLES30
-import android.opengl.GLU
+private val backend = GLBackendLocator.instance()
 
 fun checkForGLError() {
-    val errorCode = GLES30.glGetError()
-    check(errorCode == GLES30.GL_NO_ERROR) {
-        "We have a GL error: ${GLU.gluErrorString(errorCode)}"
+    val errorCode = backend.glGetError()
+    check(errorCode == backend.GL_NO_ERROR) {
+        "We have a GL error: ${backend.gluErrorString(errorCode)}"
     }
 }
 
