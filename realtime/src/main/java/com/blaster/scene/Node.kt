@@ -17,6 +17,6 @@ class Node(private val parent: Node? = null) {
             }
 
     fun tick() {
-        modelM.rotate(1f, Vector3f(0f, 1f, 0f))
+        modelM.rotate(0.01f, Vector3f(0f, 1f, 0f))
     }
 }

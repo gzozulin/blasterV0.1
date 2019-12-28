@@ -111,6 +111,7 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun setUniform(uniform: GLUniform, value: Matrix4f) {
+        value.get(bufferMat4)
         glCheck { backend.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
     }
 }

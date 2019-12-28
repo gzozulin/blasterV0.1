@@ -11,7 +11,7 @@ class Camera(aspectRatio: Float) {
     var center = Vector3f()
 
     init {
-        projectionM.perspective(90f, aspectRatio, 1f, 4000f)
+        projectionM.perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 1f, 4000f)
     }
 
     fun lookAt(from: Vector3f, to: Vector3f) {
