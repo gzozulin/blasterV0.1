@@ -36,4 +36,12 @@ interface GLBackend {
     fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int)
     fun glDrawBuffers(n: Int, bufs: IntArray, offset: Int)
     fun glCheckFramebufferStatus(target: Int): Int
+
+    val GL_FLOAT: Int
+    val GL_UNSIGNED_INT: Int
+    val GL_TRIANGLES: Int
+    fun glEnableVertexAttribArray(index: Int)
+    fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
+    fun glDisableVertexAttribArray(index: Int)
+    fun glDrawElements(mode: Int, count: Int, type: Int, offset: Int)
 }
