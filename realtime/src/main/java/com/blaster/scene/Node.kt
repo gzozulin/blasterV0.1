@@ -1,16 +1,22 @@
 package com.blaster.scene
 
-import com.blaster.math.Mat4
-import com.blaster.math.Vec3
+import org.joml.Matrix4f
+import org.joml.Vector3f
 
 // todo add versions or just straight compare
 class Node(private val parent: Node? = null) {
-    private val modelM = com.blaster.math.Mat4()
+    private val modelM = Matrix4f()
 
-    fun calculateViewM(): com.blaster.math.Mat4 =
-            if (parent == null) { modelM } else { parent.calculateViewM() * modelM }
+    fun calculateViewM(): Matrix4f =
+            if (parent == null) {
+                modelM
+            } else {
+                val result = Matrix4f()
+                parent.calculateViewM().mul(modelM, result)
+                result
+            }
 
     fun tick() {
-        modelM.rotate(1f, Vec3(0f, 1f, 0f))
+        modelM.rotate(1f, Vector3f(0f, 1f, 0f))
     }
 }

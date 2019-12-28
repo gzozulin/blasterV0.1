@@ -1,8 +1,8 @@
 package com.blaster.gl
 
 import android.opengl.GLES30
-import com.blaster.math.Mat4
-import com.blaster.math.Vec3
+import org.joml.Matrix4f
+import org.joml.Vector3f
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -105,12 +105,11 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
         glCheck { GLES30.glUniform1f(uniformLocations[uniform]!!, value) }
     }
 
-    fun setUniform(uniform: GLUniform, value: Vec3) {
+    fun setUniform(uniform: GLUniform, value: Vector3f) {
         glCheck { GLES30.glUniform3fv(uniformLocations[uniform]!!, 1, floatArrayOf(value.x, value.y, value.z), 0) }
     }
 
-    fun setUniform(uniform: GLUniform, value: com.blaster.math.Mat4) {
-        value.value.get(bufferMat4)
+    fun setUniform(uniform: GLUniform, value: Matrix4f) {
         glCheck { GLES30.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
     }
 }

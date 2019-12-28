@@ -4,9 +4,9 @@ import android.content.Context
 import com.blaster.gl.GLAttribute
 import com.blaster.gl.GLMesh
 import com.blaster.gl.GLModel
-import com.blaster.math.Aabb
+import com.blaster.scene.AABB
 import com.blaster.scene.Node
-import com.blaster.math.Vec3
+import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
@@ -55,7 +55,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), Aabb(Vec3(minX, minY, minZ), Vec3(maxX, maxY, maxZ)))
+        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
     }
 
     private fun parseLine(line: String) {

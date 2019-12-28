@@ -8,7 +8,7 @@ import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.scene.Node
-import com.blaster.math.Vec3
+import org.joml.Vector3f
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -49,7 +49,7 @@ class SimpleRenderer(ctx: Context) : GLSurfaceView.Renderer  {
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
         glCheck { GLES30.glViewport(0, 0, width, height) }
         camera = Camera(width.toFloat() / height.toFloat())
-        camera.lookAt(Vec3(z = 2.5f), Vec3())
+        camera.lookAt(Vector3f(0f, 0f, 2.5f), Vector3f())
     }
 
     override fun onDrawFrame(gl: GL10?) {

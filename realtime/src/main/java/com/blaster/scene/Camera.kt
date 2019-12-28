@@ -1,27 +1,26 @@
 package com.blaster.scene
 
-import com.blaster.math.Aabb
-import com.blaster.math.Mat4
-import com.blaster.math.Vec3
+import org.joml.Matrix4f
+import org.joml.Vector3f
 
 class Camera(aspectRatio: Float) {
-    val viewM = com.blaster.math.Mat4()
-    val projectionM = com.blaster.math.Mat4()
+    val viewM = Matrix4f()
+    val projectionM = Matrix4f()
 
-    var eye = Vec3()
-    var center = Vec3()
+    var eye = Vector3f()
+    var center = Vector3f()
 
     init {
         projectionM.perspective(90f, aspectRatio, 1f, 4000f)
     }
 
-    fun lookAt(from: Vec3, to: Vec3) {
-        viewM.lookAt(from, to, Vec3(y = 1f))
+    fun lookAt(from: Vector3f, to: Vector3f) {
+        viewM.lookAt(from, to, Vector3f(0f, 1f, 0f))
         eye = from
         center = to
     }
 
-    fun lookAt(aabb: Aabb) {
+    fun lookAt(aabb: AABB) {
         var maxValue = aabb.width
         if (aabb.height > maxValue) {
             maxValue = aabb.height
@@ -30,7 +29,8 @@ class Camera(aspectRatio: Float) {
             maxValue = aabb.depth
         }
         val center = aabb.center
-        val from = center + Vec3(y = maxValue / 2f, z = maxValue)
-        lookAt(from, center)
+        val result = Vector3f()
+        center.add(Vector3f(0f, maxValue / 2f, maxValue), result)
+        lookAt(result, center)
     }
 }

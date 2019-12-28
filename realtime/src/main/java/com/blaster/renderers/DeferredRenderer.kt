@@ -9,7 +9,8 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
 import com.blaster.scene.Camera
-import com.blaster.math.Vec3
+import org.joml.Vector3f
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -103,8 +104,8 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private fun setupLights() {
         for (i in 0..15) {
-            programLightPass.setUniform(uniformLightPosition(i), Vec3.randomVec3(5f))
-            programLightPass.setUniform(uniformLightColor(i), Vec3.randomVec3(1f))
+            programLightPass.setUniform(uniformLightPosition(i), Vector3f())
+            programLightPass.setUniform(uniformLightColor(i), Vector3f())
         }
     }
 
