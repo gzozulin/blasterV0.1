@@ -1,46 +1,47 @@
 package com.blaster.gl
 
-import android.opengl.GLES30
 import java.nio.Buffer
 
+private val backend = GLBackendLocator.instance()
+
 class GLTexture(
-        val target: Int = GLES30.GL_TEXTURE_2D,
+        val target: Int = backend.GL_TEXTURE_2D,
         val unit: Int = 0,
         private val width: Int,
         private val height: Int,
-        internalFormat: Int = GLES30.GL_RGBA,
-        pixelFormat: Int = GLES30.GL_RGBA,
-        pixelType: Int = GLES30.GL_FLOAT,
+        internalFormat: Int = backend.GL_RGBA,
+        pixelFormat: Int = backend.GL_RGBA,
+        pixelType: Int = backend.GL_FLOAT,
         pixels: Buffer? = null) : GLBindable {
 
     val handle: Int
 
     init {
         val handles = IntArray(1)
-        glCheck { GLES30.glGenTextures(1, handles, 0) }
+        glCheck { backend.glGenTextures(1, handles, 0) }
         handle = handles[0]
         check(handle > 0)
     }
 
     init {
-        glCheck { GLES30.glBindTexture(target, handle) }
-        glCheck { GLES30.glTexImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, pixels) }
-        glCheck { GLES30.glTexParameteri(target, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST) }
-        glCheck { GLES30.glTexParameteri(target, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST) }
-        glCheck { GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_REPEAT) }
-        glCheck { GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_REPEAT) }
-        glCheck { GLES30.glBindTexture(target, 0) }
+        glCheck { backend.glBindTexture(target, handle) }
+        glCheck { backend.glTexImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, pixels) }
+        glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MIN_FILTER, backend.GL_NEAREST) }
+        glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MAG_FILTER, backend.GL_NEAREST) }
+        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_S, backend.GL_REPEAT) }
+        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_T, backend.GL_REPEAT) }
+        glCheck { backend.glBindTexture(target, 0) }
     }
 
     override fun bind() {
-        glCheck { GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + unit) } // passing GL_TEXTURE1?
-        glCheck { GLES30.glBindTexture(target, handle) }
+        glCheck { backend.glActiveTexture(backend.GL_TEXTURE0 + unit) } // passing GL_TEXTURE1?
+        glCheck { backend.glBindTexture(target, handle) }
     }
 
     override fun unbind() {
         glCheck {
-            GLES30.glActiveTexture(GLES30.GL_TEXTURE0 + unit)
-            GLES30.glBindTexture(target, 0)
+            backend.glActiveTexture(backend.GL_TEXTURE0 + unit)
+            backend.glBindTexture(target, 0)
         }
     }
 }

@@ -74,4 +74,19 @@ interface GLBackend {
     fun glGenRenderbuffers(n: Int, renderbuffers: IntArray, offset: Int)
     fun glBindRenderbuffer(target: Int, renderbuffer: Int)
     fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int)
+
+    val GL_RGBA: Int
+    val GL_TEXTURE_2D: Int
+    val GL_TEXTURE0: Int
+    val GL_TEXTURE_MIN_FILTER: Int
+    val GL_TEXTURE_MAG_FILTER: Int
+    val GL_NEAREST: Int
+    val GL_TEXTURE_WRAP_S: Int
+    val GL_TEXTURE_WRAP_T: Int
+    val GL_REPEAT: Int
+    fun glGenTextures(n: Int, textures: IntArray, offset: Int)
+    fun glBindTexture(target: Int, texture: Int)
+    fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: java.nio.Buffer?)
+    fun glTexParameteri(target: Int, pname: Int, param: Int)
+    fun glActiveTexture(texture: Int)
 }
