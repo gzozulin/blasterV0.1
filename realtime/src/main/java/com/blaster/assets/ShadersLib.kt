@@ -10,8 +10,8 @@ import java.nio.charset.Charset
 
 class ShadersLib(private val ctx: Context) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GLProgram = GLProgram(
-                GLShader(GLShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
-                GLShader(GLShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
+            GLShader(GLShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
+            GLShader(GLShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
 
     private fun slurpAsset(filename: String): String {
         val stringBuilder = StringBuilder()

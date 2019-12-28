@@ -29,6 +29,7 @@ repositories {
 }
 
 dependencies {
+    implementation project(':common_gl')
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -38,5 +39,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation "org.joml:joml-android:1.9.3-SNAPSHOT"
+    implementation "org.joml:joml:1.9.19"
+    //implementation "org.joml:joml-android:1.9.3-SNAPSHOT"
 }

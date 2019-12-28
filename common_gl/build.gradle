@@ -28,4 +28,7 @@ project.ext.lwjglVersion = "3.0.0a"
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+
+    implementation "org.joml:joml:1.9.19"
+    //implementation "org.joml:joml-android:1.9.3-SNAPSHOT"
 }

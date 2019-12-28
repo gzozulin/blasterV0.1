@@ -10,7 +10,6 @@ import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import org.joml.Vector3f
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10

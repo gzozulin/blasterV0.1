@@ -10,8 +10,8 @@ class GLMesh(
 
     constructor(vertices: FloatArray, indices: IntArray, attributes: List<GLAttribute>)
             : this(
-                GLBuffer(backend.GL_ARRAY_BUFFER, vertices),
-                GLBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indices),
+            GLBuffer(backend.GL_ARRAY_BUFFER, vertices),
+            GLBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indices),
                 indices.size, attributes)
 
     private fun bindVertexPointers() {
