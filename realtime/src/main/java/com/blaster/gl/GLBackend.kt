@@ -16,6 +16,8 @@ class GLBackendLocator {
 }
 
 interface GLBackend {
+    val GL_TRUE: Int
+    val GL_FALSE: Int
     val GL_NO_ERROR: Int
     fun glGetError(): Int
     fun gluErrorString(error: Int): String
@@ -44,4 +46,27 @@ interface GLBackend {
     fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
     fun glDisableVertexAttribArray(index: Int)
     fun glDrawElements(mode: Int, count: Int, type: Int, offset: Int)
+
+    val GL_VERTEX_SHADER: Int
+    val GL_FRAGMENT_SHADER: Int
+    val GL_COMPILE_STATUS: Int
+    val GL_LINK_STATUS: Int
+    fun glCreateShader(type: Int): Int
+    fun glShaderSource(shader: Int, string: String)
+    fun glCompileShader(shader: Int)
+    fun glGetShaderiv(shader: Int, pname: Int, params: IntArray, offset: Int)
+    fun glGetShaderInfoLog(shader: Int): String
+    fun glDeleteShader(shader: Int)
+    fun glCreateProgram(): Int
+    fun glAttachShader(program: Int, shader: Int)
+    fun glLinkProgram(program: Int)
+    fun glGetProgramiv(program: Int, pname: Int, params: IntArray, offset: Int)
+    fun glGetProgramInfoLog(program: Int): String
+    fun glGetUniformLocation(program: Int, name: String): Int
+    fun glDeleteProgram(program: Int)
+    fun glUseProgram(program: Int)
+    fun glUniform1i(location: Int, x: Int)
+    fun glUniform1f(location: Int, x: Float)
+    fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int)
+    fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: java.nio.FloatBuffer)
 }

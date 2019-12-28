@@ -4,9 +4,9 @@ import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
-    private val backend = GLBackendLocator.instance()
+private val backend = GLBackendLocator.instance()
 
+class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
     private val handle: Int
 
     // todo make two different constructors for indices/vertices

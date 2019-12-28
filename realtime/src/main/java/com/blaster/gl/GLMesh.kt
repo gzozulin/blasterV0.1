@@ -1,17 +1,17 @@
 package com.blaster.gl
 
+private val backend = GLBackendLocator.instance()
+
 class GLMesh(
         private val verticesBuffer: GLBuffer,
         private val indicesBuffer: GLBuffer,
         private val indicesCount: Int,
         private val attributes: List<GLAttribute>) : GLBindable {
 
-    private val backend = GLBackendLocator.instance()
-
     constructor(vertices: FloatArray, indices: IntArray, attributes: List<GLAttribute>)
             : this(
-                GLBuffer(GLBackendLocator.instance().GL_ARRAY_BUFFER, vertices),
-                GLBuffer(GLBackendLocator.instance().GL_ELEMENT_ARRAY_BUFFER, indices),
+                GLBuffer(backend.GL_ARRAY_BUFFER, vertices),
+                GLBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indices),
                 indices.size, attributes)
 
     private fun bindVertexPointers() {
