@@ -1,12 +1,11 @@
 package com.blaster.gl
 
-import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 private val backend = GLLocator.instance()
 
-class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
+class GLBuffer(private val type: Int, buffer: ByteBuffer, size: Long) : GLBindable {
     private val handle: Int = glCheck { backend.glGenBuffers() }
 
     // todo make two different constructors for indices/vertices
@@ -23,17 +22,19 @@ class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
         }
     }
 
-    constructor(type: Int, floats: FloatArray) : this(type, ByteBuffer.allocateDirect(floats.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asFloatBuffer()
-            .put(floats)
-            .position(0), floats.size * 4)
+    companion object {
+        fun create(type: Int, floats: FloatArray): GLBuffer {
+            val buffer = ByteBuffer.allocateDirect(floats.size * 4).order(ByteOrder.nativeOrder())
+            buffer.asFloatBuffer().put(floats).position(0)
+            return GLBuffer(type, buffer, floats.size * 4L)
+        }
 
-    constructor(type: Int, ints: IntArray) : this(type, ByteBuffer.allocateDirect(ints.size * 4)
-            .order(ByteOrder.nativeOrder())
-            .asIntBuffer()
-            .put(ints)
-            .position(0), ints.size * 4)
+        fun create(type: Int, ints: IntArray): GLBuffer {
+            val buffer = ByteBuffer.allocateDirect(ints.size * 4).order(ByteOrder.nativeOrder())
+            buffer.asIntBuffer().put(ints).position(0)
+            return GLBuffer(type, buffer, ints.size * 4L)
+        }
+    }
 
     override fun bind() {
         glCheck { backend.glBindBuffer(type, handle) }

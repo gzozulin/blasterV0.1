@@ -37,7 +37,7 @@ interface GLBackend {
     val GL_STATIC_DRAW: Int
     fun glGenBuffers(): Int
     fun glBindBuffer(target: Int, buffer: Int)
-    fun glBufferData(target: Int, size: Int, data: java.nio.Buffer, usage: Int)
+    fun glBufferData(target: Int, size: Long, data: java.nio.ByteBuffer, usage: Int)
 
     val GL_FRAMEBUFFER: Int
     val GL_FRAMEBUFFER_COMPLETE: Int
@@ -45,7 +45,7 @@ interface GLBackend {
     fun glBindFramebuffer(target: Int, framebuffer: Int)
     fun glFramebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int)
     fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int)
-    fun glDrawBuffers(n: Int, bufs: IntArray, offset: Int)
+    fun glDrawBuffers(bufs: IntArray)
     fun glCheckFramebufferStatus(target: Int): Int
 
     val GL_FLOAT: Int

@@ -44,7 +44,7 @@ class GLBackendImpl : GLBackend {
     override fun glGenBuffers(): Int = GL15.glGenBuffers()
     override fun glBindBuffer(target: Int, buffer: Int) = GL15.glBindBuffer(target, buffer)
 
-    override fun glBufferData(target: Int, size: Int, data: Buffer, usage: Int) = GL15.glBufferData(target, size, data, usage)
+    override fun glBufferData(target: Int, size: Long, data: ByteBuffer, usage: Int) = GL15.glBufferData(target, size, data, usage)
 
     override val GL_FRAMEBUFFER: Int
         get() = ARBFramebufferObject.GL_FRAMEBUFFER
@@ -59,7 +59,14 @@ class GLBackendImpl : GLBackend {
     override fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int) =
             ARBFramebufferObject.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
 
-    override fun glDrawBuffers(n: Int, bufs: IntArray, offset: Int) = GL20.glDrawBuffers(n, bufs, offset)
+    override fun glDrawBuffers(bufs: IntArray) {
+
+
+        val buffer = ByteBuffer.allocateDirect(bufs.size * 4).asIntBuffer()
+        buffer.put(bufs)
+
+        GL20.glDrawBuffers(buffer)
+    }
 
     override fun glCheckFramebufferStatus(target: Int): Int = ARBFramebufferObject.glCheckFramebufferStatus(target)
 

@@ -26,7 +26,7 @@ class GLFrameBuffer : GLBindable {
     }
 
     fun setOutputs(outputs: IntArray) {
-        glCheck { backend.glDrawBuffers(outputs.size, outputs, 0) }
+        glCheck { backend.glDrawBuffers(outputs) }
     }
 
     fun checkIsComplete() {

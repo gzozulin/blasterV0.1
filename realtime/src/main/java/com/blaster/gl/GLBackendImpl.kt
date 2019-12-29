@@ -46,8 +46,8 @@ class GLBackendImpl : GLBackend {
     }
 
     override fun glBindBuffer(target: Int, buffer: Int) = GLES30.glBindBuffer(target, buffer)
-    override fun glBufferData(target: Int, size: Int, data: Buffer, usage: Int) =
-            GLES30.glBufferData(target, size, data, usage)
+    override fun glBufferData(target: Int, size: Long, data: ByteBuffer, usage: Int) =
+            GLES30.glBufferData(target, size.toInt(), data, usage)
 
     override val GL_TRUE: Int
         get() = GLES30.GL_TRUE
@@ -70,8 +70,8 @@ class GLBackendImpl : GLBackend {
             GLES30.glFramebufferTexture2D(target, attachment, textarget, texture, level)
     override fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int) =
             GLES30.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
-    override fun glDrawBuffers(n: Int, bufs: IntArray, offset: Int) =
-            GLES30.glDrawBuffers(n, bufs, offset)
+    override fun glDrawBuffers(bufs: IntArray) = GLES30.glDrawBuffers(bufs.size, bufs, 0)
+
     override fun glCheckFramebufferStatus(target: Int): Int =
             GLES30.glCheckFramebufferStatus(target)
 
