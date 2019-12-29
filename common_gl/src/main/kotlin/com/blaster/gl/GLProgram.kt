@@ -27,9 +27,8 @@ class GLShader(val type: GLShaderType, source: String) {
             backend.glShaderSource(handle, source)
             backend.glCompileShader(handle)
         }
-        val isCompiled = IntArray(1)
-        backend.glGetShaderiv(handle, backend.GL_COMPILE_STATUS, isCompiled, 0)
-        if (isCompiled[0] == backend.GL_FALSE) {
+        val isCompiled = backend.glGetShaderi(handle, backend.GL_COMPILE_STATUS)
+        if (isCompiled == backend.GL_FALSE) {
             var index = 1
             val sb = StringBuffer()
             source.lines().forEach {
@@ -61,9 +60,8 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
             backend.glAttachShader(handle, fragmentShader.handle)
             backend.glLinkProgram(handle)
         }
-        val isLinked = IntArray(1)
-        backend.glGetProgramiv(handle, backend.GL_LINK_STATUS, isLinked, 0)
-        if (isLinked[0] == backend.GL_FALSE) {
+        val isLinked = backend.glGetProgrami(handle, backend.GL_LINK_STATUS)
+        if (isLinked == backend.GL_FALSE) {
             throw IllegalStateException(backend.glGetProgramInfoLog(handle))
         }
         cacheUniforms()

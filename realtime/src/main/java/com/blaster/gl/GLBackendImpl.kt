@@ -101,15 +101,25 @@ class GLBackendImpl : GLBackend {
     override fun glCreateShader(type: Int): Int = GLES30.glCreateShader(type)
     override fun glShaderSource(shader: Int, string: String) = GLES30.glShaderSource(shader, string)
     override fun glCompileShader(shader: Int) = GLES30.glCompileShader(shader)
-    override fun glGetShaderiv(shader: Int, pname: Int, params: IntArray, offset: Int) =
-            GLES30.glGetShaderiv(shader, pname, params, offset)
+
+    override fun glGetShaderi(shader: Int, pname: Int): Int {
+        val array = intArrayOf(1)
+        GLES30.glGetShaderiv(shader, pname, array, 0)
+        return array[0]
+    }
+
     override fun glGetShaderInfoLog(shader: Int): String = GLES30.glGetShaderInfoLog(shader)
     override fun glDeleteShader(shader: Int) = GLES30.glDeleteShader(shader)
     override fun glCreateProgram(): Int = GLES30.glCreateProgram()
     override fun glAttachShader(program: Int, shader: Int) = GLES30.glAttachShader(program, shader)
     override fun glLinkProgram(program: Int) = GLES30.glLinkProgram(program)
-    override fun glGetProgramiv(program: Int, pname: Int, params: IntArray, offset: Int) =
-            GLES30.glGetProgramiv(program, pname, params, offset)
+
+    override fun glGetProgrami(program: Int, pname: Int): Int {
+        val array = intArrayOf(1)
+        GLES30.glGetProgramiv(program, pname, array, 0)
+        return array[0]
+    }
+
     override fun glGetProgramInfoLog(program: Int): String = GLES30.glGetProgramInfoLog(program)
     override fun glGetUniformLocation(program: Int, name: String): Int =
             GLES30.glGetUniformLocation(program, name)

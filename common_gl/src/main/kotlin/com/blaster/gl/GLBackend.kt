@@ -66,13 +66,13 @@ interface GLBackend {
     fun glCreateShader(type: Int): Int
     fun glShaderSource(shader: Int, string: String)
     fun glCompileShader(shader: Int)
-    fun glGetShaderiv(shader: Int, pname: Int, params: IntArray, offset: Int)
+    fun glGetShaderi(shader: Int, pname: Int): Int
     fun glGetShaderInfoLog(shader: Int): String
     fun glDeleteShader(shader: Int)
     fun glCreateProgram(): Int
     fun glAttachShader(program: Int, shader: Int)
     fun glLinkProgram(program: Int)
-    fun glGetProgramiv(program: Int, pname: Int, params: IntArray, offset: Int)
+    fun glGetProgrami(program: Int, pname: Int): Int
     fun glGetProgramInfoLog(program: Int): String
     fun glGetUniformLocation(program: Int, name: String): Int
     fun glDeleteProgram(program: Int)
