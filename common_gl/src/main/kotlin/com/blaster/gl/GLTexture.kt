@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-import java.nio.Buffer
+import java.nio.ByteBuffer
 
 private val backend = GLLocator.instance()
 
@@ -12,7 +12,7 @@ class GLTexture(
         internalFormat: Int = backend.GL_RGBA,
         pixelFormat: Int = backend.GL_RGBA,
         pixelType: Int = backend.GL_UNSIGNED_BYTE,
-        pixels: Buffer? = null) : GLBindable {
+        pixels: ByteBuffer? = null) : GLBindable {
 
     val handle: Int = glCheck { backend.glGenTextures() }
 

@@ -110,7 +110,7 @@ class GLBackendImpl : GLBackend {
     override fun glUseProgram(program: Int) = GL20.glUseProgram(program)
     override fun glUniform1i(location: Int, x: Int) = GL20.glUniform1i(location, x)
     override fun glUniform1f(location: Int, x: Float) = GL20.glUniform1f(location, x)
-    override fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int) = GL20.glUniform3fv(location, count, v, offset)
+    override fun glUniform3fv(location: Int, v: ByteBuffer) = GL20.glUniform3fv(location, v)
     override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: ByteBuffer) = GL20.glUniformMatrix4fv(location, count, transpose, value)
 
     override val GL_RENDERBUFFER: Int
@@ -157,8 +157,8 @@ class GLBackendImpl : GLBackend {
 
     override fun glGenTextures() = GL11.glGenTextures()
     override fun glBindTexture(target: Int, texture: Int) = GL11.glBindTexture(target, texture)
-    override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: Buffer?) =
-            GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
+    override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?) =
+        GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
     override fun glTexParameteri(target: Int, pname: Int, param: Int) = GL11.glTexParameteri(target, pname, param)
     override fun glActiveTexture(texture: Int) = GL13.glActiveTexture(texture)
 }

@@ -117,8 +117,7 @@ class GLBackendImpl : GLBackend {
     override fun glUseProgram(program: Int) = GLES30.glUseProgram(program)
     override fun glUniform1i(location: Int, x: Int) = GLES30. glUniform1i(location, x)
     override fun glUniform1f(location: Int, x: Float) = GLES30.glUniform1f(location, x)
-    override fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int) =
-            GLES30.glUniform3fv(location, count, v, offset)
+    override fun glUniform3fv(location: Int, v: ByteBuffer) = GLES30.glUniform3fv(location, 1, v.asFloatBuffer())
     override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: ByteBuffer) =
             GLES30.glUniformMatrix4fv(location, count, transpose, value.asFloatBuffer())
 
@@ -181,7 +180,7 @@ class GLBackendImpl : GLBackend {
     }
 
     override fun glBindTexture(target: Int, texture: Int) = GLES30.glBindTexture(target, texture)
-    override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: Buffer?) =
+    override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?) =
             GLES30.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
     override fun glTexParameteri(target: Int, pname: Int, param: Int) =
             GLES30.glTexParameteri(target, pname, param)

@@ -10,7 +10,6 @@ private val backend = GLLocator.instance()
 
 private val bufferVec3 = ByteBuffer.allocateDirect(4 * 4)
         .order(ByteOrder.nativeOrder())
-        .asFloatBuffer()
 
 private val bufferMat4 = ByteBuffer.allocateDirect(16 * 4)
         .order(ByteOrder.nativeOrder())
@@ -106,7 +105,8 @@ class GLProgram(private val vertexShader: GLShader, private val fragmentShader: 
     }
 
     fun setUniform(uniform: GLUniform, value: Vector3f) {
-        glCheck { backend.glUniform3fv(uniformLocations[uniform]!!, 1, floatArrayOf(value.x, value.y, value.z), 0) }
+        value.get(bufferVec3)
+        glCheck { backend.glUniform3fv(uniformLocations[uniform]!!, bufferVec3) }
     }
 
     fun setUniform(uniform: GLUniform, value: Matrix4f) {

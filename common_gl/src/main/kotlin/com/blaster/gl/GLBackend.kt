@@ -1,5 +1,7 @@
 package com.blaster.gl
 
+import java.nio.ByteBuffer
+
 class GLLocator {
     companion object {
         private val inst: GLBackend
@@ -77,7 +79,7 @@ interface GLBackend {
     fun glUseProgram(program: Int)
     fun glUniform1i(location: Int, x: Int)
     fun glUniform1f(location: Int, x: Float)
-    fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int)
+    fun glUniform3fv(location: Int, v: ByteBuffer)
     fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: java.nio.ByteBuffer)
 
     val GL_RENDERBUFFER: Int
@@ -104,7 +106,7 @@ interface GLBackend {
     val GL_DEPTH_ATTACHMENT: Int
     fun glGenTextures(): Int
     fun glBindTexture(target: Int, texture: Int)
-    fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: java.nio.Buffer?)
+    fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: java.nio.ByteBuffer?)
     fun glTexParameteri(target: Int, pname: Int, param: Int)
     fun glActiveTexture(texture: Int)
 }
