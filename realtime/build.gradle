@@ -30,6 +30,8 @@ repositories {
 
 dependencies {
     implementation project(':common_gl')
+    implementation project(':common_assets')
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

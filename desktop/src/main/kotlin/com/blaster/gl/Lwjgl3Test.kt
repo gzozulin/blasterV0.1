@@ -13,13 +13,12 @@ import org.lwjgl.glfw.GLFWErrorCallback
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWvidmode
 import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL11.*
+import org.lwjgl.opengl.GL11.GL_FALSE
+import org.lwjgl.opengl.GL11.GL_TRUE
 import org.lwjgl.opengl.GLContext
 import org.lwjgl.system.MemoryUtil.NULL
 import java.io.ByteArrayInputStream
-import java.io.File
 import java.io.InputStream
-import java.lang.Exception
 import java.nio.ByteBuffer
 
 const val WIDTH = 800
@@ -27,10 +26,8 @@ const val HEIGHT = 600
 
 private val assetStream = object : AssetStream {
     override fun openAsset(filename: String): InputStream {
-        val assets = File("desktop/assets")
-        val resource = File(assets, filename)
         return try {
-            resource.inputStream()
+            Thread.currentThread().contextClassLoader.getResource(filename)!!.openStream()
         } catch (e: Exception) {
             ByteArrayInputStream("It doesnt matter for now".toByteArray(Charsets.UTF_8))
         }

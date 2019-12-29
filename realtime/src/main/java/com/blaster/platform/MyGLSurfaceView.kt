@@ -16,7 +16,8 @@ import javax.microedition.khronos.opengles.GL10
 
 class MyGLSurfaceView(context: Context?, attrs: AttributeSet?) : GLSurfaceView(context, attrs) {
     private val assetStream = object : AssetStream {
-        override fun openAsset(filename: String) = context!!.assets.open(filename)
+        override fun openAsset(filename: String) =
+                Thread.currentThread().contextClassLoader.getResource(filename)!!.openStream()
     }
 
     private val pixelDecoder = object : PixelDecoder {

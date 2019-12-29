@@ -10,7 +10,7 @@ layout (location = 0) out vec4 oFragColor;
 
 void main() {
     oFragColor = texture(uTexDiffuse, vTexCoord);
-    oFragColor += vec4(1, 1, 1, 1);
+    //oFragColor += vec4(1, 1, 1, 1);
     if (oFragColor.a < 0.1) {
         discard;
     }
