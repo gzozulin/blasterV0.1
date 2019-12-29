@@ -3,12 +3,9 @@ package com.blaster.gl
 private val backend = GLLocator.instance()
 
 class GLFrameBuffer : GLBindable {
-    private val handle: Int
+    private val handle: Int = glCheck { backend.glGenFramebuffers() }
 
     init {
-        val handles = IntArray(1)
-        glCheck { backend.glGenFramebuffers(1, handles, 0) }
-        handle = handles[0]
         check(handle > 0)
     }
 

@@ -35,13 +35,13 @@ interface GLBackend {
     val GL_ARRAY_BUFFER: Int
     val GL_ELEMENT_ARRAY_BUFFER: Int
     val GL_STATIC_DRAW: Int
-    fun glGenBuffers(n: Int, buffers: IntArray, offset: Int)
+    fun glGenBuffers(): Int
     fun glBindBuffer(target: Int, buffer: Int)
     fun glBufferData(target: Int, size: Int, data: java.nio.Buffer, usage: Int)
 
     val GL_FRAMEBUFFER: Int
     val GL_FRAMEBUFFER_COMPLETE: Int
-    fun glGenFramebuffers(n: Int, framebuffers: IntArray, offset: Int)
+    fun glGenFramebuffers(): Int
     fun glBindFramebuffer(target: Int, framebuffer: Int)
     fun glFramebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int)
     fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int)
@@ -53,9 +53,9 @@ interface GLBackend {
     val GL_UNSIGNED_BYTE: Int
     val GL_TRIANGLES: Int
     fun glEnableVertexAttribArray(index: Int)
-    fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
+    fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long)
     fun glDisableVertexAttribArray(index: Int)
-    fun glDrawElements(mode: Int, count: Int, type: Int, offset: Int)
+    fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long)
 
     val GL_VERTEX_SHADER: Int
     val GL_FRAGMENT_SHADER: Int
@@ -78,11 +78,11 @@ interface GLBackend {
     fun glUniform1i(location: Int, x: Int)
     fun glUniform1f(location: Int, x: Float)
     fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int)
-    fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: java.nio.FloatBuffer)
+    fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: java.nio.ByteBuffer)
 
     val GL_RENDERBUFFER: Int
     val GL_DEPTH_COMPONENT24: Int
-    fun glGenRenderbuffers(n: Int, renderbuffers: IntArray, offset: Int)
+    fun glGenRenderbuffers() : Int
     fun glBindRenderbuffer(target: Int, renderbuffer: Int)
     fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int)
 
@@ -102,7 +102,7 @@ interface GLBackend {
     val GL_COLOR_ATTACHMENT1: Int
     val GL_COLOR_ATTACHMENT2: Int
     val GL_DEPTH_ATTACHMENT: Int
-    fun glGenTextures(n: Int, textures: IntArray, offset: Int)
+    fun glGenTextures(): Int
     fun glBindTexture(target: Int, texture: Int)
     fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: java.nio.Buffer?)
     fun glTexParameteri(target: Int, pname: Int, param: Int)

@@ -7,17 +7,11 @@ import java.nio.ByteOrder
 private val backend = GLLocator.instance()
 
 class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
-    private val handle: Int
+    private val handle: Int = glCheck { backend.glGenBuffers() }
 
     // todo make two different constructors for indices/vertices
     init {
         check(type == backend.GL_ARRAY_BUFFER || type == backend.GL_ELEMENT_ARRAY_BUFFER)
-    }
-
-    init {
-        val handles = IntArray(1)
-        glCheck { backend.glGenBuffers(1, handles, 0) }
-        handle = handles[0]
         check(handle > 0)
     }
 

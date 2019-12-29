@@ -16,7 +16,7 @@ class GLMesh(
 
     private fun bindVertexPointers() {
         var stride = 0
-        var offset = 0
+        var offset = 0L
         attributes.forEach { stride += it.size * 4 }
         attributes.forEach {
             glCheck {

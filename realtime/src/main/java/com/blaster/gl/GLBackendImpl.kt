@@ -3,6 +3,7 @@ package com.blaster.gl
 import android.opengl.GLES30
 import android.opengl.GLU
 import java.nio.Buffer
+import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
 class GLBackendImpl : GLBackend {
@@ -38,8 +39,12 @@ class GLBackendImpl : GLBackend {
     override val GL_STATIC_DRAW: Int
         get() = GLES30.GL_STATIC_DRAW
 
-    override fun glGenBuffers(n: Int, buffers: IntArray, offset: Int) =
-            GLES30.glGenBuffers(n, buffers, offset)
+    override fun glGenBuffers(): Int {
+        val handles = IntArray(1)
+        GLES30.glGenBuffers(1, handles, 0)
+        return handles[0]
+    }
+
     override fun glBindBuffer(target: Int, buffer: Int) = GLES30.glBindBuffer(target, buffer)
     override fun glBufferData(target: Int, size: Int, data: Buffer, usage: Int) =
             GLES30.glBufferData(target, size, data, usage)
@@ -53,8 +58,12 @@ class GLBackendImpl : GLBackend {
     override val GL_FRAMEBUFFER_COMPLETE: Int
         get() = GLES30.GL_FRAMEBUFFER_COMPLETE
 
-    override fun glGenFramebuffers(n: Int, framebuffers: IntArray, offset: Int) =
-            GLES30.glGenFramebuffers(n, framebuffers, offset)
+    override fun glGenFramebuffers(): Int {
+        val handles = IntArray(1)
+        GLES30.glGenFramebuffers(1, handles, 0)
+        return handles[0]
+    }
+
     override fun glBindFramebuffer(target: Int, framebuffer: Int) =
             GLES30.glBindFramebuffer(target, framebuffer)
     override fun glFramebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int) =
@@ -74,11 +83,11 @@ class GLBackendImpl : GLBackend {
         get() = GLES30.GL_TRIANGLES
 
     override fun glEnableVertexAttribArray(index: Int) = GLES30.glEnableVertexAttribArray(index)
-    override fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int) =
-            GLES30.glVertexAttribPointer(indx, size, type, normalized, stride, offset)
+    override fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long) =
+            GLES30.glVertexAttribPointer(indx, size, type, normalized, stride, offset.toInt())
     override fun glDisableVertexAttribArray(index: Int) = GLES30.glDisableVertexAttribArray(index)
-    override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Int) =
-            GLES30.glDrawElements(mode, count, type, offset)
+    override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long) =
+            GLES30.glDrawElements(mode, count, type, offset.toInt())
 
     override val GL_VERTEX_SHADER: Int
         get() = GLES30.GL_VERTEX_SHADER
@@ -110,16 +119,20 @@ class GLBackendImpl : GLBackend {
     override fun glUniform1f(location: Int, x: Float) = GLES30.glUniform1f(location, x)
     override fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int) =
             GLES30.glUniform3fv(location, count, v, offset)
-    override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: FloatBuffer) =
-            GLES30.glUniformMatrix4fv(location, count, transpose, value)
+    override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: ByteBuffer) =
+            GLES30.glUniformMatrix4fv(location, count, transpose, value.asFloatBuffer())
 
     override val GL_RENDERBUFFER: Int
         get() = GLES30.GL_RENDERBUFFER
     override val GL_DEPTH_COMPONENT24: Int
         get() = GLES30.GL_DEPTH_COMPONENT24
 
-    override fun glGenRenderbuffers(n: Int, renderbuffers: IntArray, offset: Int) =
-            GLES30.glGenRenderbuffers(n, renderbuffers, offset)
+    override fun glGenRenderbuffers(): Int {
+        val handles = IntArray(1)
+        GLES30.glGenRenderbuffers(1, handles, 0)
+        return handles[0]
+    }
+
     override fun glBindRenderbuffer(target: Int, renderbuffer: Int) =
             GLES30.glBindRenderbuffer(target, renderbuffer)
     override fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int) =
@@ -161,8 +174,12 @@ class GLBackendImpl : GLBackend {
     override val GL_DEPTH_ATTACHMENT: Int
         get() = GLES30.GL_DEPTH_ATTACHMENT
 
-    override fun glGenTextures(n: Int, textures: IntArray, offset: Int) =
-            GLES30.glGenTextures(n, textures, offset)
+    override fun glGenTextures(): Int {
+        val handles = IntArray(1)
+        GLES30.glGenTextures(1, handles, 0)
+        return handles[0]
+    }
+
     override fun glBindTexture(target: Int, texture: Int) = GLES30.glBindTexture(target, texture)
     override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: Buffer?) =
             GLES30.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)

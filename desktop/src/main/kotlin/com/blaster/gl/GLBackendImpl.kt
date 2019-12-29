@@ -2,6 +2,7 @@ package com.blaster.gl
 
 import org.lwjgl.opengl.*
 import java.nio.Buffer
+import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 
 class GLBackendImpl : GLBackend {
@@ -40,8 +41,9 @@ class GLBackendImpl : GLBackend {
     override val GL_STATIC_DRAW: Int
         get() = GL15.GL_STATIC_DRAW
 
-    override fun glGenBuffers(n: Int, buffers: IntArray, offset: Int) = GL15.glGenBuffers(n, buffers, 0)
+    override fun glGenBuffers(): Int = GL15.glGenBuffers()
     override fun glBindBuffer(target: Int, buffer: Int) = GL15.glBindBuffer(target, buffer)
+
     override fun glBufferData(target: Int, size: Int, data: Buffer, usage: Int) = GL15.glBufferData(target, size, data, usage)
 
     override val GL_FRAMEBUFFER: Int
@@ -49,7 +51,7 @@ class GLBackendImpl : GLBackend {
     override val GL_FRAMEBUFFER_COMPLETE: Int
         get() = ARBFramebufferObject.GL_FRAMEBUFFER_COMPLETE
 
-    override fun glGenFramebuffers(n: Int, framebuffers: IntArray, offset: Int) = ARBFramebufferObject.glGenFramebuffers(n, framebuffers, offset)
+    override fun glGenFramebuffers() = ARBFramebufferObject.glGenFramebuffers()
     override fun glBindFramebuffer(target: Int, framebuffer: Int) = ARBFramebufferObject.glBindFramebuffer(target, framebuffer)
     override fun glFramebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int) =
             ARBFramebufferObject.glFramebufferTexture2D(target, attachment, textarget, texture, level)
@@ -71,9 +73,10 @@ class GLBackendImpl : GLBackend {
         get() = GL11.GL_TRIANGLES
 
     override fun glEnableVertexAttribArray(index: Int) = GL20.glEnableVertexAttribArray(index)
-    override fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int) = GL20.glVertexAttribPointer(indx, size, type, normalized, stride, offset)
+    override fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long) =
+            GL20.glVertexAttribPointer(indx, size, type, normalized, stride, offset)
     override fun glDisableVertexAttribArray(index: Int) = GL20.glDisableVertexAttribArray(index)
-    override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Int) = GL11.glDrawElements(mode, count, type, offset)
+    override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long) = GL11.glDrawElements(mode, count, type, offset)
 
     override val GL_VERTEX_SHADER: Int
         get() = GL20.GL_VERTEX_SHADER
@@ -101,14 +104,14 @@ class GLBackendImpl : GLBackend {
     override fun glUniform1i(location: Int, x: Int) = GL20.glUniform1i(location, x)
     override fun glUniform1f(location: Int, x: Float) = GL20.glUniform1f(location, x)
     override fun glUniform3fv(location: Int, count: Int, v: FloatArray, offset: Int) = GL20.glUniform3fv(location, count, v, offset)
-    override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: FloatBuffer) = GL20.glUniformMatrix4fv(location, count, transpose, value)
+    override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: ByteBuffer) = GL20.glUniformMatrix4fv(location, count, transpose, value)
 
     override val GL_RENDERBUFFER: Int
         get() = GL30.GL_RENDERBUFFER
     override val GL_DEPTH_COMPONENT24: Int
         get() = GL14.GL_DEPTH_COMPONENT24
 
-    override fun glGenRenderbuffers(n: Int, renderbuffers: IntArray, offset: Int) = GL30.glGenRenderbuffers(n, renderbuffers, offset)
+    override fun glGenRenderbuffers() = GL30.glGenRenderbuffers()
     override fun glBindRenderbuffer(target: Int, renderbuffer: Int) = GL30.glBindRenderbuffer(target, renderbuffer)
     override fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int) = GL30.glRenderbufferStorage(target, internalformat, width, height)
 
@@ -145,7 +148,7 @@ class GLBackendImpl : GLBackend {
     override val GL_DEPTH_ATTACHMENT: Int
         get() = GL30.GL_DEPTH_ATTACHMENT
 
-    override fun glGenTextures(n: Int, textures: IntArray, offset: Int) = GL11.glGenTextures(n, textures, offset)
+    override fun glGenTextures() = GL11.glGenTextures()
     override fun glBindTexture(target: Int, texture: Int) = GL11.glBindTexture(target, texture)
     override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: Buffer?) =
             GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)

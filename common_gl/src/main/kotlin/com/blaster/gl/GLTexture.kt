@@ -14,12 +14,9 @@ class GLTexture(
         pixelType: Int = backend.GL_UNSIGNED_BYTE,
         pixels: Buffer? = null) : GLBindable {
 
-    val handle: Int
+    val handle: Int = glCheck { backend.glGenTextures() }
 
     init {
-        val handles = IntArray(1)
-        glCheck { backend.glGenTextures(1, handles, 0) }
-        handle = handles[0]
         check(handle > 0)
     }
 

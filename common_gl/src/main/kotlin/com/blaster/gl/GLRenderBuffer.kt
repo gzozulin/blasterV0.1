@@ -6,12 +6,9 @@ class GLRenderBuffer(
         private val component: Int = backend.GL_DEPTH_COMPONENT24,
         private val width: Int, private val height: Int) : GLBindable {
 
-    val handle: Int
+    val handle: Int = glCheck { backend.glGenRenderbuffers() }
 
     init {
-        val handles = IntArray(1)
-        glCheck { backend.glGenRenderbuffers(1, handles, 0) }
-        handle = handles[0]
         check(handle > 0)
     }
 

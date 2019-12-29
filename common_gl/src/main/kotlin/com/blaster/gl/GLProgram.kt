@@ -14,7 +14,6 @@ private val bufferVec3 = ByteBuffer.allocateDirect(4 * 4)
 
 private val bufferMat4 = ByteBuffer.allocateDirect(16 * 4)
         .order(ByteOrder.nativeOrder())
-        .asFloatBuffer()
 
 enum class GLShaderType(val type: Int) {
     VERTEX_SHADER(backend.GL_VERTEX_SHADER),
