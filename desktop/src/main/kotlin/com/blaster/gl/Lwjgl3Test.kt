@@ -17,9 +17,12 @@ import org.lwjgl.opengl.GL11.GL_FALSE
 import org.lwjgl.opengl.GL11.GL_TRUE
 import org.lwjgl.opengl.GLContext
 import org.lwjgl.system.MemoryUtil.NULL
+import java.awt.image.DataBufferByte
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import javax.imageio.ImageIO
 
 const val WIDTH = 800
 const val HEIGHT = 600
@@ -36,9 +39,20 @@ private val assetStream = object : AssetStream {
 
 private val pixelDecoder = object : PixelDecoder {
     override fun decodePixels(inputStream: InputStream): PixelDecoder.Decoded {
-        val buffer = ByteBuffer.allocateDirect(4 * 4)
-        buffer.asIntBuffer().put(intArrayOf(1, 2, 3, 4))
-        return PixelDecoder.Decoded(buffer, 2, 2)
+        // https://stackoverflow.com/questions/29301838/converting-bufferedimage-to-bytebuffer
+        val bufferedImage = ImageIO.read(inputStream)
+        val byteBuffer: ByteBuffer
+        when (val dataBuffer = bufferedImage.raster.dataBuffer) {
+            is DataBufferByte -> {
+                val pixelData = dataBuffer.data
+                byteBuffer = ByteBuffer.allocateDirect(pixelData.size)
+                        .order(ByteOrder.nativeOrder())
+                        .put(pixelData)
+                byteBuffer.position(0)
+            }
+            else -> throw IllegalArgumentException("Not implemented for data buffer type: " + dataBuffer.javaClass)
+        }
+        return PixelDecoder.Decoded(byteBuffer, bufferedImage.width, bufferedImage.height)
     }
 }
 
@@ -54,6 +68,7 @@ class Lwjgl3Test {
                 glfwSetWindowShouldClose(window, GL_TRUE) // We will detect this in our rendering loop
         }
     }
+
     private var window: Long = 0
 
     fun run() {
@@ -87,16 +102,11 @@ class Lwjgl3Test {
 
     private fun loop() {
         GLContext.createFromCurrent()
-
         simpleRenderer.onCreate()
         simpleRenderer.onChange(WIDTH, HEIGHT)
-
-
         while (glfwWindowShouldClose(window) == GL_FALSE) {
             //glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT) // clear the framebuffer
-
             simpleRenderer.onDraw()
-
             glfwSwapBuffers(window) // swap the color buffers
             glfwPollEvents()
         }
