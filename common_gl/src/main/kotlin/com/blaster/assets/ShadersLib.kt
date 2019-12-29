@@ -1,6 +1,5 @@
 package com.blaster.assets
 
-import android.content.Context
 import com.blaster.gl.GLProgram
 import com.blaster.gl.GLShader
 import com.blaster.gl.GLShaderType
@@ -8,14 +7,14 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
-class ShadersLib(private val ctx: Context) {
+class ShadersLib(private val assetStream: AssetStream) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GLProgram = GLProgram(
             GLShader(GLShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
             GLShader(GLShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
 
     private fun slurpAsset(filename: String): String {
         val stringBuilder = StringBuilder()
-        val inputStream = ctx.assets.open(filename)
+        val inputStream = assetStream.openAsset(filename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
         bufferedReader.use {
             var line = bufferedReader.readLine()

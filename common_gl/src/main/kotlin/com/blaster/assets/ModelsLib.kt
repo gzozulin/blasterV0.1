@@ -1,6 +1,5 @@
 package com.blaster.assets
 
-import android.content.Context
 import com.blaster.gl.GLAttribute
 import com.blaster.gl.GLMesh
 import com.blaster.gl.GLModel
@@ -13,7 +12,7 @@ import java.nio.charset.Charset
 
 // todo: info about model: vert/ind count, times, progress loading, etc
 // todo: load material from *.mtl
-class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib) {
+class ModelsLib (private val assetStream: AssetStream, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
 
@@ -39,7 +38,7 @@ class ModelsLib (private val ctx: Context, private val texturesLib: TexturesLib)
         maxX = 0f
         maxY = 0f
         maxZ = 0f
-        val inputStream = ctx.assets.open(meshFilename)
+        val inputStream = assetStream.openAsset(meshFilename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
         bufferedReader.use {
             var line = bufferedReader.readLine()

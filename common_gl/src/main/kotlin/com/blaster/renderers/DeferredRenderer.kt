@@ -1,25 +1,16 @@
 package com.blaster.renderers
 
-import android.content.Context
-import android.opengl.GLSurfaceView
-import android.util.Log
 import com.blaster.assets.ModelsLib
 import com.blaster.assets.ShadersLib
-import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import org.joml.Vector3f
-import java.util.concurrent.TimeUnit
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 import kotlin.system.measureNanoTime
 
 private val backend = GLLocator.instance()
 
-class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
-    private val shaderLib = ShadersLib(context)
-    private val textureLib = TexturesLib(context)
-    private val modelsLib = ModelsLib(context, textureLib)
+class DeferredRenderer(private val shadersLib: ShadersLib,
+                       private val modelsLib: ModelsLib) : Renderer {
 
     private lateinit var model: GLModel
 
@@ -47,21 +38,42 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private lateinit var camera: Camera
 
-    override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+    private fun setupLights() {
+        for (i in 0..15) {
+            programLightPass.setUniform(uniformLightPosition(i), Vector3f())
+            programLightPass.setUniform(uniformLightColor(i), Vector3f())
+        }
+    }
+
+    private fun geometryPass() {
+        glBind(listOf(programGeomPass, model.mesh, framebuffer, model.diffuse)) {
+            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
+            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, model.node.calculateViewM())
+            model.mesh.draw()
+        }
+    }
+
+    private fun lightingPass() {
+        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
+            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
+            quadMesh.draw()
+        }
+    }
+
+    override fun onCreate() {
         glCheck { backend.glClearColor(0.9f, 0.9f, 1f, 0f) }
         glCheck { backend.glEnable(backend.GL_DEPTH_TEST) }
         glCheck { backend.glFrontFace(backend.GL_CCW) }
         glCheck { backend.glEnable(backend.GL_CULL_FACE) }
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
-        programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
-        programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
+        programGeomPass = shadersLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
+        programLightPass = shadersLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
         val modelNanos = measureNanoTime {
             model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
         }
-        Log.i("DeferredRenderer", "Model loaded in ${TimeUnit.NANOSECONDS.toMillis(modelNanos)} millis")
     }
 
-    override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
+    override fun onChange(width: Int, height: Int) {
         glCheck { backend.glViewport(0, 0, width, height) }
         camera = Camera(width.toFloat() / height.toFloat())
         camera.lookAt(model.aabb)
@@ -102,45 +114,9 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
         }
     }
 
-    private fun setupLights() {
-        for (i in 0..15) {
-            programLightPass.setUniform(uniformLightPosition(i), Vector3f())
-            programLightPass.setUniform(uniformLightColor(i), Vector3f())
-        }
-    }
-
-    private fun geometryPass() {
-        glBind(listOf(programGeomPass, model.mesh, framebuffer, model.diffuse)) {
-            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
-            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, model.node.calculateViewM())
-            model.mesh.draw()
-        }
-    }
-
-    private fun lightingPass() {
-        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
-            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
-            quadMesh.draw()
-        }
-    }
-
-    private var fps = 0
-    private var last = System.currentTimeMillis()
-
-    private fun printFps() {
-        fps++
-        val current = System.currentTimeMillis()
-        if (current - last >= 1000L) {
-            Log.i("DeferredRenderer", "Fps: $fps")
-            fps = 0
-            last = current
-        }
-    }
-
-    override fun onDrawFrame(gl: GL10?) {
+    override fun onDraw() {
         model.node.tick()
         geometryPass()
         lightingPass()
-        printFps()
     }
 }

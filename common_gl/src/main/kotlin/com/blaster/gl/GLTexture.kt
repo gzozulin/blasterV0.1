@@ -11,7 +11,7 @@ class GLTexture(
         private val height: Int,
         internalFormat: Int = backend.GL_RGBA,
         pixelFormat: Int = backend.GL_RGBA,
-        pixelType: Int = backend.GL_FLOAT,
+        pixelType: Int = backend.GL_UNSIGNED_BYTE,
         pixels: Buffer? = null) : GLBindable {
 
     val handle: Int
