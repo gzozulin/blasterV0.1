@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-class GLBackendLocator {
+class GLLocator {
     companion object {
         private val inst: GLBackend
 
@@ -12,15 +12,25 @@ class GLBackendLocator {
 
         fun instance() = inst
     }
-
 }
 
 interface GLBackend {
-    val GL_TRUE: Int
-    val GL_FALSE: Int
     val GL_NO_ERROR: Int
     fun glGetError(): Int
     fun gluErrorString(error: Int): String
+
+    val GL_TRUE: Int
+    val GL_FALSE: Int
+    val GL_DEPTH_TEST: Int
+    val GL_COLOR_BUFFER_BIT: Int
+    val GL_DEPTH_BUFFER_BIT: Int
+    val GL_CCW: Int
+    val GL_CULL_FACE: Int
+    fun glEnable(cap: Int)
+    fun glClearColor(red: Float, green: Float, blue: Float, alpha: Float)
+    fun glViewport(x: Int, y: Int, width: Int, height: Int)
+    fun glFrontFace(mode: Int)
+    fun glClear(mask: Int)
 
     val GL_ARRAY_BUFFER: Int
     val GL_ELEMENT_ARRAY_BUFFER: Int
@@ -40,6 +50,7 @@ interface GLBackend {
 
     val GL_FLOAT: Int
     val GL_UNSIGNED_INT: Int
+    val GL_UNSIGNED_BYTE: Int
     val GL_TRIANGLES: Int
     fun glEnableVertexAttribArray(index: Int)
     fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Int)
@@ -75,6 +86,7 @@ interface GLBackend {
     fun glBindRenderbuffer(target: Int, renderbuffer: Int)
     fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int)
 
+    val GL_RGB: Int
     val GL_RGBA: Int
     val GL_TEXTURE_2D: Int
     val GL_TEXTURE0: Int
@@ -84,6 +96,12 @@ interface GLBackend {
     val GL_TEXTURE_WRAP_S: Int
     val GL_TEXTURE_WRAP_T: Int
     val GL_REPEAT: Int
+    val GL_RGBA16F: Int
+    val GL_RGB16F: Int
+    val GL_COLOR_ATTACHMENT0: Int
+    val GL_COLOR_ATTACHMENT1: Int
+    val GL_COLOR_ATTACHMENT2: Int
+    val GL_DEPTH_ATTACHMENT: Int
     fun glGenTextures(n: Int, textures: IntArray, offset: Int)
     fun glBindTexture(target: Int, texture: Int)
     fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: java.nio.Buffer?)

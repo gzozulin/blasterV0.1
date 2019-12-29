@@ -29,6 +29,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    implementation "org.joml:joml:1.9.19"
-    //implementation "org.joml:joml-android:1.9.3-SNAPSHOT"
+    api "org.joml:joml:1.9.19"
+    //api "org.joml:joml-android:1.9.3-SNAPSHOT"
 }

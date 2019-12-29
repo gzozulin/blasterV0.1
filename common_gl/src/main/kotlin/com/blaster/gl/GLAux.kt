@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-private val backend = GLBackendLocator.instance()
+private val backend = GLLocator.instance()
 
 fun checkForGLError() {
     val errorCode = backend.glGetError()

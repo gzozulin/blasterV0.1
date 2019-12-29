@@ -4,7 +4,7 @@ import java.nio.Buffer
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-private val backend = GLBackendLocator.instance()
+private val backend = GLLocator.instance()
 
 class GLBuffer(private val type: Int, buffer: Buffer, size: Int) : GLBindable {
     private val handle: Int

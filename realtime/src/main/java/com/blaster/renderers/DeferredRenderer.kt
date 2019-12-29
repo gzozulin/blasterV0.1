@@ -1,7 +1,6 @@
 package com.blaster.renderers
 
 import android.content.Context
-import android.opengl.GLES30
 import android.opengl.GLSurfaceView
 import android.util.Log
 import com.blaster.assets.ModelsLib
@@ -14,6 +13,8 @@ import java.util.concurrent.TimeUnit
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 import kotlin.system.measureNanoTime
+
+private val backend = GLLocator.instance()
 
 class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private val shaderLib = ShadersLib(context)
@@ -47,10 +48,10 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     private lateinit var camera: Camera
 
     override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-        glCheck { GLES30.glClearColor(0.9f, 0.9f, 1f, 0f) }
-        glCheck { GLES30.glEnable(GLES30.GL_DEPTH_TEST) }
-        glCheck { GLES30.glFrontFace(GLES30.GL_CCW) }
-        glCheck { GLES30.glEnable(GLES30.GL_CULL_FACE) }
+        glCheck { backend.glClearColor(0.9f, 0.9f, 1f, 0f) }
+        glCheck { backend.glEnable(backend.GL_DEPTH_TEST) }
+        glCheck { backend.glFrontFace(backend.GL_CCW) }
+        glCheck { backend.glEnable(backend.GL_CULL_FACE) }
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shaderLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shaderLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
@@ -61,29 +62,29 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
     }
 
     override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
-        glCheck { GLES30.glViewport(0, 0, width, height) }
+        glCheck { backend.glViewport(0, 0, width, height) }
         camera = Camera(width.toFloat() / height.toFloat())
         camera.lookAt(model.aabb)
         positionStorage = GLTexture(
                 unit = 0,
-                width = width, height = height, internalFormat = GLES30.GL_RGBA16F,
-                pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_FLOAT)
+                width = width, height = height, internalFormat = backend.GL_RGBA16F,
+                pixelFormat = backend.GL_RGBA, pixelType = backend.GL_FLOAT)
         normalStorage = GLTexture(
                 unit = 1,
-                width = width, height = height, internalFormat = GLES30.GL_RGB16F,
-                pixelFormat = GLES30.GL_RGB, pixelType = GLES30.GL_FLOAT)
+                width = width, height = height, internalFormat = backend.GL_RGB16F,
+                pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         diffuseStorage = GLTexture(
                 unit = 2,
-                width = width, height = height, internalFormat = GLES30.GL_RGBA,
-                pixelFormat = GLES30.GL_RGBA, pixelType = GLES30.GL_UNSIGNED_BYTE)
+                width = width, height = height, internalFormat = backend.GL_RGBA,
+                pixelFormat = backend.GL_RGBA, pixelType = backend.GL_UNSIGNED_BYTE)
         depthBuffer = GLRenderBuffer(width = width, height = height)
         framebuffer = GLFrameBuffer()
         glBind(listOf(framebuffer)) {
-            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT0, positionStorage)
-            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT1, normalStorage)
-            framebuffer.setTexture(GLES30.GL_COLOR_ATTACHMENT2, diffuseStorage)
-            framebuffer.setOutputs(intArrayOf(GLES30.GL_COLOR_ATTACHMENT0, GLES30.GL_COLOR_ATTACHMENT1, GLES30.GL_COLOR_ATTACHMENT2))
-            framebuffer.setRenderBuffer(GLES30.GL_DEPTH_ATTACHMENT, depthBuffer)
+            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT0, positionStorage)
+            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT1, normalStorage)
+            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT2, diffuseStorage)
+            framebuffer.setOutputs(intArrayOf(backend.GL_COLOR_ATTACHMENT0, backend.GL_COLOR_ATTACHMENT1, backend.GL_COLOR_ATTACHMENT2))
+            framebuffer.setRenderBuffer(backend.GL_DEPTH_ATTACHMENT, depthBuffer)
             framebuffer.checkIsComplete()
         }
         glBind(programGeomPass) {
@@ -110,7 +111,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private fun geometryPass() {
         glBind(listOf(programGeomPass, model.mesh, framebuffer, model.diffuse)) {
-            glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
+            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
             programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, model.node.calculateViewM())
             model.mesh.draw()
         }
@@ -118,7 +119,7 @@ class DeferredRenderer(context: Context) : GLSurfaceView.Renderer {
 
     private fun lightingPass() {
         glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
-            glCheck { GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT) }
+            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
             quadMesh.draw()
         }
     }
