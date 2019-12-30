@@ -1,5 +1,7 @@
 package com.blaster.renderers
 
+import com.blaster.assets.AssetStream
+import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
@@ -9,8 +11,12 @@ import org.joml.Vector3f
 
 private val backend = GLLocator.instance()
 
-class SimpleRenderer(private val shadersLib: ShadersLib,
-                     private val texturesLib: TexturesLib) : Renderer  {
+class SimpleRenderer : Renderer  {
+    private val assetStream = AssetStream()
+    private val pixelDecoder = PixelDecoder()
+
+    private val shadersLib = ShadersLib(assetStream)
+    private val texturesLib = TexturesLib(assetStream, pixelDecoder)
 
     private lateinit var program: GLProgram
 

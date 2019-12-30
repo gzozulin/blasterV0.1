@@ -1,7 +1,6 @@
 package com.blaster.renderers
 
-import com.blaster.assets.ModelsLib
-import com.blaster.assets.ShadersLib
+import com.blaster.assets.*
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import org.joml.Vector3f
@@ -9,8 +8,13 @@ import kotlin.system.measureNanoTime
 
 private val backend = GLLocator.instance()
 
-class DeferredRenderer(private val shadersLib: ShadersLib,
-                       private val modelsLib: ModelsLib) : Renderer {
+class DeferredRenderer : Renderer {
+    private val assetStream = AssetStream()
+    private val pixelDecoder = PixelDecoder()
+
+    private val shadersLib = ShadersLib(assetStream)
+    private val texturesLib = TexturesLib(assetStream, pixelDecoder)
+    private val modelsLib = ModelsLib(assetStream, texturesLib)
 
     private lateinit var model: GLModel
 

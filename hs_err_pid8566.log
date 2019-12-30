@@ -104,8 +104,8 @@ j  com.blaster.gl.GLTexture$2.invoke()Ljava/lang/Object;+1
 j  com.blaster.gl.GLAuxKt.glCheck(Lkotlin/jvm/functions/Function0;)Ljava/lang/Object;+1
 j  com.blaster.gl.GLTexture.<init>(IIIIIIILjava/nio/ByteBuffer;)V+133
 j  com.blaster.gl.GLTexture.<init>(IIIIIIILjava/nio/ByteBuffer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V+108
-j  com.blaster.assets.TexturesLib.loadTexture(Ljava/lang/String;I)Lcom/blaster/gl/GLTexture;+44
-j  com.blaster.assets.TexturesLib.loadTexture$default(Lcom/blaster/assets/TexturesLib;Ljava/lang/String;IILjava/lang/Object;)Lcom/blaster/gl/GLTexture;+11
+j  assets.TexturesLib.loadTexture(Ljava/lang/String;I)Lcom/blaster/gl/GLTexture;+44
+j  assets.TexturesLib.loadTexture$default(Lcom/blaster/assets/TexturesLib;Ljava/lang/String;IILjava/lang/Object;)Lcom/blaster/gl/GLTexture;+11
 j  com.blaster.renderers.SimpleRenderer.onCreate()V+68
 j  com.blaster.gl.Lwjgl3Test.loop()V+7
 j  com.blaster.gl.Lwjgl3Test.run()V+42
