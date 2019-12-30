@@ -6,6 +6,8 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.renderers.SimpleRenderer
 import com.example.desktop.SharedLibraryLoader
+import org.apache.commons.imaging.Imaging
+
 import org.lwjgl.Sys
 import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*
@@ -18,11 +20,11 @@ import org.lwjgl.opengl.GL11.GL_TRUE
 import org.lwjgl.opengl.GLContext
 import org.lwjgl.system.MemoryUtil.NULL
 import java.awt.image.DataBufferByte
+import java.awt.image.DataBufferInt
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import javax.imageio.ImageIO
 
 const val WIDTH = 800
 const val HEIGHT = 600
@@ -39,8 +41,7 @@ private val assetStream = object : AssetStream {
 
 private val pixelDecoder = object : PixelDecoder {
     override fun decodePixels(inputStream: InputStream): PixelDecoder.Decoded {
-        // https://stackoverflow.com/questions/29301838/converting-bufferedimage-to-bytebuffer
-        val bufferedImage = ImageIO.read(inputStream)
+        val bufferedImage = Imaging.getBufferedImage(inputStream)
         val byteBuffer: ByteBuffer
         when (val dataBuffer = bufferedImage.raster.dataBuffer) {
             is DataBufferByte -> {
@@ -48,6 +49,13 @@ private val pixelDecoder = object : PixelDecoder {
                 byteBuffer = ByteBuffer.allocateDirect(pixelData.size)
                         .order(ByteOrder.nativeOrder())
                         .put(pixelData)
+                byteBuffer.position(0)
+            }
+            is DataBufferInt -> {
+                val pixelData = dataBuffer.data
+                byteBuffer = ByteBuffer.allocateDirect(pixelData.size * 4)
+                        .order(ByteOrder.nativeOrder())
+                byteBuffer.asIntBuffer().put(pixelData)
                 byteBuffer.position(0)
             }
             else -> throw IllegalArgumentException("Not implemented for data buffer type: " + dataBuffer.javaClass)
