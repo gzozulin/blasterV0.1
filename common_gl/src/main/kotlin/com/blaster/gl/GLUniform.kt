@@ -41,8 +41,10 @@ enum class GLUniform(val label: String) {
     UNIFORM_LIGHT_14_POS(       "uLights[14].position"),
     UNIFORM_LIGHT_14_COLOR(     "uLights[14].color"),
     UNIFORM_LIGHT_15_POS(       "uLights[15].position"),
-    UNIFORM_LIGHT_15_COLOR(     "uLights[15].color")
-}
+    UNIFORM_LIGHT_15_COLOR(     "uLights[15].color");
 
-fun uniformLightPosition(number: Int) = GLUniform.valueOf("UNIFORM_LIGHT_${number}_POS")
-fun uniformLightColor(number: Int) = GLUniform.valueOf("UNIFORM_LIGHT_${number}_COLOR")
+    companion object {
+        fun uniformLightPosition(number: Int) = valueOf("UNIFORM_LIGHT_${number}_POS")
+        fun uniformLightColor(number: Int) = valueOf("UNIFORM_LIGHT_${number}_COLOR")
+    }
+}

@@ -7,6 +7,8 @@ import com.blaster.renderers.SimpleRenderer
 // todo: gravity affected particles, ground plane
 // http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/particles-instancing/
 
+// particle: position, ttl, emitted light, forces and etc, texture
+
 private val simpleRenderer = SimpleRenderer()
 
 private val particles = object : LwjglWindow() {

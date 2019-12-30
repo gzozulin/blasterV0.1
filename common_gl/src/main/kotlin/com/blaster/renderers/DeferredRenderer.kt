@@ -44,8 +44,8 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
 
     private fun setupLights() {
         for (i in 0..15) {
-            programLightPass.setUniform(uniformLightPosition(i), Vector3f())
-            programLightPass.setUniform(uniformLightColor(i), Vector3f())
+            programLightPass.setUniform(GLUniform.uniformLightPosition(i), Vector3f())
+            programLightPass.setUniform(GLUniform.uniformLightColor(i), Vector3f())
         }
     }
 
