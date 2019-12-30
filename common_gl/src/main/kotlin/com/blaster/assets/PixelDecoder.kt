@@ -7,10 +7,10 @@ import java.io.InputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class PixelDecoder {
+open class PixelDecoder {
     data class Decoded(val pixels: ByteBuffer, val width: Int, val height: Int)
 
-    fun decodePixels(inputStream: InputStream): Decoded {
+    open fun decodePixels(inputStream: InputStream): Decoded {
         val bufferedImage = Imaging.getBufferedImage(inputStream)
         val byteBuffer: ByteBuffer
         when (val dataBuffer = bufferedImage.raster.dataBuffer) {

@@ -11,9 +11,9 @@ import org.joml.Vector3f
 
 private val backend = GLLocator.instance()
 
-class SimpleRenderer : Renderer  {
+class SimpleRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer  {
     private val assetStream = AssetStream()
-    private val pixelDecoder = PixelDecoder()
+    private val pixelDecoder = customPixelDecoder ?: PixelDecoder()
 
     private val shadersLib = ShadersLib(assetStream)
     private val texturesLib = TexturesLib(assetStream, pixelDecoder)

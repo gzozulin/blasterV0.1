@@ -8,9 +8,9 @@ import kotlin.system.measureNanoTime
 
 private val backend = GLLocator.instance()
 
-class DeferredRenderer : Renderer {
+class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
     private val assetStream = AssetStream()
-    private val pixelDecoder = PixelDecoder()
+    private val pixelDecoder = customPixelDecoder ?: PixelDecoder()
 
     private val shadersLib = ShadersLib(assetStream)
     private val texturesLib = TexturesLib(assetStream, pixelDecoder)
