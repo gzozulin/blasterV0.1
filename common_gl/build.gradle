@@ -33,7 +33,4 @@ dependencies {
 
     api "org.joml:joml:1.9.19"
     //api "org.joml:joml-android:1.9.3-SNAPSHOT"
-
-    implementation "org.apache.commons:commons-imaging:1.0-alpha1"
-    runtime "org.apache.commons:commons-imaging:1.0-alpha1"
 }
