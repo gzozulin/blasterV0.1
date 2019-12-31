@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
-import assets.*
 import com.blaster.assets.PixelDecoder
 import com.blaster.renderers.DeferredRenderer
 import com.blaster.renderers.SimpleRenderer

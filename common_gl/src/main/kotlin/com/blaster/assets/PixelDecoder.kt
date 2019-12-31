@@ -13,9 +13,18 @@ open class PixelDecoder {
         val byteBuffer: ByteBuffer
         when (val dataBuffer = bufferedImage.raster.dataBuffer) {
             is DataBufferByte -> {
-                val pixelData = dataBuffer.data
-                byteBuffer = ByteBuffer.allocateDirect(pixelData.size)
-                byteBuffer.put(pixelData)
+                byteBuffer = ByteBuffer.allocateDirect(dataBuffer.data.size)
+                var position = 0
+                while (position < dataBuffer.data.size) {
+                    val b = dataBuffer.data[position++]
+                    val g = dataBuffer.data[position++]
+                    val r = dataBuffer.data[position++]
+                    val a = dataBuffer.data[position++]
+                    byteBuffer.put(a)
+                    byteBuffer.put(r)
+                    byteBuffer.put(g)
+                    byteBuffer.put(b)
+                }
                 byteBuffer.position(0)
             }
             else -> throw IllegalArgumentException("Not implemented for data buffer type: " + dataBuffer.javaClass)
