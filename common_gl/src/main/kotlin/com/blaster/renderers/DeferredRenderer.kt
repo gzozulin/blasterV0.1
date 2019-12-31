@@ -4,7 +4,6 @@ import com.blaster.assets.*
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import org.joml.Vector3f
-import kotlin.system.measureNanoTime
 
 private val backend = GLLocator.instance()
 
@@ -72,9 +71,7 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shadersLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        val modelNanos = measureNanoTime {
-            model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
-        }
+        model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
     }
 
     override fun onChange(width: Int, height: Int) {

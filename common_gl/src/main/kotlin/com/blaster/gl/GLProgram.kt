@@ -8,7 +8,7 @@ import java.nio.ByteOrder
 
 private val backend = GLLocator.instance()
 
-private val bufferVec3 = ByteBuffer.allocateDirect(4 * 4)
+private val bufferVec3 = ByteBuffer.allocateDirect(3 * 4)
         .order(ByteOrder.nativeOrder())
 
 private val bufferMat4 = ByteBuffer.allocateDirect(16 * 4)

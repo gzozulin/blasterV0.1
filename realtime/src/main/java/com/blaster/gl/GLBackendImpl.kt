@@ -2,13 +2,15 @@ package com.blaster.gl
 
 import android.opengl.GLES30
 import android.opengl.GLU
-import java.nio.Buffer
 import java.nio.ByteBuffer
-import java.nio.FloatBuffer
 
 class GLBackendImpl : GLBackend {
     override val GL_NO_ERROR: Int
         get() = GLES30.GL_NO_ERROR
+    override val GL_TRUE: Int
+        get() = GLES30.GL_TRUE
+    override val GL_FALSE: Int
+        get() = GLES30.GL_FALSE
 
     override fun gluErrorString(error: Int) = GLU.gluErrorString(error)
     override fun glGetError() = GLES30.glGetError()
@@ -49,10 +51,6 @@ class GLBackendImpl : GLBackend {
     override fun glBufferData(target: Int, size: Long, data: ByteBuffer, usage: Int) =
             GLES30.glBufferData(target, size.toInt(), data, usage)
 
-    override val GL_TRUE: Int
-        get() = GLES30.GL_TRUE
-    override val GL_FALSE: Int
-        get() = GLES30.GL_FALSE
     override val GL_FRAMEBUFFER: Int
         get() = GLES30.GL_FRAMEBUFFER
     override val GL_FRAMEBUFFER_COMPLETE: Int
@@ -103,7 +101,7 @@ class GLBackendImpl : GLBackend {
     override fun glCompileShader(shader: Int) = GLES30.glCompileShader(shader)
 
     override fun glGetShaderi(shader: Int, pname: Int): Int {
-        val array = intArrayOf(1)
+        val array = IntArray(1)
         GLES30.glGetShaderiv(shader, pname, array, 0)
         return array[0]
     }
@@ -115,7 +113,7 @@ class GLBackendImpl : GLBackend {
     override fun glLinkProgram(program: Int) = GLES30.glLinkProgram(program)
 
     override fun glGetProgrami(program: Int, pname: Int): Int {
-        val array = intArrayOf(1)
+        val array = IntArray(1)
         GLES30.glGetProgramiv(program, pname, array, 0)
         return array[0]
     }

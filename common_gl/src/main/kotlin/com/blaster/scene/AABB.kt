@@ -2,9 +2,19 @@ package com.blaster.scene
 
 import org.joml.Vector3f
 
-data class AABB(val min: Vector3f, val max: Vector3f) {
-    val width = 0f
-    val height = 0f
-    val depth = 0f
-    val center = Vector3f()
+data class AABB (val min: Vector3f, val max: Vector3f) {
+    val width: Float
+        get() = max.x - min.x
+
+    val height: Float
+        get() = max.y - min.y
+
+    val depth: Float
+        get() = max.z - min.z
+
+    val center: Vector3f
+        get() = Vector3f(
+                min.x + (max.x - min.x) / 2f,
+                min.y + (max.y - min.y) / 2f,
+                min.z + (max.z - min.z) / 2f)
 }

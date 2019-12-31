@@ -63,7 +63,7 @@ class MyGLSurfaceView(context: Context?, attrs: AttributeSet?) : GLSurfaceView(c
 
     init {
         setEGLContextClientVersion(2)
-        setRenderer(simple)
-        //setRenderer(deferred)
+        //setRenderer(simple)
+        setRenderer(deferred)
     }
 }
