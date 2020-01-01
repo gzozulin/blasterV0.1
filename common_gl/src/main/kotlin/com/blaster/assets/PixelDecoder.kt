@@ -1,8 +1,9 @@
 package com.blaster.assets
 
-import java.awt.image.DataBufferByte
+import java.awt.Color
 import java.io.InputStream
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import javax.imageio.ImageIO
 
 open class PixelDecoder {
@@ -10,25 +11,18 @@ open class PixelDecoder {
 
     open fun decodePixels(inputStream: InputStream): Decoded {
         val bufferedImage = ImageIO.read(inputStream)
-        val byteBuffer: ByteBuffer
-        when (val dataBuffer = bufferedImage.raster.dataBuffer) {
-            is DataBufferByte -> {
-                byteBuffer = ByteBuffer.allocateDirect(dataBuffer.data.size)
-                var position = 0
-                while (position < dataBuffer.data.size) {
-                    val b = dataBuffer.data[position++]
-                    val g = dataBuffer.data[position++]
-                    val r = dataBuffer.data[position++]
-                    val a = dataBuffer.data[position++]
-                    byteBuffer.put(a)
-                    byteBuffer.put(r)
-                    byteBuffer.put(g)
-                    byteBuffer.put(b)
-                }
-                byteBuffer.position(0)
+        val pixelNum = bufferedImage.width * bufferedImage.height
+        val byteBuffer = ByteBuffer.allocateDirect(pixelNum * 4).order(ByteOrder.nativeOrder())
+        for (y in 0 until bufferedImage.height) {
+            for (x in 0 until bufferedImage.width) {
+                val color = Color(bufferedImage.getRGB(x, y))
+                byteBuffer.put(color.red.toByte())
+                byteBuffer.put(color.green.toByte())
+                byteBuffer.put(color.blue.toByte())
+                byteBuffer.put(color.alpha.toByte())
             }
-            else -> throw IllegalArgumentException("Not implemented for data buffer type: " + dataBuffer.javaClass)
         }
+        byteBuffer.position(0)
         return Decoded(byteBuffer, bufferedImage.width, bufferedImage.height)
     }
 }

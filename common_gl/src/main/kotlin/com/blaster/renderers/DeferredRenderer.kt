@@ -4,6 +4,7 @@ import com.blaster.assets.*
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import org.joml.Vector3f
+import java.util.*
 
 private val backend = GLLocator.instance()
 
@@ -41,12 +42,11 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
 
     private lateinit var camera: Camera
 
-    private fun setupLights() {
-        for (i in 0..15) {
-            programLightPass.setUniform(GLUniform.uniformLightPosition(i), Vector3f())
-            programLightPass.setUniform(GLUniform.uniformLightColor(i), Vector3f())
-        }
-    }
+    private val random = Random()
+    private fun randomFloat(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) =
+            min + random.nextFloat() * (max - min)
+    private fun randomVector3f(min: Vector3f, max: Vector3f) =
+            Vector3f(randomFloat(min.x, max.x), randomFloat(min.y, max.y), randomFloat(min.z, max.z))
 
     private fun geometryPass() {
         glBind(listOf(programGeomPass, model.mesh, framebuffer, model.diffuse)) {
@@ -71,7 +71,7 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shadersLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        model = modelsLib.loadModel("models/akai/akai.obj", "models/akai/akai.png")
+        model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
     }
 
     override fun onChange(width: Int, height: Int) {
@@ -111,7 +111,12 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
             programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, camera.eye)
-            setupLights()
+            for (i in 0..15) {
+                val randomPos = randomVector3f(model.aabb.min, model.aabb.max)
+                val randomColor = randomVector3f(Vector3f(), Vector3f(1f))
+                programLightPass.setUniform(GLUniform.uniformLightPosition(i), randomPos)
+                programLightPass.setUniform(GLUniform.uniformLightColor(i), randomColor)
+            }
         }
     }
 

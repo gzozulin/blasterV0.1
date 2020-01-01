@@ -4,6 +4,8 @@ import java.io.InputStream
 
 class AssetStream {
     fun openAsset(filename: String) : InputStream {
-        return Thread.currentThread().contextClassLoader.getResource(filename)!!.openStream()
+        val url = Thread.currentThread().contextClassLoader.getResource(filename)
+        checkNotNull(url) { "Asset not found $filename" }
+        return url.openStream()
     }
 }

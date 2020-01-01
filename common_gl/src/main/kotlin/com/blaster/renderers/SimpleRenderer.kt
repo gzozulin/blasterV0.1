@@ -42,7 +42,9 @@ class SimpleRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer  {
         glCheck { backend.glClearColor(0.0f, 0.0f, 0.0f, 1.0f) }
         program = shadersLib.loadProgram("shaders/simple/no_lighting.vert", "shaders/simple/no_lighting.frag")
         mesh = GLMesh(triangleVertices, triangleIndices, triangleAttributes)
+        //texture = texturesLib.loadTexture("models/house/house_diffuse.png")
         texture = texturesLib.loadTexture("textures/winner.png")
+        texture = texturesLib.loadTexture("textures/utah.jpeg")
         glBind(program) {
             program.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, texture)
         }
