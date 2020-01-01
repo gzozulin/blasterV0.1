@@ -3,6 +3,7 @@ package com.blaster.gl
 import org.lwjgl.opengl.*
 import java.nio.Buffer
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.FloatBuffer
 
 class GLBackendImpl : GLBackend {
@@ -60,8 +61,8 @@ class GLBackendImpl : GLBackend {
             ARBFramebufferObject.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
 
     override fun glDrawBuffers(bufs: IntArray) {
-        val buffer = ByteBuffer.allocateDirect(bufs.size * 4).asIntBuffer()
-        buffer.put(bufs)
+        val buffer = ByteBuffer.allocateDirect(bufs.size * 4).order(ByteOrder.nativeOrder()).asIntBuffer()
+        buffer.put(bufs).position(0)
         GL20.glDrawBuffers(buffer)
     }
 
