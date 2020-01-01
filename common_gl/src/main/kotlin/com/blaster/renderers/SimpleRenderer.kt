@@ -25,7 +25,7 @@ class SimpleRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer  {
     private lateinit var camera: Camera
 
     private val node1 = Node()
-    private val node2 = Node(node1)
+    private val node2 = Node()
 
     private val triangleAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
     private val triangleVertices = floatArrayOf(
@@ -48,6 +48,7 @@ class SimpleRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer  {
         glBind(program) {
             program.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, texture)
         }
+        node1.attach(node2)
     }
 
     override fun onChange(width: Int, height: Int) {

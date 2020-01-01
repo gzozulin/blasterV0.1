@@ -66,6 +66,7 @@ class GLBackendImpl : GLBackend {
     override fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int) =
             ARBFramebufferObject.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer)
     override fun glDrawBuffers(bufs: IntArray) {
+        // todo: remove allocation
         val buffer = ByteBuffer.allocateDirect(bufs.size * 4).order(ByteOrder.nativeOrder()).asIntBuffer()
         buffer.put(bufs).position(0)
         GL20.glDrawBuffers(buffer)

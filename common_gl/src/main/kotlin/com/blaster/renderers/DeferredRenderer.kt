@@ -2,21 +2,15 @@ package com.blaster.renderers
 
 import com.blaster.assets.*
 import com.blaster.gl.*
+import com.blaster.math.randomVector3f
 import com.blaster.scene.Camera
+import com.blaster.scene.Node
 import org.joml.Vector3f
-import java.util.*
 
 private val backend = GLLocator.instance()
 
-class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
-    private val assetStream = AssetStream()
-    private val pixelDecoder = customPixelDecoder ?: PixelDecoder()
-
+class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
     private val shadersLib = ShadersLib(assetStream)
-    private val texturesLib = TexturesLib(assetStream, pixelDecoder)
-    private val modelsLib = ModelsLib(assetStream, texturesLib)
-
-    private lateinit var model: GLModel
 
     // todo: upside down, normalized device space?
     private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
@@ -40,28 +34,11 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
 
     private lateinit var depthBuffer: GLRenderBuffer
 
-    private lateinit var camera: Camera
+    val root = Node()
+    lateinit var camera: Camera
 
-    private val random = Random()
-    private fun randomFloat(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) =
-            min + random.nextFloat() * (max - min)
-    private fun randomVector3f(min: Vector3f, max: Vector3f) =
-            Vector3f(randomFloat(min.x, max.x), randomFloat(min.y, max.y), randomFloat(min.z, max.z))
-
-    private fun geometryPass() {
-        glBind(listOf(programGeomPass, model.mesh, framebuffer, model.diffuse)) {
-            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
-            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, model.node.calculateViewM())
-            model.mesh.draw()
-        }
-    }
-
-    private fun lightingPass() {
-        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
-            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
-            quadMesh.draw()
-        }
-    }
+    private val renderList = mutableListOf<Node>()
+    private var renderListVersion = Int.MAX_VALUE
 
     override fun onCreate() {
         glCheck { backend.glClearColor(0.9f, 0.9f, 1f, 0f) }
@@ -71,13 +48,11 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
         quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shadersLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
     }
 
     override fun onChange(width: Int, height: Int) {
         glCheck { backend.glViewport(0, 0, width, height) }
         camera = Camera(width.toFloat() / height.toFloat())
-        camera.lookAt(model.aabb)
         positionStorage = GLTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,
@@ -100,19 +75,13 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
             framebuffer.setRenderBuffer(backend.GL_DEPTH_ATTACHMENT, depthBuffer)
             framebuffer.checkIsComplete()
         }
-        glBind(programGeomPass) {
-            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, model.node.calculateViewM())
-            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.viewM)
-            programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
-            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, model.diffuse)
-        }
         glBind(programLightPass) {
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
             programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, camera.eye)
             for (i in 0..15) {
-                val randomPos = randomVector3f(model.aabb.min, model.aabb.max)
+                val randomPos = randomVector3f(Vector3f(-5f), Vector3f(5f))
                 val randomColor = randomVector3f(Vector3f(), Vector3f(1f))
                 programLightPass.setUniform(GLUniform.uniformLightPosition(i), randomPos)
                 programLightPass.setUniform(GLUniform.uniformLightColor(i), randomColor)
@@ -121,8 +90,47 @@ class DeferredRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer {
     }
 
     override fun onDraw() {
-        model.node.tick()
+        updateRenderList()
         geometryPass()
         lightingPass()
+    }
+
+    private fun updateRenderList() {
+        if (renderListVersion != root.version) {
+            renderList.clear()
+            addChildrenToRenderlist(root)
+            renderListVersion = root.version
+        }
+    }
+
+    private fun addChildrenToRenderlist(node: Node) {
+        renderList.addAll(node.children)
+        node.children.forEach { addChildrenToRenderlist(it) }
+    }
+
+    private fun geometryPass() {
+        glBind(listOf(programGeomPass, framebuffer)) {
+            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
+            for (node in renderList) {
+                when (node) {
+                    is GLModel -> {
+                        glBind(listOf(node.mesh, node.diffuse)) {
+                            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.viewM)
+                            programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
+                            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
+                            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, node.diffuse)
+                            node.mesh.draw()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun lightingPass() {
+        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
+            glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
+            quadMesh.draw()
+        }
     }
 }

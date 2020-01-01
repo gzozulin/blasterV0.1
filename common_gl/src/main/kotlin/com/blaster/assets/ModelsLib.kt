@@ -3,8 +3,7 @@ package com.blaster.assets
 import com.blaster.gl.GLAttribute
 import com.blaster.gl.GLMesh
 import com.blaster.gl.GLModel
-import com.blaster.scene.AABB
-import com.blaster.scene.Node
+import com.blaster.math.AABB
 import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -54,7 +53,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), Node(), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
+        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
     }
 
     private fun parseLine(line: String) {

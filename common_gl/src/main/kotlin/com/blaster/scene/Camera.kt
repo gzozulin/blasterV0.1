@@ -1,5 +1,7 @@
 package com.blaster.scene
 
+import com.blaster.math.AABB
+import com.blaster.math.VECTOR_UP
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
@@ -15,7 +17,7 @@ class Camera(aspectRatio: Float) {
     }
 
     fun lookAt(from: Vector3f, to: Vector3f) {
-        viewM.lookAt(from, to, Vector3f(0f, 1f, 0f))
+        viewM.lookAt(from, to, VECTOR_UP)
         eye = from
         center = to
     }
