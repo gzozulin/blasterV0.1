@@ -46,7 +46,7 @@ class GLBackendImpl : GLBackend {
     override val GL_DEPTH_ATTACHMENT: Int get() =   GL30.GL_DEPTH_ATTACHMENT
 
     override fun glGetError() = GL11.glGetError()
-    override fun gluErrorString(error: Int) = ""
+    override fun gluErrorString(error: Int) = "Undeciphered error $error"
     override fun glEnable(cap: Int) = GL11.glEnable(cap)
     override fun glClearColor(red: Float, green: Float, blue: Float, alpha: Float)  =
             GL11.glClearColor(red, green, blue, alpha)
