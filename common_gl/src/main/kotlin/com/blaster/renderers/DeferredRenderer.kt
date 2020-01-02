@@ -115,9 +115,9 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
                 when (node) {
                     is GLModel -> {
                         glBind(listOf(node.mesh, node.diffuse)) {
-                            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.calculateM())
+                            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.calculateTransformM())
                             programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
-                            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateM())
+                            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateTransformM())
                             programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, node.diffuse)
                             node.mesh.draw()
                         }

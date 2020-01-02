@@ -15,13 +15,7 @@ open class Node {
     private val internalScale: Vector3f = Vector3f(1f)
 
     val position
-        get() = internalPosition
-
-    val rotation
-        get() = internalRotation
-
-    val scale
-        get() = internalScale
+        get() = internalPosition // todo: should be absolute from matrix
 
     protected var localMatrixVersion = 0
     protected var localMatrixLastVersion = Int.MAX_VALUE
@@ -59,7 +53,7 @@ open class Node {
         return localM
     }
 
-    fun calculateM(): Matrix4f {
+    fun calculateTransformM(): Matrix4f {
         if (parent == null) {
             return calculateLocalM() // root
         }
