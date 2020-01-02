@@ -79,7 +79,7 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
-            programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, camera.eye)
+            programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, camera.position)
             for (i in 0..15) {
                 val randomPos = randomVector3f(Vector3f(-5f), Vector3f(5f))
                 val randomColor = randomVector3f(Vector3f(), Vector3f(1f))
@@ -96,10 +96,10 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
     }
 
     private fun updateRenderList() {
-        if (renderListVersion != root.version) {
+        if (renderListVersion != root.graphVersion) {
             renderList.clear()
             addChildrenToRenderlist(root)
-            renderListVersion = root.version
+            renderListVersion = root.graphVersion
         }
     }
 
@@ -115,7 +115,7 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
                 when (node) {
                     is GLModel -> {
                         glBind(listOf(node.mesh, node.diffuse)) {
-                            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.viewM)
+                            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.calculateViewM())
                             programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
                             programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateViewM())
                             programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, node.diffuse)

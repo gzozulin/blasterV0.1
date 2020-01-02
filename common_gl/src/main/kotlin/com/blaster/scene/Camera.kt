@@ -1,38 +1,23 @@
 package com.blaster.scene
 
-import com.blaster.math.AABB
-import com.blaster.math.VECTOR_UP
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
-class Camera(aspectRatio: Float) {
-    val viewM = Matrix4f()
+class Camera(aspectRatio: Float) : Node() {
     val projectionM = Matrix4f()
-
-    var eye = Vector3f()
-    var center = Vector3f()
 
     init {
         projectionM.perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 1f, 4000f)
     }
 
-    fun lookAt(from: Vector3f, to: Vector3f) {
-        viewM.lookAt(from, to, VECTOR_UP)
-        eye = from
-        center = to
-    }
+    private val negatedPosition = Vector3f()
 
-    fun lookAt(aabb: AABB) {
-        var maxValue = aabb.width
-        if (aabb.height > maxValue) {
-            maxValue = aabb.height
+    override fun calculateLocalM(): Matrix4f {
+        if (localMatrixVersion != localMatrixLastVersion) {
+            internalPosition.negate(negatedPosition)
+            localM.identity().rotate(internalRotation).translate(negatedPosition)
+            localMatrixLastVersion = localMatrixVersion
         }
-        if (aabb.depth > maxValue) {
-            maxValue = aabb.depth
-        }
-        val center = aabb.center
-        val result = Vector3f()
-        center.add(Vector3f(0f, maxValue / 2f, maxValue), result)
-        lookAt(result, center)
+        return localM
     }
 }
