@@ -14,8 +14,12 @@ open class Node {
     protected val internalRotation: Quaternionf = Quaternionf()
     private val internalScale: Vector3f = Vector3f(1f)
 
-    val position
-        get() = internalPosition // todo: should be absolute from matrix
+    private val positionBuf = Vector3f()
+    val position: Vector3f
+        get() {
+            calculateTransformM().getTranslation(positionBuf)
+            return positionBuf
+        }
 
     protected var localMatrixVersion = 0
     protected var localMatrixLastVersion = Int.MAX_VALUE
@@ -66,12 +70,12 @@ open class Node {
         internalRotation.rotateAxis(0.01f, VECTOR_UP)
     }
 
-    private val direction = Vector3f()
+    private val directionBuf = Vector3f()
     fun lookAt(from: Vector3f, to: Vector3f) {
         localMatrixLastVersion++
         internalPosition.set(from)
-        to.sub(from, direction).normalize()
-        internalRotation.lookAlong(direction, VECTOR_UP)
+        to.sub(from, directionBuf).normalize()
+        internalRotation.lookAlong(directionBuf, VECTOR_UP)
     }
 
     fun lookAt(aabb: AABB) {
