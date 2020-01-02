@@ -62,11 +62,11 @@ class SimpleRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer  {
         node2.tick()
         glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
         glBind(listOf(program, mesh, texture)) {
-            program.setUniform(GLUniform.UNIFORM_VIEW_M, camera.calculateViewM())
+            program.setUniform(GLUniform.UNIFORM_VIEW_M, camera.calculateM())
             program.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
-            program.setUniform(GLUniform.UNIFORM_MODEL_M, node1.calculateViewM())
+            program.setUniform(GLUniform.UNIFORM_MODEL_M, node1.calculateM())
             mesh.draw()
-            program.setUniform(GLUniform.UNIFORM_MODEL_M, node2.calculateViewM())
+            program.setUniform(GLUniform.UNIFORM_MODEL_M, node2.calculateM())
             mesh.draw()
         }
     }

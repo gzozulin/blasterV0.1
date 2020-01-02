@@ -59,7 +59,7 @@ open class Node {
         return localM
     }
 
-    fun calculateViewM(): Matrix4f {
+    fun calculateM(): Matrix4f {
         if (parent == null) {
             return calculateLocalM() // root
         }
