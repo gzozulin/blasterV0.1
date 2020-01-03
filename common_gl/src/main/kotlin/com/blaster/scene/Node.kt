@@ -1,6 +1,7 @@
 package com.blaster.scene
 
-import com.blaster.math.VECTOR_UP
+import com.blaster.common.Version
+import com.blaster.common.VECTOR_UP
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -8,14 +9,13 @@ import org.joml.Vector3f
 open class Node : Movable {
     private var parent: Node? = null
     val children: List<Node> = ArrayList()
-    var graphVersion = 0
+    var graphVersion = Version()
 
     private val internalPosition: Vector3f = Vector3f()
     private val internalRotation: Quaternionf = Quaternionf()
     private val internalScale: Vector3f = Vector3f(1f)
 
-    private var localVersion = 0
-    private var localLastVersion = Int.MAX_VALUE
+    private val localVersion = Version()
     private val localM = Matrix4f()
     private val modelM = Matrix4f()
 
@@ -27,9 +27,9 @@ open class Node : Movable {
         }
 
     private fun incrementVersion() {
-        graphVersion++
+        graphVersion.increment()
         if (parent != null) {
-            parent!!.graphVersion++
+            parent!!.graphVersion.increment()
         }
     }
 
@@ -48,9 +48,8 @@ open class Node : Movable {
     }
 
     protected open fun calculateLocalM(): Matrix4f {
-        if (localVersion != localLastVersion) {
+        if (localVersion.check()) {
             localM.identity().rotate(internalRotation).scale(internalScale).translate(internalPosition)
-            localLastVersion = localVersion
         }
         return localM
     }
@@ -64,7 +63,7 @@ open class Node : Movable {
     }
 
     fun tick() {
-        localLastVersion++
+        localVersion.increment()
         internalRotation.rotateAxis(0.01f, VECTOR_UP)
     }
 }

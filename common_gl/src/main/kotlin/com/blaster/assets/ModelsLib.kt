@@ -3,7 +3,7 @@ package com.blaster.assets
 import com.blaster.gl.GLAttribute
 import com.blaster.gl.GLMesh
 import com.blaster.gl.GLModel
-import com.blaster.math.AABB
+import com.blaster.common.AABB
 import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader

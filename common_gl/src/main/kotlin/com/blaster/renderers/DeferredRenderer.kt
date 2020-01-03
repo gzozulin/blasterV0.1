@@ -2,7 +2,7 @@ package com.blaster.renderers
 
 import com.blaster.assets.*
 import com.blaster.gl.*
-import com.blaster.math.randomVector3f
+import com.blaster.common.randomVector3f
 import com.blaster.scene.Camera
 import com.blaster.scene.Node
 import org.joml.Vector3f
@@ -38,7 +38,6 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
     lateinit var camera: Camera
 
     private val renderList = mutableListOf<Node>()
-    private var renderListVersion = Int.MAX_VALUE
 
     override fun onCreate() {
         glCheck { backend.glClearColor(0.9f, 0.9f, 1f, 0f) }
@@ -96,10 +95,9 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
     }
 
     private fun updateRenderList() {
-        if (renderListVersion != root.graphVersion) {
+        if (root.graphVersion.check()) {
             renderList.clear()
             addChildrenToRenderlist(root)
-            renderListVersion = root.graphVersion
         }
     }
 

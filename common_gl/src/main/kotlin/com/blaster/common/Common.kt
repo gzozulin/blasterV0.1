@@ -1,4 +1,4 @@
-package com.blaster.math
+package com.blaster.common
 
 import org.joml.Vector3f
 import java.util.*
