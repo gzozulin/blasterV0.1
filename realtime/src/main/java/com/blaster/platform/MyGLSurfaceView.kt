@@ -45,7 +45,7 @@ class MyGLSurfaceView(context: Context?, attrs: AttributeSet?) : GLSurfaceView(c
     }
 
     private val deferred = object : Renderer {
-        private val renderer = DeferredRenderer(pixelDecoder)
+        private val renderer = DeferredRenderer()
 
         override fun onDrawFrame(gl: GL10?) {
             renderer.onDraw()
