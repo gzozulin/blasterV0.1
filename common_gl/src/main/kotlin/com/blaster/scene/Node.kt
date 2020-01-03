@@ -1,29 +1,28 @@
 package com.blaster.scene
 
-import com.blaster.math.AABB
 import com.blaster.math.VECTOR_UP
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-open class Node {
+open class Node : Movable {
     private var parent: Node? = null
     val children: List<Node> = ArrayList()
 
-    protected val internalPosition: Vector3f = Vector3f()
-    protected val internalRotation: Quaternionf = Quaternionf()
+    private val internalPosition: Vector3f = Vector3f()
+    private val internalRotation: Quaternionf = Quaternionf()
     private val internalScale: Vector3f = Vector3f(1f)
 
     private val positionBuf = Vector3f()
     val position: Vector3f
         get() {
-            calculateTransformM().getTranslation(positionBuf)
+            calculateModelM().getTranslation(positionBuf)
             return positionBuf
         }
 
-    protected var localMatrixVersion = 0
-    protected var localMatrixLastVersion = Int.MAX_VALUE
-    protected val localM = Matrix4f()
+    private var localMatrixVersion = 0
+    private var localMatrixLastVersion = Int.MAX_VALUE
+    private val localM = Matrix4f()
 
     private val modelM = Matrix4f()
 
@@ -57,7 +56,7 @@ open class Node {
         return localM
     }
 
-    fun calculateTransformM(): Matrix4f {
+    fun calculateModelM(): Matrix4f {
         if (parent == null) {
             return calculateLocalM() // root
         }
@@ -68,27 +67,5 @@ open class Node {
     fun tick() {
         localMatrixLastVersion++
         internalRotation.rotateAxis(0.01f, VECTOR_UP)
-    }
-
-    private val directionBuf = Vector3f()
-    fun lookAt(from: Vector3f, to: Vector3f) {
-        localMatrixLastVersion++
-        internalPosition.set(from)
-        to.sub(from, directionBuf).normalize()
-        internalRotation.lookAlong(directionBuf, VECTOR_UP)
-    }
-
-    fun lookAt(aabb: AABB) {
-        localMatrixLastVersion++
-        var maxValue = aabb.width
-        if (aabb.height > maxValue) {
-            maxValue = aabb.height
-        }
-        if (aabb.depth > maxValue) {
-            maxValue = aabb.depth
-        }
-        val center = aabb.center
-        center.add(Vector3f(0f, maxValue / 2f, maxValue), internalPosition)
-        lookAt(internalPosition, center)
     }
 }
