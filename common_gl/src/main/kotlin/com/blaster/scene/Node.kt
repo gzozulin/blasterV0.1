@@ -11,19 +11,19 @@ open class Node : Movable {
     val children: List<Node> = ArrayList()
     var graphVersion = Version()
 
-    private val internalPosition: Vector3f = Vector3f()
-    private val internalRotation: Quaternionf = Quaternionf()
-    private val internalScale: Vector3f = Vector3f(1f)
+    val position: Vector3f = Vector3f()
+    val rotation: Quaternionf = Quaternionf()
+    val scale: Vector3f = Vector3f(1f)
 
-    private val localVersion = Version()
+    val localVersion = Version()
     private val localM = Matrix4f()
     private val modelM = Matrix4f()
 
-    private val positionBuf = Vector3f()
+    private val absolutePositionBuf = Vector3f()
     val absolutePosition: Vector3f
         get() {
-            calculateModelM().getTranslation(positionBuf)
-            return positionBuf
+            calculateModelM().getTranslation(absolutePositionBuf)
+            return absolutePositionBuf
         }
 
     private fun incrementVersion() {
@@ -49,7 +49,7 @@ open class Node : Movable {
 
     protected open fun calculateLocalM(): Matrix4f {
         if (localVersion.check()) {
-            localM.identity().rotate(internalRotation).scale(internalScale).translate(internalPosition)
+            localM.identity().rotate(rotation).scale(scale).translate(position)
         }
         return localM
     }
@@ -64,6 +64,6 @@ open class Node : Movable {
 
     fun tick() {
         localVersion.increment()
-        internalRotation.rotateAxis(0.01f, VECTOR_UP)
+        rotation.rotateAxis(0.01f, VECTOR_UP)
     }
 }

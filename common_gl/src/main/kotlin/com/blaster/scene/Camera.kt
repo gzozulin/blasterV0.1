@@ -14,20 +14,17 @@ class Camera(aspectRatio: Float) : Movable {
         projectionM.perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 1f, 4000f)
     }
 
-    private val internalPosition: Vector3f = Vector3f()
-    private val internalRotation: Quaternionf = Quaternionf()
+    val position: Vector3f = Vector3f()
+    val rotation: Quaternionf = Quaternionf()
 
     private var viewVersion = Version()
     private val viewM = Matrix4f()
 
-    val position
-        get() = internalPosition
-
     private val negatedBuf = Vector3f()
     fun calculateViewM(): Matrix4f {
         if (viewVersion.check()) {
-            internalPosition.negate(negatedBuf)
-            viewM.identity().rotate(internalRotation).translate(negatedBuf)
+            position.negate(negatedBuf)
+            viewM.identity().rotate(rotation).translate(negatedBuf)
         }
         return viewM
     }
@@ -35,9 +32,9 @@ class Camera(aspectRatio: Float) : Movable {
     private val directionBuf = Vector3f()
     fun lookAt(from: Vector3f, to: Vector3f) {
         viewVersion.increment()
-        internalPosition.set(from)
+        position.set(from)
         to.sub(from, directionBuf).normalize()
-        internalRotation.lookAlong(directionBuf, VECTOR_UP)
+        rotation.lookAlong(directionBuf, VECTOR_UP)
     }
 
     fun lookAt(aabb: AABB) {
@@ -50,7 +47,7 @@ class Camera(aspectRatio: Float) : Movable {
             maxValue = aabb.depth
         }
         val center = aabb.center
-        center.add(Vector3f(0f, maxValue / 2f, maxValue), internalPosition)
-        lookAt(internalPosition, center)
+        center.add(Vector3f(0f, maxValue / 2f, maxValue), position)
+        lookAt(position, center)
     }
 }
