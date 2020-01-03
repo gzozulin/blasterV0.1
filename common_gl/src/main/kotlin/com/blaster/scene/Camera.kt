@@ -16,33 +16,33 @@ class Camera(aspectRatio: Float) : Movable {
     private val internalPosition: Vector3f = Vector3f()
     private val internalRotation: Quaternionf = Quaternionf()
 
-    private var localMatrixVersion = 0
-    private var localMatrixLastVersion = Int.MAX_VALUE
-    private val localM = Matrix4f()
+    private var viewVersion = 0
+    private var lastViewVersion = Int.MAX_VALUE
+    private val viewM = Matrix4f()
 
     val position
         get() = internalPosition
 
     private val negatedBuf = Vector3f()
     fun calculateViewM(): Matrix4f {
-        if (localMatrixVersion != localMatrixLastVersion) {
+        if (viewVersion != lastViewVersion) {
             internalPosition.negate(negatedBuf)
-            localM.identity().rotate(internalRotation).translate(negatedBuf)
-            localMatrixLastVersion = localMatrixVersion
+            viewM.identity().rotate(internalRotation).translate(negatedBuf)
+            lastViewVersion = viewVersion
         }
-        return localM
+        return viewM
     }
 
     private val directionBuf = Vector3f()
     fun lookAt(from: Vector3f, to: Vector3f) {
-        localMatrixLastVersion++
+        lastViewVersion++
         internalPosition.set(from)
         to.sub(from, directionBuf).normalize()
         internalRotation.lookAlong(directionBuf, VECTOR_UP)
     }
 
     fun lookAt(aabb: AABB) {
-        localMatrixLastVersion++
+        lastViewVersion++
         var maxValue = aabb.width
         if (aabb.height > maxValue) {
             maxValue = aabb.height

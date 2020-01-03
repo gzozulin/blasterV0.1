@@ -8,25 +8,24 @@ import org.joml.Vector3f
 open class Node : Movable {
     private var parent: Node? = null
     val children: List<Node> = ArrayList()
+    var graphVersion = 0
 
     private val internalPosition: Vector3f = Vector3f()
     private val internalRotation: Quaternionf = Quaternionf()
     private val internalScale: Vector3f = Vector3f(1f)
 
+    private var localVersion = 0
+    private var localLastVersion = Int.MAX_VALUE
+    private val localM = Matrix4f()
+    private val modelM = Matrix4f()
+
     private val positionBuf = Vector3f()
-    val position: Vector3f
+    val absolutePosition: Vector3f
         get() {
             calculateModelM().getTranslation(positionBuf)
             return positionBuf
         }
 
-    private var localMatrixVersion = 0
-    private var localMatrixLastVersion = Int.MAX_VALUE
-    private val localM = Matrix4f()
-
-    private val modelM = Matrix4f()
-
-    var graphVersion = 0
     private fun incrementVersion() {
         graphVersion++
         if (parent != null) {
@@ -49,9 +48,9 @@ open class Node : Movable {
     }
 
     protected open fun calculateLocalM(): Matrix4f {
-        if (localMatrixVersion != localMatrixLastVersion) {
+        if (localVersion != localLastVersion) {
             localM.identity().rotate(internalRotation).scale(internalScale).translate(internalPosition)
-            localMatrixLastVersion = localMatrixVersion
+            localLastVersion = localVersion
         }
         return localM
     }
@@ -65,7 +64,7 @@ open class Node : Movable {
     }
 
     fun tick() {
-        localMatrixLastVersion++
+        localLastVersion++
         internalRotation.rotateAxis(0.01f, VECTOR_UP)
     }
 }

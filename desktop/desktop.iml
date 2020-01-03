@@ -4,8 +4,6 @@
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
         <option name="GRADLE_PROJECT_PATH" value=":desktop" />
-        <option name="LAST_SUCCESSFUL_SYNC_AGP_VERSION" />
-        <option name="LAST_KNOWN_AGP_VERSION" />
       </configuration>
     </facet>
     <facet type="java-gradle" name="Java-Gradle">
@@ -15,13 +13,13 @@
       </configuration>
     </facet>
     <facet type="kotlin-language" name="Kotlin">
-      <configuration version="3" platform="JVM 1.8" allPlatforms="JVM [1.8]" useProjectSettings="false">
+      <configuration version="3" platform="JVM 1.8" useProjectSettings="false">
         <compilerSettings>
           <option name="additionalArguments" value="-Xallow-no-source-files -Xno-call-assertions -Xno-param-assertions" />
         </compilerSettings>
         <compilerArguments>
           <option name="destination" value="$MODULE_DIR$/build/classes/kotlin/main" />
-          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl/3.0.0a/788064e90fc99d6202b89c487ac525cb336a8dd3/lwjgl-3.0.0a.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/4d92e1b7c9c3077209a8cb2531cd803837b685d5/lwjgl-platform-3.0.0a-natives-windows.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/23d98c0b5a1ca12726d47fe8cccaf323d2ba30a9/lwjgl-platform-3.0.0a-natives-linux.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/85281dee834fb29b530148f354b704699e03c5b7/lwjgl-platform-3.0.0a-natives-osx.jar;C:/dev/blaster/common_gl/build/classes/kotlin/main;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.3.61/e91d61b7cfd9a45566b580fef18bbd5c32d505b5/kotlin-stdlib-jdk8-1.3.61.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.joml/joml/1.9.19/170cc48a699a3ebe8a7d6b989a1f1b058f316f97/joml-1.9.19.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.3.61/70dffc5f8ac5ea7c34f30deac5b9d8b1d48af066/kotlin-stdlib-jdk7-1.3.61.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.61/4702105e97f7396ae41b113fdbdc180ec1eb1e36/kotlin-stdlib-1.3.61.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.61/65abb71d5afb850b68be03987b08e2c864ca3110/kotlin-stdlib-common-1.3.61.jar;C:/Users/gzozulin/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" />
+          <option name="classpath" value="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl/3.0.0a/788064e90fc99d6202b89c487ac525cb336a8dd3/lwjgl-3.0.0a.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/4d92e1b7c9c3077209a8cb2531cd803837b685d5/lwjgl-platform-3.0.0a-natives-windows.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/23d98c0b5a1ca12726d47fe8cccaf323d2ba30a9/lwjgl-platform-3.0.0a-natives-linux.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.lwjgl/lwjgl-platform/3.0.0a/85281dee834fb29b530148f354b704699e03c5b7/lwjgl-platform-3.0.0a-natives-osx.jar:/home/greg/blaster/common_gl/build/classes/kotlin/main:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk8/1.3.61/e91d61b7cfd9a45566b580fef18bbd5c32d505b5/kotlin-stdlib-jdk8-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.joml/joml/1.9.19/170cc48a699a3ebe8a7d6b989a1f1b058f316f97/joml-1.9.19.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.3.61/70dffc5f8ac5ea7c34f30deac5b9d8b1d48af066/kotlin-stdlib-jdk7-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.3.61/4702105e97f7396ae41b113fdbdc180ec1eb1e36/kotlin-stdlib-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.3.61/65abb71d5afb850b68be03987b08e2c864ca3110/kotlin-stdlib-common-1.3.61.jar:/home/greg/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar" />
           <option name="noStdlib" value="true" />
           <option name="noReflect" value="true" />
           <option name="moduleName" value="desktop" />
@@ -63,7 +61,7 @@
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
-    <orderEntry type="jdk" jdkName="JDK" jdkType="JavaSDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="common_gl" exported="" />
     <orderEntry type="module" module-name="common_assets" exported="" />
