@@ -25,20 +25,20 @@ private val deferredTechnique = DeferredTechnique()
 private var camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
 
 private lateinit var model: GlModel
-private lateinit var renderlist: List<Node>
 
 private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {
         glState.apply()
         deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
-        renderlist = listOf(model)
         camera.lookAt(model.aabb)
     }
 
     override fun onDraw() {
         model.tick()
-        deferredTechnique.draw(camera, renderlist)
+        deferredTechnique.draw(camera) {
+            deferredTechnique.instance(model.mesh, model.diffuse, model.calculateModelM())
+        }
     }
 }
 

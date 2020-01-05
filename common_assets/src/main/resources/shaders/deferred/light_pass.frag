@@ -19,10 +19,11 @@ const int LIGHTS_CNT = 16;
 uniform Light uLights[LIGHTS_CNT];
 
 const float ambientTerm         = 0.7;
+const float specularPower       = 2.0;
+
 const float lightConstantAtt    = 1.0;
 const float lightLinearAtt      = 0.8;
 const float lightQuadraticAtt   = 0.2;
-const float specularPower       = 16.0;
 
 out vec4 oFragColor;
 
@@ -43,7 +44,7 @@ void main()
     for (int i = 0; i < LIGHTS_CNT; ++i) {
         float distance = length(uLights[i].position - fragPosition);
         float attenuation = 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
-        if (attenuation > 0.1) {
+        if (attenuation > 0.0) {
             vec3 attenuatedLight = uLights[i].color * attenuation;
             vec3 lightDir = normalize(uLights[i].position - fragPosition);
 

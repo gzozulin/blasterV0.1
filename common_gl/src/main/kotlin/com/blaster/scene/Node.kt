@@ -47,7 +47,7 @@ open class Node : Movable {
         incrementVersion()
     }
 
-    protected open fun calculateLocalM(): Matrix4f {
+    private fun calculateLocalM(): Matrix4f {
         if (localVersion.check()) {
             localM.identity().rotate(rotation).scale(scale).translate(position)
         }

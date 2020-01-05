@@ -5,6 +5,7 @@ import com.blaster.common.randomVector3f
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.scene.Node
+import org.joml.Matrix4f
 import org.joml.Vector3f
 
 private val backend = GlLocator.locate()
@@ -71,35 +72,25 @@ class DeferredTechnique {
         }
     }
 
-    fun draw(camera: Camera, renderlist: List<Node>) {
-        geometryPass(camera, renderlist)
-        lightingPass(camera)
-    }
-
-    private fun geometryPass(camera: Camera, renderlist: List<Node>) {
+    fun draw(camera: Camera, draw: () -> Unit) {
         glBind(listOf(programGeomPass, framebuffer)) {
+            programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
+            programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
-            for (node in renderlist) {
-                when (node) {
-                    is GlModel -> {
-                        glBind(listOf(node.mesh, node.diffuse)) {
-                            programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
-                            programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
-                            programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
-                            programGeomPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, node.diffuse)
-                            node.mesh.draw()
-                        }
-                    }
-                }
-            }
+            draw.invoke()
         }
-    }
-
-    private fun lightingPass(camera: Camera) {
         glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
             programLightPass.setUniform(GlUniform.UNIFORM_VIEW_POS, camera.position)
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
             quadMesh.draw()
+        }
+    }
+
+    fun instance(mesh: GlMesh, diffuse: GlTexture, modelM: Matrix4f) {
+        glBind(listOf(mesh, diffuse)) {
+            programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
+            programGeomPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+            mesh.draw()
         }
     }
 }
