@@ -1,8 +1,8 @@
 package com.blaster.gl
 
-private val backend = GLLocator.instance()
+private val backend = GlLocator.instance()
 
-class GLFrameBuffer : GLBindable {
+class GlFrameBuffer : GLBindable {
     private val handle: Int = glCheck { backend.glGenFramebuffers() }
 
     init {
@@ -17,11 +17,11 @@ class GLFrameBuffer : GLBindable {
         glCheck { backend.glBindFramebuffer(backend.GL_FRAMEBUFFER, 0) }
     }
 
-    fun setTexture(attachement: Int, texture: GLTexture) {
+    fun setTexture(attachement: Int, texture: GlTexture) {
         glCheck { backend.glFramebufferTexture2D(backend.GL_FRAMEBUFFER, attachement, texture.target, texture.handle, 0) } // 0 - level
     }
 
-    fun setRenderBuffer(attachement: Int, renderBuffer: GLRenderBuffer) {
+    fun setRenderBuffer(attachement: Int, renderBuffer: GlRenderBuffer) {
         glCheck { backend.glFramebufferRenderbuffer(backend.GL_FRAMEBUFFER, attachement, backend.GL_RENDERBUFFER, renderBuffer.handle) }
     }
 

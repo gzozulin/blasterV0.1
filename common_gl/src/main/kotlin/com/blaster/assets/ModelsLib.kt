@@ -1,8 +1,8 @@
 package com.blaster.assets
 
-import com.blaster.gl.GLAttribute
-import com.blaster.gl.GLMesh
-import com.blaster.gl.GLModel
+import com.blaster.gl.GlAttribute
+import com.blaster.gl.GlMesh
+import com.blaster.gl.GlModel
 import com.blaster.common.AABB
 import org.joml.Vector3f
 import java.io.BufferedReader
@@ -30,7 +30,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
     private var maxZ = 0f
 
     // todo: create Native(Float)Buffer directly, instead of copying arrays
-    fun loadModel(meshFilename: String, diffuseFilename: String): GLModel {
+    fun loadModel(meshFilename: String, diffuseFilename: String): GlModel {
         minX = 0f
         minY = 0f
         minZ = 0f
@@ -46,14 +46,14 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
                 line = bufferedReader.readLine()
             }
         }
-        val mesh = GLMesh(currentVertices.toFloatArray(), currentIndices.toIntArray(),
-                listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD, GLAttribute.ATTRIBUTE_NORMAL))
+        val mesh = GlMesh(currentVertices.toFloatArray(), currentIndices.toIntArray(),
+                listOf(GlAttribute.ATTRIBUTE_POSITION, GlAttribute.ATTRIBUTE_TEXCOORD, GlAttribute.ATTRIBUTE_NORMAL))
         currentVertexList.clear()
         currentTexCoordList.clear()
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return GLModel(mesh, texturesLib.loadTexture(diffuseFilename), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
+        return GlModel(mesh, texturesLib.loadTexture(diffuseFilename), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
     }
 
     private fun parseLine(line: String) {

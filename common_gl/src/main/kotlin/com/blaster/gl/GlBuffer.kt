@@ -3,9 +3,9 @@ package com.blaster.gl
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-private val backend = GLLocator.instance()
+private val backend = GlLocator.instance()
 
-class GLBuffer(private val type: Int, buffer: ByteBuffer, size: Long) : GLBindable {
+class GlBuffer(private val type: Int, buffer: ByteBuffer, size: Long) : GLBindable {
     private val handle: Int = glCheck { backend.glGenBuffers() }
 
     // todo make two different constructors for indices/vertices
@@ -23,16 +23,16 @@ class GLBuffer(private val type: Int, buffer: ByteBuffer, size: Long) : GLBindab
     }
 
     companion object {
-        fun create(type: Int, floats: FloatArray): GLBuffer {
+        fun create(type: Int, floats: FloatArray): GlBuffer {
             val buffer = ByteBuffer.allocateDirect(floats.size * 4).order(ByteOrder.nativeOrder())
             buffer.asFloatBuffer().put(floats).position(0)
-            return GLBuffer(type, buffer, floats.size * 4L)
+            return GlBuffer(type, buffer, floats.size * 4L)
         }
 
-        fun create(type: Int, ints: IntArray): GLBuffer {
+        fun create(type: Int, ints: IntArray): GlBuffer {
             val buffer = ByteBuffer.allocateDirect(ints.size * 4).order(ByteOrder.nativeOrder())
             buffer.asIntBuffer().put(ints).position(0)
-            return GLBuffer(type, buffer, ints.size * 4L)
+            return GlBuffer(type, buffer, ints.size * 4L)
         }
     }
 

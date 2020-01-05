@@ -2,9 +2,9 @@ package com.blaster.gl
 
 import java.nio.ByteBuffer
 
-private val backend = GLLocator.instance()
+private val backend = GlLocator.instance()
 
-class GLTexture(
+class GlTexture(
         val target: Int = backend.GL_TEXTURE_2D,
         val unit: Int = 0,
         private val width: Int,

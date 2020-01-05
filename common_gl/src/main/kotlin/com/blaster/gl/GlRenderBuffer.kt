@@ -1,8 +1,8 @@
 package com.blaster.gl
 
-private val backend = GLLocator.instance()
+private val backend = GlLocator.instance()
 
-class GLRenderBuffer(
+class GlRenderBuffer(
         private val component: Int = backend.GL_DEPTH_COMPONENT24,
         private val width: Int, private val height: Int) : GLBindable {
 

@@ -1,16 +1,16 @@
 package com.blaster.assets
 
-import com.blaster.gl.GLProgram
-import com.blaster.gl.GLShader
-import com.blaster.gl.GLShaderType
+import com.blaster.gl.GlProgram
+import com.blaster.gl.GlShader
+import com.blaster.gl.GlShaderType
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
 class ShadersLib(private val assetStream: AssetStream) {
-    fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GLProgram = GLProgram(
-            GLShader(GLShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
-            GLShader(GLShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
+    fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
+            GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
+            GlShader(GlShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
 
     private fun slurpAsset(filename: String): String {
         val stringBuilder = StringBuilder()

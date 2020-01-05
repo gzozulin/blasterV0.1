@@ -1,17 +1,17 @@
 package com.blaster.gl
 
-private val backend = GLLocator.instance()
+private val backend = GlLocator.instance()
 
-class GLMesh(
-        private val verticesBuffer: GLBuffer,
-        private val indicesBuffer: GLBuffer,
+class GlMesh(
+        private val verticesBuffer: GlBuffer,
+        private val indicesBuffer: GlBuffer,
         private val indicesCount: Int,
-        private val attributes: List<GLAttribute>) : GLBindable {
+        private val attributes: List<GlAttribute>) : GLBindable {
 
-    constructor(vertices: FloatArray, indices: IntArray, attributes: List<GLAttribute>)
+    constructor(vertices: FloatArray, indices: IntArray, attributes: List<GlAttribute>)
             : this(
-                GLBuffer.create(backend.GL_ARRAY_BUFFER, vertices),
-                GLBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size, attributes)
+                GlBuffer.create(backend.GL_ARRAY_BUFFER, vertices),
+                GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size, attributes)
 
     private fun bindVertexPointers() {
         var stride = 0

@@ -4,7 +4,7 @@ import org.lwjgl.opengl.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-class GLBackendImpl : GLBackend {
+class GlBackendImpl : GlBackend {
     override val GL_NO_ERROR:           Int get() = GL11.GL_NO_ERROR
     override val GL_TRUE:               Int get() = GL11.GL_TRUE
     override val GL_FALSE:              Int get() = GL11.GL_FALSE

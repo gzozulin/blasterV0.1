@@ -11,6 +11,8 @@ import com.blaster.renderers.DeferredRenderer
 // template ps
 // etc
 
+// general placeholders (aabb) placement
+
 private val renderer = DeferredRenderer()
 
 private val window = object : LwjglWindow() {

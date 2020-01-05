@@ -4,7 +4,7 @@ import android.opengl.GLES30
 import android.opengl.GLU
 import java.nio.ByteBuffer
 
-class GLBackendImpl : GLBackend {
+class GlBackendImpl : GlBackend {
     override val GL_NO_ERROR: Int
         get() = GLES30.GL_NO_ERROR
     override val GL_TRUE: Int

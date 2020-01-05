@@ -4,7 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ModelsLib
 import com.blaster.assets.PixelDecoder
 import com.blaster.assets.TexturesLib
-import com.blaster.gl.GLModel
+import com.blaster.gl.GlModel
 import com.blaster.platform.LwjglWindow
 import com.blaster.renderers.DeferredRenderer
 
@@ -16,7 +16,7 @@ private val modelsLib = ModelsLib(assetStream, texturesLib)
 
 private val renderer = DeferredRenderer(assetStream)
 
-private lateinit var model: GLModel
+private lateinit var model: GlModel
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {

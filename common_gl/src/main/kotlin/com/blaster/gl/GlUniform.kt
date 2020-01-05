@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-enum class GLUniform(val label: String) {
+enum class GlUniform(val label: String) {
     UNIFORM_MODEL_M(            "uModelM"),
     UNIFORM_PROJ_M(             "uProjectionM"),
     UNIFORM_VIEW_M(             "uViewM"),

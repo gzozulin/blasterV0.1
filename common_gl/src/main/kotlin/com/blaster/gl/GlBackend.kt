@@ -2,21 +2,21 @@ package com.blaster.gl
 
 import java.nio.ByteBuffer
 
-class GLLocator {
+class GlLocator {
     companion object {
-        private val inst: GLBackend
+        private val INST: GlBackend
 
         init {
-            val clazz = Class.forName("com.blaster.gl.GLBackendImpl")
+            val clazz = Class.forName("com.blaster.gl.GlBackendImpl")
             val ctor = clazz.getConstructor()
-            inst = ctor.newInstance() as GLBackend
+            INST = ctor.newInstance() as GlBackend
         }
 
-        fun instance() = inst
+        fun instance() = INST
     }
 }
 
-interface GLBackend {
+interface GlBackend {
     val GL_NO_ERROR: Int
     fun glGetError(): Int
     fun gluErrorString(error: Int): String

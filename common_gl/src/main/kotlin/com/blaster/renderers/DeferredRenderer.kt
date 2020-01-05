@@ -7,13 +7,13 @@ import com.blaster.scene.Camera
 import com.blaster.scene.Node
 import org.joml.Vector3f
 
-private val backend = GLLocator.instance()
+private val backend = GlLocator.instance()
 
 class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
     private val shadersLib = ShadersLib(assetStream)
 
     // todo: upside down, normalized device space?
-    private val quadAttributes = listOf(GLAttribute.ATTRIBUTE_POSITION, GLAttribute.ATTRIBUTE_TEXCOORD)
+    private val quadAttributes = listOf(GlAttribute.ATTRIBUTE_POSITION, GlAttribute.ATTRIBUTE_TEXCOORD)
     private val quadVertices = floatArrayOf(
             -1f,  1f, 0f,     0f, 1f,
             -1f, -1f, 0f,     0f, 0f,
@@ -22,17 +22,17 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
     )
     private val quadIndices = intArrayOf(0, 1, 2, 1, 3, 2)
 
-    private lateinit var quadMesh: GLMesh
+    private lateinit var quadMesh: GlMesh
 
-    private lateinit var programGeomPass: GLProgram
-    private lateinit var programLightPass: GLProgram
+    private lateinit var programGeomPass: GlProgram
+    private lateinit var programLightPass: GlProgram
 
-    private lateinit var framebuffer: GLFrameBuffer
-    private lateinit var positionStorage: GLTexture
-    private lateinit var normalStorage: GLTexture
-    private lateinit var diffuseStorage: GLTexture
+    private lateinit var framebuffer: GlFrameBuffer
+    private lateinit var positionStorage: GlTexture
+    private lateinit var normalStorage: GlTexture
+    private lateinit var diffuseStorage: GlTexture
 
-    private lateinit var depthBuffer: GLRenderBuffer
+    private lateinit var depthBuffer: GlRenderBuffer
 
     val root = Node()
     lateinit var camera: Camera
@@ -44,28 +44,27 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
         glCheck { backend.glEnable(backend.GL_DEPTH_TEST) }
         glCheck { backend.glFrontFace(backend.GL_CCW) }
         glCheck { backend.glEnable(backend.GL_CULL_FACE) }
-        quadMesh = GLMesh(quadVertices, quadIndices, quadAttributes)
+        quadMesh = GlMesh(quadVertices, quadIndices, quadAttributes)
         programGeomPass = shadersLib.loadProgram("shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram("shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
     }
 
     override fun onChange(width: Int, height: Int) {
-        glCheck { backend.glViewport(0, 0, width, height) }
         camera = Camera(width.toFloat() / height.toFloat())
-        positionStorage = GLTexture(
+        positionStorage = GlTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,
                 pixelFormat = backend.GL_RGBA, pixelType = backend.GL_FLOAT)
-        normalStorage = GLTexture(
+        normalStorage = GlTexture(
                 unit = 1,
                 width = width, height = height, internalFormat = backend.GL_RGB16F,
                 pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
-        diffuseStorage = GLTexture(
+        diffuseStorage = GlTexture(
                 unit = 2,
                 width = width, height = height, internalFormat = backend.GL_RGBA,
                 pixelFormat = backend.GL_RGBA, pixelType = backend.GL_UNSIGNED_BYTE)
-        depthBuffer = GLRenderBuffer(width = width, height = height)
-        framebuffer = GLFrameBuffer()
+        depthBuffer = GlRenderBuffer(width = width, height = height)
+        framebuffer = GlFrameBuffer()
         glBind(listOf(framebuffer)) {
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT0, positionStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT1, normalStorage)
@@ -75,15 +74,15 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
             framebuffer.checkIsComplete()
         }
         glBind(programLightPass) {
-            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
-            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
-            programLightPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
-            programLightPass.setUniform(GLUniform.UNIFORM_VIEW_POS, camera.position)
+            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
+            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
+            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
+            programLightPass.setUniform(GlUniform.UNIFORM_VIEW_POS, camera.position)
             for (i in 0..15) {
                 val randomPos = randomVector3f(Vector3f(-5f), Vector3f(5f))
                 val randomColor = randomVector3f(Vector3f(), Vector3f(1f))
-                programLightPass.setUniform(GLUniform.uniformLightPosition(i), randomPos)
-                programLightPass.setUniform(GLUniform.uniformLightColor(i), randomColor)
+                programLightPass.setUniform(GlUniform.uniformLightPosition(i), randomPos)
+                programLightPass.setUniform(GlUniform.uniformLightColor(i), randomColor)
             }
         }
     }
@@ -111,12 +110,12 @@ class DeferredRenderer(assetStream: AssetStream = AssetStream()) : Renderer {
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
             for (node in renderList) {
                 when (node) {
-                    is GLModel -> {
+                    is GlModel -> {
                         glBind(listOf(node.mesh, node.diffuse)) {
-                            programGeomPass.setUniform(GLUniform.UNIFORM_VIEW_M, camera.calculateViewM())
-                            programGeomPass.setUniform(GLUniform.UNIFORM_PROJ_M, camera.projectionM)
-                            programGeomPass.setUniform(GLUniform.UNIFORM_MODEL_M, node.calculateModelM())
-                            programGeomPass.setTexture(GLUniform.UNIFORM_TEXTURE_DIFFUSE, node.diffuse)
+                            programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
+                            programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+                            programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
+                            programGeomPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, node.diffuse)
                             node.mesh.draw()
                         }
                     }
