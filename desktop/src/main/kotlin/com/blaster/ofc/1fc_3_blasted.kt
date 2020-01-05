@@ -1,7 +1,6 @@
 package com.blaster.ofc
 
 import com.blaster.platform.LwjglWindow
-import com.blaster.renderers.DeferredRenderer
 
 // todo templates -> setup on the scene
 
@@ -13,9 +12,9 @@ import com.blaster.renderers.DeferredRenderer
 
 // general placeholders (aabb) placement
 
-private val renderer = DeferredRenderer()
+/*private val renderer = DeferredRenderer()
 
-private val window = object : LwjglWindow() {
+private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate(width: Int, height: Int) {
         renderer.onCreate()
         renderer.onChange(width, height)
@@ -24,8 +23,8 @@ private val window = object : LwjglWindow() {
     override fun onDraw() {
         renderer.onDraw()
     }
-}
+}*/
 
 fun main() {
-    window.show()
+    //window.show()
 }

@@ -3,7 +3,7 @@ package com.blaster.gl
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-private val backend = GlLocator.instance()
+private val backend = GlLocator.locate()
 
 class GlBuffer(private val type: Int, buffer: ByteBuffer, size: Long) : GLBindable {
     private val handle: Int = glCheck { backend.glGenBuffers() }

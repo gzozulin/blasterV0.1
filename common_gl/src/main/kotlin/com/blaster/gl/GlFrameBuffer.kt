@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-private val backend = GlLocator.instance()
+private val backend = GlLocator.locate()
 
 class GlFrameBuffer : GLBindable {
     private val handle: Int = glCheck { backend.glGenFramebuffers() }

@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-private val backend = GlLocator.instance()
+private val backend = GlLocator.locate()
 
 class GlRenderBuffer(
         private val component: Int = backend.GL_DEPTH_COMPONENT24,

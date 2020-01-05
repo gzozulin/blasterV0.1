@@ -12,7 +12,7 @@ class GlLocator {
             INST = ctor.newInstance() as GlBackend
         }
 
-        fun instance() = INST
+        fun locate() = INST
     }
 }
 

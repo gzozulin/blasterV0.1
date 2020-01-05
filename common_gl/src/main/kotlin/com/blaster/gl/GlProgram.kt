@@ -6,7 +6,7 @@ import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-private val backend = GlLocator.instance()
+private val backend = GlLocator.locate()
 
 private val bufferVec3 = ByteBuffer.allocateDirect(3 * 4)
         .order(ByteOrder.nativeOrder())

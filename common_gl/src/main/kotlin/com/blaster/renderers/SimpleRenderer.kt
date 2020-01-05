@@ -9,7 +9,7 @@ import com.blaster.scene.Camera
 import com.blaster.scene.Node
 import org.joml.Vector3f
 
-private val backend = GlLocator.instance()
+private val backend = GlLocator.locate()
 
 class SimpleRenderer(customPixelDecoder: PixelDecoder? = null) : Renderer  {
     private val assetStream = AssetStream()

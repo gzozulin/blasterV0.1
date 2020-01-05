@@ -1,6 +1,6 @@
 package com.blaster.ofc
 
-import com.blaster.platform.LwjglWindow
+/*import com.blaster.platform.LwjglWindow
 import com.blaster.renderers.DeferredRenderer
 
 // todo: store the current position of particle in the texture object (100x100 tex == 10000 particles)
@@ -11,7 +11,7 @@ import com.blaster.renderers.DeferredRenderer
 
 private val simpleRenderer = DeferredRenderer()
 
-private val particles = object : LwjglWindow() {
+private val particles = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate(width: Int, height: Int) {
         simpleRenderer.onCreate()
         simpleRenderer.onChange(width, height)
@@ -20,8 +20,8 @@ private val particles = object : LwjglWindow() {
     override fun onDraw() {
         simpleRenderer.onDraw()
     }
-}
+}*/
 
 fun main() {
-    particles.show()
+    //particles.show()
 }
