@@ -26,14 +26,15 @@ class Camera(aspectRatio: Float) : Movable {
     }
 
     private val directionBuf = Vector3f()
-    fun lookAt(from: Vector3f, to: Vector3f) {
+    fun lookAt(from: Vector3f, to: Vector3f): Camera {
         viewVersion.increment()
         position.set(from)
         to.sub(from, directionBuf).normalize()
         rotation.lookAlong(directionBuf, VECTOR_UP)
+        return this
     }
 
-    fun lookAt(aabb: AABB) {
+    fun lookAt(aabb: AABB): Camera {
         viewVersion.increment()
         var maxValue = aabb.width
         if (aabb.height > maxValue) {
@@ -44,6 +45,6 @@ class Camera(aspectRatio: Float) : Movable {
         }
         val center = aabb.center
         center.add(Vector3f(0f, maxValue / 2f, maxValue), position)
-        lookAt(position, center)
+        return lookAt(position, center)
     }
 }

@@ -2,7 +2,7 @@ package com.blaster.common
 
 import org.joml.Vector3f
 
-data class AABB (val min: Vector3f, val max: Vector3f) {
+data class AABB (val min: Vector3f = Vector3f(), val max: Vector3f = Vector3f()) {
     val width: Float
         get() = max.x - min.x
 
