@@ -44,7 +44,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {
         simpleTechnique.prepare(shadersLib)
         mesh = GlMesh(triangleVertices, triangleIndices, triangleAttributes)
-        tex1 = texturesLib.loadTexture("textures/winner.png")
+        tex1 = texturesLib.loadTexture("textures/lumina.png")
         tex2 = texturesLib.loadTexture("textures/utah.jpeg")
         model1 = GlModel(mesh, tex1)
         model2 = GlModel(mesh, tex2)
@@ -55,6 +55,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onDraw() {
         model1.tick()
         model2.tick()
+        glState.clear()
         simpleTechnique.draw(camera) {
             simpleTechnique.instance(model1)
             simpleTechnique.instance(model2)

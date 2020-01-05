@@ -41,7 +41,9 @@ enum class GlUniform(val label: String) {
     UNIFORM_LIGHT_14_POS(       "uLights[14].position"),
     UNIFORM_LIGHT_14_COLOR(     "uLights[14].color"),
     UNIFORM_LIGHT_15_POS(       "uLights[15].position"),
-    UNIFORM_LIGHT_15_COLOR(     "uLights[15].color");
+    UNIFORM_LIGHT_15_COLOR(     "uLights[15].color"),
+
+    UNIFORM_CHAR_INDEX(         "uCharIndex");
 
     companion object {
         fun uniformLightPosition(number: Int) = valueOf("UNIFORM_LIGHT_${number}_POS")

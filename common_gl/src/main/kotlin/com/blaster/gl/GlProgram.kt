@@ -94,7 +94,7 @@ class GlProgram(private val vertexShader: GlShader, private val fragmentShader: 
         setUniform(uniform, texture.unit)
     }
 
-    private fun setUniform(uniform: GlUniform, value: Int) {
+    fun setUniform(uniform: GlUniform, value: Int) {
         glCheck { backend.glUniform1i(uniformLocations[uniform]!!, value) }
     }
 

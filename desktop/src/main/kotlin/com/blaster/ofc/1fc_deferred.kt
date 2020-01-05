@@ -1,8 +1,10 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
+import com.blaster.gl.GlLocator
 import com.blaster.gl.GlModel
 import com.blaster.gl.GlState
+import com.blaster.gl.glCheck
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
 import com.blaster.scene.Node
@@ -36,6 +38,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
 
     override fun onDraw() {
         model.tick()
+        glState.clear()
         deferredTechnique.draw(camera) {
             deferredTechnique.instance(model.mesh, model.diffuse, model.calculateModelM())
         }

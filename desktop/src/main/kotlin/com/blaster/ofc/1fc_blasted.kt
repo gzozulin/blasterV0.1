@@ -6,6 +6,8 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 
 // WYSIWYG scene editor
+// https://github.com/SalomonBrys/Kotson
+// reading json every second and placing accordingly
 
 val json = """
     {

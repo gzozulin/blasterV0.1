@@ -2,7 +2,9 @@ package com.blaster.assets
 
 import com.blaster.gl.GlTexture
 
-class TexturesLib (private val assetStream: AssetStream, private val pixelDecoder: PixelDecoder) {
+class TexturesLib (
+        private val assetStream: AssetStream,
+        private val pixelDecoder: PixelDecoder = PixelDecoder()) {
     fun loadTexture(filename: String, unit: Int = 0): GlTexture {
         val decoded = pixelDecoder.decodePixels(assetStream.openAsset(filename))
         val tex = GlTexture(
