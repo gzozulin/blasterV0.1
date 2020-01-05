@@ -36,7 +36,6 @@ private lateinit var tex1: GlTexture
 private lateinit var tex2: GlTexture
 private lateinit var model1: GlModel
 private lateinit var model2: GlModel
-private lateinit var renderlist: List<Node>
 
 private val camera: Camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
         .lookAt(Vector3f(0f, 0f, 2.5f), Vector3f())
@@ -50,14 +49,16 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         model1 = GlModel(mesh, tex1)
         model2 = GlModel(mesh, tex2)
         model1.attach(model2)
-        renderlist = listOf(model1, model2)
         glState.apply(false)
     }
 
     override fun onDraw() {
         model1.tick()
         model2.tick()
-        simpleTechnique.draw(camera, renderlist)
+        simpleTechnique.draw(camera) {
+            simpleTechnique.instance(model1)
+            simpleTechnique.instance(model2)
+        }
     }
 }
 

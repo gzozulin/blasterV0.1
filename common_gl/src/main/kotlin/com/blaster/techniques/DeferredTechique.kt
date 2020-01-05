@@ -86,6 +86,10 @@ class DeferredTechnique {
         }
     }
 
+    fun instance(model: GlModel) {
+        instance(model.mesh, model.diffuse, model.calculateModelM())
+    }
+
     fun instance(mesh: GlMesh, diffuse: GlTexture, modelM: Matrix4f) {
         glBind(listOf(mesh, diffuse)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)

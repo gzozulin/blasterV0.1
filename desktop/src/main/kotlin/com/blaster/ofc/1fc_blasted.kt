@@ -5,41 +5,34 @@ import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-// todo templates -> setup on the scene
+// WYSIWYG scene editor
 
-// template model
-// template light
-// template billboard
-// template ps
-// etc
+val json = """
+    {
+        mesh = "teapot.obj"
+        diffuse = "teapot_diffuse.png"
+        position = 123
+        scale = 123
+        rotation = 123
+        
+        children = {
+            light
+            color = 123
+            position = 2123
+            rotation
+            etc...
+        }
+"""
 
-// general placeholders (aabb) placement
 
-/*private val renderer = DeferredRenderer()
+private val window = object : LwjglWindow(800, 600) {
+    override fun onCreate() {
 
-private val window = object : LwjglWindow(WIDTH, HEIGHT) {
-    override fun onCreate(width: Int, height: Int) {
-        renderer.onCreate()
-        renderer.onChange(width, height)
     }
 
     override fun onDraw() {
-        renderer.onDraw()
+
     }
-}*/
-
-data class MaterialTemplate(
-        val ambientTerm: Vector3f, val specularPower: Float, val diffuseFilename: String)
-
-data class ModelTemplate(
-        val meshFilename: String, val material: MaterialTemplate,
-        val position: Vector3f, val rotation: Quaternionf, val scale: Vector3f)
-
-data class LightTemplate(val vector: Vector3f, val color: Vector3f,
-                         val constantAttenuation: Float, val linearAttenuation: Float, val quadraticAttenuation: Float)
-
-class SceneTemplate {
-
 }
 
 fun main() {
