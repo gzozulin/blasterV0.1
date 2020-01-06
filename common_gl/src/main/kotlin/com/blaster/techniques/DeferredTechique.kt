@@ -27,7 +27,7 @@ class DeferredTechnique {
                 "shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram(
                 "shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        quadMesh = GlMesh.rectPosTex()
+        quadMesh = GlMesh.rect()
         positionStorage = GlTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,

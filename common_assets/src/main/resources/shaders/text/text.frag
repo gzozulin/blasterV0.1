@@ -12,7 +12,7 @@ layout (location = 0) out vec4 oFragColor;
 
 void main() {
     oFragColor = texture(uTexDiffuse, vTexCoord);
-    if (oFragColor.r == 1.0 && oFragColor.g == 1.0 && oFragColor.b == 1.0) {
+    if (oFragColor.a < 0.1) {
         discard;
     }
     oFragColor.r = (1.0 - oFragColor.r) * uColor.r;

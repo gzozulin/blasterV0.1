@@ -24,7 +24,7 @@ class TextTechnique {
     fun prepare() {
         program = shadersLib.loadProgram("shaders/text/text.vert", "shaders/text/text.frag")
         font = textureLib.loadTexture("textures/lumina.png")
-        rect = GlMesh.rectPosTex()
+        rect = GlMesh.rect()
     }
 
     fun draw(call: () -> Unit) {

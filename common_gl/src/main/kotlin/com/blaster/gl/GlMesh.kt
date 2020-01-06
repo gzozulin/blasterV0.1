@@ -49,7 +49,7 @@ class GlMesh(
     }
 
     companion object {
-        fun rectPosTex(): GlMesh {
+        fun rect(): GlMesh {
             // todo: upside down, normalized device space?
             val quadAttributes = listOf(GlAttribute.ATTRIBUTE_POSITION, GlAttribute.ATTRIBUTE_TEXCOORD)
             val quadVertices = floatArrayOf(
@@ -60,6 +60,17 @@ class GlMesh(
             )
             val quadIndices = intArrayOf(0, 1, 2, 1, 3, 2)
             return GlMesh(quadVertices, quadIndices, quadAttributes)
+        }
+
+        fun triangle(): GlMesh {
+            val triangleAttributes = listOf(GlAttribute.ATTRIBUTE_POSITION, GlAttribute.ATTRIBUTE_TEXCOORD)
+            val triangleVertices = floatArrayOf(
+                    0f,  1f, 0f,     0.5f, 0f,
+                    -1f, -1f, 0f,     0f,   1f,
+                    1f, -1f, 0f,     1f,   1f
+            )
+            val triangleIndices = intArrayOf(0, 1, 2)
+            return GlMesh(triangleVertices, triangleIndices, triangleAttributes)
         }
     }
 }
