@@ -7,6 +7,8 @@ import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import org.joml.Vector2f
 import org.joml.Vector3f
+import org.lwjgl.glfw.GLFW
+import org.lwjgl.opencl.INTELDevicePartitionByNames
 
 private val assetStream = AssetStream()
 private val textureLib = TexturesLib(assetStream)
@@ -51,7 +53,36 @@ class TextTechnique {
     }
 }
 
+class Console(private val timeout: Long = 1000L) {
+    private data class Line(val text: String, val timestamp: Long)
+    private val lines = mutableListOf<Line>()
+
+    fun line(text: String) {
+        lines.add(Line(text, System.currentTimeMillis()))
+    }
+
+    fun throttle() {
+        val iterator = lines.iterator()
+        while (iterator.hasNext()) {
+            val current = System.currentTimeMillis()
+            val line = iterator.next()
+            if (current - line.timestamp > timeout) {
+                iterator.remove()
+            }
+        }
+    }
+
+    fun render(callback: (index: Int, text: String) -> Unit) {
+        lines.forEachIndexed { index, line ->
+            callback.invoke(index, line.text)
+        }
+    }
+}
+
 private val technique = TextTechnique()
+private val console = Console(2000L)
+
+const val TEXT_SCALE = 0.025f
 
 private val window = object : LwjglWindow(800, 600) {
     override fun onCreate() {
@@ -61,8 +92,17 @@ private val window = object : LwjglWindow(800, 600) {
 
     override fun onDraw() {
         glState.clear()
+        console.throttle()
         technique.draw {
-            technique.text("Hello, World!", Vector2f(-0.7f, 0.0f), 0.1f, Vector3f(0f, 1f, 0f))
+            console.render { index, text ->
+                technique.text(text, Vector2f(-0.8f, 0.8f - TEXT_SCALE * index * 2f), TEXT_SCALE, Vector3f(0f, 1f, 0f))
+            }
+        }
+    }
+
+    override fun keyPressed(key: Int) {
+        if (key == GLFW.GLFW_KEY_SPACE) {
+            console.line(System.currentTimeMillis().toString())
         }
     }
 }

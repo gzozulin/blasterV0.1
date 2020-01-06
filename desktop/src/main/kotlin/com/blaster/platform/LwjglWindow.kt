@@ -17,11 +17,19 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
     private var errorCallback: GLFWErrorCallback = errorCallbackPrint(System.err)
     private var keyCallback: GLFWKeyCallback = object : GLFWKeyCallback() {
         override fun invoke(window: kotlin.Long, key: kotlin.Int, scancode: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
-                glfwSetWindowShouldClose(window, GL11.GL_TRUE)
+            if (action == GLFW_RELEASE) {
+                if (key == GLFW_KEY_ESCAPE) {
+                    glfwSetWindowShouldClose(window, GL11.GL_TRUE)
+                }
+                keyReleased(key)
+            } else if (action == GLFW_PRESS) {
+                keyPressed(key)
             }
         }
     }
+
+    private var fps = 0
+    private var last = System.currentTimeMillis()
 
     fun show() {
         glfwSetErrorCallback(errorCallback)
@@ -42,6 +50,13 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
             onDraw()
             glfwSwapBuffers(window)
             glfwPollEvents()
+            fps++
+            val current = System.currentTimeMillis()
+            if (current - last > 1000L) {
+                glfwSetWindowTitle(window, "Blaster! $fps fps")
+                last = current
+                fps = 0
+            }
         }
         glfwDestroyWindow(window)
         keyCallback.release()
@@ -49,4 +64,7 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
 
     protected abstract fun onCreate()
     protected abstract fun onDraw()
+
+    open fun keyPressed(key: Int) {}
+    open fun keyReleased(key: Int) {}
 }
