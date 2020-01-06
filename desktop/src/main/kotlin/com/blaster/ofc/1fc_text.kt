@@ -16,7 +16,7 @@ private val shadersLib = ShadersLib(assetStream)
 
 private val glState = GlState()
 
-// todo: Console class: line timeout, error - red, warning - yellow, info - white, success - green, rainbow :)
+// todo: Console class: line timeout, error - red, warning - yellow, info - blue, success - green, rainbow :)
 
 class TextTechnique {
     private lateinit var program: GlProgram
