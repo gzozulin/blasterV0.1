@@ -11,7 +11,7 @@ uniform float uCharScale;
 
 out vec2 vTexCoord;
 
-const float CHAR_STEP = 32.0 / 512.0;
+const float CHAR_STEP = 16.0 / 256.0;
 const int CHARS_IN_ROW  = 16;
 
 void calculateTexCoords() {

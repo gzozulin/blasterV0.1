@@ -11,11 +11,10 @@ uniform vec3 uColor;
 layout (location = 0) out vec4 oFragColor;
 
 void main() {
-    oFragColor = texture(uTexDiffuse, vTexCoord);
-    if (oFragColor.a < 0.1) {
+    vec4 diffuse = texture(uTexDiffuse, vTexCoord);
+    if (diffuse.r < 0.1) {
         discard;
     }
-    oFragColor.r = (1.0 - oFragColor.r) * uColor.r;
-    oFragColor.g = (1.0 - oFragColor.g) * uColor.g;
-    oFragColor.b = (1.0 - oFragColor.b) * uColor.b;
+    oFragColor.rgb = diffuse.rgb * uColor.rgb;
+    oFragColor.a = 1.0;
 }

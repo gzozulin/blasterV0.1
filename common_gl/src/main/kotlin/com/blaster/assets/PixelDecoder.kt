@@ -15,7 +15,7 @@ open class PixelDecoder {
         val byteBuffer = ByteBuffer.allocateDirect(pixelNum * 4).order(ByteOrder.nativeOrder())
         for (y in 0 until bufferedImage.height) {
             for (x in 0 until bufferedImage.width) {
-                val color = Color(bufferedImage.getRGB(x, y))
+                val color = Color(bufferedImage.getRGB(x, y), true)
                 byteBuffer.put(color.red.toByte())
                 byteBuffer.put(color.green.toByte())
                 byteBuffer.put(color.blue.toByte())
