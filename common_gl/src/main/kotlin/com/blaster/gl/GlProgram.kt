@@ -1,12 +1,16 @@
 package com.blaster.gl
 
 import org.joml.Matrix4f
+import org.joml.Vector2f
 import org.joml.Vector3f
 import java.lang.IllegalStateException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 private val backend = GlLocator.locate()
+
+private val bufferVec2 = ByteBuffer.allocateDirect(2 * 4)
+        .order(ByteOrder.nativeOrder())
 
 private val bufferVec3 = ByteBuffer.allocateDirect(3 * 4)
         .order(ByteOrder.nativeOrder())
@@ -100,6 +104,11 @@ class GlProgram(private val vertexShader: GlShader, private val fragmentShader: 
 
     fun setUniform(uniform: GlUniform, value: Float) {
         glCheck { backend.glUniform1f(uniformLocations[uniform]!!, value) }
+    }
+
+    fun setUniform(uniform: GlUniform, value: Vector2f) {
+        value.get(bufferVec2)
+        glCheck { backend.glUniform2fv(uniformLocations[uniform]!!, bufferVec2) }
     }
 
     fun setUniform(uniform: GlUniform, value: Vector3f) {

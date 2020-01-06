@@ -125,6 +125,7 @@ class GlBackendImpl : GlBackend {
     override fun glUseProgram(program: Int) = GLES30.glUseProgram(program)
     override fun glUniform1i(location: Int, x: Int) = GLES30. glUniform1i(location, x)
     override fun glUniform1f(location: Int, x: Float) = GLES30.glUniform1f(location, x)
+    override fun glUniform2fv(location: Int, v: ByteBuffer) = GLES30.glUniform2fv(location, 1, v.asFloatBuffer())
     override fun glUniform3fv(location: Int, v: ByteBuffer) = GLES30.glUniform3fv(location, 1, v.asFloatBuffer())
     override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: ByteBuffer) =
             GLES30.glUniformMatrix4fv(location, count, transpose, value.asFloatBuffer())

@@ -79,6 +79,7 @@ interface GlBackend {
     fun glUseProgram(program: Int)
     fun glUniform1i(location: Int, x: Int)
     fun glUniform1f(location: Int, x: Float)
+    fun glUniform2fv(location: Int, v: ByteBuffer)
     fun glUniform3fv(location: Int, v: ByteBuffer)
     fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: java.nio.ByteBuffer)
 

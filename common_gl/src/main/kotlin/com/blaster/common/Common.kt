@@ -1,7 +1,11 @@
 package com.blaster.common
 
+import org.joml.Vector2f
 import org.joml.Vector3f
 import java.util.*
+
+val VECTOR_2D_CENTER = Vector2f()
+val VECTOR_2D_LEFT = Vector2f(-1f, 0f)
 
 val VECTOR_UP = Vector3f(0f, 1f, 0f)
 

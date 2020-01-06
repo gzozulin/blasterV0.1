@@ -5,6 +5,8 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
+import org.joml.Vector2f
+import org.joml.Vector3f
 
 private val assetStream = AssetStream()
 private val textureLib = TexturesLib(assetStream)
@@ -19,35 +21,6 @@ class TextTechnique {
     private lateinit var font: GlTexture
     private lateinit var rect: GlMesh
 
-    private val table = mapOf(
-            'A' to 177,
-            'B' to 178,
-            'C' to 179,
-            'D' to 180,
-            'E' to 181,
-            'F' to 182,
-            'G' to 183,
-            'H' to 184,
-            'I' to 185,
-            'J' to 186,
-            'K' to 187,
-            'L' to 188,
-            'L' to 189,
-            'M' to 190,
-            'N' to 191,
-            'O' to 192,
-            'P' to 193,
-            'Q' to 194,
-            'R' to 195,
-            'S' to 196,
-            'T' to 197,
-            'U' to 198,
-            'V' to 199,
-            'W' to 200,
-            'X' to 201,
-            'Y' to 202,
-            'Z' to 203)
-
     fun prepare() {
         program = shadersLib.loadProgram("shaders/text/text.vert", "shaders/text/text.frag")
         font = textureLib.loadTexture("textures/lumina.png")
@@ -61,10 +34,20 @@ class TextTechnique {
         }
     }
 
-    fun character(ch: Char) {
-        program.setUniform(GlUniform.UNIFORM_CHAR_INDEX,
-                table[ch] ?: error("Symbol is not found in the table: $ch"))
+    fun character(ch: Char, start: Vector2f, scale: Float, color: Vector3f) {
+        program.setUniform(GlUniform.UNIFORM_CHAR_INDEX, ch.toInt())
+        program.setUniform(GlUniform.UNIFORM_CHAR_START, start)
+        program.setUniform(GlUniform.UNIFORM_CHAR_SCALE, scale)
+        program.setUniform(GlUniform.UNIFORM_COLOR, color)
         rect.draw()
+    }
+
+    private val startBuf = Vector2f()
+    fun text(text: String, start: Vector2f, scale: Float, color: Vector3f) {
+        text.forEachIndexed { index, ch ->
+            startBuf.set(start.x + index * scale, start.y)
+            character(ch, startBuf, scale, color)
+        }
     }
 }
 
@@ -79,7 +62,7 @@ private val window = object : LwjglWindow(800, 600) {
     override fun onDraw() {
         glState.clear()
         technique.draw {
-            technique.character('W')
+            technique.text("Hello, World!", Vector2f(-0.7f, 0.0f), 0.1f, Vector3f(0f, 1f, 0f))
         }
     }
 }
