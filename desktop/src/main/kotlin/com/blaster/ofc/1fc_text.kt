@@ -15,7 +15,7 @@ private val shadersLib = ShadersLib(assetStream)
 
 private val glState = GlState()
 
-// todo: Console class: line timeout, error - red, warning - yellow, info - blue, success - green, rainbow :)
+// todo: Console class: error - red, warning - yellow, info - blue, success - green, rainbow :)
 
 class TextTechnique {
     private lateinit var program: GlProgram
@@ -61,9 +61,9 @@ class Console(private val timeout: Long = 1000L) {
     }
 
     fun throttle() {
+        val current = System.currentTimeMillis()
         val iterator = lines.iterator()
         while (iterator.hasNext()) {
-            val current = System.currentTimeMillis()
             val line = iterator.next()
             if (current - line.timestamp > timeout) {
                 iterator.remove()
