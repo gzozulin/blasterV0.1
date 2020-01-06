@@ -8,7 +8,6 @@ import com.blaster.platform.LwjglWindow
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
-import org.lwjgl.opencl.INTELDevicePartitionByNames
 
 private val assetStream = AssetStream()
 private val textureLib = TexturesLib(assetStream)
