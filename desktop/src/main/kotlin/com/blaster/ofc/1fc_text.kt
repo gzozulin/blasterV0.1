@@ -3,19 +3,14 @@ package com.blaster.ofc
 import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
+import com.blaster.common.extractColors
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
-
-private val assetStream = AssetStream()
-private val textureLib = TexturesLib(assetStream)
-private val shadersLib = ShadersLib(assetStream)
-
-private val glState = GlState()
-
-// todo: Console class: error - red, warning - yellow, info - blue, success - green, rainbow :)
+import java.lang.IllegalArgumentException
+import java.util.*
 
 class TextTechnique {
     private lateinit var program: GlProgram
@@ -53,11 +48,24 @@ class TextTechnique {
 }
 
 class Console(private val timeout: Long = 1000L) {
-    private data class Line(val text: String, val timestamp: Long)
+    enum class Level { FAILURE, INFO, SUCCESS }
+    private data class Line(val text: String, val timestamp: Long, val level: Level)
     private val lines = mutableListOf<Line>()
 
-    fun line(text: String) {
-        lines.add(Line(text, System.currentTimeMillis()))
+    fun line(text: String, level: Level) {
+        lines.add(Line(text, System.currentTimeMillis(), level))
+    }
+
+    fun failure(text: String) {
+        line(text, Level.FAILURE)
+    }
+
+    fun info(text: String) {
+        line(text, Level.INFO)
+    }
+
+    fun success(text: String) {
+        line(text, Level.SUCCESS)
     }
 
     fun throttle() {
@@ -71,17 +79,29 @@ class Console(private val timeout: Long = 1000L) {
         }
     }
 
-    fun render(callback: (index: Int, text: String) -> Unit) {
+    fun render(callback: (index: Int, text: String, level: Level) -> Unit) {
         lines.forEachIndexed { index, line ->
-            callback.invoke(index, line.text)
+            callback.invoke(index, line.text, line.level)
         }
     }
 }
 
+private val assetStream = AssetStream()
+private val textureLib = TexturesLib(assetStream)
+private val shadersLib = ShadersLib(assetStream)
+
+private val glState = GlState()
+
 private val technique = TextTechnique()
 private val console = Console(2000L)
 
-const val TEXT_SCALE = 0.025f
+private val COLOR_FAILURE = extractColors("ffabab")
+private val COLOR_INFO = extractColors("6eb5ff")
+private val COLOR_SUCCESS = extractColors("9ee09e")
+
+private const val TEXT_SCALE = 0.025f
+
+private val random = Random()
 
 private val window = object : LwjglWindow(800, 600) {
     override fun onCreate() {
@@ -93,15 +113,25 @@ private val window = object : LwjglWindow(800, 600) {
         glState.clear()
         console.throttle()
         technique.draw {
-            console.render { index, text ->
-                technique.text(text, Vector2f(-0.8f, 0.8f - TEXT_SCALE * index * 2f), TEXT_SCALE, Vector3f(0f, 1f, 0f))
+            console.render { index, text, level ->
+                val color = when (level) {
+                    Console.Level.FAILURE -> COLOR_FAILURE
+                    Console.Level.INFO -> COLOR_INFO
+                    Console.Level.SUCCESS -> COLOR_SUCCESS
+                }
+                technique.text(text, Vector2f(-0.8f, 0.8f - TEXT_SCALE * index * 2f), TEXT_SCALE, color)
             }
         }
     }
 
     override fun keyPressed(key: Int) {
         if (key == GLFW.GLFW_KEY_SPACE) {
-            console.line(System.currentTimeMillis().toString())
+            when (random.nextInt(3)) {
+                0 -> console.failure(System.currentTimeMillis().toString())
+                1 -> console.info(System.currentTimeMillis().toString())
+                2 -> console.success(System.currentTimeMillis().toString())
+                else -> throw IllegalArgumentException()
+            }
         }
     }
 }
