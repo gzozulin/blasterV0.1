@@ -1,13 +1,10 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
-import com.blaster.gl.GlLocator
 import com.blaster.gl.GlModel
 import com.blaster.gl.GlState
-import com.blaster.gl.glCheck
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
-import com.blaster.scene.Node
 import com.blaster.techniques.DeferredTechnique
 
 private const val WIDTH = 800
