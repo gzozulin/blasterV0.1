@@ -4,15 +4,16 @@ import java.nio.ByteBuffer
 
 class GlLocator {
     companion object {
-        private val INST: GlBackend
+        private var instance: GlBackend? = null
 
-        init {
-            val clazz = Class.forName("com.blaster.gl.GlBackendImpl")
-            val ctor = clazz.getConstructor()
-            INST = ctor.newInstance() as GlBackend
+        fun locate(): GlBackend {
+            if (instance == null) {
+                val clazz = Class.forName("com.blaster.gl.GlBackendImpl")
+                val ctor = clazz.getConstructor()
+                instance = ctor.newInstance() as GlBackend
+            }
+            return instance!!
         }
-
-        fun locate() = INST
     }
 }
 
