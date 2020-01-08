@@ -13,9 +13,9 @@ out float vIsAlive;
 
 void main() {
     vIsAlive = aIsAlive;
-    if (vIsAlive == 0.0) {
-        return;
-    }
+    //if (vIsAlive == 0.0) {
+    //    return;
+    //}
     mat4 mvp =  uProjectionM * uViewM * uModelM;
     gl_Position = mvp * vec4(aPosition, 1.0);
 }
