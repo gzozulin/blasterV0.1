@@ -17,8 +17,6 @@ private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream, pixelDecoder)
 private val modelsLib = ModelsLib(assetStream, texturesLib)
 
-private val glState = GlState()
-
 private val deferredTechnique = DeferredTechnique()
 
 private var camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
@@ -27,7 +25,7 @@ private lateinit var model: Model
 
 private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {
-        glState.apply()
+        GlState.apply()
         deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
         camera.lookAt(model.aabb)
@@ -35,7 +33,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
 
     override fun onDraw() {
         model.tick()
-        glState.clear()
+        GlState.clear()
         deferredTechnique.draw(camera) {
             deferredTechnique.instance(model.mesh, model.diffuse, model.calculateModelM())
         }

@@ -18,8 +18,6 @@ private val assetStream = AssetStream()
 private val textureLib = TexturesLib(assetStream)
 private val shadersLib = ShadersLib(assetStream)
 
-private val glState = GlState()
-
 private val technique = TextTechnique()
 private val console = Console(2000L)
 
@@ -34,11 +32,11 @@ private val random = Random()
 private val window = object : LwjglWindow(800, 600) {
     override fun onCreate() {
         technique.prepare(shadersLib, textureLib)
-        glState.apply()
+        GlState.apply()
     }
 
     override fun onDraw() {
-        glState.clear()
+        GlState.clear()
         console.throttle()
         technique.draw {
             console.render { index, text, level ->

@@ -26,6 +26,7 @@ fun glBind(bindable: GLBindable, action: () -> Unit) {
     bindable.unbind()
 }
 
+// todo: remove creation of the list each frame
 fun glBind(bindables: List<GLBindable>, action: () -> Unit) {
     bindables.forEach { it.bind() }
     action.invoke()

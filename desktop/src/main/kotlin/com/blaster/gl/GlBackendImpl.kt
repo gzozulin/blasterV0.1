@@ -24,6 +24,7 @@ class GlBackendImpl : GlBackend {
     override val GL_UNSIGNED_BYTE:      Int get() = GL11.GL_UNSIGNED_BYTE
     override val GL_BYTE:               Int get() = GL11.GL_BYTE
     override val GL_TRIANGLES:          Int get() = GL11.GL_TRIANGLES
+    override val GL_POINTS:             Int get() = GL11.GL_POINTS
     override val GL_VERTEX_SHADER:      Int get() = GL20.GL_VERTEX_SHADER
     override val GL_FRAGMENT_SHADER:    Int get() = GL20.GL_FRAGMENT_SHADER
     override val GL_COMPILE_STATUS:     Int get() = GL20.GL_COMPILE_STATUS

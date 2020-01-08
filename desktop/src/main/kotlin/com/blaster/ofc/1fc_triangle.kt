@@ -14,8 +14,6 @@ import org.joml.Vector3f
 private const val WIDTH = 800
 private const val HEIGHT = 600
 
-private val glState = GlState()
-
 private val assetStream = AssetStream()
 private val pixelDecoder = PixelDecoder()
 private val texturesLib = TexturesLib(assetStream, pixelDecoder)
@@ -46,14 +44,14 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         model3 = Model(mesh, tex3)
         model1.attach(model2)
         //model2.attach(model3)
-        glState.apply(false)
+        GlState.apply(false)
     }
 
     override fun onDraw() {
         model1.tick()
         model2.tick()
         //model3.tick()
-        glState.clear()
+        GlState.clear()
         simpleTechnique.draw(camera) {
             simpleTechnique.instance(model1)
             simpleTechnique.instance(model2)
