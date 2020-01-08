@@ -1,5 +1,6 @@
 package com.blaster.gl
 
+import android.opengl.GLES11
 import android.opengl.GLES30
 import android.opengl.GLU
 import java.nio.ByteBuffer
@@ -11,6 +12,8 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_TRUE
     override val GL_FALSE: Int
         get() = GLES30.GL_FALSE
+    override val GL_BYTE: Int
+        get() = GLES11.GL_BYTE
 
     override fun gluErrorString(error: Int) = GLU.gluErrorString(error)
     override fun glGetError() = GLES30.glGetError()
@@ -40,6 +43,8 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_ELEMENT_ARRAY_BUFFER
     override val GL_STATIC_DRAW: Int
         get() = GLES30.GL_STATIC_DRAW
+    override val GL_STREAM_DRAW: Int
+        get() = GLES30.GL_STREAM_DRAW
 
     override fun glGenBuffers(): Int {
         val handles = IntArray(1)
@@ -48,8 +53,8 @@ class GlBackendImpl : GlBackend {
     }
 
     override fun glBindBuffer(target: Int, buffer: Int) = GLES30.glBindBuffer(target, buffer)
-    override fun glBufferData(target: Int, size: Long, data: ByteBuffer, usage: Int) =
-            GLES30.glBufferData(target, size.toInt(), data, usage)
+    override fun glBufferData(target: Int, data: ByteBuffer, usage: Int) =
+            GLES30.glBufferData(target, data.limit(), data, usage)
 
     override val GL_FRAMEBUFFER: Int
         get() = GLES30.GL_FRAMEBUFFER

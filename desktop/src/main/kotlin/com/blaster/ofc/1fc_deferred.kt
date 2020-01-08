@@ -1,7 +1,7 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
-import com.blaster.gl.GlModel
+import com.blaster.scene.Model
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
@@ -23,7 +23,7 @@ private val deferredTechnique = DeferredTechnique()
 
 private var camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
 
-private lateinit var model: GlModel
+private lateinit var model: Model
 
 private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {

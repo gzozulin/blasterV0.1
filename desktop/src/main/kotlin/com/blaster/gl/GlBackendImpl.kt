@@ -16,6 +16,7 @@ class GlBackendImpl : GlBackend {
     override val GL_ARRAY_BUFFER:       Int get() = GL15.GL_ARRAY_BUFFER
     override val GL_ELEMENT_ARRAY_BUFFER: Int get() = GL15.GL_ELEMENT_ARRAY_BUFFER
     override val GL_STATIC_DRAW:        Int get() = GL15.GL_STATIC_DRAW
+    override val GL_STREAM_DRAW:        Int get() = GL15.GL_STREAM_DRAW
     override val GL_FRAMEBUFFER:        Int get() = ARBFramebufferObject.GL_FRAMEBUFFER
     override val GL_FRAMEBUFFER_COMPLETE: Int get() = ARBFramebufferObject.GL_FRAMEBUFFER_COMPLETE
     override val GL_FLOAT:              Int get() = GL11.GL_FLOAT
@@ -57,8 +58,8 @@ class GlBackendImpl : GlBackend {
     override fun glClear(mask: Int) = GL11.glClear(mask)
     override fun glGenBuffers(): Int = GL15.glGenBuffers()
     override fun glBindBuffer(target: Int, buffer: Int) = GL15.glBindBuffer(target, buffer)
-    override fun glBufferData(target: Int, size: Long, data: ByteBuffer, usage: Int) =
-            GL15.glBufferData(target, size, data, usage)
+    override fun glBufferData(target: Int, data: ByteBuffer, usage: Int) =
+            GL15.glBufferData(target, data, usage)
     override fun glGenFramebuffers() = ARBFramebufferObject.glGenFramebuffers()
     override fun glBindFramebuffer(target: Int, framebuffer: Int) =
             ARBFramebufferObject.glBindFramebuffer(target, framebuffer)

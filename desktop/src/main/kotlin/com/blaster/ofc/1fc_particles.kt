@@ -1,27 +1,37 @@
 package com.blaster.ofc
 
-/*import com.blaster.platform.LwjglWindow
-import com.blaster.renderers.DeferredRenderer
+import com.blaster.gl.GlBuffer
+import com.blaster.platform.LwjglWindow
 
-// todo: store the current position of particle in the texture object (100x100 tex == 10000 particles)
-// todo: gravity affected particles, ground plane
-// http://www.opengl-tutorial.org/intermediate-tutorials/billboards-particles/particles-instancing/
+// simple particles - all mathematics on cpu, only instancing and points on gpu
 
-// particle: position, ttl, emitted light, forces and etc, texture
+private const val W = 800
+private const val H = 600
 
-private val simpleRenderer = DeferredRenderer()
+class ParticlesTechnique {
+    private lateinit var buffer: GlBuffer
 
-private val particles = object : LwjglWindow(WIDTH, HEIGHT) {
-    override fun onCreate(width: Int, height: Int) {
-        simpleRenderer.onCreate()
-        simpleRenderer.onChange(width, height)
+    fun prepare() {
+
+    }
+
+    fun draw() {
+
+    }
+}
+
+private val technique = ParticlesTechnique()
+
+private val window = object : LwjglWindow(W, H) {
+    override fun onCreate() {
+        technique.prepare()
     }
 
     override fun onDraw() {
-        simpleRenderer.onDraw()
+        technique.draw()
     }
-}*/
+}
 
 fun main() {
-    //particles.show()
+    window.show()
 }

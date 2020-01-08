@@ -7,7 +7,7 @@ import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
-import com.blaster.scene.Node
+import com.blaster.scene.Model
 import com.blaster.techniques.SimpleTechnique
 import org.joml.Vector3f
 
@@ -27,9 +27,9 @@ private lateinit var mesh: GlMesh
 private lateinit var tex1: GlTexture
 private lateinit var tex2: GlTexture
 private lateinit var tex3: GlTexture
-private lateinit var model1: GlModel
-private lateinit var model2: GlModel
-private lateinit var model3: GlModel
+private lateinit var model1: Model
+private lateinit var model2: Model
+private lateinit var model3: Model
 
 private val camera: Camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
         .lookAt(Vector3f(0f, 0f, 2.5f), Vector3f())
@@ -41,9 +41,9 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         tex1 = texturesLib.loadTexture("textures/lumina.png")
         tex2 = texturesLib.loadTexture("textures/utah.jpeg")
         tex3 = texturesLib.loadTexture("textures/winner.png")
-        model1 = GlModel(mesh, tex1)
-        model2 = GlModel(mesh, tex2)
-        model3 = GlModel(mesh, tex3)
+        model1 = Model(mesh, tex1)
+        model2 = Model(mesh, tex2)
+        model3 = Model(mesh, tex3)
         model1.attach(model2)
         //model2.attach(model3)
         glState.apply(false)

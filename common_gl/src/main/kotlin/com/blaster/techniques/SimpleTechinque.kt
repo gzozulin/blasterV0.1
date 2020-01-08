@@ -3,6 +3,7 @@ package com.blaster.techniques
 import com.blaster.assets.ShadersLib
 import com.blaster.gl.*
 import com.blaster.scene.Camera
+import com.blaster.scene.Model
 import org.joml.Matrix4f
 
 private val backend = GlLocator.locate()
@@ -24,7 +25,7 @@ class SimpleTechnique {
         }
     }
 
-    fun instance(model: GlModel) {
+    fun instance(model: Model) {
         instance(model.mesh, model.diffuse, model.calculateModelM())
     }
 

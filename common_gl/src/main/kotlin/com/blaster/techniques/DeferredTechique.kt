@@ -4,6 +4,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.common.randomVector3f
 import com.blaster.gl.*
 import com.blaster.scene.Camera
+import com.blaster.scene.Model
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
@@ -76,7 +77,7 @@ class DeferredTechnique {
         }
     }
 
-    fun instance(model: GlModel) {
+    fun instance(model: Model) {
         instance(model.mesh, model.diffuse, model.calculateModelM())
     }
 
