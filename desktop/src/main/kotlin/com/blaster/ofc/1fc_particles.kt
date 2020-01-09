@@ -85,10 +85,12 @@ private val camera = Camera(W.toFloat() / H.toFloat())
 private val window = object : LwjglWindow(W, H) {
     override fun onCreate() {
         particlesTechnique.prepare(shadersLib, texturesLib)
+        console.info("Particles ready..")
         textTechnique.prepare(shadersLib, texturesLib)
+        console.info("Text ready..")
         camera.lookAt(Vector3f(0f, 0f, 2.5f), Vector3f(0f))
         GlState.apply()
-        console.success("Ready!")
+        console.success("All ready..")
     }
 
     override fun onDraw() {
