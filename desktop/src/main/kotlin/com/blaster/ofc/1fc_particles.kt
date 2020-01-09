@@ -76,18 +76,29 @@ private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
 private val particlesTechnique = ParticlesTechnique()
+private val textTechnique = TextTechnique()
+
+private val console = Console(2000L)
 
 private val camera = Camera(W.toFloat() / H.toFloat())
 
 private val window = object : LwjglWindow(W, H) {
     override fun onCreate() {
         particlesTechnique.prepare(shadersLib, texturesLib)
+        textTechnique.prepare(shadersLib, texturesLib)
         camera.lookAt(Vector3f(0f, 0f, 2.5f), Vector3f(0f))
         GlState.apply()
+        console.success("Ready!")
     }
 
     override fun onDraw() {
         GlState.clear()
+        console.throttle()
+        textTechnique.draw {
+            console.render { position, text, color, scale ->
+                textTechnique.text(text, position, scale, color)
+            }
+        }
         particlesTechnique.draw(camera)
     }
 }
