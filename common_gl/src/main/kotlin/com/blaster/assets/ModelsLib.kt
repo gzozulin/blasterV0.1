@@ -1,10 +1,6 @@
 package com.blaster.assets
 
-import com.blaster.gl.GlAttribute
-import com.blaster.gl.GlMesh
 import com.blaster.scene.Model
-import com.blaster.common.AABB
-import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
@@ -15,7 +11,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
 
-    private val currentVertexList = ArrayList<Float>()
+    private val currentPositionList = ArrayList<Float>()
     private val currentTexCoordList = ArrayList<Float>()
     private val currentNormalList = ArrayList<Float>()
 
@@ -46,14 +42,15 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
                 line = bufferedReader.readLine()
             }
         }
-        val mesh = GlMesh(currentVertices.toFloatArray(), currentIndices.toIntArray(),
-                listOf(GlAttribute.ATTRIBUTE_POSITION, GlAttribute.ATTRIBUTE_TEXCOORD, GlAttribute.ATTRIBUTE_NORMAL))
-        currentVertexList.clear()
+        //val mesh = GlMesh(currentVertices.toFloatArray(), currentIndices.toIntArray(),
+         //       listOf(GlAttribute.ATTRIBUTE_POSITION, GlAttribute.ATTRIBUTE_TEXCOORD, GlAttribute.ATTRIBUTE_NORMAL))
+        currentPositionList.clear()
         currentTexCoordList.clear()
         currentNormalList.clear()
         currentVertices.clear()
         currentIndices.clear()
-        return Model(mesh, texturesLib.loadTexture(diffuseFilename), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
+        //return Model(mesh, texturesLib.loadTexture(diffuseFilename), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
+        TODO()
     }
 
     private fun parseLine(line: String) {
@@ -68,18 +65,18 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
 
     private fun parseVertexAttribute(line: String) {
         when (line[1]) {
-            ' ' -> parseVertex(line)
+            ' ' -> parsePosition(line)
             't' -> parseTexCoordinate(line)
             'n' -> parseNormal(line)
             else -> throw IllegalStateException("Unknown vertex attribute! $line")
         }
     }
 
-    private fun parseVertex(line: String) {
+    private fun parsePosition(line: String) {
         val split = line.split(whitespaceRegex)
-        currentVertexList.add(split[1].toFloat())
-        currentVertexList.add(split[2].toFloat())
-        currentVertexList.add(split[3].toFloat())
+        currentPositionList.add(split[1].toFloat())
+        currentPositionList.add(split[2].toFloat())
+        currentPositionList.add(split[3].toFloat())
     }
 
     private fun parseTexCoordinate(line: String) {
@@ -115,9 +112,9 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
     private fun addVertex(vertex: String) {
         val vertSplit = vertex.split(slashRegex)
         val vertIndex = vertSplit[0].toInt() - 1
-        val vx = currentVertexList[vertIndex * 3 + 0]
-        val vy = currentVertexList[vertIndex * 3 + 1]
-        val vz = currentVertexList[vertIndex * 3 + 2]
+        val vx = currentPositionList[vertIndex * 3 + 0]
+        val vy = currentPositionList[vertIndex * 3 + 1]
+        val vz = currentPositionList[vertIndex * 3 + 2]
         currentVertices.add(vx)
         currentVertices.add(vy)
         currentVertices.add(vz)
