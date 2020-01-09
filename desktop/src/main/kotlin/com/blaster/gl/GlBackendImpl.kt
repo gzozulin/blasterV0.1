@@ -80,6 +80,8 @@ class GlBackendImpl : GlBackend {
             GL20.glEnableVertexAttribArray(index)
     override fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long) =
             GL20.glVertexAttribPointer(indx, size, type, normalized, stride, offset)
+
+    override fun glVertexAttribDivisor(indx: Int, divisor: Int) = GL33.glVertexAttribDivisor(indx, divisor)
     override fun glDisableVertexAttribArray(index: Int) = GL20.glDisableVertexAttribArray(index)
     override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long) =
             GL11.glDrawElements(mode, count, type, offset)

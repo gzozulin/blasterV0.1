@@ -79,6 +79,7 @@ interface GlBackend {
     fun glCheckFramebufferStatus(target: Int): Int
     fun glEnableVertexAttribArray(index: Int)
     fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long)
+    fun glVertexAttribDivisor(indx: Int, divisor: Int)
     fun glDisableVertexAttribArray(index: Int)
     fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long)
     fun glDrawElementsInstanced(mode: Int, count: Int, type: Int, offset: Long, instances: Int)

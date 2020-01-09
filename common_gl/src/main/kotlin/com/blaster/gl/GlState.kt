@@ -16,13 +16,5 @@ class GlState private constructor() {
         fun clear() {
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
         }
-
-        fun draw(mode: Int = backend.GL_TRIANGLES, count: Int) {
-            glCheck { backend.glDrawElements(mode, count, backend.GL_UNSIGNED_INT, 0) }
-        }
-
-        fun drawInstanced(mode: Int = backend.GL_TRIANGLES, count: Int, instances: Int) {
-            glCheck { backend.glDrawElementsInstanced(mode, count, backend.GL_UNSIGNED_INT, 0, instances) }
-        }
     }
 }
