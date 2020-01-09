@@ -20,11 +20,13 @@ private const val H = 600
 
 private val backend = GlLocator.locate()
 
-const val POINTS_CNT = 1000
+const val POINTS_CNT = 10000
 
 private val random = Random()
 
-class ParticlesTechnique {
+// todo: ParticleSystem with BillboardTechnique
+
+class BillboardsTechnique {
     private lateinit var program: GlProgram
     private lateinit var rect: GlMesh
     private lateinit var diffuse: GlTexture
@@ -65,6 +67,7 @@ class ParticlesTechnique {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, Matrix4f().identity()) // todo
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+            program.setUniform(GlUniform.UNIFORM_VIEW_POS, camera.position)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             rect.drawInstanced(instances = POINTS_CNT)
         }
@@ -75,7 +78,7 @@ private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
-private val particlesTechnique = ParticlesTechnique()
+private val particlesTechnique = BillboardsTechnique()
 private val textTechnique = TextTechnique()
 
 private val console = Console(2000L)
@@ -88,7 +91,7 @@ private val window = object : LwjglWindow(W, H) {
         console.info("Particles ready..")
         textTechnique.prepare(shadersLib, texturesLib)
         console.info("Text ready..")
-        camera.lookAt(Vector3f(0f, 0f, 2.5f), Vector3f(0f))
+        camera.lookAt(Vector3f(3f), Vector3f())
         GlState.apply()
         console.success("All ready..")
     }
