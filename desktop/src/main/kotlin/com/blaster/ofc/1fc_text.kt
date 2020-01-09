@@ -21,12 +21,6 @@ private val shadersLib = ShadersLib(assetStream)
 private val technique = TextTechnique()
 private val console = Console(2000L)
 
-private val COLOR_FAILURE = extractColors("ffabab")
-private val COLOR_INFO = extractColors("6eb5ff")
-private val COLOR_SUCCESS = extractColors("9ee09e")
-
-private const val TEXT_SCALE = 0.025f
-
 private val random = Random()
 
 private val window = object : LwjglWindow(800, 600) {
@@ -39,13 +33,8 @@ private val window = object : LwjglWindow(800, 600) {
         GlState.clear()
         console.throttle()
         technique.draw {
-            console.render { index, text, level ->
-                val color = when (level) {
-                    Console.Level.FAILURE -> COLOR_FAILURE
-                    Console.Level.INFO -> COLOR_INFO
-                    Console.Level.SUCCESS -> COLOR_SUCCESS
-                }
-                technique.text(text, Vector2f(-0.8f, 0.8f - TEXT_SCALE * index * 2f), TEXT_SCALE, color)
+            console.render { position, text, color, scale ->
+                technique.text(text, position, scale, color)
             }
         }
     }

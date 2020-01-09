@@ -1,11 +1,25 @@
 package com.blaster.common
 
+import org.joml.Vector2f
+import org.joml.Vector3f
+
+private val COLOR_FAILURE = extractColors("ffabab")
+private val COLOR_INFO = extractColors("6eb5ff")
+private val COLOR_SUCCESS = extractColors("9ee09e")
+
+private const val TEXT_SCALE = 0.025f
+
+private const val START_X = -1 + TEXT_SCALE / 2f
+private const val START_Y = 1 - TEXT_SCALE
+
+private val POSITION = Vector2f()
+
 class Console(private val timeout: Long = 1000L) {
     enum class Level { FAILURE, INFO, SUCCESS }
     private data class Line(val text: String, val timestamp: Long, val level: Level)
     private val lines = mutableListOf<Line>()
 
-    fun line(text: String, level: Level) {
+    private fun line(text: String, level: Level) {
         lines.add(Line(text, System.currentTimeMillis(), level))
     }
 
@@ -32,9 +46,15 @@ class Console(private val timeout: Long = 1000L) {
         }
     }
 
-    fun render(callback: (index: Int, text: String, level: Level) -> Unit) {
+    fun render(callback: (position: Vector2f, text: String, color: Vector3f, scale: Float) -> Unit) {
         lines.forEachIndexed { index, line ->
-            callback.invoke(index, line.text, line.level)
+            val color = when (line.level) {
+                Level.FAILURE -> COLOR_FAILURE
+                Level.INFO -> COLOR_INFO
+                Level.SUCCESS -> COLOR_SUCCESS
+            }
+            POSITION.set(START_X, START_Y - TEXT_SCALE * index * 2f)
+            callback.invoke(POSITION, line.text, color, TEXT_SCALE)
         }
     }
 }
