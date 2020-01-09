@@ -1,12 +1,36 @@
 package com.blaster.assets
 
+import com.blaster.common.AABB
+import com.blaster.gl.*
 import com.blaster.scene.Model
+import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.charset.Charset
+
+private val backend = GlLocator.locate()
+
+private fun arrayListFloatToByteBuffer(list: ArrayList<Float>): ByteBuffer {
+    val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
+    val typed = buffer.asFloatBuffer()
+    list.forEach { typed.put(it) }
+    buffer.position(0)
+    return buffer
+}
+
+private fun arrayListIntToByteBuffer(list: ArrayList<Int>): ByteBuffer {
+    val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
+    val typed = buffer.asIntBuffer()
+    list.forEach { typed.put(it) }
+    buffer.position(0)
+    return buffer
+}
 
 // todo: info about model: vert/ind count, times, progress loading, etc
 // todo: load material from *.mtl
+// todo: use buffers directly
 class ModelsLib (private val assetStream: AssetStream, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
@@ -15,7 +39,9 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
     private val currentTexCoordList = ArrayList<Float>()
     private val currentNormalList = ArrayList<Float>()
 
-    private val currentVertices = ArrayList<Float>()
+    private val currentPositions = ArrayList<Float>()
+    private val currentTexCoords = ArrayList<Float>()
+    private val currentNormals = ArrayList<Float>()
     private val currentIndices = ArrayList<Int>()
 
     private var minX = 0f
@@ -42,15 +68,27 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
                 line = bufferedReader.readLine()
             }
         }
-        //val mesh = GlMesh(currentVertices.toFloatArray(), currentIndices.toIntArray(),
-         //       listOf(GlAttribute.ATTRIBUTE_POSITION, GlAttribute.ATTRIBUTE_TEXCOORD, GlAttribute.ATTRIBUTE_NORMAL))
+        val positionBuff = arrayListFloatToByteBuffer(currentPositions)
+        val texCoordBuff = arrayListFloatToByteBuffer(currentTexCoords)
+        val normalBuff = arrayListFloatToByteBuffer(currentNormals)
+        val indicesBuff = arrayListIntToByteBuffer(currentIndices)
+        val mesh = GlMesh(
+                listOf(
+                        GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),
+                        GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer(backend.GL_ARRAY_BUFFER, texCoordBuff),
+                        GlAttribute.ATTRIBUTE_NORMAL to GlBuffer(backend.GL_ARRAY_BUFFER, normalBuff)
+                ),
+                GlBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indicesBuff), currentIndices.size
+        )
         currentPositionList.clear()
         currentTexCoordList.clear()
         currentNormalList.clear()
-        currentVertices.clear()
+        currentPositions.clear()
+        currentTexCoords.clear()
+        currentNormals.clear()
         currentIndices.clear()
-        //return Model(mesh, texturesLib.loadTexture(diffuseFilename), AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
-        TODO()
+        return Model(mesh, texturesLib.loadTexture(diffuseFilename),
+                AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
     }
 
     private fun parseLine(line: String) {
@@ -96,7 +134,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
         val split = line.split(whitespaceRegex)
         val verticesCnt = split.size - 1
         val indices = ArrayList<Int>()
-        var nextIndex = currentVertices.size / 8 // position, texcoord, normal
+        var nextIndex = currentPositions.size / 3 // x, y, z
         for (vertex in 0 until verticesCnt) {
             addVertex(split[vertex + 1])
             indices.add(nextIndex)
@@ -115,27 +153,27 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
         val vx = currentPositionList[vertIndex * 3 + 0]
         val vy = currentPositionList[vertIndex * 3 + 1]
         val vz = currentPositionList[vertIndex * 3 + 2]
-        currentVertices.add(vx)
-        currentVertices.add(vy)
-        currentVertices.add(vz)
+        currentPositions.add(vx)
+        currentPositions.add(vy)
+        currentPositions.add(vz)
         updateAabb(vx, vy, vz)
         if (vertSplit[1].isNotEmpty()) {
             val texIndex = vertSplit[1].toInt()  - 1
-            currentVertices.add(currentTexCoordList[texIndex  * 2 + 0])
-            currentVertices.add(currentTexCoordList[texIndex  * 2 + 1])
+            currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 0])
+            currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 1])
         } else {
-            currentVertices.add(0f)
-            currentVertices.add(0f)
+            currentTexCoords.add(0f)
+            currentTexCoords.add(0f)
         }
         if (vertSplit[2].isNotEmpty()) {
             val normIndex = vertSplit[2].toInt() - 1
-            currentVertices.add(currentNormalList  [normIndex * 3 + 0])
-            currentVertices.add(currentNormalList  [normIndex * 3 + 1])
-            currentVertices.add(currentNormalList  [normIndex * 3 + 2])
+            currentNormals.add(currentNormalList  [normIndex * 3 + 0])
+            currentNormals.add(currentNormalList  [normIndex * 3 + 1])
+            currentNormals.add(currentNormalList  [normIndex * 3 + 2])
         } else {
-            currentVertices.add(0f)
-            currentVertices.add(0f)
-            currentVertices.add(0f)
+            currentNormals.add(0f)
+            currentNormals.add(0f)
+            currentNormals.add(0f)
         }
     }
 
