@@ -13,14 +13,33 @@ class GlMesh(
                 GlBuffer.create(backend.GL_ARRAY_BUFFER, vertices),
                 GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size, attributes)
 
+    private fun bindVertexPointers(attributes: List<GlAttribute>) {
+        var stride = 0
+        var offset = 0L
+        attributes.forEach { stride += it.size * 4 }
+        attributes.forEach {
+            glCheck {
+                backend.glEnableVertexAttribArray(it.location)
+                backend.glVertexAttribPointer(it.location, it.size, backend.GL_FLOAT, false, stride, offset)
+            }
+            offset += it.size * 4
+        }
+    }
+
+    private fun disableVertexPointers(attributes: List<GlAttribute>) {
+        attributes.forEach {
+            glCheck { backend.glDisableVertexAttribArray(it.location) }
+        }
+    }
+
     override fun bind() {
         indicesBuffer.bind()
         verticesBuffer.bind()
-        GlAttribute.bindVertexPointers(attributes)
+        bindVertexPointers(attributes)
     }
 
     override fun unbind() {
-        GlAttribute.disableVertexPointers(attributes)
+        disableVertexPointers(attributes)
         verticesBuffer.unbind()
         indicesBuffer.unbind()
     }
