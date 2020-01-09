@@ -81,6 +81,7 @@ interface GlBackend {
     fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long)
     fun glDisableVertexAttribArray(index: Int)
     fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long)
+    fun glDrawElementsInstanced(mode: Int, count: Int, type: Int, offset: Long, instances: Int)
     fun glCreateShader(type: Int): Int
     fun glShaderSource(shader: Int, string: String)
     fun glCompileShader(shader: Int)

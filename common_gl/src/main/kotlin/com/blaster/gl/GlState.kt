@@ -20,5 +20,9 @@ class GlState private constructor() {
         fun draw(mode: Int = backend.GL_TRIANGLES, count: Int) {
             glCheck { backend.glDrawElements(mode, count, backend.GL_UNSIGNED_INT, 0) }
         }
+
+        fun drawInstanced(mode: Int = backend.GL_TRIANGLES, count: Int, instances: Int) {
+            glCheck { backend.glDrawElementsInstanced(mode, count, backend.GL_UNSIGNED_INT, 0, instances) }
+        }
     }
 }

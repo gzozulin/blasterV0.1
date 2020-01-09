@@ -2,7 +2,7 @@
 
 precision mediump float;
 
-in float vIsAlive;
+//in float vIsAlive;
 
 in vec2 vTexCoord;
 
@@ -18,5 +18,4 @@ void main() {
     if (oFragColor.a < 0.1) {
         discard;
     }
-    oFragColor = vec4(1, 0, 0, 1);
 }

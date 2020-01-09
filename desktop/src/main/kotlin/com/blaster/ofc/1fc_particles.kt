@@ -33,7 +33,8 @@ class ParticlesTechnique {
     private val attributes = listOf(GlAttribute.ATTRIBUTE_IS_ALIVE, GlAttribute.ATTRIBUTE_POSITION)
 
     fun prepare(shadersLib: ShadersLib, texturesLib: TexturesLib) {
-        program = shadersLib.loadProgram("shaders/particles/particles.vert", "shaders/particles/particles.frag")
+        program = shadersLib.loadProgram(
+                "shaders/particles/particles.vert", "shaders/particles/particles.frag")
         val buffer = ByteBuffer.allocateDirect(POINTS_CNT * 4 * 4) // 1000 * vec4f
         val floats = buffer.asFloatBuffer()
         for (i in 0 until POINTS_CNT) {
@@ -43,18 +44,25 @@ class ParticlesTechnique {
             floats.put(randomFloat(-1f, 1f))
         }
         buffer.position(0)
-        rect = GlMesh.rect()
+        rect = GlMesh.triangle()
         offsets = GlBuffer(backend.GL_ARRAY_BUFFER, buffer, backend.GL_STATIC_DRAW)
         diffuse = texturesLib.loadTexture("textures/winner.png")
     }
 
     fun draw(camera: Camera) {
-        glBind(listOf(rect, program, offsets)) {
+        glBind(listOf(program, rect, diffuse, offsets)) {
+
+            // todo array pointers
+
+
+            program.setUniform(GlUniform.UNIFORM_MODEL_M, Matrix4f().identity()) // todo
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
-            program.setUniform(GlUniform.UNIFORM_MODEL_M, Matrix4f().identity()) // todo
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
-            rect.draw()
+
+
+
+
         }
     }
 }
@@ -70,7 +78,7 @@ private val camera = Camera(W.toFloat() / H.toFloat())
 private val window = object : LwjglWindow(W, H) {
     override fun onCreate() {
         technique.prepare(shadersLib, texturesLib)
-        camera.lookAt(Vector3f(-3f), Vector3f(0f))
+        camera.lookAt(Vector3f(0f, 0f, 2.5f), Vector3f(0f))
         GlState.apply()
     }
 

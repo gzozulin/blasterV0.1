@@ -83,6 +83,9 @@ class GlBackendImpl : GlBackend {
     override fun glDisableVertexAttribArray(index: Int) = GL20.glDisableVertexAttribArray(index)
     override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long) =
             GL11.glDrawElements(mode, count, type, offset)
+
+    override fun glDrawElementsInstanced(mode: Int, count: Int, type: Int, offset: Long, instances: Int) =
+            GL31.glDrawElementsInstanced(mode, count, type, offset, instances)
     override fun glCreateShader(type: Int): Int = GL20.glCreateShader(type)
     override fun glShaderSource(shader: Int, string: String) = GL20.glShaderSource(shader, string)
     override fun glCompileShader(shader: Int) = GL20.glCompileShader(shader)
