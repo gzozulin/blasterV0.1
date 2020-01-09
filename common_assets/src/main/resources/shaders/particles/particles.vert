@@ -22,5 +22,5 @@ void main() {
         return;
     }
     mat4 mvp =  uProjectionM * uViewM * uModelM;
-    gl_Position = mvp * vec4(aPosition, 1.0);
+    gl_Position = mvp * vec4(aPosition + aParticlePosition, 1.0);
 }
