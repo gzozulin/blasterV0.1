@@ -12,7 +12,7 @@ import java.nio.charset.Charset
 
 private val backend = GlLocator.locate()
 
-private fun arrayListFloatToByteBuffer(list: ArrayList<Float>): ByteBuffer {
+private fun arrayListFloatToByteBuffer(list: List<Float>): ByteBuffer {
     val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
     val typed = buffer.asFloatBuffer()
     list.forEach { typed.put(it) }
@@ -20,7 +20,7 @@ private fun arrayListFloatToByteBuffer(list: ArrayList<Float>): ByteBuffer {
     return buffer
 }
 
-private fun arrayListIntToByteBuffer(list: ArrayList<Int>): ByteBuffer {
+private fun arrayListIntToByteBuffer(list: List<Int>): ByteBuffer {
     val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
     val typed = buffer.asIntBuffer()
     list.forEach { typed.put(it) }
@@ -35,14 +35,14 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
 
-    private val currentPositionList = ArrayList<Float>()
-    private val currentTexCoordList = ArrayList<Float>()
-    private val currentNormalList = ArrayList<Float>()
+    private val currentPositionList = mutableListOf<Float>()
+    private val currentTexCoordList = mutableListOf<Float>()
+    private val currentNormalList = mutableListOf<Float>()
 
-    private val currentPositions = ArrayList<Float>()
-    private val currentTexCoords = ArrayList<Float>()
-    private val currentNormals = ArrayList<Float>()
-    private val currentIndices = ArrayList<Int>()
+    private val currentPositions = mutableListOf<Float>()
+    private val currentTexCoords = mutableListOf<Float>()
+    private val currentNormals = mutableListOf<Float>()
+    private val currentIndices = mutableListOf<Int>()
 
     private var minX = 0f
     private var minY = 0f
