@@ -50,15 +50,15 @@ class CameraController(private val sensitivity: Float = 0.005f) {
     val direction = Vector3f(0f, 0f, -1f)
 
     fun yaw(radians: Float) {
-        yaw += radians * sensitivity
+        yaw += (radians * sensitivity)
     }
 
     fun pitch(radians: Float) {
-        pitch += radians * sensitivity
+        pitch += (radians * sensitivity)
     }
 
     fun roll(radians: Float) {
-        roll += radians * sensitivity
+        roll += (radians * sensitivity)
     }
 
     fun apply(apply: (position: Vector3f, direction: Vector3f) -> Unit) {
@@ -85,19 +85,16 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         model2 = Model(mesh, tex2)
         model3 = Model(mesh, tex3)
         model1.attach(model2)
-        //model2.attach(model3)
         GlState.apply(false)
     }
 
     override fun onDraw() {
-        //cameraController.yaw(0.001f)
         cameraController.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
         model1.tick()
         model2.tick()
-        //model3.tick()
         GlState.clear()
         simpleTechnique.draw(camera) {
             simpleTechnique.instance(model1)
@@ -107,7 +104,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        cameraController.yaw(-delta.x)
+        cameraController.yaw(delta.x)
         cameraController.pitch(-delta.y)
     }
 }

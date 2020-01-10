@@ -9,8 +9,6 @@ import org.lwjgl.glfw.GLFWvidmode
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GLContext
 import org.lwjgl.system.MemoryUtil.NULL
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 
 abstract class LwjglWindow(private val width: Int, private val height: Int) {
     init {
@@ -37,19 +35,14 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
     private val cursorCallback = object : GLFWCursorPosCallback() {
         override fun invoke(window: kotlin.Long, xpos: kotlin.Double, ypos: kotlin.Double) {
             currentPos.set(xpos.toFloat(), ypos.toFloat())
+            if (lastCursorPos.x == 0f && lastCursorPos.y == 0f) {
+                lastCursorPos.set(xpos.toFloat(), ypos.toFloat())
+            }
             onCursorPos(currentPos)
             currentPos.sub(lastCursorPos, lastCursorPos)
             onCursorDelta(lastCursorPos)
             lastCursorPos.set(currentPos)
         }
-    }
-
-    private fun updateCursorPosition(window: Long) {
-        val xbuff = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
-        val ybuff = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
-        glfwGetCursorPos(window, xbuff, ybuff)
-        currentPos.x = xbuff.asDoubleBuffer().get().toFloat()
-        currentPos.y = ybuff.asDoubleBuffer().get().toFloat()
     }
 
     private var fps = 0
@@ -62,7 +55,6 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
         glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE)
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE)
         val window = glfwCreateWindow(width, height, "Blaster!", NULL, NULL)
-        updateCursorPosition(window)
         glfwSetKeyCallback(window, keyCallback)
         glfwSetCursorPosCallback(window, cursorCallback)
         val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
