@@ -4,6 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
+import com.blaster.common.VECTOR_UP
 import com.blaster.gl.GlMesh
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
@@ -14,6 +15,7 @@ import com.blaster.techniques.SimpleTechnique
 import org.joml.Math
 import org.joml.Vector2f
 import org.joml.Vector3f
+import org.lwjgl.glfw.GLFW
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -34,6 +36,8 @@ private lateinit var tex3: GlTexture
 private lateinit var model1: Model
 private lateinit var model2: Model
 private lateinit var model3: Model
+
+private const val VELOCITY = 0.05f
 
 class CameraController(private val sensitivity: Float = 0.005f) {
     var w = false
@@ -61,10 +65,35 @@ class CameraController(private val sensitivity: Float = 0.005f) {
         roll += (radians * sensitivity)
     }
 
-    fun apply(apply: (position: Vector3f, direction: Vector3f) -> Unit) {
+    private fun updatePosition() {
+        delta.zero()
+        if (w) {
+            delta.set(direction).mul(VELOCITY)
+        }
+        if (a) {
+            VECTOR_UP.cross(direction, delta)
+            delta.normalize().mul(VELOCITY)
+        }
+        if (s) {
+            direction.negate(delta).mul(VELOCITY)
+        }
+        if (d) {
+            VECTOR_UP.cross(direction, delta)
+            delta.normalize().negate().mul(VELOCITY)
+        }
+        position.add(delta)
+    }
+
+    private fun updateDirection() {
         direction.x = cos(yaw) * cos(pitch)
         direction.y = sin(pitch)
         direction.z = sin(yaw) * cos(pitch)
+    }
+
+    private val delta = Vector3f()
+    fun apply(apply: (position: Vector3f, direction: Vector3f) -> Unit) {
+        updatePosition()
+        updateDirection()
         apply.invoke(position, direction)
     }
 }
@@ -106,6 +135,24 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCursorDelta(delta: Vector2f) {
         cameraController.yaw(delta.x)
         cameraController.pitch(-delta.y)
+    }
+
+    override fun keyPressed(key: Int) {
+        when (key) {
+            GLFW.GLFW_KEY_W -> cameraController.w = true
+            GLFW.GLFW_KEY_A -> cameraController.a = true
+            GLFW.GLFW_KEY_S -> cameraController.s = true
+            GLFW.GLFW_KEY_D -> cameraController.d = true
+        }
+    }
+
+    override fun keyReleased(key: Int) {
+        when (key) {
+            GLFW.GLFW_KEY_W -> cameraController.w = false
+            GLFW.GLFW_KEY_A -> cameraController.a = false
+            GLFW.GLFW_KEY_S -> cameraController.s = false
+            GLFW.GLFW_KEY_D -> cameraController.d = false
+        }
     }
 }
 
