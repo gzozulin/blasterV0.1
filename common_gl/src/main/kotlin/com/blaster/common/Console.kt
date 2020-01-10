@@ -14,6 +14,8 @@ private const val START_Y = 1 - TEXT_SCALE
 
 private val POSITION = Vector2f()
 
+// todo: stick something by id and remove it after
+
 class Console(private val timeout: Long = 1000L) {
     enum class Level { FAILURE, INFO, SUCCESS }
     private data class Line(val text: String, val timestamp: Long, val level: Level)

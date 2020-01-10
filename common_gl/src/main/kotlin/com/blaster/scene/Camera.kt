@@ -47,4 +47,14 @@ class Camera(aspectRatio: Float) : Movable {
         center.add(Vector3f(0f, maxValue / 2f, maxValue), position)
         return lookAt(position, center)
     }
+
+    fun setPosition(newPostion: Vector3f) {
+        viewVersion.increment()
+        position.set(newPostion)
+    }
+
+    fun lookAlong(direction: Vector3f) {
+        viewVersion.increment()
+        rotation.identity().lookAlong(direction, VECTOR_UP)
+    }
 }

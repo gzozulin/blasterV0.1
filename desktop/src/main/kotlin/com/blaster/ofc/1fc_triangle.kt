@@ -4,12 +4,18 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.gl.*
+import com.blaster.gl.GlMesh
+import com.blaster.gl.GlState
+import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
 import com.blaster.scene.Model
 import com.blaster.techniques.SimpleTechnique
+import org.joml.Math
+import org.joml.Vector2f
 import org.joml.Vector3f
+import kotlin.math.cos
+import kotlin.math.sin
 
 private const val WIDTH = 800
 private const val HEIGHT = 600
@@ -29,11 +35,47 @@ private lateinit var model1: Model
 private lateinit var model2: Model
 private lateinit var model3: Model
 
+class CameraController(private val sensitivity: Float = 0.005f) {
+    var w = false
+    var a = false
+    var s = false
+    var d = false
+
+    val position = Vector3f()
+
+    private var yaw = Math.toRadians(-90.0).toFloat()
+    private var pitch = 0f
+    private var roll = 0f
+
+    val direction = Vector3f(0f, 0f, -1f)
+
+    fun yaw(radians: Float) {
+        yaw += radians * sensitivity
+    }
+
+    fun pitch(radians: Float) {
+        pitch += radians * sensitivity
+    }
+
+    fun roll(radians: Float) {
+        roll += radians * sensitivity
+    }
+
+    fun apply(apply: (position: Vector3f, direction: Vector3f) -> Unit) {
+        direction.x = cos(yaw) * cos(pitch)
+        direction.y = sin(pitch)
+        direction.z = sin(yaw) * cos(pitch)
+        apply.invoke(position, direction)
+    }
+}
+
+private val cameraController = CameraController()
+
 private val camera: Camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
-        .lookAt(Vector3f(0f, 0f, 2.5f), Vector3f())
 
 private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {
+        cameraController.position.set(Vector3f(0f, 0f, 3f))
         simpleTechnique.prepare(shadersLib)
         mesh = GlMesh.triangle()
         tex1 = texturesLib.loadTexture("textures/lumina.png")
@@ -48,6 +90,11 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     }
 
     override fun onDraw() {
+        //cameraController.yaw(0.001f)
+        cameraController.apply { position, direction ->
+            camera.setPosition(position)
+            camera.lookAlong(direction)
+        }
         model1.tick()
         model2.tick()
         //model3.tick()
@@ -57,6 +104,11 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
             simpleTechnique.instance(model2)
             simpleTechnique.instance(model3)
         }
+    }
+
+    override fun onCursorDelta(delta: Vector2f) {
+        cameraController.yaw(-delta.x)
+        cameraController.pitch(-delta.y)
     }
 }
 
