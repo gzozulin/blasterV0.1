@@ -72,7 +72,7 @@ class DeferredTechnique {
             draw.invoke()
         }
         glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
-            programLightPass.setUniform(GlUniform.UNIFORM_VIEW_POS, camera.position)
+            programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
             quadMesh.draw()
         }
     }

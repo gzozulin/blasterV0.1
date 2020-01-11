@@ -4,7 +4,7 @@ enum class GlUniform(val label: String) {
     UNIFORM_MODEL_M(            "uModelM"),
     UNIFORM_PROJ_M(             "uProjectionM"),
     UNIFORM_VIEW_M(             "uViewM"),
-    UNIFORM_VIEW_POS(           "uViewPosition"),
+    UNIFORM_EYE(                "uEye"),
 
     UNIFORM_TEXTURE_POSITION(   "uTexPosition"),
     UNIFORM_TEXTURE_NORMAL(     "uTexNormal"),

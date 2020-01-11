@@ -4,22 +4,22 @@ precision mediump float;
 
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aTexCoord;
-layout (location = 4) in float aIsAlive;
-layout (location = 5) in vec3 aParticlePosition;
+layout (location = 4) in float aIsEnabled;
+layout (location = 5) in vec3 aBillbPos;
 
 uniform mat4 uModelM;
 uniform mat4 uProjectionM;
 uniform mat4 uViewM;
 
-uniform vec3 uViewPosition;
+uniform vec3 uEye;
 
-out float vIsAlive;
+out float vIsEnabled;
 
 out vec2 vTexCoord;
 
 mat4 billboardM() {
-    vec3 from = uViewPosition;
-    vec3 to = aParticlePosition;
+    vec3 from = uEye;
+    vec3 to = aBillbPos;
 
     vec3 forward = normalize(from - to);
     vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), forward));
@@ -42,7 +42,7 @@ mat4 billboardM() {
 }
 
 void main() {
-    vIsAlive = aIsAlive;
+    vIsEnabled = aIsEnabled;
     vTexCoord = aTexCoord;
     gl_Position = uProjectionM * uViewM * uModelM * billboardM() * vec4(aPosition, 1.0);
 }

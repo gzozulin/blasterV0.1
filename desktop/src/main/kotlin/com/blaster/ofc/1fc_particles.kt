@@ -50,7 +50,7 @@ class BillboardsTechnique {
             floats.put(1f)
         }
         buffer.position(0)
-        return GlAttribute.ATTRIBUTE_PARTICLE_IS_ALIVE to GlBuffer(backend.GL_ARRAY_BUFFER, buffer)
+        return GlAttribute.ATTRIBUTE_BILLBOARD_IS_ENABLED to GlBuffer(backend.GL_ARRAY_BUFFER, buffer)
     }
 
     private fun createParticlePositions(): Pair<GlAttribute, GlBuffer> {
@@ -63,7 +63,7 @@ class BillboardsTechnique {
             floats.put(randomFloat(-1f, 1f))
         }
         buffer.position(0)
-        return GlAttribute.ATTRIBUTE_PARTICLE_POSITION to  GlBuffer(backend.GL_ARRAY_BUFFER, buffer)
+        return GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to  GlBuffer(backend.GL_ARRAY_BUFFER, buffer)
     }
 
     fun draw(camera: Camera) {
@@ -71,7 +71,7 @@ class BillboardsTechnique {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, Matrix4f().identity()) // todo
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
-            program.setUniform(GlUniform.UNIFORM_VIEW_POS, camera.position)
+            program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             rect.drawInstanced(instances = POINTS_CNT)
         }

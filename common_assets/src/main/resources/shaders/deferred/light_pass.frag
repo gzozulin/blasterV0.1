@@ -8,7 +8,7 @@ uniform sampler2D uTexPosition;
 uniform sampler2D uTexNormal;
 uniform sampler2D uTexDiffuse;
 
-uniform vec3 uViewPosition;
+uniform vec3 uEye;
 
 struct Light {
     vec3 position;
@@ -38,7 +38,7 @@ void main()
     vec3 fragNormal = texture(uTexNormal, vTexCoord).rgb;
     vec3 fragDiffuse = texture(uTexDiffuse, vTexCoord).rgb;
 
-    vec3 viewDir  = normalize(uViewPosition - fragPosition);
+    vec3 viewDir  = normalize(uEye - fragPosition);
     vec3 lighting  = vec3(ambientTerm);
 
     for (int i = 0; i < LIGHTS_CNT; ++i) {
