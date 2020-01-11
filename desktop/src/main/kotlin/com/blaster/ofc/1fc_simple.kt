@@ -4,7 +4,6 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.common.VECTOR_UP
 import com.blaster.gl.GlMesh
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
@@ -13,12 +12,9 @@ import com.blaster.scene.Camera
 import com.blaster.scene.Controller
 import com.blaster.scene.Model
 import com.blaster.techniques.SimpleTechnique
-import org.joml.Math
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
-import kotlin.math.cos
-import kotlin.math.sin
 
 private const val WIDTH = 800
 private const val HEIGHT = 600
@@ -38,13 +34,13 @@ private lateinit var model1: Model
 private lateinit var model2: Model
 private lateinit var model3: Model
 
-private val cameraController = Controller()
+private val controller = Controller()
 
 private val camera: Camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
 
 private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {
-        cameraController.position.set(Vector3f(0f, 0f, 3f))
+        controller.position.set(Vector3f(0f, 0f, 3f))
         simpleTechnique.prepare(shadersLib)
         mesh = GlMesh.triangle()
         tex1 = texturesLib.loadTexture("textures/lumina.png")
@@ -58,7 +54,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     }
 
     override fun onDraw() {
-        cameraController.apply { position, direction ->
+        controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
@@ -73,25 +69,29 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        cameraController.yaw(delta.x)
-        cameraController.pitch(-delta.y)
+        controller.yaw(delta.x)
+        controller.pitch(-delta.y)
     }
 
     override fun keyPressed(key: Int) {
         when (key) {
-            GLFW.GLFW_KEY_W -> cameraController.w = true
-            GLFW.GLFW_KEY_A -> cameraController.a = true
-            GLFW.GLFW_KEY_S -> cameraController.s = true
-            GLFW.GLFW_KEY_D -> cameraController.d = true
+            GLFW.GLFW_KEY_W -> controller.w = true
+            GLFW.GLFW_KEY_A -> controller.a = true
+            GLFW.GLFW_KEY_S -> controller.s = true
+            GLFW.GLFW_KEY_D -> controller.d = true
+            GLFW.GLFW_KEY_E -> controller.e = true
+            GLFW.GLFW_KEY_Q -> controller.q = true
         }
     }
 
     override fun keyReleased(key: Int) {
         when (key) {
-            GLFW.GLFW_KEY_W -> cameraController.w = false
-            GLFW.GLFW_KEY_A -> cameraController.a = false
-            GLFW.GLFW_KEY_S -> cameraController.s = false
-            GLFW.GLFW_KEY_D -> cameraController.d = false
+            GLFW.GLFW_KEY_W -> controller.w = false
+            GLFW.GLFW_KEY_A -> controller.a = false
+            GLFW.GLFW_KEY_S -> controller.s = false
+            GLFW.GLFW_KEY_D -> controller.d = false
+            GLFW.GLFW_KEY_E -> controller.e = false
+            GLFW.GLFW_KEY_Q -> controller.q = false
         }
     }
 }

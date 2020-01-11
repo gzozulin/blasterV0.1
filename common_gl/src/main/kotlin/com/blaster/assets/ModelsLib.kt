@@ -120,7 +120,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
     private fun parseTexCoordinate(line: String) {
         val split = line.split(whitespaceRegex)
         currentTexCoordList.add(split[1].toFloat())
-        currentTexCoordList.add(1f - split[2].toFloat())
+        currentTexCoordList.add(split[2].toFloat())
     }
 
     private fun parseNormal(line: String) {

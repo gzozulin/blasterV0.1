@@ -25,8 +25,8 @@ class GlTexture(
         glCheck { backend.glTexImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, pixels) }
         glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MIN_FILTER, backend.GL_NEAREST) }
         glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MAG_FILTER, backend.GL_NEAREST) }
-        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_S, backend.GL_REPEAT) }
-        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_T, backend.GL_REPEAT) }
+        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_S, backend.GL_REPEAT) } // todo: mirrored repeat
+        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_T, backend.GL_REPEAT) } // todo: mirrored repeat
         glCheck { backend.glBindTexture(target, 0) }
     }
 

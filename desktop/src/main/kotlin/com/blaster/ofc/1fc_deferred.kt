@@ -23,7 +23,7 @@ private val modelsLib = ModelsLib(assetStream, texturesLib)
 
 private val deferredTechnique = DeferredTechnique()
 
-private val cameraController = Controller(velocity = 0.05f)
+private val controller = Controller(velocity = 0.05f)
 
 private var camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
 
@@ -31,14 +31,14 @@ private lateinit var model: Model
 
 private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {
-        cameraController.position.set(Vector3f(0.5f, 3f, 3f))
+        controller.position.set(Vector3f(0.5f, 3f, 3f))
         GlState.apply()
         deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
     }
 
     override fun onDraw() {
-        cameraController.apply { position, direction ->
+        controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
@@ -49,29 +49,29 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        cameraController.yaw(delta.x)
-        cameraController.pitch(-delta.y)
+        controller.yaw(delta.x)
+        controller.pitch(-delta.y)
     }
 
     override fun keyPressed(key: Int) {
         when (key) {
-            GLFW.GLFW_KEY_W -> cameraController.w = true
-            GLFW.GLFW_KEY_A -> cameraController.a = true
-            GLFW.GLFW_KEY_S -> cameraController.s = true
-            GLFW.GLFW_KEY_D -> cameraController.d = true
-            GLFW.GLFW_KEY_E -> cameraController.e = true
-            GLFW.GLFW_KEY_Q -> cameraController.q = true
+            GLFW.GLFW_KEY_W -> controller.w = true
+            GLFW.GLFW_KEY_A -> controller.a = true
+            GLFW.GLFW_KEY_S -> controller.s = true
+            GLFW.GLFW_KEY_D -> controller.d = true
+            GLFW.GLFW_KEY_E -> controller.e = true
+            GLFW.GLFW_KEY_Q -> controller.q = true
         }
     }
 
     override fun keyReleased(key: Int) {
         when (key) {
-            GLFW.GLFW_KEY_W -> cameraController.w = false
-            GLFW.GLFW_KEY_A -> cameraController.a = false
-            GLFW.GLFW_KEY_S -> cameraController.s = false
-            GLFW.GLFW_KEY_D -> cameraController.d = false
-            GLFW.GLFW_KEY_E -> cameraController.e = false
-            GLFW.GLFW_KEY_Q -> cameraController.q = false
+            GLFW.GLFW_KEY_W -> controller.w = false
+            GLFW.GLFW_KEY_A -> controller.a = false
+            GLFW.GLFW_KEY_S -> controller.s = false
+            GLFW.GLFW_KEY_D -> controller.d = false
+            GLFW.GLFW_KEY_E -> controller.e = false
+            GLFW.GLFW_KEY_Q -> controller.q = false
         }
     }
 }
