@@ -6,13 +6,13 @@ import org.joml.Vector3f
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val VELOCITY = 0.01f
-
-class Controller(private val sensitivity: Float = 0.005f) {
+class Controller(private val sensitivity: Float = 0.005f, private val velocity: Float = 0.01f) {
     var w = false
     var a = false
     var s = false
     var d = false
+    var q = false
+    var e = false
 
     val position = Vector3f()
 
@@ -20,7 +20,7 @@ class Controller(private val sensitivity: Float = 0.005f) {
     private var pitch = 0f
     private var roll = 0f
 
-    val direction = Vector3f(0f, 0f, -1f)
+    val forward = Vector3f(0f, 0f, -1f)
 
     fun yaw(radians: Float) {
         yaw += (radians * sensitivity)
@@ -35,40 +35,52 @@ class Controller(private val sensitivity: Float = 0.005f) {
     }
 
     private val delta = Vector3f()
-    private val temp = Vector3f()
+    private val back = Vector3f()
+    private val right = Vector3f()
+    private val left = Vector3f()
+    private val up = Vector3f()
+    private val down = Vector3f()
     private fun updatePosition() {
         delta.zero()
-        temp.zero()
+        VECTOR_UP.cross(forward, right)
+        right.normalize()
+        forward.negate(back)
+        VECTOR_UP.cross(forward, left)
+        left.normalize().negate()
+        forward.cross(right, up)
+        up.normalize()
+        up.negate(down)
         if (w) {
-            delta.add(direction)
+            delta.add(forward)
         }
         if (a) {
-            VECTOR_UP.cross(direction, temp)
-            temp.normalize()
-            delta.add(temp)
+            delta.add(right)
         }
         if (s) {
-            direction.negate(temp)
-            delta.add(temp)
+            delta.add(back)
         }
         if (d) {
-            VECTOR_UP.cross(direction, temp)
-            temp.normalize().negate()
-            delta.add(temp)
+            delta.add(left)
         }
-        delta.mul(VELOCITY)
+        if (q) {
+            delta.add(down)
+        }
+        if (e) {
+            delta.add(up)
+        }
+        delta.mul(velocity)
         position.add(delta)
     }
 
     private fun updateDirection() {
-        direction.x = cos(yaw) * cos(pitch)
-        direction.y = sin(pitch)
-        direction.z = sin(yaw) * cos(pitch)
+        forward.x = cos(yaw) * cos(pitch)
+        forward.y = sin(pitch)
+        forward.z = sin(yaw) * cos(pitch)
     }
 
     fun apply(apply: (position: Vector3f, direction: Vector3f) -> Unit) {
         updatePosition()
         updateDirection()
-        apply.invoke(position, direction)
+        apply.invoke(position, forward)
     }
 }

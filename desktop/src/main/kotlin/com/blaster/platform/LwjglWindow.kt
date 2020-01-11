@@ -9,6 +9,8 @@ import org.lwjgl.glfw.GLFWvidmode
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GLContext
 import org.lwjgl.system.MemoryUtil.NULL
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 
 abstract class LwjglWindow(private val width: Int, private val height: Int) {
     init {
@@ -30,19 +32,26 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
         }
     }
 
+    private val xbuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
+    private val xbufDouble = xbuf.asDoubleBuffer()
+    private val ybuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
+    private val ybufDouble = ybuf.asDoubleBuffer()
     private val currentPos = Vector2f()
     private val lastCursorPos = Vector2f()
-    private val cursorCallback = object : GLFWCursorPosCallback() {
-        override fun invoke(window: kotlin.Long, xpos: kotlin.Double, ypos: kotlin.Double) {
-            currentPos.set(xpos.toFloat(), ypos.toFloat())
-            if (lastCursorPos.x == 0f && lastCursorPos.y == 0f) {
-                lastCursorPos.set(xpos.toFloat(), ypos.toFloat())
-            }
-            onCursorPos(currentPos)
-            currentPos.sub(lastCursorPos, lastCursorPos)
-            onCursorDelta(lastCursorPos)
-            lastCursorPos.set(currentPos)
+    private fun updateCursor(window: Long) {
+        xbuf.rewind()
+        xbufDouble.rewind()
+        ybuf.rewind()
+        ybufDouble.rewind()
+        glfwGetCursorPos(window, xbuf, ybuf)
+        currentPos.set(xbufDouble.get().toFloat(), ybufDouble.get().toFloat())
+        if (lastCursorPos.x == 0f && lastCursorPos.y == 0f) {
+            lastCursorPos.set(currentPos.x, currentPos.y)
         }
+        onCursorPos(currentPos)
+        currentPos.sub(lastCursorPos, lastCursorPos)
+        onCursorDelta(lastCursorPos)
+        lastCursorPos.set(currentPos)
     }
 
     private var fps = 0
@@ -56,7 +65,6 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE)
         val window = glfwCreateWindow(width, height, "Blaster!", NULL, NULL)
         glfwSetKeyCallback(window, keyCallback)
-        glfwSetCursorPosCallback(window, cursorCallback)
         val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
         glfwSetWindowPos(window, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
         glfwMakeContextCurrent(window)
@@ -65,6 +73,7 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
         GLContext.createFromCurrent()
         onCreate()
         while (glfwWindowShouldClose(window) == GL11.GL_FALSE) {
+            updateCursor(window)
             onDraw()
             glfwSwapBuffers(window)
             glfwPollEvents()

@@ -49,7 +49,6 @@ class GlMesh(
     }
 
     companion object {
-        // todo: upside down, normalized device space?
         fun rect(additionalAttributes: List<Pair<GlAttribute, GlBuffer>> = listOf()): GlMesh {
             val quadPositions = floatArrayOf(
                     -1f,  1f, 0f,
@@ -79,18 +78,16 @@ class GlMesh(
                     1f, -1f, 0f
             )
             val triangleTexCoords = floatArrayOf(
-                    0.5f, 0f,
-                    0f,   1f,
-                    1f,   1f
+                    0.5f, 1f,
+                    0f,   0f,
+                    1f,   0f
             )
             val triangleIndices = intArrayOf(0, 1, 2)
-            return GlMesh(
-                    listOf(
-                            GlAttribute.ATTRIBUTE_POSITION to GlBuffer.create(backend.GL_ARRAY_BUFFER, trianglePositions),
-                            GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, triangleTexCoords)
-                    ),
-                    GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, triangleIndices), triangleIndices.size
+            val attributes = listOf(
+                    GlAttribute.ATTRIBUTE_POSITION to GlBuffer.create(backend.GL_ARRAY_BUFFER, trianglePositions),
+                    GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, triangleTexCoords)
             )
+            return GlMesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, triangleIndices), triangleIndices.size)
         }
     }
 }

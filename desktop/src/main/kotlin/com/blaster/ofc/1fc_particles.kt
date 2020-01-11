@@ -23,7 +23,7 @@ private const val H = 600
 
 private val backend = GlLocator.locate()
 
-const val POINTS_CNT = 3
+const val POINTS_CNT = 1000
 
 private val random = Random()
 
