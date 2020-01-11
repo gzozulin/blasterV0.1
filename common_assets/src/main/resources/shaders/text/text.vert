@@ -16,9 +16,9 @@ const int CHARS_IN_ROW  = 16;
 
 void calculateTexCoords() {
     float charIndexX = float(uCharIndex % CHARS_IN_ROW);
-    float charIndexY = float(uCharIndex / CHARS_IN_ROW);
+    float charIndexY = float(CHARS_IN_ROW) - float(uCharIndex / CHARS_IN_ROW) - 1.0;
     float texCoordX = (charIndexX + aTexCoord.x) * CHAR_STEP;
-    float texCoordY = (charIndexY + 1.0 - aTexCoord.y) * CHAR_STEP;
+    float texCoordY = (charIndexY + aTexCoord.y) * CHAR_STEP;
     vTexCoord = vec2(texCoordX, texCoordY);
 }
 
