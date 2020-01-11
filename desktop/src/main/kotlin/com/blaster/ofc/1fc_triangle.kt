@@ -37,7 +37,7 @@ private lateinit var model1: Model
 private lateinit var model2: Model
 private lateinit var model3: Model
 
-private const val VELOCITY = 0.05f
+private const val VELOCITY = 0.01f
 
 class CameraController(private val sensitivity: Float = 0.005f) {
     var w = false
@@ -65,22 +65,29 @@ class CameraController(private val sensitivity: Float = 0.005f) {
         roll += (radians * sensitivity)
     }
 
+    private val delta = Vector3f()
+    private val temp = Vector3f()
     private fun updatePosition() {
         delta.zero()
+        temp.zero()
         if (w) {
-            delta.set(direction).mul(VELOCITY)
+            delta.add(direction)
         }
         if (a) {
-            VECTOR_UP.cross(direction, delta)
-            delta.normalize().mul(VELOCITY)
+            VECTOR_UP.cross(direction, temp)
+            temp.normalize()
+            delta.add(temp)
         }
         if (s) {
-            direction.negate(delta).mul(VELOCITY)
+            direction.negate(temp)
+            delta.add(temp)
         }
         if (d) {
-            VECTOR_UP.cross(direction, delta)
-            delta.normalize().negate().mul(VELOCITY)
+            VECTOR_UP.cross(direction, temp)
+            temp.normalize().negate()
+            delta.add(temp)
         }
+        delta.mul(VELOCITY)
         position.add(delta)
     }
 
@@ -90,7 +97,6 @@ class CameraController(private val sensitivity: Float = 0.005f) {
         direction.z = sin(yaw) * cos(pitch)
     }
 
-    private val delta = Vector3f()
     fun apply(apply: (position: Vector3f, direction: Vector3f) -> Unit) {
         updatePosition()
         updateDirection()
