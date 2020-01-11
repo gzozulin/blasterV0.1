@@ -17,45 +17,32 @@ out float vIsAlive;
 
 out vec2 vTexCoord;
 
-mat4 lookAt(vec3 eye, vec3 target, vec3 updir) {
-    // compute the forward vector from target to eye
-    vec3 forward = eye - target;
-    forward = normalize(forward);
+mat4 billboardM() {
+    vec3 from = uViewPosition;
+    vec3 to = aParticlePosition;
 
-    // compute the left vector
-    vec3 left = cross(updir, forward);
-    left = normalize(left);
-
-    // recompute the orthonormal up vector
-    vec3 up = cross(forward, left);
+    vec3 forward = normalize(from - to);
+    vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), forward));
+    vec3 up = cross(forward, right);
 
     mat4 matrix = mat4(1.0);
-
-    // set rotation part, inverse rotation matrix: M^-1 = M^T for Euclidean transform
-    matrix[0][0] = left.x;
-    matrix[0][1] = left.y;
-    matrix[0][2] = left.z;
-
+    matrix[0][0] = right.x;
+    matrix[0][1] = right.y;
+    matrix[0][2] = right.z;
     matrix[1][0] = up.x;
     matrix[1][1] = up.y;
     matrix[1][2] = up.z;
-
     matrix[2][0] = forward.x;
     matrix[2][1] = forward.y;
     matrix[2][2] = forward.z;
-
-    // set translation part
-    matrix[3][0] = -left.x * eye.x - left.y * eye.y - left.z * eye.z;
-    matrix[3][1] = -up.x * eye.x - up.y * eye.y - up.z * eye.z;
-    matrix[3][2] = -forward.x * eye.x - forward.y * eye.y - forward.z * eye.z;
-
+    matrix[3][0] = to.x;
+    matrix[3][1] = to.y;
+    matrix[3][2] = to.z;
     return matrix;
 }
 
 void main() {
     vIsAlive = aIsAlive;
     vTexCoord = aTexCoord;
-    mat4 billbM = lookAt(uViewPosition, aParticlePosition, vec3(0.0, 1.0, 0.0));
-    mat4 mvp =  uProjectionM * uViewM * uModelM * billbM;
-    gl_Position = mvp * vec4(aPosition, 1.0);
+    gl_Position = uProjectionM * uViewM * uModelM * billboardM() * vec4(aPosition, 1.0);
 }
