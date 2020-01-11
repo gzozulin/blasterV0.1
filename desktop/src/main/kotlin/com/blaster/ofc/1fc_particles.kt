@@ -8,9 +8,12 @@ import com.blaster.common.randomFloat
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
+import com.blaster.scene.Controller
 import com.blaster.techniques.TextTechnique
 import org.joml.Matrix4f
+import org.joml.Vector2f
 import org.joml.Vector3f
+import org.lwjgl.glfw.GLFW
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
@@ -20,7 +23,7 @@ private const val H = 600
 
 private val backend = GlLocator.locate()
 
-const val POINTS_CNT = 10000
+const val POINTS_CNT = 3
 
 private val random = Random()
 
@@ -43,7 +46,8 @@ class BillboardsTechnique {
                 .order(ByteOrder.nativeOrder())
         val floats = buffer.asFloatBuffer()
         for (i in 0 until POINTS_CNT) {
-            floats.put(if (random.nextBoolean()) 1f else 0f)
+            //floats.put(if (random.nextBoolean()) 1f else 0f)
+            floats.put(1f)
         }
         buffer.position(0)
         return GlAttribute.ATTRIBUTE_PARTICLE_IS_ALIVE to GlBuffer(backend.GL_ARRAY_BUFFER, buffer)
@@ -85,18 +89,25 @@ private val console = Console(2000L)
 
 private val camera = Camera(W.toFloat() / H.toFloat())
 
+private val controller = Controller()
+
 private val window = object : LwjglWindow(W, H) {
     override fun onCreate() {
+        controller.position.set(Vector3f(0f, 0f, 3f))
+        console.info("Controller set..")
         particlesTechnique.prepare(shadersLib, texturesLib)
         console.info("Particles ready..")
         textTechnique.prepare(shadersLib, texturesLib)
         console.info("Text ready..")
-        camera.lookAt(Vector3f(3f), Vector3f())
         GlState.apply()
         console.success("All ready..")
     }
 
     override fun onDraw() {
+        controller.apply { position, direction ->
+            camera.setPosition(position)
+            camera.lookAlong(direction)
+        }
         GlState.clear()
         console.throttle()
         textTechnique.draw {
@@ -105,6 +116,29 @@ private val window = object : LwjglWindow(W, H) {
             }
         }
         particlesTechnique.draw(camera)
+    }
+
+    override fun onCursorDelta(delta: Vector2f) {
+        controller.yaw(delta.x)
+        controller.pitch(-delta.y)
+    }
+
+    override fun keyPressed(key: Int) {
+        when (key) {
+            GLFW.GLFW_KEY_W -> controller.w = true
+            GLFW.GLFW_KEY_A -> controller.a = true
+            GLFW.GLFW_KEY_S -> controller.s = true
+            GLFW.GLFW_KEY_D -> controller.d = true
+        }
+    }
+
+    override fun keyReleased(key: Int) {
+        when (key) {
+            GLFW.GLFW_KEY_W -> controller.w = false
+            GLFW.GLFW_KEY_A -> controller.a = false
+            GLFW.GLFW_KEY_S -> controller.s = false
+            GLFW.GLFW_KEY_D -> controller.d = false
+        }
     }
 }
 
