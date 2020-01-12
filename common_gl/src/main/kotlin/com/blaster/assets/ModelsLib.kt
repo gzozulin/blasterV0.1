@@ -29,6 +29,7 @@ private fun arrayListIntToByteBuffer(list: List<Int>): ByteBuffer {
     return buffer
 }
 
+// todo: scaler - to bring any model to the scene dimensions
 // todo: info about model: vert/ind count, times, progress loading, etc
 // todo: load material from *.mtl
 // todo: use buffers directly
