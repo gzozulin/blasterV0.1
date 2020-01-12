@@ -43,10 +43,11 @@ open class Particle(origin: Vector3f) {
 }
 
 class Particles(
-        private val emitters: List<Vector3f>,
         private val max: Int,
+        private val emitters: List<Vector3f>,
         private val emitterFunction: (emitter: Vector3f, particles: MutableList<Particle>) -> Unit,
         private val particleFunction: (particle: Particle) -> Boolean) {
+
 
     val particles = mutableListOf<Particle>()
 
@@ -68,10 +69,13 @@ class Particles(
     fun flush(buffer: ByteBuffer) {
         buffer.rewind()
         val floats = buffer.asFloatBuffer()
-        particles.forEach {
-            floats.put(it.position.x)
-            floats.put(it.position.y)
-            floats.put(it.position.z)
+        particles.forEachIndexed { index, particle ->
+            if (index >= max) {
+                return
+            }
+            floats.put(particle.position.x)
+            floats.put(particle.position.y)
+            floats.put(particle.position.z)
         }
     }
 }
@@ -90,14 +94,14 @@ private fun snowflakeEmitters(): List<Vector3f> {
     return emitters
 }
 
-private fun snowflakeEmitterFunction(emitter: Vector3f, particles: MutableList<Particle>) {
+private fun emitSnowflake(emitter: Vector3f, particles: MutableList<Particle>) {
     if (random.nextInt(500) == 1) {
         particles.add(Snowflake(emitter))
         console.info("Particle ${particles.size}")
     }
 }
 
-private fun snowflakeParticleFunction(particle: Particle): Boolean {
+private fun updateSnowflake(particle: Particle): Boolean {
     val snowflake = particle as Snowflake
     snowflake.position.y -= 0.01f
     snowflake.position.x = snowflake.origin.x + sin(3f * snowflake.position.y)
@@ -106,9 +110,10 @@ private fun snowflakeParticleFunction(particle: Particle): Boolean {
 }
 
 private val particles = Particles(
-        snowflakeEmitters(), BILLBOARDS_MAX,
-        ::snowflakeEmitterFunction,
-        ::snowflakeParticleFunction)
+        BILLBOARDS_MAX,
+        snowflakeEmitters(),
+        ::emitSnowflake,
+        ::updateSnowflake)
 
 class BillboardsTechnique(max: Int) {
     private lateinit var program: GlProgram
