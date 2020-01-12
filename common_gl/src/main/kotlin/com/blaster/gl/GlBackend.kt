@@ -26,6 +26,7 @@ interface GlBackend {
     val GL_UNSIGNED_BYTE: Int
     val GL_BYTE: Int
     val GL_TRIANGLES: Int
+    val GL_LINES: Int
     val GL_POINTS: Int
     val GL_DEPTH_TEST: Int
     val GL_COLOR_BUFFER_BIT: Int
@@ -118,4 +119,9 @@ interface GlBackend {
     fun glMapBuffer(target: Int, access: Int, oldBuffer: ByteBuffer): ByteBuffer
     fun glUnapBuffer(target: Int): Boolean
     fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer
+    fun glBegin(mode: Int)
+    fun glEnd()
+    fun glColor3f(r: Float, g: Float, b: Float)
+    fun glVertex3f(x: Float, y: Float, z: Float)
+
 }

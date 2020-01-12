@@ -3,6 +3,7 @@ package com.blaster.ofc
 import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
+import com.blaster.common.AABB
 import com.blaster.common.Console
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
@@ -17,7 +18,6 @@ import org.lwjgl.glfw.GLFW
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
-import kotlin.math.cos
 import kotlin.math.sin
 
 private const val W = 800
@@ -29,14 +29,27 @@ private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
-const val BILLBOARDS_MAX = 300
+private val sceneAABB = AABB(Vector3f(-5f), Vector3f(5f))
+
+const val BILLBOARDS_MAX = 1000
 const val BILLBOARDS_WIDTH = 0.1f
 const val BILLBOARDS_HEIGHT = 0.1f
 
 private val random = Random()
 
-// todo: ParticleSystem with BillboardTechnique
-// todo: sort particles/bbrds?
+class ImmediateTechnique {
+    fun aabb(camera: Camera, aabb: AABB, color: Vector3f = Vector3f(1f)) {
+        // todo: glFrustum, glLoadIdentity, glLoadMatrix, glLoadTransposeMatrix, glMatrixMode, glMultMatrix, glMultTransposeMatrix, glOrtho, glRotate, glScale, glTranslate, glViewport
+        /*glCheck {
+            backend.glBegin(backend.GL_LINES)
+            //backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.min.x, aabb.min.y, aabb.min.z)
+            //backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.max.x, aabb.max.y, aabb.max.z)
+            backend.glEnd()
+        }*/
+    }
+}
 
 open class Particle(origin: Vector3f) {
     val position = Vector3f(origin)
@@ -82,6 +95,7 @@ class Particles(
 
 class Snowflake(origin: Vector3f) : Particle(origin) {
     val origin = Vector3f(origin)
+    val randomness = random.nextFloat()
 }
 
 private fun snowflakeEmitters(): List<Vector3f> {
@@ -95,7 +109,7 @@ private fun snowflakeEmitters(): List<Vector3f> {
 }
 
 private fun emitSnowflake(emitter: Vector3f, particles: MutableList<Particle>) {
-    if (random.nextInt(500) == 1) {
+    if (random.nextInt(50) == 1) {
         particles.add(Snowflake(emitter))
         console.info("Particle ${particles.size}")
     }
@@ -104,8 +118,8 @@ private fun emitSnowflake(emitter: Vector3f, particles: MutableList<Particle>) {
 private fun updateSnowflake(particle: Particle): Boolean {
     val snowflake = particle as Snowflake
     snowflake.position.y -= 0.01f
-    snowflake.position.x = snowflake.origin.x + sin(3f * snowflake.position.y)
-    snowflake.position.z = snowflake.origin.z + cos(2f * snowflake.position.y)
+    snowflake.position.x = snowflake.origin.x + sin(snowflake.randomness + snowflake.position.y * 2f) * 0.5f
+    snowflake.position.z = snowflake.origin.z + sin(snowflake.randomness + snowflake.position.y * 4f) * 0.2f
     return particle.position.y > -2f
 }
 
@@ -115,6 +129,8 @@ private val particles = Particles(
         ::emitSnowflake,
         ::updateSnowflake)
 
+// todo: maybe (optionally) sort billboards?
+// todo: can draw multiple sets of billboards with same buffer
 class BillboardsTechnique(max: Int) {
     private lateinit var program: GlProgram
     private lateinit var rect: Mesh
@@ -154,10 +170,11 @@ class BillboardsTechnique(max: Int) {
     }
 }
 
+private val immediateTechnique = ImmediateTechnique()
 private val particlesTechnique = BillboardsTechnique(BILLBOARDS_MAX)
 private val textTechnique = TextTechnique()
 
-private val console = Console(2000L)
+private val console = Console(1000L)
 
 private val camera = Camera(W.toFloat() / H.toFloat())
 
@@ -176,11 +193,12 @@ private val window = object : LwjglWindow(W, H) {
     }
 
     override fun onDraw() {
+        GlState.clear()
+        immediateTechnique.aabb(camera, sceneAABB)
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
-        GlState.clear()
         console.throttle()
         textTechnique.draw {
             console.render { position, text, color, scale ->

@@ -24,6 +24,7 @@ class GlBackendImpl : GlBackend {
     override val GL_UNSIGNED_BYTE:      Int get() = GL11.GL_UNSIGNED_BYTE
     override val GL_BYTE:               Int get() = GL11.GL_BYTE
     override val GL_TRIANGLES:          Int get() = GL11.GL_TRIANGLES
+    override val GL_LINES:              Int get() = GL11.GL_LINES
     override val GL_POINTS:             Int get() = GL11.GL_POINTS
     override val GL_VERTEX_SHADER:      Int get() = GL20.GL_VERTEX_SHADER
     override val GL_FRAGMENT_SHADER:    Int get() = GL20.GL_FRAGMENT_SHADER
@@ -131,4 +132,8 @@ class GlBackendImpl : GlBackend {
     override fun glUnapBuffer(target: Int) = GL15.glUnmapBuffer(target)
     override fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer =
             GL30.glMapBufferRange(target, offset, length, access, oldBuffer)
+    override fun glBegin(mode: Int) = GL11.glBegin(mode)
+    override fun glEnd() = GL11.glEnd()
+    override fun glColor3f(r: Float, g: Float, b: Float) = GL11.glColor3f(r, g, b)
+    override fun glVertex3f(x: Float, y: Float, z: Float) = GL11.glVertex3f(x, y, z)
 }
