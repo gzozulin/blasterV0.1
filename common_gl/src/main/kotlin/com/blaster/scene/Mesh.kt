@@ -1,8 +1,10 @@
-package com.blaster.gl
+package com.blaster.scene
+
+import com.blaster.gl.*
 
 private val backend = GlLocator.locate()
 
-class GlMesh(
+class Mesh(
         private val attributes: List<Pair<GlAttribute, GlBuffer>>,
         private val indicesBuffer: GlBuffer,
         private val indicesCount: Int) : GLBindable {
@@ -49,7 +51,7 @@ class GlMesh(
     }
 
     companion object {
-        fun rect(additionalAttributes: List<Pair<GlAttribute, GlBuffer>> = listOf()): GlMesh {
+        fun rect(additionalAttributes: List<Pair<GlAttribute, GlBuffer>> = listOf()): Mesh {
             val quadPositions = floatArrayOf(
                     -1f,  1f, 0f,
                     -1f, -1f, 0f,
@@ -68,10 +70,10 @@ class GlMesh(
                     GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, quadTexCoords)
             )
             attributes.addAll(additionalAttributes)
-            return GlMesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, quadIndices), quadIndices.size)
+            return Mesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, quadIndices), quadIndices.size)
         }
 
-        fun triangle(): GlMesh {
+        fun triangle(): Mesh {
             val trianglePositions = floatArrayOf(
                     0f,  1f, 0f,
                     -1f, -1f, 0f,
@@ -87,7 +89,7 @@ class GlMesh(
                     GlAttribute.ATTRIBUTE_POSITION to GlBuffer.create(backend.GL_ARRAY_BUFFER, trianglePositions),
                     GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, triangleTexCoords)
             )
-            return GlMesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, triangleIndices), triangleIndices.size)
+            return Mesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, triangleIndices), triangleIndices.size)
         }
     }
 }

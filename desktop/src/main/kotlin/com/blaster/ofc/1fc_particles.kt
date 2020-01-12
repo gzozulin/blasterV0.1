@@ -9,6 +9,7 @@ import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
 import com.blaster.scene.Controller
+import com.blaster.scene.Mesh
 import com.blaster.techniques.TextTechnique
 import org.joml.Matrix4f
 import org.joml.Vector2f
@@ -32,10 +33,13 @@ const val POINTS_CNT = 10000
 private val random = Random()
 
 // todo: ParticleSystem with BillboardTechnique
+// todo: sort particles/bbrds?
+
+class Particles
 
 class BillboardsTechnique {
     private lateinit var program: GlProgram
-    private lateinit var rect: GlMesh
+    private lateinit var rect: Mesh
     private lateinit var diffuse: GlTexture
 
     private val enabledBuffer = ByteBuffer.allocateDirect(POINTS_CNT * 1 * 4) // 1000 * float
@@ -54,7 +58,7 @@ class BillboardsTechnique {
         val positionsGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer)
         val additional = listOf(GlAttribute.ATTRIBUTE_BILLBOARD_IS_ENABLED to enabledGlBuffer,
                 GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positionsGlBuffer)
-        rect = GlMesh.rect(additionalAttributes = additional)
+        rect = Mesh.rect(additionalAttributes = additional)
         diffuse = texturesLib.loadTexture("textures/winner.png")
     }
 

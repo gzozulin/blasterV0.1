@@ -8,7 +8,7 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 
 class Camera(aspectRatio: Float) : Movable {
-    val projectionM = Matrix4f().perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 1f, 4000f)
+    val projectionM = Matrix4f().perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 0.1f, 1000f)
 
     val position: Vector3f = Vector3f()
     val rotation: Quaternionf = Quaternionf()

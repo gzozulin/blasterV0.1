@@ -2,6 +2,7 @@ package com.blaster.assets
 
 import com.blaster.common.AABB
 import com.blaster.gl.*
+import com.blaster.scene.Mesh
 import com.blaster.scene.Model
 import org.joml.Vector3f
 import java.io.BufferedReader
@@ -72,7 +73,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
         val texCoordBuff = arrayListFloatToByteBuffer(currentTexCoords)
         val normalBuff = arrayListFloatToByteBuffer(currentNormals)
         val indicesBuff = arrayListIntToByteBuffer(currentIndices)
-        val mesh = GlMesh(
+        val mesh = Mesh(
                 listOf(
                         GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),
                         GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer(backend.GL_ARRAY_BUFFER, texCoordBuff),

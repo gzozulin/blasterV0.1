@@ -4,12 +4,12 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.gl.GlMesh
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
 import com.blaster.scene.Controller
+import com.blaster.scene.Mesh
 import com.blaster.scene.Model
 import com.blaster.techniques.SimpleTechnique
 import org.joml.Vector2f
@@ -26,7 +26,7 @@ private val shadersLib = ShadersLib(assetStream)
 
 private val simpleTechnique = SimpleTechnique()
 
-private lateinit var mesh: GlMesh
+private lateinit var mesh: Mesh
 private lateinit var tex1: GlTexture
 private lateinit var tex2: GlTexture
 private lateinit var tex3: GlTexture
@@ -42,7 +42,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
     override fun onCreate() {
         controller.position.set(Vector3f(0f, 0f, 3f))
         simpleTechnique.prepare(shadersLib)
-        mesh = GlMesh.triangle()
+        mesh = Mesh.triangle()
         tex1 = texturesLib.loadTexture("textures/lumina.png")
         tex2 = texturesLib.loadTexture("textures/utah.jpeg")
         tex3 = texturesLib.loadTexture("textures/winner.png")

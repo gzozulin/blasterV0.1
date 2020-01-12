@@ -4,6 +4,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.common.randomVector3f
 import com.blaster.gl.*
 import com.blaster.scene.Camera
+import com.blaster.scene.Mesh
 import com.blaster.scene.Model
 import org.joml.Matrix4f
 import org.joml.Vector3f
@@ -14,7 +15,7 @@ class DeferredTechnique {
     private lateinit var programGeomPass: GlProgram
     private lateinit var programLightPass: GlProgram
 
-    private lateinit var quadMesh: GlMesh
+    private lateinit var quadMesh: Mesh
 
     private lateinit var framebuffer: GlFrameBuffer
     private lateinit var positionStorage: GlTexture
@@ -28,7 +29,7 @@ class DeferredTechnique {
                 "shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram(
                 "shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        quadMesh = GlMesh.rect()
+        quadMesh = Mesh.rect()
         positionStorage = GlTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,
@@ -81,7 +82,7 @@ class DeferredTechnique {
         instance(model.mesh, model.diffuse, model.calculateModelM())
     }
 
-    fun instance(mesh: GlMesh, diffuse: GlTexture, modelM: Matrix4f) {
+    fun instance(mesh: Mesh, diffuse: GlTexture, modelM: Matrix4f) {
         glBind(listOf(mesh, diffuse)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
             programGeomPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
