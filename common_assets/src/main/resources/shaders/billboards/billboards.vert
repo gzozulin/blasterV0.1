@@ -11,6 +11,8 @@ uniform mat4 uProjectionM;
 uniform mat4 uViewM;
 
 uniform vec3 uEye;
+uniform float uWidth;
+uniform float uHeight;
 
 out vec2 vTexCoord;
 
@@ -40,5 +42,10 @@ mat4 billboardM() {
 
 void main() {
     vTexCoord = aTexCoord;
-    gl_Position = uProjectionM * uViewM * uModelM * billboardM() * vec4(aPosition, 1.0);
+    vec4 position = vec4(0.0);
+    position.x = aPosition.x * uWidth / 2.0;
+    position.y = aPosition.y * uHeight / 2.0;
+    position.z = aPosition.z;
+    position.w = 1.0;
+    gl_Position = uProjectionM * uViewM * uModelM * billboardM() * position;
 }

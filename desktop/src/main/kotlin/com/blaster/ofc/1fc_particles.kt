@@ -30,6 +30,8 @@ private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
 const val BILLBOARDS_MAX = 300
+const val BILLBOARDS_WIDTH = 0.1f
+const val BILLBOARDS_HEIGHT = 0.1f
 
 private val random = Random()
 
@@ -82,7 +84,7 @@ private fun snowflakeEmitters(): List<Vector3f> {
     val emitters = mutableListOf<Vector3f>()
     for (x in -5..5) {
         for (z in -5..5) {
-            emitters.add(Vector3f(x.toFloat(), 0f, z.toFloat()))
+            emitters.add(Vector3f(x.toFloat(), 2f, z.toFloat()))
         }
     }
     return emitters
@@ -91,15 +93,15 @@ private fun snowflakeEmitters(): List<Vector3f> {
 private fun snowflakeEmitterFunction(emitter: Vector3f, particles: MutableList<Particle>) {
     if (random.nextInt(500) == 1) {
         particles.add(Snowflake(emitter))
-        console.info("Emitted particle.. Count: ${particles.size}")
+        console.info("Particle ${particles.size}")
     }
 }
 
 private fun snowflakeParticleFunction(particle: Particle): Boolean {
     val snowflake = particle as Snowflake
     snowflake.position.y -= 0.01f
-    snowflake.position.x = snowflake.origin.x + sin(5f * snowflake.position.y)
-    snowflake.position.z = snowflake.origin.y + cos(2f * snowflake.position.y)
+    snowflake.position.x = snowflake.origin.x + sin(3f * snowflake.position.y)
+    snowflake.position.z = snowflake.origin.z + cos(2f * snowflake.position.y)
     return particle.position.y > -2f
 }
 
@@ -139,6 +141,8 @@ class BillboardsTechnique(max: Int) {
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
+            program.setUniform(GlUniform.UNIFORM_WIDTH, BILLBOARDS_WIDTH)
+            program.setUniform(GlUniform.UNIFORM_HEIGHT, BILLBOARDS_HEIGHT)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             rect.drawInstanced(instances = particles.particles.size)
         }
@@ -162,7 +166,7 @@ private val window = object : LwjglWindow(W, H) {
         console.info("Particles ready..")
         textTechnique.prepare(shadersLib, texturesLib)
         console.info("Text ready..")
-        GlState.apply()
+        GlState.apply(color = Vector3f())
         console.success("All ready..")
     }
 
