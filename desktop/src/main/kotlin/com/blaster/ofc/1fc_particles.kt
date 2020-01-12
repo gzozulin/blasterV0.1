@@ -28,23 +28,50 @@ private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
-const val POINTS_CNT = 10000
+const val PARTICLES_MAX = 10000
 
 private val random = Random()
 
 // todo: ParticleSystem with BillboardTechnique
 // todo: sort particles/bbrds?
 
-class Particles
+class Particles(
+        private val emitterFunction: (emitter: Vector3f, particles: MutableList<Vector3f>) -> Unit,
+        private val particleFunction: (position: Vector3f) -> Boolean) {
+
+    val emitters = mutableListOf<Vector3f>()
+    val particles = mutableListOf<Vector3f>()
+
+    fun tick() {
+        emitters.forEach { emitterFunction.invoke(it, particles) }
+        val particlesIterator = particles.iterator()
+        while (particlesIterator.hasNext()) {
+            val isAlive = particleFunction.invoke(particlesIterator.next())
+            if (!isAlive) {
+                particlesIterator.remove()
+            }
+        }
+    }
+
+    fun flush(buffer: ByteBuffer) {
+        buffer.rewind()
+        val floats = buffer.asFloatBuffer()
+        particles.forEach {
+            floats.put(it.x)
+            floats.put(it.y)
+            floats.put(it.z)
+        }
+    }
+}
 
 class BillboardsTechnique {
     private lateinit var program: GlProgram
     private lateinit var rect: Mesh
     private lateinit var diffuse: GlTexture
 
-    private val enabledBuffer = ByteBuffer.allocateDirect(POINTS_CNT * 1 * 4) // 1000 * float
+    private val enabledBuffer = ByteBuffer.allocateDirect(PARTICLES_MAX * 1 * 4) // 1000 * float
             .order(ByteOrder.nativeOrder())
-    private val positionsBuffer = ByteBuffer.allocateDirect(POINTS_CNT * 3 * 4) // 1000 * vec3f
+    private val positionsBuffer = ByteBuffer.allocateDirect(PARTICLES_MAX * 3 * 4) // 1000 * vec3f
             .order(ByteOrder.nativeOrder())
 
     private lateinit var enabledGlBuffer: GlBuffer
@@ -65,7 +92,7 @@ class BillboardsTechnique {
     private fun updateEnabled(buffer: ByteBuffer) {
         buffer.rewind()
         val floats = buffer.asFloatBuffer()
-        for (i in 0 until POINTS_CNT) {
+        for (i in 0 until PARTICLES_MAX) {
             floats.put(if (random.nextBoolean()) 1f else 0f)
         }
         buffer.position(0)
@@ -73,7 +100,7 @@ class BillboardsTechnique {
 
     private fun createPositions() {
         val floats = positionsBuffer.asFloatBuffer()
-        for (i in 0 until POINTS_CNT) {
+        for (i in 0 until PARTICLES_MAX) {
             floats.put(randomFloat(-1f, 1f))
             floats.put(randomFloat(-1f, 1f))
             floats.put(randomFloat(-1f, 1f))
@@ -93,7 +120,7 @@ class BillboardsTechnique {
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
-            rect.drawInstanced(instances = POINTS_CNT)
+            rect.drawInstanced(instances = PARTICLES_MAX)
         }
     }
 }
