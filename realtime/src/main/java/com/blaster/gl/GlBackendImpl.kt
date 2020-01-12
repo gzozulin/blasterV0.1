@@ -54,7 +54,7 @@ class GlBackendImpl : GlBackend {
 
     override fun glBindBuffer(target: Int, buffer: Int) = GLES30.glBindBuffer(target, buffer)
     override fun glBufferData(target: Int, data: ByteBuffer, usage: Int) =
-            GLES30.glBufferData(target, data.limit(), data, usage)
+            GLES30.glBufferData(target, data.capacity(), data, usage)
 
     override val GL_FRAMEBUFFER: Int
         get() = GLES30.GL_FRAMEBUFFER
@@ -84,13 +84,24 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_UNSIGNED_INT
     override val GL_TRIANGLES: Int
         get() = GLES30.GL_TRIANGLES
+    override val GL_POINTS: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override fun glEnableVertexAttribArray(index: Int) = GLES30.glEnableVertexAttribArray(index)
     override fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long) =
             GLES30.glVertexAttribPointer(indx, size, type, normalized, stride, offset.toInt())
+
+    override fun glVertexAttribDivisor(indx: Int, divisor: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun glDisableVertexAttribArray(index: Int) = GLES30.glDisableVertexAttribArray(index)
     override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long) =
             GLES30.glDrawElements(mode, count, type, offset.toInt())
+
+    override fun glDrawElementsInstanced(mode: Int, count: Int, type: Int, offset: Long, instances: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     override val GL_VERTEX_SHADER: Int
         get() = GLES30.GL_VERTEX_SHADER
@@ -186,6 +197,10 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_COLOR_ATTACHMENT2
     override val GL_DEPTH_ATTACHMENT: Int
         get() = GLES30.GL_DEPTH_ATTACHMENT
+    override val GL_MAP_UNSYNCHRONIZED_BIT: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_MAP_WRITE_BIT: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override fun glGenTextures(): Int {
         val handles = IntArray(1)
@@ -199,4 +214,7 @@ class GlBackendImpl : GlBackend {
     override fun glTexParameteri(target: Int, pname: Int, param: Int) =
             GLES30.glTexParameteri(target, pname, param)
     override fun glActiveTexture(texture: Int) = GLES30.glActiveTexture(texture)
+    override fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }

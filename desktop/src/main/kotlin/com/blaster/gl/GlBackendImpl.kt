@@ -47,6 +47,8 @@ class GlBackendImpl : GlBackend {
     override val GL_COLOR_ATTACHMENT1:  Int get() = GL30.GL_COLOR_ATTACHMENT1
     override val GL_COLOR_ATTACHMENT2:  Int get() = GL30.GL_COLOR_ATTACHMENT2
     override val GL_DEPTH_ATTACHMENT:   Int get() = GL30.GL_DEPTH_ATTACHMENT
+    override val GL_MAP_WRITE_BIT:      Int get() = GL30.GL_MAP_WRITE_BIT
+    override val GL_MAP_UNSYNCHRONIZED_BIT: Int get() = GL30.GL_MAP_UNSYNCHRONIZED_BIT
 
     override fun glGetError() = GL11.glGetError()
     override fun gluErrorString(error: Int) = "Undeciphered error $error"
@@ -121,4 +123,6 @@ class GlBackendImpl : GlBackend {
         GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
     override fun glTexParameteri(target: Int, pname: Int, param: Int) = GL11.glTexParameteri(target, pname, param)
     override fun glActiveTexture(texture: Int) = GL13.glActiveTexture(texture)
+    override fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer =
+            GL30.glMapBufferRange(target, offset, length, access, oldBuffer)
 }

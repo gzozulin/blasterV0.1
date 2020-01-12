@@ -5,7 +5,11 @@ import java.nio.ByteOrder
 
 private val backend = GlLocator.locate()
 
-class GlBuffer(private val type: Int, buffer: ByteBuffer, private val usage: Int = backend.GL_STATIC_DRAW) : GLBindable {
+class GlBuffer(
+        private val type: Int,
+        private val buffer: ByteBuffer,
+        private val usage: Int = backend.GL_STATIC_DRAW) : GLBindable {
+
     private val handle: Int = glCheck { backend.glGenBuffers() }
 
     // todo make two different constructors for indices/vertices
@@ -43,4 +47,7 @@ class GlBuffer(private val type: Int, buffer: ByteBuffer, private val usage: Int
     override fun unbind() {
         glCheck { backend.glBindBuffer(type, 0) }
     }
+
+    fun mapBuffer(access : Int = backend.GL_MAP_WRITE_BIT or backend.GL_MAP_UNSYNCHRONIZED_BIT): ByteBuffer =
+            backend.glMapBufferRange(type, 0, buffer.capacity().toLong(), access, buffer)
 }

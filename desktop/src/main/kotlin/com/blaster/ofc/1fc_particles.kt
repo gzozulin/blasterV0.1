@@ -34,36 +34,37 @@ class BillboardsTechnique {
     private lateinit var rect: GlMesh
     private lateinit var diffuse: GlTexture
 
+    private val enabledBuffer = ByteBuffer.allocateDirect(POINTS_CNT * 1 * 4) // 1000 * float
+            .order(ByteOrder.nativeOrder())
+    private val positionsBuffer = ByteBuffer.allocateDirect(POINTS_CNT * 3 * 4) // 1000 * vec3f
+            .order(ByteOrder.nativeOrder())
+
     fun prepare(shadersLib: ShadersLib, texturesLib: TexturesLib) {
         program = shadersLib.loadProgram(
-                "shaders/particles/particles.vert", "shaders/particles/particles.frag")
-        rect = GlMesh.rect(listOf(createParticleIsAlive(), createParticlePositions()))
+                "shaders/billboards/billboards.vert", "shaders/billboards/billboards.frag")
+        rect = GlMesh.rect(listOf(createEnabled(), createPositions()))
         diffuse = texturesLib.loadTexture("textures/winner.png")
     }
 
-    private fun createParticleIsAlive(): Pair<GlAttribute, GlBuffer> {
-        val buffer = ByteBuffer.allocateDirect(POINTS_CNT * 1 * 4) // 1000 * float
-                .order(ByteOrder.nativeOrder())
-        val floats = buffer.asFloatBuffer()
+    private fun createEnabled(): Pair<GlAttribute, GlBuffer> {
+        val floats = enabledBuffer.asFloatBuffer()
         for (i in 0 until POINTS_CNT) {
             //floats.put(if (random.nextBoolean()) 1f else 0f)
             floats.put(1f)
         }
-        buffer.position(0)
-        return GlAttribute.ATTRIBUTE_BILLBOARD_IS_ENABLED to GlBuffer(backend.GL_ARRAY_BUFFER, buffer)
+        enabledBuffer.position(0)
+        return GlAttribute.ATTRIBUTE_BILLBOARD_IS_ENABLED to GlBuffer(backend.GL_ARRAY_BUFFER, enabledBuffer)
     }
 
-    private fun createParticlePositions(): Pair<GlAttribute, GlBuffer> {
-        val buffer = ByteBuffer.allocateDirect(POINTS_CNT * 3 * 4) // 1000 * vec3f
-                .order(ByteOrder.nativeOrder())
-        val floats = buffer.asFloatBuffer()
+    private fun createPositions(): Pair<GlAttribute, GlBuffer> {
+        val floats = positionsBuffer.asFloatBuffer()
         for (i in 0 until POINTS_CNT) {
             floats.put(randomFloat(-1f, 1f))
             floats.put(randomFloat(-1f, 1f))
             floats.put(randomFloat(-1f, 1f))
         }
-        buffer.position(0)
-        return GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to  GlBuffer(backend.GL_ARRAY_BUFFER, buffer)
+        positionsBuffer.position(0)
+        return GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to  GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer)
     }
 
     fun draw(camera: Camera) {
@@ -129,6 +130,8 @@ private val window = object : LwjglWindow(W, H) {
             GLFW.GLFW_KEY_A -> controller.a = true
             GLFW.GLFW_KEY_S -> controller.s = true
             GLFW.GLFW_KEY_D -> controller.d = true
+            GLFW.GLFW_KEY_E -> controller.e = true
+            GLFW.GLFW_KEY_Q -> controller.q = true
         }
     }
 
@@ -138,6 +141,8 @@ private val window = object : LwjglWindow(W, H) {
             GLFW.GLFW_KEY_A -> controller.a = false
             GLFW.GLFW_KEY_S -> controller.s = false
             GLFW.GLFW_KEY_D -> controller.d = false
+            GLFW.GLFW_KEY_E -> controller.e = false
+            GLFW.GLFW_KEY_Q -> controller.q = false
         }
     }
 }

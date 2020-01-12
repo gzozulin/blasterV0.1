@@ -60,6 +60,8 @@ interface GlBackend {
     val GL_COLOR_ATTACHMENT1: Int
     val GL_COLOR_ATTACHMENT2: Int
     val GL_DEPTH_ATTACHMENT: Int
+    val GL_MAP_UNSYNCHRONIZED_BIT: Int
+    val GL_MAP_WRITE_BIT: Int
 
     fun glGetError(): Int
     fun gluErrorString(error: Int): String
@@ -110,4 +112,5 @@ interface GlBackend {
     fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?)
     fun glTexParameteri(target: Int, pname: Int, param: Int)
     fun glActiveTexture(texture: Int)
+    fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer
 }
