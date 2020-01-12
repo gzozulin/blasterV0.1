@@ -14,6 +14,9 @@ class Controller(private val sensitivity: Float = 0.005f, private val velocity: 
     var q = false
     var e = false
 
+    // todo: 0-9 - teleports
+    // 0 - starting point
+
     val position = Vector3f()
 
     private var yaw = Math.toRadians(-90.0).toFloat()

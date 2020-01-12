@@ -29,24 +29,30 @@ private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
-const val BILLBOARDS_MAX = 10
+const val BILLBOARDS_MAX = 300
 
 private val random = Random()
 
 // todo: ParticleSystem with BillboardTechnique
 // todo: sort particles/bbrds?
 
+open class Particle(origin: Vector3f) {
+    val position = Vector3f(origin)
+}
+
 class Particles(
         private val emitters: List<Vector3f>,
         private val max: Int,
-        private val emitterFunction: (emitter: Vector3f, particles: MutableList<Vector3f>) -> Unit,
-        private val particleFunction: (particle: Vector3f) -> Boolean) {
+        private val emitterFunction: (emitter: Vector3f, particles: MutableList<Particle>) -> Unit,
+        private val particleFunction: (particle: Particle) -> Boolean) {
 
-    val particles = mutableListOf<Vector3f>()
+    val particles = mutableListOf<Particle>()
 
     fun tick() {
-        if (particles.size < max) {
-            emitters.forEach { emitterFunction.invoke(it, particles) }
+        emitters.forEach {
+            if (particles.size < max) {
+                emitterFunction.invoke(it, particles)
+            }
         }
         val particlesIterator = particles.iterator()
         while (particlesIterator.hasNext()) {
@@ -61,36 +67,46 @@ class Particles(
         buffer.rewind()
         val floats = buffer.asFloatBuffer()
         particles.forEach {
-            floats.put(it.x)
-            floats.put(it.y)
-            floats.put(it.z)
+            floats.put(it.position.x)
+            floats.put(it.position.y)
+            floats.put(it.position.z)
         }
     }
 }
 
-private fun updateSnowflake(snowflake: Vector3f) {
-    val timestamp = System.currentTimeMillis().toFloat()
-    snowflake.x = sin(timestamp)
-    snowflake.z = cos(timestamp)
-    snowflake.y -= 0.01f
+class Snowflake(origin: Vector3f) : Particle(origin) {
+    val origin = Vector3f(origin)
 }
 
-private fun emitterFunction(emitter: Vector3f, particles: MutableList<Vector3f>) {
-    if (random.nextInt(50) == 1) {
-        val particle = Vector3f(emitter)
-        updateSnowflake(particle)
-        particles.add(Vector3f(emitter))
+private fun snowflakeEmitters(): List<Vector3f> {
+    val emitters = mutableListOf<Vector3f>()
+    for (x in -5..5) {
+        for (z in -5..5) {
+            emitters.add(Vector3f(x.toFloat(), 0f, z.toFloat()))
+        }
+    }
+    return emitters
+}
+
+private fun snowflakeEmitterFunction(emitter: Vector3f, particles: MutableList<Particle>) {
+    if (random.nextInt(500) == 1) {
+        particles.add(Snowflake(emitter))
         console.info("Emitted particle.. Count: ${particles.size}")
     }
 }
 
-private fun particleFunction(particle: Vector3f): Boolean {
-    updateSnowflake(particle)
-    return particle.y > -2f
+private fun snowflakeParticleFunction(particle: Particle): Boolean {
+    val snowflake = particle as Snowflake
+    snowflake.position.y -= 0.01f
+    snowflake.position.x = snowflake.origin.x + sin(5f * snowflake.position.y)
+    snowflake.position.z = snowflake.origin.y + cos(2f * snowflake.position.y)
+    return particle.position.y > -2f
 }
 
-private val particles = Particles(listOf(Vector3f()), BILLBOARDS_MAX, ::emitterFunction, ::particleFunction)
-
+private val particles = Particles(
+        snowflakeEmitters(), BILLBOARDS_MAX,
+        ::snowflakeEmitterFunction,
+        ::snowflakeParticleFunction)
 
 class BillboardsTechnique(max: Int) {
     private lateinit var program: GlProgram
