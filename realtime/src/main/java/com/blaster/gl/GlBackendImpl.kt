@@ -201,6 +201,12 @@ class GlBackendImpl : GlBackend {
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_MAP_WRITE_BIT: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_READ_ONLY: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_WRITE_ONLY: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_READ_WRITE: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override fun glGenTextures(): Int {
         val handles = IntArray(1)
@@ -214,6 +220,14 @@ class GlBackendImpl : GlBackend {
     override fun glTexParameteri(target: Int, pname: Int, param: Int) =
             GLES30.glTexParameteri(target, pname, param)
     override fun glActiveTexture(texture: Int) = GLES30.glActiveTexture(texture)
+    override fun glMapBuffer(target: Int, access: Int, oldBuffer: ByteBuffer): ByteBuffer {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glUnapBuffer(target: Int): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }

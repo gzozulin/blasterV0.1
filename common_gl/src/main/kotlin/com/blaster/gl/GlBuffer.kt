@@ -6,7 +6,7 @@ import java.nio.ByteOrder
 private val backend = GlLocator.locate()
 
 class GlBuffer(
-        private val type: Int,
+        private val target: Int,
         private val buffer: ByteBuffer,
         private val usage: Int = backend.GL_STATIC_DRAW) : GLBindable {
 
@@ -14,15 +14,15 @@ class GlBuffer(
 
     // todo make two different constructors for indices/vertices
     init {
-        check(type == backend.GL_ARRAY_BUFFER || type == backend.GL_ELEMENT_ARRAY_BUFFER)
+        check(target == backend.GL_ARRAY_BUFFER || target == backend.GL_ELEMENT_ARRAY_BUFFER)
         check(handle > 0)
     }
 
     init {
         glCheck {
-            backend.glBindBuffer(type, handle)
-            backend.glBufferData(type, buffer, usage)
-            backend.glBindBuffer(type, 0)
+            backend.glBindBuffer(target, handle)
+            backend.glBufferData(target, buffer, usage)
+            backend.glBindBuffer(target, 0)
         }
     }
 
@@ -41,13 +41,19 @@ class GlBuffer(
     }
 
     override fun bind() {
-        glCheck { backend.glBindBuffer(type, handle) }
+        glCheck { backend.glBindBuffer(target, handle) }
     }
 
     override fun unbind() {
-        glCheck { backend.glBindBuffer(type, 0) }
+        glCheck { backend.glBindBuffer(target, 0) }
     }
 
-    fun mapBuffer(access : Int = backend.GL_MAP_WRITE_BIT or backend.GL_MAP_UNSYNCHRONIZED_BIT): ByteBuffer =
-            backend.glMapBufferRange(type, 0, buffer.capacity().toLong(), access, buffer)
+    fun mapBuffer(access: Int): ByteBuffer = glCheck {  backend.glMapBuffer(target, access, buffer) }
+    fun unmapBuffer() = glCheck { backend.glUnapBuffer(target) }
+
+    fun updateBuffer(access : Int = backend.GL_WRITE_ONLY, update: (mapped: ByteBuffer) -> Unit) {
+        val mapped = mapBuffer(access)
+        update.invoke(mapped)
+        unmapBuffer()
+    }
 }

@@ -23,7 +23,11 @@ private const val H = 600
 
 private val backend = GlLocator.locate()
 
-const val POINTS_CNT = 1000
+private val assetStream = AssetStream()
+private val shadersLib = ShadersLib(assetStream)
+private val texturesLib = TexturesLib(assetStream)
+
+const val POINTS_CNT = 10000
 
 private val random = Random()
 
@@ -39,24 +43,31 @@ class BillboardsTechnique {
     private val positionsBuffer = ByteBuffer.allocateDirect(POINTS_CNT * 3 * 4) // 1000 * vec3f
             .order(ByteOrder.nativeOrder())
 
+    private lateinit var enabledGlBuffer: GlBuffer
+
     fun prepare(shadersLib: ShadersLib, texturesLib: TexturesLib) {
         program = shadersLib.loadProgram(
                 "shaders/billboards/billboards.vert", "shaders/billboards/billboards.frag")
-        rect = GlMesh.rect(listOf(createEnabled(), createPositions()))
+        createPositions()
+        updateEnabled(enabledBuffer)
+        enabledGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, enabledBuffer, backend.GL_STREAM_DRAW)
+        val positionsGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer)
+        val additional = listOf(GlAttribute.ATTRIBUTE_BILLBOARD_IS_ENABLED to enabledGlBuffer,
+                GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positionsGlBuffer)
+        rect = GlMesh.rect(additionalAttributes = additional)
         diffuse = texturesLib.loadTexture("textures/winner.png")
     }
 
-    private fun createEnabled(): Pair<GlAttribute, GlBuffer> {
-        val floats = enabledBuffer.asFloatBuffer()
+    private fun updateEnabled(buffer: ByteBuffer) {
+        buffer.rewind()
+        val floats = buffer.asFloatBuffer()
         for (i in 0 until POINTS_CNT) {
-            //floats.put(if (random.nextBoolean()) 1f else 0f)
-            floats.put(1f)
+            floats.put(if (random.nextBoolean()) 1f else 0f)
         }
-        enabledBuffer.position(0)
-        return GlAttribute.ATTRIBUTE_BILLBOARD_IS_ENABLED to GlBuffer(backend.GL_ARRAY_BUFFER, enabledBuffer)
+        buffer.position(0)
     }
 
-    private fun createPositions(): Pair<GlAttribute, GlBuffer> {
+    private fun createPositions() {
         val floats = positionsBuffer.asFloatBuffer()
         for (i in 0 until POINTS_CNT) {
             floats.put(randomFloat(-1f, 1f))
@@ -64,10 +75,14 @@ class BillboardsTechnique {
             floats.put(randomFloat(-1f, 1f))
         }
         positionsBuffer.position(0)
-        return GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to  GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer)
     }
 
     fun draw(camera: Camera) {
+        glBind(enabledGlBuffer) {
+            enabledGlBuffer.updateBuffer {
+                updateEnabled(it)
+            }
+        }
         glBind(listOf(program, rect, diffuse)) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, Matrix4f().identity()) // todo
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
@@ -78,10 +93,6 @@ class BillboardsTechnique {
         }
     }
 }
-
-private val assetStream = AssetStream()
-private val shadersLib = ShadersLib(assetStream)
-private val texturesLib = TexturesLib(assetStream)
 
 private val particlesTechnique = BillboardsTechnique()
 private val textTechnique = TextTechnique()
