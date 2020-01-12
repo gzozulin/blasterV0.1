@@ -8,6 +8,5 @@ enum class GlAttribute(val size: Int, val location: Int, val divisor: Int = 0) {
     ATTRIBUTE_NORMAL    (3, 2),
     ATTRIBUTE_COLOR     (3, 3),
 
-    ATTRIBUTE_BILLBOARD_IS_ENABLED  (1, 4, 1),
-    ATTRIBUTE_BILLBOARD_POSITION    (3, 5, 1);
+    ATTRIBUTE_BILLBOARD_POSITION    (3, 4, 1);
 }

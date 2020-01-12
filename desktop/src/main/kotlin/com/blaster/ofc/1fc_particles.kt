@@ -4,7 +4,6 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.Console
-import com.blaster.common.randomFloat
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
@@ -18,6 +17,8 @@ import org.lwjgl.glfw.GLFW
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 private const val W = 800
 private const val H = 600
@@ -28,7 +29,7 @@ private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
-const val PARTICLES_MAX = 10000
+const val BILLBOARDS_MAX = 10
 
 private val random = Random()
 
@@ -36,14 +37,17 @@ private val random = Random()
 // todo: sort particles/bbrds?
 
 class Particles(
+        private val emitters: List<Vector3f>,
+        private val max: Int,
         private val emitterFunction: (emitter: Vector3f, particles: MutableList<Vector3f>) -> Unit,
-        private val particleFunction: (position: Vector3f) -> Boolean) {
+        private val particleFunction: (particle: Vector3f) -> Boolean) {
 
-    val emitters = mutableListOf<Vector3f>()
     val particles = mutableListOf<Vector3f>()
 
     fun tick() {
-        emitters.forEach { emitterFunction.invoke(it, particles) }
+        if (particles.size < max) {
+            emitters.forEach { emitterFunction.invoke(it, particles) }
+        }
         val particlesIterator = particles.iterator()
         while (particlesIterator.hasNext()) {
             val isAlive = particleFunction.invoke(particlesIterator.next())
@@ -64,54 +68,54 @@ class Particles(
     }
 }
 
-class BillboardsTechnique {
+private fun updateSnowflake(snowflake: Vector3f) {
+    val timestamp = System.currentTimeMillis().toFloat()
+    snowflake.x = sin(timestamp)
+    snowflake.z = cos(timestamp)
+    snowflake.y -= 0.01f
+}
+
+private fun emitterFunction(emitter: Vector3f, particles: MutableList<Vector3f>) {
+    if (random.nextInt(50) == 1) {
+        val particle = Vector3f(emitter)
+        updateSnowflake(particle)
+        particles.add(Vector3f(emitter))
+        console.info("Emitted particle.. Count: ${particles.size}")
+    }
+}
+
+private fun particleFunction(particle: Vector3f): Boolean {
+    updateSnowflake(particle)
+    return particle.y > -2f
+}
+
+private val particles = Particles(listOf(Vector3f()), BILLBOARDS_MAX, ::emitterFunction, ::particleFunction)
+
+
+class BillboardsTechnique(max: Int) {
     private lateinit var program: GlProgram
     private lateinit var rect: Mesh
     private lateinit var diffuse: GlTexture
 
-    private val enabledBuffer = ByteBuffer.allocateDirect(PARTICLES_MAX * 1 * 4) // 1000 * float
-            .order(ByteOrder.nativeOrder())
-    private val positionsBuffer = ByteBuffer.allocateDirect(PARTICLES_MAX * 3 * 4) // 1000 * vec3f
+    private val positionsBuffer = ByteBuffer.allocateDirect(max * 3 * 4) // max * vec3f
             .order(ByteOrder.nativeOrder())
 
-    private lateinit var enabledGlBuffer: GlBuffer
+    private lateinit var positionsGlBuffer: GlBuffer
 
     fun prepare(shadersLib: ShadersLib, texturesLib: TexturesLib) {
         program = shadersLib.loadProgram(
                 "shaders/billboards/billboards.vert", "shaders/billboards/billboards.frag")
-        createPositions()
-        updateEnabled(enabledBuffer)
-        enabledGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, enabledBuffer, backend.GL_STREAM_DRAW)
-        val positionsGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer)
-        val additional = listOf(GlAttribute.ATTRIBUTE_BILLBOARD_IS_ENABLED to enabledGlBuffer,
-                GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positionsGlBuffer)
+        positionsGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer, backend.GL_STREAM_DRAW)
+        val additional = listOf(GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positionsGlBuffer)
         rect = Mesh.rect(additionalAttributes = additional)
-        diffuse = texturesLib.loadTexture("textures/winner.png")
-    }
-
-    private fun updateEnabled(buffer: ByteBuffer) {
-        buffer.rewind()
-        val floats = buffer.asFloatBuffer()
-        for (i in 0 until PARTICLES_MAX) {
-            floats.put(if (random.nextBoolean()) 1f else 0f)
-        }
-        buffer.position(0)
-    }
-
-    private fun createPositions() {
-        val floats = positionsBuffer.asFloatBuffer()
-        for (i in 0 until PARTICLES_MAX) {
-            floats.put(randomFloat(-1f, 1f))
-            floats.put(randomFloat(-1f, 1f))
-            floats.put(randomFloat(-1f, 1f))
-        }
-        positionsBuffer.position(0)
+        diffuse = texturesLib.loadTexture("textures/snowflake.png")
     }
 
     fun draw(camera: Camera) {
-        glBind(enabledGlBuffer) {
-            enabledGlBuffer.updateBuffer {
-                updateEnabled(it)
+        particles.tick()
+        glBind(listOf(positionsGlBuffer)) {
+            positionsGlBuffer.updateBuffer {
+                particles.flush(it)
             }
         }
         glBind(listOf(program, rect, diffuse)) {
@@ -120,12 +124,12 @@ class BillboardsTechnique {
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
-            rect.drawInstanced(instances = PARTICLES_MAX)
+            rect.drawInstanced(instances = particles.particles.size)
         }
     }
 }
 
-private val particlesTechnique = BillboardsTechnique()
+private val particlesTechnique = BillboardsTechnique(BILLBOARDS_MAX)
 private val textTechnique = TextTechnique()
 
 private val console = Console(2000L)
