@@ -4,6 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.Console
+import com.blaster.common.center
 import com.blaster.gl.GlLocator
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
@@ -33,7 +34,7 @@ private lateinit var flameDiffuse: GlTexture
 
 private val sceneAABB = AABBf(Vector3f(-5f), Vector3f(5f))
 
-const val BILLB_MAX = 1000
+const val BILLBOARDS_MAX = 2500
 
 const val SNOWFLAKE_SIDE = 0.1f
 const val FLAMES_SIDE = 1.5f
@@ -41,11 +42,11 @@ const val FLAMES_SIDE = 1.5f
 private val random = Random()
 
 private val immediateTechnique = ImmediateTechnique()
-private val billboardsTechnique = BillboardsTechnique(BILLB_MAX)
+private val billboardsTechnique = BillboardsTechnique(BILLBOARDS_MAX)
 private val textTechnique = TextTechnique()
 
-private val snow = Particles(BILLB_MAX, snowflakeEmitters(), ::emitSnowflake, ::updateSnowflake)
-private val flame = Particles(BILLB_MAX, listOf(Vector3f(0f, -1f, 0f)), ::emitFlame, ::updateFlame)
+private val snow = Particles(BILLBOARDS_MAX, snowflakeEmitters(), ::emitSnowflake, ::updateSnowflake)
+private val flame = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center()), ::emitFlame, ::updateFlame)
 
 private val console = Console(1000L)
 
@@ -67,18 +68,59 @@ class ImmediateTechnique {
     }
 
     fun aabb(camera: Camera, aabb: AABBf, color: Vector3f = Vector3f(1f)) {
-        // todo: glFrustum, glLoadIdentity, glLoadMatrix, glLoadTransposeMatrix, glMatrixMode, glMultMatrix, glMultTransposeMatrix, glOrtho, glRotate, glScale, glTranslate, glViewport
         glCheck {
             backend.glMatrixMode(backend.GL_MODELVIEW)
             camera.calculateViewM().get(bufferMat4)
             backend.glLoadMatrix(bufferMat4)
             backend.glBegin(backend.GL_LINES)
-
             backend.glColor3f(color.x, color.y, color.z)
             backend.glVertex3f(aabb.minX, aabb.minY, aabb.minZ)
-
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.minY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.minY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.maxY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.minY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.minY, aabb.maxZ)
             backend.glColor3f(color.x, color.y, color.z)
             backend.glVertex3f(aabb.maxX, aabb.maxY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.maxY, aabb.maxY)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.maxY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.minY, aabb.maxY)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.maxY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.maxY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.maxY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.maxY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.minY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.minY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.minY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.maxY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.minY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.maxY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.maxY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.maxY, aabb.maxZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.minY, aabb.minZ)
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.minY, aabb.maxZ)
             backend.glEnd()
         }
     }
@@ -93,7 +135,7 @@ private fun snowflakeEmitters(): List<Vector3f> {
     val emitters = mutableListOf<Vector3f>()
     for (x in -5..5) {
         for (z in -5..5) {
-            emitters.add(Vector3f(x.toFloat(), 2f, z.toFloat()))
+            emitters.add(Vector3f(x.toFloat(), sceneAABB.maxY, z.toFloat()))
         }
     }
     return emitters
@@ -111,7 +153,7 @@ private fun updateSnowflake(particle: Particle): Boolean {
     snowflake.position.y -= 0.01f
     snowflake.position.x = snowflake.origin.x + sin((snowflake.randomness + snowflake.position.y) * 2f) * 0.5f
     snowflake.position.z = snowflake.origin.z + sin((snowflake.randomness + snowflake.position.y) * 4f) * 0.2f
-    return particle.position.y > -2f
+    return particle.position.y > sceneAABB.minY
 }
 
 class Flame(origin: Vector3f) : Particle(origin)
@@ -128,7 +170,7 @@ private fun updateFlame(particle: Particle): Boolean {
     flame.position.y += 0.01f
     flame.position.x += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
     flame.position.z += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
-    return particle.position.y < -0.5f
+    return particle.position.y < 1f
 }
 
 private val window = object : LwjglWindow(W, H) {
