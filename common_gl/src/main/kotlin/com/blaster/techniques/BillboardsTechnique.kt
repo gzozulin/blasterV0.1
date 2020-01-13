@@ -44,7 +44,8 @@ class BillboardsTechnique(max: Int) {
         }
     }
 
-    fun instance(provider: PositionsProvider, node: Node, diffuse: GlTexture, width: Float, height: Float) {
+    fun instance(provider: PositionsProvider, node: Node, diffuse: GlTexture, transparency: Float,
+                 width: Float, height: Float) {
         glBind(positionsGlBuffer) {
             positionsGlBuffer.updateBuffer {
                 provider.flush(it)
@@ -54,6 +55,7 @@ class BillboardsTechnique(max: Int) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
             program.setUniform(GlUniform.UNIFORM_WIDTH, width)
             program.setUniform(GlUniform.UNIFORM_HEIGHT, height)
+            program.setUniform(GlUniform.UNIFORM_TRANSPARENCY, transparency)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             rect.drawInstanced(instances = provider.count())
         }

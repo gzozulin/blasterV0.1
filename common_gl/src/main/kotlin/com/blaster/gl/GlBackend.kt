@@ -66,10 +66,14 @@ interface GlBackend {
     val GL_READ_ONLY: Int
     val GL_WRITE_ONLY: Int
     val GL_READ_WRITE: Int
+    val GL_BLEND: Int
+    val GL_SRC_ALPHA: Int
+    val GL_ONE_MINUS_SRC_ALPHA: Int
 
     fun glGetError(): Int
     fun gluErrorString(error: Int): String
     fun glEnable(cap: Int)
+    fun glDisable(cap: Int)
     fun glClearColor(red: Float, green: Float, blue: Float, alpha: Float)
     fun glViewport(x: Int, y: Int, width: Int, height: Int)
     fun glFrontFace(mode: Int)
@@ -123,5 +127,5 @@ interface GlBackend {
     fun glEnd()
     fun glColor3f(r: Float, g: Float, b: Float)
     fun glVertex3f(x: Float, y: Float, z: Float)
-
+    fun glBlendFunc(sfactor: Int, dfactor: Int)
 }

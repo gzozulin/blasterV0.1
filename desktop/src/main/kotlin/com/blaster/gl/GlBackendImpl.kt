@@ -53,10 +53,14 @@ class GlBackendImpl : GlBackend {
     override val GL_READ_ONLY:          Int get() = GL15.GL_READ_ONLY
     override val GL_READ_WRITE:         Int get() = GL15.GL_READ_WRITE
     override val GL_WRITE_ONLY:         Int get() = GL15.GL_READ_WRITE
+    override val GL_BLEND:              Int get() = GL11.GL_BLEND
+    override val GL_ONE_MINUS_SRC_ALPHA: Int get() = GL11.GL_ONE_MINUS_SRC_ALPHA
+    override val GL_SRC_ALPHA:          Int get() = GL11.GL_SRC_ALPHA
 
     override fun glGetError() = GL11.glGetError()
     override fun gluErrorString(error: Int) = "Undeciphered error $error"
     override fun glEnable(cap: Int) = GL11.glEnable(cap)
+    override fun glDisable(cap: Int) = GL11.glDisable(cap)
     override fun glClearColor(red: Float, green: Float, blue: Float, alpha: Float)  =
             GL11.glClearColor(red, green, blue, alpha)
     override fun glViewport(x: Int, y: Int, width: Int, height: Int) =
@@ -136,4 +140,5 @@ class GlBackendImpl : GlBackend {
     override fun glEnd() = GL11.glEnd()
     override fun glColor3f(r: Float, g: Float, b: Float) = GL11.glColor3f(r, g, b)
     override fun glVertex3f(x: Float, y: Float, z: Float) = GL11.glVertex3f(x, y, z)
+    override fun glBlendFunc(sfactor: Int, dfactor: Int) = GL11.glBlendFunc(sfactor, dfactor)
 }

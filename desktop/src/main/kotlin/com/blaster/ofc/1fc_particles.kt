@@ -141,8 +141,10 @@ private val window = object : LwjglWindow(W, H) {
             }
         }
         billboardsTechnique.draw(camera) {
-            billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE)
-            billboardsTechnique.instance(flame, node, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+            billboardsTechnique.instance(snow, node, snowflakeDiffuse, 1.0f, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE)
+            GlState.drawTransparent {
+                billboardsTechnique.instance(flame, node, flameDiffuse, 0.4f, FLAMES_SIDE, FLAMES_SIDE)
+            }
         }
     }
 

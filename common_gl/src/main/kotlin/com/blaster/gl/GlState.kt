@@ -18,5 +18,20 @@ class GlState private constructor() {
         fun clear() {
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
         }
+
+        fun drawTransparent(draw: () -> Unit) {
+            enableTransparency()
+            draw.invoke()
+            disableTransparency()
+        }
+
+        fun enableTransparency() {
+            backend.glEnable(backend.GL_BLEND)
+            backend.glBlendFunc(backend.GL_SRC_ALPHA, backend.GL_ONE_MINUS_SRC_ALPHA)
+        }
+
+        fun disableTransparency() {
+            backend.glDisable(backend.GL_BLEND)
+        }
     }
 }
