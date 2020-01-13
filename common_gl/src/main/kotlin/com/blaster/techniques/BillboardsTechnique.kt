@@ -15,6 +15,7 @@ interface PositionsProvider {
     fun count(): Int
 }
 
+// todo: can pass matrix to have full control over bb (position, scale, rotation)
 // todo: parameter to billboard only around y axis - to draw characters and items
 // todo: maybe (optionally) sort billboards?
 class BillboardsTechnique(max: Int) {

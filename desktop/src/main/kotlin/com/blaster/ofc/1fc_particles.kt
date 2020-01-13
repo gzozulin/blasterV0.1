@@ -25,19 +25,23 @@ private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
 private lateinit var snowflakeDiffuse: GlTexture
+private lateinit var flameDiffuse: GlTexture
 
 private val sceneAABB = AABB(Vector3f(-5f), Vector3f(5f))
 
-const val BILLBOARDS_MAX = 1000
-const val BILLBOARDS_SIDE = 0.1f
+const val BILLB_MAX = 1000
+
+const val SNOWFLAKE_SIDE = 0.1f
+const val FLAMES_SIDE = 1.5f
 
 private val random = Random()
 
 private val immediateTechnique = ImmediateTechnique()
-private val billboardsTechnique = BillboardsTechnique(BILLBOARDS_MAX)
+private val billboardsTechnique = BillboardsTechnique(BILLB_MAX)
 private val textTechnique = TextTechnique()
 
-private val particles = Particles(BILLBOARDS_MAX, snowflakeEmitters(), ::emitSnowflake, ::updateSnowflake)
+private val snow = Particles(BILLB_MAX, snowflakeEmitters(), ::emitSnowflake, ::updateSnowflake)
+private val flame = Particles(BILLB_MAX, listOf(Vector3f(0f, -1f, 0f)), ::emitFlame, ::updateFlame)
 
 private val console = Console(1000L)
 
@@ -77,16 +81,33 @@ private fun snowflakeEmitters(): List<Vector3f> {
 private fun emitSnowflake(emitter: Vector3f, particles: MutableList<Particle>) {
     if (random.nextInt(50) == 1) {
         particles.add(Snowflake(emitter))
-        console.info("Particle ${particles.size}")
+        console.info("Snowflake ${particles.size}")
     }
 }
 
 private fun updateSnowflake(particle: Particle): Boolean {
     val snowflake = particle as Snowflake
     snowflake.position.y -= 0.01f
-    snowflake.position.x = snowflake.origin.x + sin(snowflake.randomness + snowflake.position.y * 2f) * 0.5f
-    snowflake.position.z = snowflake.origin.z + sin(snowflake.randomness + snowflake.position.y * 4f) * 0.2f
+    snowflake.position.x = snowflake.origin.x + sin((snowflake.randomness + snowflake.position.y) * 2f) * 0.5f
+    snowflake.position.z = snowflake.origin.z + sin((snowflake.randomness + snowflake.position.y) * 4f) * 0.2f
     return particle.position.y > -2f
+}
+
+class Flame(origin: Vector3f) : Particle(origin)
+
+private fun emitFlame(emitter: Vector3f, particles: MutableList<Particle>) {
+    if (random.nextInt(5) == 1) {
+        particles.add(Flame(emitter))
+        console.success("Flame ${particles.size}")
+    }
+}
+
+private fun updateFlame(particle: Particle): Boolean {
+    val flame = particle as Flame
+    flame.position.y += 0.01f
+    flame.position.x += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
+    flame.position.z += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
+    return particle.position.y < -0.5f
 }
 
 private val window = object : LwjglWindow(W, H) {
@@ -98,14 +119,16 @@ private val window = object : LwjglWindow(W, H) {
         textTechnique.prepare(shadersLib, texturesLib)
         console.info("Text ready..")
         snowflakeDiffuse = texturesLib.loadTexture("textures/snowflake.png")
-        console.info("Texture loaded..")
+        flameDiffuse = texturesLib.loadTexture("textures/flame.png")
+        console.info("Textures loaded..")
         GlState.apply(color = Vector3f())
         console.success("All ready..")
     }
 
     override fun onDraw() {
         GlState.clear()
-        particles.tick()
+        snow.tick()
+        flame.tick()
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
@@ -118,7 +141,8 @@ private val window = object : LwjglWindow(W, H) {
             }
         }
         billboardsTechnique.draw(camera) {
-            billboardsTechnique.instance(particles, node, snowflakeDiffuse, BILLBOARDS_SIDE, BILLBOARDS_SIDE)
+            billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE)
+            billboardsTechnique.instance(flame, node, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
         }
     }
 
