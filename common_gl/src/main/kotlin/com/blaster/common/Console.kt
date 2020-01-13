@@ -37,7 +37,7 @@ class Console(private val timeout: Long = 1000L) {
         line(text, Level.SUCCESS)
     }
 
-    fun throttle() {
+    fun tick() {
         val current = System.currentTimeMillis()
         val iterator = lines.iterator()
         while (iterator.hasNext()) {

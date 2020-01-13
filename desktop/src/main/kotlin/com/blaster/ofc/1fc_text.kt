@@ -4,12 +4,9 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.Console
-import com.blaster.common.extractColors
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.techniques.TextTechnique
-import org.joml.Vector2f
-import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
 import java.lang.IllegalArgumentException
 import java.util.*
@@ -31,7 +28,7 @@ private val window = object : LwjglWindow(800, 600) {
 
     override fun onDraw() {
         GlState.clear()
-        console.throttle()
+        console.tick()
         technique.draw {
             console.render { position, text, color, scale ->
                 technique.text(text, position, scale, color)

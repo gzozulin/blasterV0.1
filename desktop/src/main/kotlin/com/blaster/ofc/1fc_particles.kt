@@ -10,8 +10,8 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
 import com.blaster.scene.Controller
 import com.blaster.scene.Mesh
+import com.blaster.scene.Node
 import com.blaster.techniques.TextTechnique
-import org.joml.Matrix4f
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
@@ -29,11 +29,12 @@ private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 
+private lateinit var snowflakeDiffuse: GlTexture
+
 private val sceneAABB = AABB(Vector3f(-5f), Vector3f(5f))
 
 const val BILLBOARDS_MAX = 1000
-const val BILLBOARDS_WIDTH = 0.1f
-const val BILLBOARDS_HEIGHT = 0.1f
+const val BILLBOARDS_SIDE = 0.1f
 
 private val random = Random()
 
@@ -55,14 +56,18 @@ open class Particle(origin: Vector3f) {
     val position = Vector3f(origin)
 }
 
+interface PositionsProvider {
+    fun flush(buffer: ByteBuffer)
+    fun count(): Int
+}
+
 class Particles(
         private val max: Int,
         private val emitters: List<Vector3f>,
         private val emitterFunction: (emitter: Vector3f, particles: MutableList<Particle>) -> Unit,
-        private val particleFunction: (particle: Particle) -> Boolean) {
+        private val particleFunction: (particle: Particle) -> Boolean) : PositionsProvider {
 
-
-    val particles = mutableListOf<Particle>()
+    private val particles = mutableListOf<Particle>()
 
     fun tick() {
         emitters.forEach {
@@ -79,7 +84,7 @@ class Particles(
         }
     }
 
-    fun flush(buffer: ByteBuffer) {
+    override fun flush(buffer: ByteBuffer) {
         buffer.rewind()
         val floats = buffer.asFloatBuffer()
         particles.forEachIndexed { index, particle ->
@@ -91,6 +96,8 @@ class Particles(
             floats.put(particle.position.z)
         }
     }
+
+    override fun count() = particles.size
 }
 
 class Snowflake(origin: Vector3f) : Particle(origin) {
@@ -131,48 +138,48 @@ private val particles = Particles(
 
 // todo: parameter to billboard only around y axis - to draw characters and items
 // todo: maybe (optionally) sort billboards?
-// todo: can draw multiple sets of billboards with same buffer
 class BillboardsTechnique(max: Int) {
     private lateinit var program: GlProgram
     private lateinit var rect: Mesh
-    private lateinit var diffuse: GlTexture
 
     private val positionsBuffer = ByteBuffer.allocateDirect(max * 3 * 4) // max * vec3f
             .order(ByteOrder.nativeOrder())
 
     private lateinit var positionsGlBuffer: GlBuffer
 
-    fun prepare(shadersLib: ShadersLib, texturesLib: TexturesLib) {
+    fun prepare(shadersLib: ShadersLib) {
         program = shadersLib.loadProgram(
                 "shaders/billboards/billboards.vert", "shaders/billboards/billboards.frag")
         positionsGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer, backend.GL_STREAM_DRAW)
         val additional = listOf(GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positionsGlBuffer)
         rect = Mesh.rect(additionalAttributes = additional)
-        diffuse = texturesLib.loadTexture("textures/snowflake.png")
     }
 
-    fun draw(camera: Camera) {
-        particles.tick()
-        glBind(listOf(positionsGlBuffer)) {
-            positionsGlBuffer.updateBuffer {
-                particles.flush(it)
-            }
-        }
-        glBind(listOf(program, rect, diffuse)) {
-            program.setUniform(GlUniform.UNIFORM_MODEL_M, Matrix4f().identity()) // todo
+    fun draw(camera: Camera, draw: () -> Unit) {
+        glBind(listOf(program, rect, snowflakeDiffuse)) {
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
-            program.setUniform(GlUniform.UNIFORM_WIDTH, BILLBOARDS_WIDTH)
-            program.setUniform(GlUniform.UNIFORM_HEIGHT, BILLBOARDS_HEIGHT)
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
-            rect.drawInstanced(instances = particles.particles.size)
+            draw.invoke()
         }
+    }
+
+    fun instance(provider: PositionsProvider, node: Node, diffuse: GlTexture, width: Float, height: Float) {
+        program.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
+        program.setUniform(GlUniform.UNIFORM_WIDTH, width)
+        program.setUniform(GlUniform.UNIFORM_HEIGHT, height)
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+        glBind(positionsGlBuffer) {
+            positionsGlBuffer.updateBuffer {
+                provider.flush(it)
+            }
+        }
+        rect.drawInstanced(instances = provider.count())
     }
 }
 
 private val immediateTechnique = ImmediateTechnique()
-private val particlesTechnique = BillboardsTechnique(BILLBOARDS_MAX)
+private val billboardsTechnique = BillboardsTechnique(BILLBOARDS_MAX)
 private val textTechnique = TextTechnique()
 
 private val console = Console(1000L)
@@ -181,32 +188,39 @@ private val camera = Camera(W.toFloat() / H.toFloat())
 
 private val controller = Controller()
 
+private val node = Node()
+
 private val window = object : LwjglWindow(W, H) {
     override fun onCreate() {
         controller.position.set(Vector3f(0f, 0f, 3f))
         console.info("Controller set..")
-        particlesTechnique.prepare(shadersLib, texturesLib)
+        billboardsTechnique.prepare(shadersLib)
         console.info("Particles ready..")
         textTechnique.prepare(shadersLib, texturesLib)
         console.info("Text ready..")
+        snowflakeDiffuse = texturesLib.loadTexture("textures/snowflake.png")
+        console.info("Texture loaded..")
         GlState.apply(color = Vector3f())
         console.success("All ready..")
     }
 
     override fun onDraw() {
         GlState.clear()
-        immediateTechnique.aabb(camera, sceneAABB)
+        particles.tick()
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
-        console.throttle()
+        console.tick()
+        immediateTechnique.aabb(camera, sceneAABB)
         textTechnique.draw {
             console.render { position, text, color, scale ->
                 textTechnique.text(text, position, scale, color)
             }
         }
-        particlesTechnique.draw(camera)
+        billboardsTechnique.draw(camera) {
+            billboardsTechnique.instance(particles, node, snowflakeDiffuse, BILLBOARDS_SIDE, BILLBOARDS_SIDE)
+        }
     }
 
     override fun onCursorDelta(delta: Vector2f) {
