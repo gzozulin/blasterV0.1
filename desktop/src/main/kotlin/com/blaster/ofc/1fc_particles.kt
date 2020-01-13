@@ -129,6 +129,7 @@ private val particles = Particles(
         ::emitSnowflake,
         ::updateSnowflake)
 
+// todo: parameter to billboard only around y axis - to draw characters and items
 // todo: maybe (optionally) sort billboards?
 // todo: can draw multiple sets of billboards with same buffer
 class BillboardsTechnique(max: Int) {
