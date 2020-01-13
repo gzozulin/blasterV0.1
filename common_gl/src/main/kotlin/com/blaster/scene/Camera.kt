@@ -1,8 +1,7 @@
 package com.blaster.scene
 
-import com.blaster.common.Version
-import com.blaster.common.AABB
-import com.blaster.common.VECTOR_UP
+import com.blaster.common.*
+import org.joml.AABBf
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
@@ -34,16 +33,16 @@ class Camera(aspectRatio: Float) : Movable {
         return this
     }
 
-    fun lookAt(aabb: AABB): Camera {
+    fun lookAt(aabb: AABBf): Camera {
         viewVersion.increment()
-        var maxValue = aabb.width
-        if (aabb.height > maxValue) {
-            maxValue = aabb.height
+        var maxValue = aabb.width()
+        if (aabb.height() > maxValue) {
+            maxValue = aabb.height()
         }
-        if (aabb.depth > maxValue) {
-            maxValue = aabb.depth
+        if (aabb.depth() > maxValue) {
+            maxValue = aabb.depth()
         }
-        val center = aabb.center
+        val center = aabb.center()
         center.add(Vector3f(0f, maxValue / 2f, maxValue), position)
         return lookAt(position, center)
     }

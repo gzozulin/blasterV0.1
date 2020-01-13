@@ -30,6 +30,10 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_CULL_FACE
 
     override fun glEnable(cap: Int) = GLES30.glEnable(cap)
+    override fun glDisable(cap: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun glClearColor(red: Float, green: Float, blue: Float, alpha: Float) =
             GLES30.glClearColor(red, green, blue, alpha)
     override fun glViewport(x: Int, y: Int, width: Int, height: Int) =
@@ -84,6 +88,8 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_UNSIGNED_INT
     override val GL_TRIANGLES: Int
         get() = GLES30.GL_TRIANGLES
+    override val GL_LINES: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_POINTS: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
@@ -207,6 +213,16 @@ class GlBackendImpl : GlBackend {
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_READ_WRITE: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_BLEND: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_SRC_ALPHA: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_ONE_MINUS_SRC_ALPHA: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_MODELVIEW: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_PROJECTION: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override fun glGenTextures(): Int {
         val handles = IntArray(1)
@@ -229,6 +245,34 @@ class GlBackendImpl : GlBackend {
     }
 
     override fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glBegin(mode: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glEnd() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glColor3f(r: Float, g: Float, b: Float) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glVertex3f(x: Float, y: Float, z: Float) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glBlendFunc(sfactor: Int, dfactor: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glMatrixMode(mode: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glLoadMatrix(matrix: ByteBuffer) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 }

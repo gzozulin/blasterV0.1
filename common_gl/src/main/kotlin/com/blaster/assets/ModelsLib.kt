@@ -1,9 +1,9 @@
 package com.blaster.assets
 
-import com.blaster.common.AABB
 import com.blaster.gl.*
 import com.blaster.scene.Mesh
 import com.blaster.scene.Model
+import org.joml.AABBf
 import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -90,7 +90,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
         currentNormals.clear()
         currentIndices.clear()
         return Model(mesh, texturesLib.loadTexture(diffuseFilename),
-                AABB(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
+                AABBf(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
     }
 
     private fun parseLine(line: String) {

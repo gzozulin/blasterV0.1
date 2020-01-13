@@ -3,17 +3,21 @@ package com.blaster.ofc
 import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.common.AABB
 import com.blaster.common.Console
+import com.blaster.gl.GlLocator
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
+import com.blaster.gl.glCheck
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.*
 import com.blaster.techniques.BillboardsTechnique
 import com.blaster.techniques.TextTechnique
+import org.joml.AABBf
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.util.*
 import kotlin.math.sin
 
@@ -27,7 +31,7 @@ private val texturesLib = TexturesLib(assetStream)
 private lateinit var snowflakeDiffuse: GlTexture
 private lateinit var flameDiffuse: GlTexture
 
-private val sceneAABB = AABB(Vector3f(-5f), Vector3f(5f))
+private val sceneAABB = AABBf(Vector3f(-5f), Vector3f(5f))
 
 const val BILLB_MAX = 1000
 
@@ -49,17 +53,34 @@ private val camera = Camera(W.toFloat() / H.toFloat())
 private val controller = Controller()
 private val node = Node()
 
+private val backend = GlLocator.locate()
+
 class ImmediateTechnique {
-    fun aabb(camera: Camera, aabb: AABB, color: Vector3f = Vector3f(1f)) {
+    private val bufferMat4 = ByteBuffer.allocateDirect(16 * 4).order(ByteOrder.nativeOrder())
+
+    fun prepare(camera: Camera) {
+        glCheck {
+            backend.glMatrixMode(backend.GL_PROJECTION)
+            camera.projectionM.get(bufferMat4)
+            backend.glLoadMatrix(bufferMat4)
+        }
+    }
+
+    fun aabb(camera: Camera, aabb: AABBf, color: Vector3f = Vector3f(1f)) {
         // todo: glFrustum, glLoadIdentity, glLoadMatrix, glLoadTransposeMatrix, glMatrixMode, glMultMatrix, glMultTransposeMatrix, glOrtho, glRotate, glScale, glTranslate, glViewport
-        /*glCheck {
+        glCheck {
+            backend.glMatrixMode(backend.GL_MODELVIEW)
+            camera.calculateViewM().get(bufferMat4)
+            backend.glLoadMatrix(bufferMat4)
             backend.glBegin(backend.GL_LINES)
-            //backend.glColor3f(color.x, color.y, color.z)
-            backend.glVertex3f(aabb.min.x, aabb.min.y, aabb.min.z)
-            //backend.glColor3f(color.x, color.y, color.z)
-            backend.glVertex3f(aabb.max.x, aabb.max.y, aabb.max.z)
+
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.minX, aabb.minY, aabb.minZ)
+
+            backend.glColor3f(color.x, color.y, color.z)
+            backend.glVertex3f(aabb.maxX, aabb.maxY, aabb.maxZ)
             backend.glEnd()
-        }*/
+        }
     }
 }
 
@@ -117,7 +138,8 @@ private val window = object : LwjglWindow(W, H) {
         billboardsTechnique.prepare(shadersLib)
         console.info("Particles ready..")
         textTechnique.prepare(shadersLib, texturesLib)
-        console.info("Text ready..")
+        immediateTechnique.prepare(camera)
+        console.info("Techniques ready..")
         snowflakeDiffuse = texturesLib.loadTexture("textures/snowflake.png")
         flameDiffuse = texturesLib.loadTexture("textures/flame.png")
         console.info("Textures loaded..")

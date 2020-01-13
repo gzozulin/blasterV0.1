@@ -1,5 +1,6 @@
 package com.blaster.common
 
+import org.joml.AABBf
 import org.joml.Vector2f
 import org.joml.Vector3f
 import java.util.*
@@ -22,3 +23,8 @@ fun extractColors(hex: String): Vector3f {
     val bIntValue = (integerHex            ) % 256
     return Vector3f(rIntValue / 255.0f, gIntValue / 255.0f, bIntValue / 255.0f)
 }
+
+fun AABBf.width() = maxX - minX
+fun AABBf.height() = maxY - minY
+fun AABBf.depth() = maxZ - minZ
+fun AABBf.center() = Vector3f(minX + (maxX - minX) / 2f, minY + (maxY - minY) / 2f, minZ + (maxZ - minZ) / 2f)

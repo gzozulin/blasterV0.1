@@ -56,6 +56,8 @@ class GlBackendImpl : GlBackend {
     override val GL_BLEND:              Int get() = GL11.GL_BLEND
     override val GL_ONE_MINUS_SRC_ALPHA: Int get() = GL11.GL_ONE_MINUS_SRC_ALPHA
     override val GL_SRC_ALPHA:          Int get() = GL11.GL_SRC_ALPHA
+    override val GL_MODELVIEW:          Int get() = GL11.GL_MODELVIEW
+    override val GL_PROJECTION:         Int get() = GL11.GL_PROJECTION
 
     override fun glGetError() = GL11.glGetError()
     override fun gluErrorString(error: Int) = "Undeciphered error $error"
@@ -141,4 +143,6 @@ class GlBackendImpl : GlBackend {
     override fun glColor3f(r: Float, g: Float, b: Float) = GL11.glColor3f(r, g, b)
     override fun glVertex3f(x: Float, y: Float, z: Float) = GL11.glVertex3f(x, y, z)
     override fun glBlendFunc(sfactor: Int, dfactor: Int) = GL11.glBlendFunc(sfactor, dfactor)
+    override fun glMatrixMode(mode: Int) = GL11.glMatrixMode(mode)
+    override fun glLoadMatrix(matrix: ByteBuffer) = GL11.glLoadMatrixf(matrix)
 }

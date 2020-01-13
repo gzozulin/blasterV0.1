@@ -69,6 +69,8 @@ interface GlBackend {
     val GL_BLEND: Int
     val GL_SRC_ALPHA: Int
     val GL_ONE_MINUS_SRC_ALPHA: Int
+    val GL_MODELVIEW: Int
+    val GL_PROJECTION: Int
 
     fun glGetError(): Int
     fun gluErrorString(error: Int): String
@@ -128,4 +130,6 @@ interface GlBackend {
     fun glColor3f(r: Float, g: Float, b: Float)
     fun glVertex3f(x: Float, y: Float, z: Float)
     fun glBlendFunc(sfactor: Int, dfactor: Int)
+    fun glMatrixMode(mode: Int)
+    fun glLoadMatrix(matrix: ByteBuffer)
 }
