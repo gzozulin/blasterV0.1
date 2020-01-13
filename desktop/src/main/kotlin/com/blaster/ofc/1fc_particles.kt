@@ -5,25 +5,20 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.AABB
 import com.blaster.common.Console
-import com.blaster.gl.*
+import com.blaster.gl.GlState
+import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
-import com.blaster.scene.Camera
-import com.blaster.scene.Controller
-import com.blaster.scene.Mesh
-import com.blaster.scene.Node
+import com.blaster.scene.*
+import com.blaster.techniques.BillboardsTechnique
 import com.blaster.techniques.TextTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.util.*
 import kotlin.math.sin
 
 private const val W = 800
 private const val H = 600
-
-private val backend = GlLocator.locate()
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
@@ -38,6 +33,18 @@ const val BILLBOARDS_SIDE = 0.1f
 
 private val random = Random()
 
+private val immediateTechnique = ImmediateTechnique()
+private val billboardsTechnique = BillboardsTechnique(BILLBOARDS_MAX)
+private val textTechnique = TextTechnique()
+
+private val particles = Particles(BILLBOARDS_MAX, snowflakeEmitters(), ::emitSnowflake, ::updateSnowflake)
+
+private val console = Console(1000L)
+
+private val camera = Camera(W.toFloat() / H.toFloat())
+private val controller = Controller()
+private val node = Node()
+
 class ImmediateTechnique {
     fun aabb(camera: Camera, aabb: AABB, color: Vector3f = Vector3f(1f)) {
         // todo: glFrustum, glLoadIdentity, glLoadMatrix, glLoadTransposeMatrix, glMatrixMode, glMultMatrix, glMultTransposeMatrix, glOrtho, glRotate, glScale, glTranslate, glViewport
@@ -50,54 +57,6 @@ class ImmediateTechnique {
             backend.glEnd()
         }*/
     }
-}
-
-open class Particle(origin: Vector3f) {
-    val position = Vector3f(origin)
-}
-
-interface PositionsProvider {
-    fun flush(buffer: ByteBuffer)
-    fun count(): Int
-}
-
-class Particles(
-        private val max: Int,
-        private val emitters: List<Vector3f>,
-        private val emitterFunction: (emitter: Vector3f, particles: MutableList<Particle>) -> Unit,
-        private val particleFunction: (particle: Particle) -> Boolean) : PositionsProvider {
-
-    private val particles = mutableListOf<Particle>()
-
-    fun tick() {
-        emitters.forEach {
-            if (particles.size < max) {
-                emitterFunction.invoke(it, particles)
-            }
-        }
-        val particlesIterator = particles.iterator()
-        while (particlesIterator.hasNext()) {
-            val isAlive = particleFunction.invoke(particlesIterator.next())
-            if (!isAlive) {
-                particlesIterator.remove()
-            }
-        }
-    }
-
-    override fun flush(buffer: ByteBuffer) {
-        buffer.rewind()
-        val floats = buffer.asFloatBuffer()
-        particles.forEachIndexed { index, particle ->
-            if (index >= max) {
-                return
-            }
-            floats.put(particle.position.x)
-            floats.put(particle.position.y)
-            floats.put(particle.position.z)
-        }
-    }
-
-    override fun count() = particles.size
 }
 
 class Snowflake(origin: Vector3f) : Particle(origin) {
@@ -129,66 +88,6 @@ private fun updateSnowflake(particle: Particle): Boolean {
     snowflake.position.z = snowflake.origin.z + sin(snowflake.randomness + snowflake.position.y * 4f) * 0.2f
     return particle.position.y > -2f
 }
-
-private val particles = Particles(
-        BILLBOARDS_MAX,
-        snowflakeEmitters(),
-        ::emitSnowflake,
-        ::updateSnowflake)
-
-// todo: parameter to billboard only around y axis - to draw characters and items
-// todo: maybe (optionally) sort billboards?
-class BillboardsTechnique(max: Int) {
-    private lateinit var program: GlProgram
-    private lateinit var rect: Mesh
-
-    private val positionsBuffer = ByteBuffer.allocateDirect(max * 3 * 4) // max * vec3f
-            .order(ByteOrder.nativeOrder())
-
-    private lateinit var positionsGlBuffer: GlBuffer
-
-    fun prepare(shadersLib: ShadersLib) {
-        program = shadersLib.loadProgram(
-                "shaders/billboards/billboards.vert", "shaders/billboards/billboards.frag")
-        positionsGlBuffer = GlBuffer(backend.GL_ARRAY_BUFFER, positionsBuffer, backend.GL_STREAM_DRAW)
-        val additional = listOf(GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positionsGlBuffer)
-        rect = Mesh.rect(additionalAttributes = additional)
-    }
-
-    fun draw(camera: Camera, draw: () -> Unit) {
-        glBind(listOf(program, rect, snowflakeDiffuse)) {
-            program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
-            program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
-            program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
-            draw.invoke()
-        }
-    }
-
-    fun instance(provider: PositionsProvider, node: Node, diffuse: GlTexture, width: Float, height: Float) {
-        program.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
-        program.setUniform(GlUniform.UNIFORM_WIDTH, width)
-        program.setUniform(GlUniform.UNIFORM_HEIGHT, height)
-        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
-        glBind(positionsGlBuffer) {
-            positionsGlBuffer.updateBuffer {
-                provider.flush(it)
-            }
-        }
-        rect.drawInstanced(instances = provider.count())
-    }
-}
-
-private val immediateTechnique = ImmediateTechnique()
-private val billboardsTechnique = BillboardsTechnique(BILLBOARDS_MAX)
-private val textTechnique = TextTechnique()
-
-private val console = Console(1000L)
-
-private val camera = Camera(W.toFloat() / H.toFloat())
-
-private val controller = Controller()
-
-private val node = Node()
 
 private val window = object : LwjglWindow(W, H) {
     override fun onCreate() {
