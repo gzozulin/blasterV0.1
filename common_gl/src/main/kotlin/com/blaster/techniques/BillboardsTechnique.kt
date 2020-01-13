@@ -36,7 +36,7 @@ class BillboardsTechnique(max: Int) {
     }
 
     fun draw(camera: Camera, draw: () -> Unit) {
-        glBind(listOf(program, rect)) {
+        glBind(listOf(program, rect, positionsGlBuffer)) {
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
@@ -46,12 +46,10 @@ class BillboardsTechnique(max: Int) {
 
     fun instance(provider: PositionsProvider, node: Node, diffuse: GlTexture, transparency: Float,
                  width: Float, height: Float) {
-        glBind(positionsGlBuffer) {
+        glBind(diffuse) {
             positionsGlBuffer.updateBuffer {
                 provider.flush(it)
             }
-        }
-        glBind(diffuse) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
             program.setUniform(GlUniform.UNIFORM_WIDTH, width)
             program.setUniform(GlUniform.UNIFORM_HEIGHT, height)
