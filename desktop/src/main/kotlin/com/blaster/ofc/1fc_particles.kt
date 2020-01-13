@@ -28,6 +28,8 @@ private val texturesLib = TexturesLib(assetStream)
 
 private lateinit var snowflakeDiffuse: GlTexture
 private lateinit var flameDiffuse: GlTexture
+private lateinit var flameDiffuse2: GlTexture
+private lateinit var smokeDiffuse: GlTexture
 
 private val sceneAABB = AABBf(Vector3f(-5f), Vector3f(5f))
 
@@ -44,6 +46,8 @@ private val textTechnique = TextTechnique()
 
 private val snow = Particles(BILLBOARDS_MAX, snowflakeEmitters(), ::emitSnowflake, ::updateSnowflake)
 private val flame = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center()), ::emitFlame, ::updateFlame)
+private val flame2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center()), ::emitFlame, ::updateFlame)
+private val smoke = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center()), ::emitFlame, ::updateFlame)
 
 private val console = Console(1000L)
 
@@ -84,7 +88,7 @@ private fun updateSnowflake(particle: Particle): Boolean {
 class Flame(origin: Vector3f) : Particle(origin)
 
 private fun emitFlame(emitter: Vector3f, particles: MutableList<Particle>) {
-    if (random.nextInt(5) == 1) {
+    if (random.nextInt(10) == 1) {
         particles.add(Flame(emitter))
         console.success("Flame ${particles.size}")
     }
@@ -109,6 +113,8 @@ private val window = object : LwjglWindow(W, H) {
         console.info("Techniques ready..")
         snowflakeDiffuse = texturesLib.loadTexture("textures/snowflake.png")
         flameDiffuse = texturesLib.loadTexture("textures/flame.png")
+        flameDiffuse2 = texturesLib.loadTexture("textures/flame.png", mirror = true)
+        smokeDiffuse = texturesLib.loadTexture("textures/smoke.png")
         console.info("Textures loaded..")
         GlState.apply(color = Vector3f())
         console.success("All ready..")
@@ -118,6 +124,8 @@ private val window = object : LwjglWindow(W, H) {
         GlState.clear()
         snow.tick()
         flame.tick()
+        flame2.tick()
+        smoke.tick()
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
@@ -130,9 +138,11 @@ private val window = object : LwjglWindow(W, H) {
             }
         }
         billboardsTechnique.draw(camera) {
-            billboardsTechnique.instance(snow, node, snowflakeDiffuse, 1.0f, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE)
+            billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE)
             GlState.drawTransparent {
-                billboardsTechnique.instance(flame, node, flameDiffuse, 0.4f, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(flame, node, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(flame2, node, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(smoke, node, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)
             }
         }
     }

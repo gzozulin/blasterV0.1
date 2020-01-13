@@ -14,5 +14,4 @@ void main() {
     if (oFragColor.a < 0.1) {
         discard;
     }
-    oFragColor.a = uTransparency;
 }

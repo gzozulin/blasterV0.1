@@ -15,9 +15,9 @@ interface PositionsProvider {
     fun count(): Int
 }
 
-// todo: can pass matrix to have full control over bb (position, scale, rotation)
 // todo: parameter to billboard only around y axis - to draw characters and items
 // todo: maybe (optionally) sort billboards?
+// todo: buffers: positon, transparency, scale, rotation around z, should be standalone
 class BillboardsTechnique(max: Int) {
     private lateinit var program: GlProgram
     private lateinit var rect: Mesh
@@ -44,8 +44,7 @@ class BillboardsTechnique(max: Int) {
         }
     }
 
-    fun instance(provider: PositionsProvider, node: Node, diffuse: GlTexture, transparency: Float,
-                 width: Float, height: Float) {
+    fun instance(provider: PositionsProvider, node: Node, diffuse: GlTexture, width: Float, height: Float) {
         glBind(diffuse) {
             positionsGlBuffer.updateBuffer {
                 provider.flush(it)
@@ -53,7 +52,6 @@ class BillboardsTechnique(max: Int) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
             program.setUniform(GlUniform.UNIFORM_WIDTH, width)
             program.setUniform(GlUniform.UNIFORM_HEIGHT, height)
-            program.setUniform(GlUniform.UNIFORM_TRANSPARENCY, transparency)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             rect.drawInstanced(instances = provider.count())
         }

@@ -44,7 +44,6 @@ enum class GlUniform(val label: String) {
     UNIFORM_LIGHT_15_COLOR(     "uLights[15].color"),
 
     UNIFORM_COLOR(              "uColor"),
-    UNIFORM_TRANSPARENCY        ("uTransparency"),
 
     UNIFORM_CHAR_INDEX(         "uCharIndex"),
     UNIFORM_CHAR_START(         "uCharStart"),
