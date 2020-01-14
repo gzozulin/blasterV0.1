@@ -1,18 +1,20 @@
 package com.blaster.scene
 
-import com.blaster.techniques.PositionsProvider
+import com.blaster.techniques.BillboardsProvider
 import org.joml.Vector3f
-import java.nio.ByteBuffer
+import java.nio.FloatBuffer
 
 open class Particle(origin: Vector3f) {
     val position = Vector3f(origin)
+    var scale = 1f
+    var transparency = 1f
 }
 
 class Particles(
         private val max: Int,
         private val emitters: List<Vector3f>,
         private val emitterFunction: (emitter: Vector3f, particles: MutableList<Particle>) -> Unit,
-        private val particleFunction: (particle: Particle) -> Boolean) : PositionsProvider {
+        private val particleFunction: (particle: Particle) -> Boolean) : BillboardsProvider {
 
     private val particles = mutableListOf<Particle>()
 
@@ -31,16 +33,35 @@ class Particles(
         }
     }
 
-    override fun flush(buffer: ByteBuffer) {
-        buffer.rewind()
-        val floats = buffer.asFloatBuffer()
+    override fun flushPositions(position: FloatBuffer) {
+        position.rewind()
         particles.forEachIndexed { index, particle ->
             if (index >= max) {
                 return
             }
-            floats.put(particle.position.x)
-            floats.put(particle.position.y)
-            floats.put(particle.position.z)
+            position.put(particle.position.x)
+            position.put(particle.position.y)
+            position.put(particle.position.z)
+        }
+    }
+
+    override fun flushScale(scale: FloatBuffer) {
+        scale.rewind()
+        particles.forEachIndexed { index, particle ->
+            if (index >= max) {
+                return
+            }
+            scale.put(particle.scale)
+        }
+    }
+
+    override fun flushTransparency(transparency: FloatBuffer) {
+        transparency.rewind()
+        particles.forEachIndexed { index, particle ->
+            if (index >= max) {
+                return
+            }
+            transparency.put(particle.transparency)
         }
     }
 
