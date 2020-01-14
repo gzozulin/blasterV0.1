@@ -28,3 +28,5 @@ fun AABBf.width() = maxX - minX
 fun AABBf.height() = maxY - minY
 fun AABBf.depth() = maxZ - minZ
 fun AABBf.center() = Vector3f(minX + (maxX - minX) / 2f, minY + (maxY - minY) / 2f, minZ + (maxZ - minZ) / 2f)
+
+fun lerpf(from: Float, to: Float, t: Float) = (1f - t) * from + t * to

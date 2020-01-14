@@ -5,6 +5,8 @@ precision mediump float;
 layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec2 aTexCoord;
 layout (location = 4) in vec3 aBillbPos;
+layout (location = 5) in float aBillbScale;
+layout (location = 6) in float aBillbTransparency;
 
 uniform mat4 uModelM;
 uniform mat4 uProjectionM;
@@ -15,6 +17,7 @@ uniform float uWidth;
 uniform float uHeight;
 
 out vec2 vTexCoord;
+out float vBillbTransparency;
 
 mat4 billboardM() {
     vec3 from = uEye;
@@ -42,9 +45,10 @@ mat4 billboardM() {
 
 void main() {
     vTexCoord = aTexCoord;
+    vBillbTransparency = aBillbTransparency;
     vec4 position = vec4(0.0);
-    position.x = aPosition.x * uWidth / 2.0;
-    position.y = aPosition.y * uHeight / 2.0;
+    position.x = aPosition.x * uWidth / 2.0 * aBillbScale;
+    position.y = aPosition.y * uHeight / 2.0 * aBillbScale;
     position.z = aPosition.z;
     position.w = 1.0;
     gl_Position = uProjectionM * uViewM * uModelM * billboardM() * position;

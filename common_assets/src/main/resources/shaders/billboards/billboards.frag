@@ -3,6 +3,7 @@
 precision mediump float;
 
 in vec2 vTexCoord;
+in float vBillbTransparency;
 
 uniform sampler2D uTexDiffuse;
 uniform float uTransparency;
@@ -14,4 +15,5 @@ void main() {
     if (oFragColor.a < 0.1) {
         discard;
     }
+    oFragColor.a *= vBillbTransparency;
 }

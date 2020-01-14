@@ -5,6 +5,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.Console
 import com.blaster.common.center
+import com.blaster.common.lerpf
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
@@ -98,6 +99,7 @@ private fun updateFlame(particle: Particle): Boolean {
     particle.position.y += 0.05f
     particle.position.x += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
     particle.position.z += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
+    particle.transparency = lerpf(1f, 0f, 1f - particle.position.y)
     return particle.position.y < 1f
 }
 
@@ -111,6 +113,7 @@ private fun updateSmoke(particle: Particle): Boolean {
     particle.position.y += 0.01f
     particle.position.x += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
     particle.position.z += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
+    particle.transparency = lerpf(1f, 0f, 1.5f - particle.position.y)
     return particle.position.y < 1.5f
 }
 
@@ -152,7 +155,8 @@ private val window = object : LwjglWindow(W, H) {
             }
         }
         billboardsTechnique.draw(camera) {
-            billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE)
+            billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE,
+                    updateScale = false, updateTransparency = false)
             GlState.drawTransparent {
                 GlState.drawWithNoDepth {
                     billboardsTechnique.instance(flame, node, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
