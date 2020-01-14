@@ -11,6 +11,7 @@ import java.nio.FloatBuffer
 
 private val backend = GlLocator.locate()
 
+// todo: the bad (integration)
 interface BillboardsProvider {
     fun flushPositions(position: FloatBuffer)
     fun flushScale(scale: FloatBuffer)
@@ -20,7 +21,7 @@ interface BillboardsProvider {
 
 // todo: parameter to billboard only around y axis - to draw characters and items
 // todo: maybe (optionally) sort billboards?
-// todo: buffers: positon, transparency, scale, rotation around z, color: should be standalone
+// todo: buffers: rotation around z, color
 // todo: mirror with uniform
 
 class BillboardsTechnique(private val max: Int) {

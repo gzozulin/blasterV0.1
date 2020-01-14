@@ -65,7 +65,7 @@ class Snowflake(origin: Vector3f) : Particle(origin) {
     val randomness = random.nextFloat()
 
     init {
-        transparency = random.nextFloat()
+        transparency = 0.5f + random.nextFloat() / 2f
     }
 }
 
