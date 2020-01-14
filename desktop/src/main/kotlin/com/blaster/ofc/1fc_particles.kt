@@ -156,8 +156,8 @@ private val window = object : LwjglWindow(W, H) {
             GlState.drawTransparent {
                 GlState.drawWithNoDepth {
                     billboardsTechnique.instance(flame, node, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
-                    billboardsTechnique.instance(flame2, node, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
                     billboardsTechnique.instance(smoke, node, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                    billboardsTechnique.instance(flame2, node, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
                     billboardsTechnique.instance(smoke2, node, smokeDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
                 }
             }
