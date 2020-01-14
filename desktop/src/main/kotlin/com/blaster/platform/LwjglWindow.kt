@@ -12,7 +12,12 @@ import org.lwjgl.system.MemoryUtil.NULL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-abstract class LwjglWindow(private val width: Int, private val height: Int) {
+// todo: swap fullscreen button
+// http://www.java-gaming.org/topics/glfw-lwjgl3-toggle-between-fullscreen-and-windowed-mode/34882/view.html
+abstract class LwjglWindow(
+        private val width: Int = 800, private val height: Int = 600,
+        private val fullscreen: Boolean = false) {
+
     init {
         SharedLibraryLoader.load()
     }
@@ -63,10 +68,12 @@ abstract class LwjglWindow(private val width: Int, private val height: Int) {
         glfwDefaultWindowHints()
         glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE)
         glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE)
-        val window = glfwCreateWindow(width, height, "Blaster!", NULL, NULL)
+        val window = glfwCreateWindow(width, height, "Blaster!", if (fullscreen) glfwGetPrimaryMonitor() else NULL, NULL)
+        if (!fullscreen) {
+            val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
+            glfwSetWindowPos(window, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
+        }
         glfwSetKeyCallback(window, keyCallback)
-        val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
-        glfwSetWindowPos(window, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
         glfwMakeContextCurrent(window)
         glfwSwapInterval(1)
         glfwShowWindow(window)
