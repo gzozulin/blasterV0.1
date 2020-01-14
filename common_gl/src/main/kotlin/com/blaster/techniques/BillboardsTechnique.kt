@@ -17,7 +17,7 @@ interface PositionsProvider {
 
 // todo: parameter to billboard only around y axis - to draw characters and items
 // todo: maybe (optionally) sort billboards?
-// todo: buffers: positon, transparency, scale, rotation around z, should be standalone
+// todo: buffers: positon, transparency, scale, rotation around z, color: should be standalone
 // todo: mirror with uniform
 class BillboardsTechnique(max: Int) {
     private lateinit var program: GlProgram
