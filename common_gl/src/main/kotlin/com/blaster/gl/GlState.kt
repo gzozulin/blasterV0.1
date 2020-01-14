@@ -6,9 +6,23 @@ private val backend = GlLocator.locate()
 
 class GlState private constructor() {
     companion object {
+        fun enableDepthTest() {
+            glCheck { backend.glEnable(backend.GL_DEPTH_TEST) }
+        }
+
+        fun disableDepthTest() {
+            glCheck { backend.glDisable(backend.GL_DEPTH_TEST) }
+        }
+
+        fun drawWithNoDepth(draw: () -> Unit) {
+            disableDepthTest()
+            draw.invoke()
+            enableDepthTest()
+        }
+
         fun apply(culling: Boolean = true, color: Vector3f = Vector3f(0.9f, 9.9f, 1f)) {
             glCheck { backend.glClearColor(color.x, color.y, color.z, 0f) }
-            glCheck { backend.glEnable(backend.GL_DEPTH_TEST) }
+            enableDepthTest()
             if (culling) {
                 glCheck { backend.glFrontFace(backend.GL_CCW) }
                 glCheck { backend.glEnable(backend.GL_CULL_FACE) }
