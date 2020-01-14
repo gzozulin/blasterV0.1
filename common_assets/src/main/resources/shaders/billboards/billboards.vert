@@ -12,6 +12,9 @@ uniform mat4 uModelM;
 uniform mat4 uProjectionM;
 uniform mat4 uViewM;
 
+uniform int uScaleFlag;
+uniform int uTransparencyFlag;
+
 uniform vec3 uEye;
 uniform float uWidth;
 uniform float uHeight;
@@ -45,10 +48,14 @@ mat4 billboardM() {
 
 void main() {
     vTexCoord = aTexCoord;
-    vBillbTransparency = aBillbTransparency;
+    vBillbTransparency = uTransparencyFlag == 1 ? aBillbTransparency : 1.0;
     vec4 position = vec4(0.0);
-    position.x = aPosition.x * uWidth / 2.0 * aBillbScale;
-    position.y = aPosition.y * uHeight / 2.0 * aBillbScale;
+    position.x = aPosition.x * uWidth / 2.0;
+    position.y = aPosition.y * uHeight / 2.0;
+    if (uScaleFlag == 1) {
+        position.x *= aBillbScale;
+        position.y *= aBillbScale;
+    }
     position.z = aPosition.z;
     position.w = 1.0;
     gl_Position = uProjectionM * uViewM * uModelM * billboardM() * position;

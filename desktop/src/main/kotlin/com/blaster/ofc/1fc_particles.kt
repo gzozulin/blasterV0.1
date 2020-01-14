@@ -63,6 +63,10 @@ private val node = Node()
 class Snowflake(origin: Vector3f) : Particle(origin) {
     val origin = Vector3f(origin)
     val randomness = random.nextFloat()
+
+    init {
+        transparency = random.nextFloat()
+    }
 }
 
 private fun snowflakeEmitters(): List<Vector3f> {
@@ -99,7 +103,9 @@ private fun updateFlame(particle: Particle): Boolean {
     particle.position.y += 0.05f
     particle.position.x += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
     particle.position.z += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
-    particle.transparency = lerpf(1f, 0f, 1f - particle.position.y)
+    val ttl = 1f - particle.position.y
+    particle.transparency = lerpf(1f, 0f, ttl)
+    particle.scale -= 0.001f
     return particle.position.y < 1f
 }
 
@@ -113,8 +119,14 @@ private fun updateSmoke(particle: Particle): Boolean {
     particle.position.y += 0.01f
     particle.position.x += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
     particle.position.z += (random.nextFloat() * if (random.nextBoolean()) 1f else -1f) * 0.01f
-    particle.transparency = lerpf(1f, 0f, 1.5f - particle.position.y)
-    return particle.position.y < 1.5f
+    val ttl = (2f - particle.position.y) / 1.5f
+    if (ttl > 0.5f) {
+        particle.transparency = lerpf(1f, 0f, ttl)
+    } else {
+        particle.transparency = lerpf(0f, 1f, ttl)
+    }
+    particle.scale += 0.003f
+    return particle.position.y < 2f
 }
 
 private val window = object : LwjglWindow(W, H) {
@@ -155,9 +167,8 @@ private val window = object : LwjglWindow(W, H) {
             }
         }
         billboardsTechnique.draw(camera) {
-            billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE,
-                    updateScale = false, updateTransparency = false)
             GlState.drawTransparent {
+                billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE, updateScale = false)
                 GlState.drawWithNoDepth {
                     billboardsTechnique.instance(flame, node, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
                     billboardsTechnique.instance(smoke, node, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)

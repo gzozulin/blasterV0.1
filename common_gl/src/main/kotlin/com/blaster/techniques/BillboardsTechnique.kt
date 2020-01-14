@@ -5,7 +5,6 @@ import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.scene.Mesh
 import com.blaster.scene.Node
-import java.awt.Transparency
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -59,7 +58,6 @@ class BillboardsTechnique(private val max: Int) {
 
     fun instance(provider: BillboardsProvider, node: Node, diffuse: GlTexture, width: Float, height: Float,
                  updateScale: Boolean = true, updateTransparency: Boolean = true) {
-        // todo: do it in one go somehow
         glBind(positions) {
             positions.updateBuffer {
                 provider.flushPositions(it.asFloatBuffer())
@@ -79,7 +77,9 @@ class BillboardsTechnique(private val max: Int) {
                 }
             }
         }
-        glBind(diffuse) {
+        glBind(listOf(diffuse, positions, scale, transparency)) {
+            program.setUniform(GlUniform.UNIFORM_SCALE_FLAG, if (updateScale) 1 else 0)
+            program.setUniform(GlUniform.UNIFORM_TRANSPARENCY_FLAG, if (updateTransparency) 1 else 0)
             program.setUniform(GlUniform.UNIFORM_MODEL_M, node.calculateModelM())
             program.setUniform(GlUniform.UNIFORM_WIDTH, width)
             program.setUniform(GlUniform.UNIFORM_HEIGHT, height)
