@@ -4,6 +4,7 @@
       <w>decl</w>
       <w>hitable</w>
       <w>hitables</w>
+      <w>intens</w>
       <w>raytracer</w>
       <w>renderers</w>
       <w>shaders</w>

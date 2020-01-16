@@ -11,12 +11,13 @@ uniform sampler2D uTexDiffuse;
 uniform vec3 uEye;
 
 struct Light {
-    vec3 position;
-    vec3 color;
+    vec3 vector;
+    vec3 intensity;
 };
 
-const int LIGHTS_CNT = 16;
-uniform Light uLights[LIGHTS_CNT];
+uniform int uLightsPointCnt;
+uniform int uLightsDirCnt;
+uniform Light uLights[64];
 
 const float ambientTerm         = 0.7;
 const float specularPower       = 2.0;
@@ -41,12 +42,14 @@ void main()
     vec3 viewDir  = normalize(uEye - fragPosition);
     vec3 lighting  = vec3(ambientTerm);
 
-    for (int i = 0; i < LIGHTS_CNT; ++i) {
-        float distance = length(uLights[i].position - fragPosition);
+    for (int i = 0; i < uLightsPointCnt; ++i) {
+        vec3 direction = uLights[i].vector - fragPosition;
+
+        float distance = length(direction);
         float attenuation = 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
         if (attenuation > 0.0) {
-            vec3 attenuatedLight = uLights[i].color * attenuation;
-            vec3 lightDir = normalize(uLights[i].position - fragPosition);
+            vec3 attenuatedLight = uLights[i].intensity * attenuation;
+            vec3 lightDir = normalize(direction);
 
             // diffuse
             float diffuseTerm = dot(fragNormal, lightDir);

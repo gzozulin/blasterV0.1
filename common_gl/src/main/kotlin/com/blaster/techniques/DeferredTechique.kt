@@ -5,7 +5,6 @@ import com.blaster.common.randomVector3f
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.scene.Mesh
-import com.blaster.scene.Model
 import org.joml.Matrix4f
 import org.joml.Vector3f
 
@@ -56,11 +55,12 @@ class DeferredTechnique {
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
+            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, 16)
             for (i in 0..15) {
                 val randomPos = randomVector3f(Vector3f(-5f), Vector3f(5f))
                 val randomColor = randomVector3f(Vector3f(), Vector3f(1f))
-                programLightPass.setUniform(GlUniform.uniformLightPosition(i), randomPos)
-                programLightPass.setUniform(GlUniform.uniformLightColor(i), randomColor)
+                programLightPass.setUniform(GlUniform.uniformLightVector(i), randomPos)
+                programLightPass.setUniform(GlUniform.uniformLightIntensity(i), randomColor)
             }
         }
     }
@@ -76,10 +76,6 @@ class DeferredTechnique {
             programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
             quadMesh.draw()
         }
-    }
-
-    fun instance(model: Model) {
-        instance(model.mesh, model.diffuse, model.calculateModelM())
     }
 
     fun instance(mesh: Mesh, diffuse: GlTexture, modelM: Matrix4f) {
