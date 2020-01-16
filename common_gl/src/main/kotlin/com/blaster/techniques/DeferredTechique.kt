@@ -1,14 +1,15 @@
 package com.blaster.techniques
 
 import com.blaster.assets.ShadersLib
-import com.blaster.common.randomVector3f
 import com.blaster.gl.*
 import com.blaster.scene.Camera
+import com.blaster.scene.Light
 import com.blaster.scene.Mesh
 import org.joml.Matrix4f
-import org.joml.Vector3f
 
 private val backend = GlLocator.locate()
+
+const val MAX_LIGHTS = 128
 
 class DeferredTechnique {
     private lateinit var programGeomPass: GlProgram
@@ -22,6 +23,9 @@ class DeferredTechnique {
     private lateinit var diffuseStorage: GlTexture
 
     private lateinit var depthBuffer: GlRenderBuffer
+
+    private val pointLights = mutableListOf<Light>()
+    private val dirLights = mutableListOf<Light>()
 
     fun prepare(shadersLib: ShadersLib, width: Int, height: Int) {
         programGeomPass = shadersLib.loadProgram(
@@ -55,13 +59,6 @@ class DeferredTechnique {
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
-            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, 16)
-            for (i in 0..15) {
-                val randomPos = randomVector3f(Vector3f(-5f), Vector3f(5f))
-                val randomColor = randomVector3f(Vector3f(), Vector3f(1f))
-                programLightPass.setUniform(GlUniform.uniformLightVector(i), randomPos)
-                programLightPass.setUniform(GlUniform.uniformLightIntensity(i), randomColor)
-            }
         }
     }
 
@@ -75,6 +72,39 @@ class DeferredTechnique {
         glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
             programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
             quadMesh.draw()
+        }
+    }
+
+    fun light(light: Light, isPoint: Boolean = true) {
+        if (isPoint) {
+            pointLights.add(light)
+        } else {
+            dirLights.add(light)
+        }
+        updateLightsUniforms()
+    }
+
+    fun setLights(pointLights: List<Light>, dirLights: List<Light>) {
+        this.pointLights.clear()
+        this.pointLights.addAll(pointLights)
+        this.dirLights.clear()
+        this.dirLights.addAll(dirLights)
+        updateLightsUniforms()
+    }
+
+    private fun updateLightsUniforms() {
+        check(pointLights.size + dirLights.size <= MAX_LIGHTS) { "More lights than defined in shader!" }
+        glBind(programLightPass) {
+            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLights.size)
+            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLights.size)
+            pointLights.forEachIndexed { index, light ->
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, light.vector)
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, light.intensity)
+            }
+            dirLights.forEachIndexed { index, light ->
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, light.vector)
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, light.intensity)
+            }
         }
     }
 

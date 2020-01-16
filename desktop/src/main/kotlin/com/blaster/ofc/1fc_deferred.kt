@@ -1,11 +1,13 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
-import com.blaster.scene.Model
+import com.blaster.common.randomVector3f
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.Camera
 import com.blaster.scene.Controller
+import com.blaster.scene.Light
+import com.blaster.scene.Model
 import com.blaster.techniques.DeferredTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -34,6 +36,11 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         controller.position.set(Vector3f(0.5f, 3f, 3f))
         GlState.apply()
         deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
+        for (i in 0..3) {
+            deferredTechnique.light(
+                    Light(randomVector3f(Vector3f(-5f), Vector3f(5f)), randomVector3f(Vector3f(), Vector3f(3f))))
+        }
+        deferredTechnique.light(Light(Vector3f(0f, -1f, 0f), Vector3f(1f, 0f, 0f)), isPoint = false)
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
     }
 

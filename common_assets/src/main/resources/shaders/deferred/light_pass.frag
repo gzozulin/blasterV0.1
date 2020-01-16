@@ -17,7 +17,7 @@ struct Light {
 
 uniform int uLightsPointCnt;
 uniform int uLightsDirCnt;
-uniform Light uLights[64];
+uniform Light uLights[128];
 
 const float ambientTerm         = 0.7;
 const float specularPower       = 2.0;
@@ -27,6 +27,40 @@ const float lightLinearAtt      = 0.8;
 const float lightQuadraticAtt   = 0.2;
 
 out vec4 oFragColor;
+
+float attenuation(float distance) {
+    return 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
+}
+
+vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntensity, float attenuation) {
+    vec3 contribution = vec3(0.0);
+    vec3 attenuatedLight = lightIntensity * attenuation;
+    // diffuse
+    float diffuseTerm = dot(fragNormal, lightDir);
+    if (diffuseTerm > 0.0) {
+        contribution += diffuseTerm * attenuatedLight;
+    }
+    // specular
+    vec3 halfwayDir = normalize(lightDir + viewDir);
+    float specularTerm = dot(fragNormal, halfwayDir);
+    if (specularTerm > 0.0) {
+        contribution += pow(specularTerm, specularPower) * attenuatedLight;
+    }
+    return contribution;
+}
+
+vec3 pointLightContrib(vec3 viewDir, vec3 fragPosition, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity) {
+    vec3 direction = lightVector - fragPosition;
+    float attenuation = attenuation(length(direction));
+    vec3 lightDir = normalize(direction);
+    return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation);
+}
+
+vec3 dirLightContrib(vec3 viewDir, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity) {
+    float attenuation = 1.0; // no attenuation
+    vec3 lightDir = -normalize(lightVector);
+    return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation);
+}
 
 void main()
 {
@@ -43,27 +77,11 @@ void main()
     vec3 lighting  = vec3(ambientTerm);
 
     for (int i = 0; i < uLightsPointCnt; ++i) {
-        vec3 direction = uLights[i].vector - fragPosition;
+        lighting += pointLightContrib(viewDir, fragPosition, fragNormal, uLights[i].vector, uLights[i].intensity);
+    }
 
-        float distance = length(direction);
-        float attenuation = 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
-        if (attenuation > 0.0) {
-            vec3 attenuatedLight = uLights[i].intensity * attenuation;
-            vec3 lightDir = normalize(direction);
-
-            // diffuse
-            float diffuseTerm = dot(fragNormal, lightDir);
-            if (diffuseTerm > 0.0) {
-                lighting += diffuseTerm * attenuatedLight;
-            }
-
-            // specular
-            vec3 halfwayDir = normalize(lightDir + viewDir);
-            float specularTerm = dot(fragNormal, halfwayDir);
-            if (specularTerm > 0.0) {
-                lighting += pow(specularTerm, specularPower) * attenuatedLight;
-            }
-        }
+    for (int i = 0; i < uLightsDirCnt; ++i) {
+        lighting += dirLightContrib(viewDir, fragNormal, uLights[i].vector, uLights[i].intensity);
     }
 
     lighting *= fragDiffuse;

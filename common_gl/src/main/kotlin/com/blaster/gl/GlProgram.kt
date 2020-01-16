@@ -55,6 +55,7 @@ class GlProgram(private val vertexShader: GlShader, private val fragmentShader: 
     private val handle = glCheck { backend.glCreateProgram() }
 
     private val uniformLocations = HashMap<GlUniform, Int>()
+    private val arrayUniformLoctions = HashMap<String, Int>()
 
     init {
         check(vertexShader.type == GlShaderType.VERTEX_SHADER)
@@ -119,5 +120,16 @@ class GlProgram(private val vertexShader: GlShader, private val fragmentShader: 
     fun setUniform(uniform: GlUniform, value: Matrix4f) {
         value.get(bufferMat4)
         glCheck { backend.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
+    }
+
+    fun setArrayUniform(uniform: GlUniform, index: Int, value: Vector3f) {
+        val label = uniform.label.format(index) // todo: can be cached
+        var location: Int? = arrayUniformLoctions[label]
+        if (location == null) {
+            location = glCheck { backend.glGetUniformLocation(handle, label) }
+            arrayUniformLoctions[label] = location
+        }
+        value.get(bufferVec3)
+        glCheck { backend.glUniform3fv(location, bufferVec3) }
     }
 }
