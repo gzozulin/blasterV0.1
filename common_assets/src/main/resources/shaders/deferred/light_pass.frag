@@ -28,6 +28,9 @@ const float lightQuadraticAtt   = 0.2;
 
 out vec4 oFragColor;
 
+// todo: spot light is done by comparing the angle (dot prod) between light dir an vec from light to fragment
+// https://www.lighthouse3d.com/tutorials/glsl-tutorial/spotlights/
+
 float attenuation(float distance) {
     return 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
 }
