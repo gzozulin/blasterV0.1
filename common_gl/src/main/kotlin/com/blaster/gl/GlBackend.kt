@@ -60,6 +60,9 @@ interface GlBackend {
     val GL_COLOR_ATTACHMENT0: Int
     val GL_COLOR_ATTACHMENT1: Int
     val GL_COLOR_ATTACHMENT2: Int
+    val GL_COLOR_ATTACHMENT3: Int
+    val GL_COLOR_ATTACHMENT4: Int
+    val GL_COLOR_ATTACHMENT5: Int
     val GL_DEPTH_ATTACHMENT: Int
     val GL_MAP_UNSYNCHRONIZED_BIT: Int
     val GL_MAP_WRITE_BIT: Int

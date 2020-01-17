@@ -4,10 +4,7 @@ import com.blaster.assets.*
 import com.blaster.common.randomVector3f
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
-import com.blaster.scene.Camera
-import com.blaster.scene.Controller
-import com.blaster.scene.Light
-import com.blaster.scene.Model
+import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -42,7 +39,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
                             randomVector3f(
                                     Vector3f(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
                                     Vector3f(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
-                            randomVector3f(Vector3f(), Vector3f(5f))))
+                            randomVector3f(Vector3f(), Vector3f(1f))))
         }
         //deferredTechnique.light(Light(Vector3f(0f, -1f, 0f), Vector3f(1f, 0f, 0f)), isPoint = false)
     }
@@ -54,7 +51,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         }
         GlState.clear()
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, model.diffuse, model.calculateModelM())
+            deferredTechnique.instance(model.mesh, model.diffuse, model.calculateModelM(), Material.BRASS)
         }
     }
 

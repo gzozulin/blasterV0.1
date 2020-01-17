@@ -8,6 +8,10 @@ uniform sampler2D uTexPosition;
 uniform sampler2D uTexNormal;
 uniform sampler2D uTexDiffuse;
 
+uniform sampler2D uTexMatAmbientShine;
+uniform sampler2D uTexMatDiffuse;
+uniform sampler2D uTexMatSpecular;
+
 uniform vec3 uEye;
 
 struct Light {
@@ -18,9 +22,6 @@ struct Light {
 uniform int uLightsPointCnt;
 uniform int uLightsDirCnt;
 uniform Light uLights[128];
-
-const float ambientTerm         = 0.3;
-const float specularPower       = 32.0;
 
 const float lightConstantAtt    = 0.9;
 const float lightLinearAtt      = 0.7;
@@ -35,7 +36,7 @@ float attenuation(float distance) {
     return 1.0 / (lightConstantAtt + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
 }
 
-vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntensity, float attenuation) {
+vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntensity, float attenuation, vec3 matDiffuse, vec3 matSpecular, float shine) {
     vec3 contribution = vec3(0.0);
     if (attenuation < 0.01){
         return contribution;
@@ -44,28 +45,28 @@ vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntens
     // diffuse
     float diffuseTerm = dot(fragNormal, lightDir);
     if (diffuseTerm > 0.0) {
-        contribution += diffuseTerm * attenuatedLight;
+        contribution += diffuseTerm * attenuatedLight * matDiffuse;
     }
     // specular
     vec3 reflectDir = reflect(-lightDir, fragNormal);
     float specularTerm = dot(viewDir, reflectDir);
     if (specularTerm > 0.0) {
-        contribution += pow(specularTerm, specularPower) * attenuatedLight;
+        contribution += pow(specularTerm, shine) * matSpecular * attenuatedLight;
     }
     return contribution;
 }
 
-vec3 pointLightContrib(vec3 viewDir, vec3 fragPosition, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity) {
+vec3 pointLightContrib(vec3 viewDir, vec3 fragPosition, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity, vec3 matDiffuse, vec3 matSpecular, float shine) {
     vec3 direction = lightVector - fragPosition;
     float attenuation = attenuation(length(direction));
     vec3 lightDir = normalize(direction);
-    return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation);
+    return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation, matDiffuse, matSpecular, shine);
 }
 
-vec3 dirLightContrib(vec3 viewDir, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity) {
+vec3 dirLightContrib(vec3 viewDir, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity, vec3 matDiffuse, vec3 matSpecular, float shine) {
     float attenuation = 1.0; // no attenuation
     vec3 lightDir = -normalize(lightVector);
-    return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation);
+    return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation, matDiffuse, matSpecular, shine);
 }
 
 void main()
@@ -79,15 +80,21 @@ void main()
     vec3 fragNormal = texture(uTexNormal, vTexCoord).rgb;
     vec3 fragDiffuse = texture(uTexDiffuse, vTexCoord).rgb;
 
+    vec4 matAmbientShine = texture(uTexMatAmbientShine, vTexCoord);
+    vec3 matDiffuse = texture(uTexMatDiffuse, vTexCoord).rgb;
+    vec3 matSpecular = texture(uTexMatSpecular, vTexCoord).rgb;
+
     vec3 viewDir  = normalize(uEye - fragPosition);
-    vec3 lighting  = vec3(ambientTerm);
+    vec3 lighting  = matAmbientShine.rgb;
 
     for (int i = 0; i < uLightsPointCnt; ++i) {
-        lighting += pointLightContrib(viewDir, fragPosition, fragNormal, uLights[i].vector, uLights[i].intensity);
+        lighting += pointLightContrib(viewDir, fragPosition, fragNormal, uLights[i].vector, uLights[i].intensity,
+        matDiffuse, matSpecular, matAmbientShine.a);
     }
 
     for (int i = 0; i < uLightsDirCnt; ++i) {
-        lighting += dirLightContrib(viewDir, fragNormal, uLights[i].vector, uLights[i].intensity);
+        lighting += dirLightContrib(viewDir, fragNormal, uLights[i].vector, uLights[i].intensity,
+        matDiffuse, matSpecular, matAmbientShine.a);
     }
 
     lighting *= fragDiffuse;

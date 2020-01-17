@@ -8,9 +8,19 @@ uniform mat4 uModelM;
 uniform mat4 uViewM;
 uniform mat4 uProjectionM;
 
+uniform vec3 uMatAmbient;
+uniform vec3 uMatDiffuse;
+uniform vec3 uMatSpecular;
+uniform float uMatShine;
+
 out vec4 vFragPosition;
 out vec2 vTexCoord;
 out vec3 vNormal;
+
+out vec3 vMatAmbient;
+out vec3 vMatDiffuse;
+out vec3 vMatSpecular;
+out float vMatShine;
 
 void main()
 {
@@ -23,4 +33,9 @@ void main()
     vNormal = normalMatrix * aNormal;
 
     gl_Position = uProjectionM * uViewM * worldPos;
+
+    vMatAmbient = uMatAmbient;
+    vMatDiffuse = uMatDiffuse;
+    vMatSpecular = uMatSpecular;
+    vMatShine = uMatShine;
 }

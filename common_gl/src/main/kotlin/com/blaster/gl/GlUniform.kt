@@ -10,10 +10,19 @@ enum class GlUniform(val label: String) {
     UNIFORM_TEXTURE_NORMAL      ("uTexNormal"),
     UNIFORM_TEXTURE_DIFFUSE     ("uTexDiffuse"),
 
+    UNIFORM_TEXTURE_MAT_AMB_SHINE("uTexMatAmbientShine"),
+    UNIFORM_TEXTURE_MAT_DIFFUSE ("uTexMatDiffuse"),
+    UNIFORM_TEXTURE_MAT_SPECULAR("uTexMatSpecular"),
+
     UNIFORM_LIGHTS_POINT_CNT    ("uLightsPointCnt"),
     UNIFORM_LIGHTS_DIR_CNT      ("uLightsDirCnt"),
     UNIFORM_LIGHT_VECTOR        ("uLights[%d].vector"),
     UNIFORM_LIGHT_INTENSITY     ("uLights[%d].intensity"),
+
+    UNIFORM_MAT_AMBIENT         ("uMatAmbient"),
+    UNIFORM_MAT_DIFFUSE         ("uMatDiffuse"),
+    UNIFORM_MAT_SPECULAR        ("uMatSpecular"),
+    UNIFORM_MAT_SHINE           ("uMatShine"),
 
     UNIFORM_COLOR               ("uColor"),
 

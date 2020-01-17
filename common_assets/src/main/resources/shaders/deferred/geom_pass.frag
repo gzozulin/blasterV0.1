@@ -6,11 +6,20 @@ in vec4 vFragPosition;
 in vec2 vTexCoord;
 in vec3 vNormal;
 
+in vec3 vMatAmbient;
+in vec3 vMatDiffuse;
+in vec3 vMatSpecular;
+in float vMatShine;
+
 uniform sampler2D uTexDiffuse;
 
 layout (location = 0) out vec4 oPosition;
 layout (location = 1) out vec3 oNormal;
 layout (location = 2) out vec4 oDiffuse;
+
+layout (location = 3) out vec4 oMatAmbientShine;
+layout (location = 4) out vec3 oMatDiffuse;
+layout (location = 5) out vec3 oMatSpecular;
 
 void main()
 {
@@ -21,4 +30,8 @@ void main()
     oDiffuse = diffuse;
     oPosition = vFragPosition;
     oNormal = normalize(vNormal);
+    oMatAmbientShine.a = vMatShine;
+    oMatAmbientShine.rgb = vMatAmbient;
+    oMatDiffuse = vMatDiffuse;
+    oMatSpecular = vMatSpecular;
 }

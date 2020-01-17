@@ -47,6 +47,9 @@ class GlBackendImpl : GlBackend {
     override val GL_COLOR_ATTACHMENT0:  Int get() = GL30.GL_COLOR_ATTACHMENT0
     override val GL_COLOR_ATTACHMENT1:  Int get() = GL30.GL_COLOR_ATTACHMENT1
     override val GL_COLOR_ATTACHMENT2:  Int get() = GL30.GL_COLOR_ATTACHMENT2
+    override val GL_COLOR_ATTACHMENT3:  Int get() = GL30.GL_COLOR_ATTACHMENT3
+    override val GL_COLOR_ATTACHMENT4:  Int get() = GL30.GL_COLOR_ATTACHMENT4
+    override val GL_COLOR_ATTACHMENT5:  Int get() = GL30.GL_COLOR_ATTACHMENT5
     override val GL_DEPTH_ATTACHMENT:   Int get() = GL30.GL_DEPTH_ATTACHMENT
     override val GL_MAP_WRITE_BIT:      Int get() = GL30.GL_MAP_WRITE_BIT
     override val GL_MAP_UNSYNCHRONIZED_BIT: Int get() = GL30.GL_MAP_UNSYNCHRONIZED_BIT

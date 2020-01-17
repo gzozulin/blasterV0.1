@@ -1,13 +1,14 @@
 package com.blaster.common
 
-import org.joml.AABBf
-import org.joml.Vector2f
-import org.joml.Vector3f
-import java.util.*
+import org.joml.*
+import java.util.Random
 
-val VECTOR_2D_CENTER = Vector2f()
-val VECTOR_2D_LEFT = Vector2f(-1f, 0f)
+typealias vec3 = Vector3f
+typealias vec2 = Vector2f
+typealias mat4 = Matrix4f
+typealias quat = Quaternionf
 
+// todo: remove - mutable
 val VECTOR_UP = Vector3f(0f, 1f, 0f)
 
 private val random = Random()

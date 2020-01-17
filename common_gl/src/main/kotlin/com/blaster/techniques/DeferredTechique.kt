@@ -4,6 +4,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.scene.Light
+import com.blaster.scene.Material
 import com.blaster.scene.Mesh
 import org.joml.Matrix4f
 
@@ -18,9 +19,14 @@ class DeferredTechnique {
     private lateinit var quadMesh: Mesh
 
     private lateinit var framebuffer: GlFrameBuffer
+
     private lateinit var positionStorage: GlTexture
     private lateinit var normalStorage: GlTexture
     private lateinit var diffuseStorage: GlTexture
+
+    private lateinit var matAmbShineStorage: GlTexture // ambient + shine
+    private lateinit var matDiffuseStorage: GlTexture
+    private lateinit var matSpecularStorage: GlTexture
 
     private lateinit var depthBuffer: GlRenderBuffer
 
@@ -45,12 +51,27 @@ class DeferredTechnique {
                 unit = 2,
                 width = width, height = height, internalFormat = backend.GL_RGBA,
                 pixelFormat = backend.GL_RGBA, pixelType = backend.GL_UNSIGNED_BYTE)
+        matAmbShineStorage = GlTexture(
+                unit = 0,
+                width = width, height = height, internalFormat = backend.GL_RGBA16F,
+                pixelFormat = backend.GL_RGBA, pixelType = backend.GL_FLOAT)
+        matDiffuseStorage = GlTexture(
+                unit = 0,
+                width = width, height = height, internalFormat = backend.GL_RGBA16F,
+                pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
+        matSpecularStorage = GlTexture(
+                unit = 0,
+                width = width, height = height, internalFormat = backend.GL_RGBA16F,
+                pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         depthBuffer = GlRenderBuffer(width = width, height = height)
         framebuffer = GlFrameBuffer()
         glBind(listOf(framebuffer)) {
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT0, positionStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT1, normalStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT2, diffuseStorage)
+            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT3, matAmbShineStorage)
+            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT4, matDiffuseStorage)
+            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT5, matSpecularStorage)
             framebuffer.setOutputs(intArrayOf(backend.GL_COLOR_ATTACHMENT0, backend.GL_COLOR_ATTACHMENT1, backend.GL_COLOR_ATTACHMENT2))
             framebuffer.setRenderBuffer(backend.GL_DEPTH_ATTACHMENT, depthBuffer)
             framebuffer.checkIsComplete()
@@ -59,6 +80,9 @@ class DeferredTechnique {
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_POSITION, positionStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
+            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_AMB_SHINE, matAmbShineStorage)
+            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_DIFFUSE, matDiffuseStorage)
+            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_SPECULAR, matSpecularStorage)
         }
     }
 
@@ -108,9 +132,13 @@ class DeferredTechnique {
         }
     }
 
-    fun instance(mesh: Mesh, diffuse: GlTexture, modelM: Matrix4f) {
+    fun instance(mesh: Mesh, diffuse: GlTexture, modelM: Matrix4f, material: Material) {
         glBind(listOf(mesh, diffuse)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
+            programGeomPass.setUniform(GlUniform.UNIFORM_MAT_AMBIENT, material.ambient)
+            programGeomPass.setUniform(GlUniform.UNIFORM_MAT_DIFFUSE, material.diffuse)
+            programGeomPass.setUniform(GlUniform.UNIFORM_MAT_SPECULAR, material.specular)
+            programGeomPass.setUniform(GlUniform.UNIFORM_MAT_SHINE, material.shine)
             programGeomPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             mesh.draw()
         }
