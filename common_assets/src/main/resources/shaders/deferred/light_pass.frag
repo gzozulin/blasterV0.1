@@ -51,7 +51,7 @@ vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntens
     vec3 reflectDir = reflect(-lightDir, fragNormal);
     float specularTerm = dot(viewDir, reflectDir);
     if (specularTerm > 0.0) {
-        contribution += pow(specularTerm, shine) * matSpecular * attenuatedLight;
+        contribution += pow(specularTerm, shine) * attenuatedLight * matSpecular;
     }
     return contribution;
 }

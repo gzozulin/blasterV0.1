@@ -36,12 +36,11 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
         for (i in 0..15) {
             deferredTechnique.light(Light(
-                            randomVector3f(
-                                    Vector3f(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
+                            randomVector3f(Vector3f(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
                                     Vector3f(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
-                            randomVector3f(Vector3f(), Vector3f(1f))))
+                            randomVector3f(Vector3f(), Vector3f(2f))))
         }
-        //deferredTechnique.light(Light(Vector3f(0f, -1f, 0f), Vector3f(1f, 0f, 0f)), isPoint = false)
+        deferredTechnique.light(Light(Vector3f(0f, -1f, 0f), Vector3f(1f, 0f, 0f)), isPoint = false)
     }
 
     override fun onDraw() {
@@ -51,7 +50,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         }
         GlState.clear()
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, model.diffuse, model.calculateModelM(), Material.BRASS)
+            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.BRASS)
         }
     }
 

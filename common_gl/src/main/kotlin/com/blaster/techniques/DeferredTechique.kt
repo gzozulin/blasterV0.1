@@ -52,27 +52,30 @@ class DeferredTechnique {
                 width = width, height = height, internalFormat = backend.GL_RGBA,
                 pixelFormat = backend.GL_RGBA, pixelType = backend.GL_UNSIGNED_BYTE)
         matAmbShineStorage = GlTexture(
-                unit = 0,
+                unit = 3,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,
                 pixelFormat = backend.GL_RGBA, pixelType = backend.GL_FLOAT)
         matDiffuseStorage = GlTexture(
-                unit = 0,
-                width = width, height = height, internalFormat = backend.GL_RGBA16F,
+                unit = 4,
+                width = width, height = height, internalFormat = backend.GL_RGB16F,
                 pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         matSpecularStorage = GlTexture(
-                unit = 0,
-                width = width, height = height, internalFormat = backend.GL_RGBA16F,
+                unit = 5,
+                width = width, height = height, internalFormat = backend.GL_RGB16F,
                 pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         depthBuffer = GlRenderBuffer(width = width, height = height)
         framebuffer = GlFrameBuffer()
-        glBind(listOf(framebuffer)) {
+        glBind(framebuffer) {
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT0, positionStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT1, normalStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT2, diffuseStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT3, matAmbShineStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT4, matDiffuseStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT5, matSpecularStorage)
-            framebuffer.setOutputs(intArrayOf(backend.GL_COLOR_ATTACHMENT0, backend.GL_COLOR_ATTACHMENT1, backend.GL_COLOR_ATTACHMENT2))
+            framebuffer.setOutputs(intArrayOf(
+                    backend.GL_COLOR_ATTACHMENT0, backend.GL_COLOR_ATTACHMENT1, backend.GL_COLOR_ATTACHMENT2,
+                    backend.GL_COLOR_ATTACHMENT3, backend.GL_COLOR_ATTACHMENT4, backend.GL_COLOR_ATTACHMENT5
+            ))
             framebuffer.setRenderBuffer(backend.GL_DEPTH_ATTACHMENT, depthBuffer)
             framebuffer.checkIsComplete()
         }
@@ -93,7 +96,8 @@ class DeferredTechnique {
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
             draw.invoke()
         }
-        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer)) {
+        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer,
+                matAmbShineStorage, matDiffuseStorage, matSpecularStorage)) {
             programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
             quadMesh.draw()
         }
@@ -132,7 +136,7 @@ class DeferredTechnique {
         }
     }
 
-    fun instance(mesh: Mesh, diffuse: GlTexture, modelM: Matrix4f, material: Material) {
+    fun instance(mesh: Mesh, modelM: Matrix4f, diffuse: GlTexture, material: Material) {
         glBind(listOf(mesh, diffuse)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
             programGeomPass.setUniform(GlUniform.UNIFORM_MAT_AMBIENT, material.ambient)
