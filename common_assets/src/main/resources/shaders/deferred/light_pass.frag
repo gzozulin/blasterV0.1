@@ -36,7 +36,8 @@ float attenuation(float distance) {
     return 1.0 / (lightConstantAtt + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
 }
 
-vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntensity, float attenuation, vec3 matDiffuse, vec3 matSpecular, float shine) {
+vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntensity, float attenuation,
+        vec3 matDiffuse, vec3 matSpecular, float shine) {
     vec3 contribution = vec3(0.0);
     if (attenuation < 0.01){
         return contribution;
@@ -56,14 +57,16 @@ vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntens
     return contribution;
 }
 
-vec3 pointLightContrib(vec3 viewDir, vec3 fragPosition, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity, vec3 matDiffuse, vec3 matSpecular, float shine) {
+vec3 pointLightContrib(vec3 viewDir, vec3 fragPosition, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity,
+        vec3 matDiffuse, vec3 matSpecular, float shine) {
     vec3 direction = lightVector - fragPosition;
     float attenuation = attenuation(length(direction));
     vec3 lightDir = normalize(direction);
     return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation, matDiffuse, matSpecular, shine);
 }
 
-vec3 dirLightContrib(vec3 viewDir, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity, vec3 matDiffuse, vec3 matSpecular, float shine) {
+vec3 dirLightContrib(vec3 viewDir, vec3 fragNormal, vec3 lightVector, vec3 lightIntensity,
+        vec3 matDiffuse, vec3 matSpecular, float shine) {
     float attenuation = 1.0; // no attenuation
     vec3 lightDir = -normalize(lightVector);
     return lightContrib(viewDir, lightDir, fragNormal, lightIntensity, attenuation, matDiffuse, matSpecular, shine);
