@@ -19,12 +19,12 @@ uniform int uLightsPointCnt;
 uniform int uLightsDirCnt;
 uniform Light uLights[128];
 
-const float ambientTerm         = 0.7;
-const float specularPower       = 2.0;
+const float ambientTerm         = 0.3;
+const float specularPower       = 3.0;
 
-const float lightConstantAtt    = 1.0;
-const float lightLinearAtt      = 0.8;
-const float lightQuadraticAtt   = 0.2;
+const float lightConstantAtt    = 0.9;
+const float lightLinearAtt      = 0.7;
+const float lightQuadraticAtt   = 0.3;
 
 out vec4 oFragColor;
 
@@ -32,11 +32,14 @@ out vec4 oFragColor;
 // https://www.lighthouse3d.com/tutorials/glsl-tutorial/spotlights/
 
 float attenuation(float distance) {
-    return 1.0 / (1.0 + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
+    return 1.0 / (lightConstantAtt + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
 }
 
 vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntensity, float attenuation) {
     vec3 contribution = vec3(0.0);
+    if (attenuation < 0.01){
+        return contribution;
+    }
     vec3 attenuatedLight = lightIntensity * attenuation;
     // diffuse
     float diffuseTerm = dot(fragNormal, lightDir);

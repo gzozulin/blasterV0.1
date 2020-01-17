@@ -36,11 +36,11 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         controller.position.set(Vector3f(0.5f, 3f, 3f))
         GlState.apply()
         deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
-        for (i in 0..3) {
+        for (i in 0..15) {
             deferredTechnique.light(
-                    Light(randomVector3f(Vector3f(-5f), Vector3f(5f)), randomVector3f(Vector3f(), Vector3f(3f))))
+                    Light(randomVector3f(Vector3f(-5f), Vector3f(5f)), randomVector3f(Vector3f(), Vector3f(5f))))
         }
-        deferredTechnique.light(Light(Vector3f(0f, -1f, 0f), Vector3f(1f, 0f, 0f)), isPoint = false)
+        //deferredTechnique.light(Light(Vector3f(0f, -1f, 0f), Vector3f(1f, 0f, 0f)), isPoint = false)
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
     }
 
