@@ -30,8 +30,7 @@ class DeferredTechnique {
 
     private lateinit var depthBuffer: GlRenderBuffer
 
-    private val pointLights = mutableListOf<Light>()
-    private val dirLights = mutableListOf<Light>()
+    private val lights = mutableListOf<Light>()
 
     fun prepare(shadersLib: ShadersLib, width: Int, height: Int) {
         programGeomPass = shadersLib.loadProgram(
@@ -103,25 +102,27 @@ class DeferredTechnique {
         }
     }
 
-    fun light(light: Light, isPoint: Boolean = true) {
-        if (isPoint) {
-            pointLights.add(light)
-        } else {
-            dirLights.add(light)
-        }
+    fun light(light: Light) {
+        lights.add(light)
         updateLightsUniforms()
     }
 
-    fun setLights(pointLights: List<Light>, dirLights: List<Light>) {
-        this.pointLights.clear()
-        this.pointLights.addAll(pointLights)
-        this.dirLights.clear()
-        this.dirLights.addAll(dirLights)
+    fun setLights(lights: List<Light>) {
+        this.lights.addAll(lights)
         updateLightsUniforms()
     }
 
     private fun updateLightsUniforms() {
-        check(pointLights.size + dirLights.size <= MAX_LIGHTS) { "More lights than defined in shader!" }
+        check(lights.size <= MAX_LIGHTS) { "More lights than defined in shader!" }
+        val pointLights = mutableListOf<Light>()
+        val dirLights = mutableListOf<Light>()
+        lights.forEach {
+            if (it.point) {
+                pointLights.add(it)
+            } else {
+                dirLights.add(it)
+            }
+        }
         glBind(programLightPass) {
             programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLights.size)
             programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLights.size)

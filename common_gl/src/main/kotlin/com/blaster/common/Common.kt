@@ -4,6 +4,7 @@ import org.joml.*
 import java.util.Random
 
 typealias vec3 = Vector3f
+typealias color = Vector3f
 typealias vec2 = Vector2f
 typealias mat4 = Matrix4f
 typealias quat = Quaternionf

@@ -34,13 +34,13 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
         GlState.apply()
         deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
-        for (i in 0..15) {
+        deferredTechnique.light(Light.SUNLIGHT)
+        /*for (i in 0..15) {
             deferredTechnique.light(Light(
                             randomVector3f(Vector3f(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
                                     Vector3f(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
                             randomVector3f(Vector3f(), Vector3f(2f))))
-        }
-        deferredTechnique.light(Light(Vector3f(0f, -1f, 0f), Vector3f(1f, 0f, 0f)), isPoint = false)
+        }*/
     }
 
     override fun onDraw() {
