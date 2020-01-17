@@ -20,7 +20,7 @@ uniform int uLightsDirCnt;
 uniform Light uLights[128];
 
 const float ambientTerm         = 0.3;
-const float specularPower       = 3.0;
+const float specularPower       = 32.0;
 
 const float lightConstantAtt    = 0.9;
 const float lightLinearAtt      = 0.7;
@@ -47,8 +47,8 @@ vec3 lightContrib(vec3 viewDir, vec3 lightDir, vec3 fragNormal, vec3 lightIntens
         contribution += diffuseTerm * attenuatedLight;
     }
     // specular
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float specularTerm = dot(fragNormal, halfwayDir);
+    vec3 reflectDir = reflect(-lightDir, fragNormal);
+    float specularTerm = dot(viewDir, reflectDir);
     if (specularTerm > 0.0) {
         contribution += pow(specularTerm, specularPower) * attenuatedLight;
     }
