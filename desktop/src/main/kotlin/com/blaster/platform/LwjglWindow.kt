@@ -22,6 +22,7 @@ abstract class LwjglWindow(
     private var window = 0L
 
     private var isFullscreen = false
+    private val isHoldingCursor = true
 
     private val screenWidth: Int
         get() = if (isFullscreen) fullWidth else width
@@ -106,7 +107,9 @@ abstract class LwjglWindow(
             glfwSetWindowPos(wnd, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
             wnd
         }
-        glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        if (isHoldingCursor) {
+            glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        }
         glfwSetKeyCallback(new, keyCallback)
         glfwMakeContextCurrent(new)
         glfwSwapInterval(1)

@@ -20,9 +20,6 @@ import org.lwjgl.glfw.GLFW
 import java.util.*
 import kotlin.math.sin
 
-private const val W = 800
-private const val H = 600
-
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
@@ -56,7 +53,8 @@ private val smoke2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vec
 
 private val console = Console(1000L)
 
-private val camera = Camera(W.toFloat() / H.toFloat())
+private lateinit var camera: Camera
+
 private val controller = Controller(velocity = 0.05f)
 private val node = Node()
 
@@ -129,8 +127,9 @@ private fun updateSmoke(particle: Particle): Boolean {
     return particle.position.y < 2f
 }
 
-private val window = object : LwjglWindow(W, H) {
-    override fun onCreate() {
+private val window = object : LwjglWindow() {
+    override fun onCreate(width: Int, height: Int) {
+        camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0f, 0f, 3f))
         console.info("Controller set..")
         billboardsTechnique.prepare(shadersLib)

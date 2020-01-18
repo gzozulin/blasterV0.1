@@ -1,12 +1,14 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
+import com.blaster.common.Console
 import com.blaster.common.random
 import com.blaster.common.vec3
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
+import com.blaster.techniques.TextTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
@@ -19,6 +21,9 @@ private val texturesLib = TexturesLib(assetStream, pixelDecoder)
 private val modelsLib = ModelsLib(assetStream, texturesLib)
 
 private val deferredTechnique = DeferredTechnique()
+private val textTechnique = TextTechnique()
+
+private val console = Console()
 
 private val controller = Controller(velocity = 0.05f)
 
@@ -32,6 +37,7 @@ private val window = object : LwjglWindow() {
         controller.position.set(Vector3f(0.5f, 3f, 3f))
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
         GlState.apply()
+        textTechnique.prepare(shadersLib, texturesLib)
         deferredTechnique.prepare(shadersLib, width, height)
         deferredTechnique.light(Light.SUNLIGHT)
         for (i in 0..16) {
@@ -43,11 +49,17 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onDraw() {
+        console.tick()
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
         GlState.clear()
+        textTechnique.draw {
+            console.render { pos, text, color, scale ->
+                textTechnique.text(text, pos, scale, color)
+            }
+        }
         deferredTechnique.draw(camera) {
             deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.CONCRETE)
         }

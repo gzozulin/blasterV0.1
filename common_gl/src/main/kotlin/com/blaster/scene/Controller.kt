@@ -4,6 +4,8 @@ import com.blaster.common.VECTOR_UP
 import org.joml.Math
 import org.joml.Vector3f
 import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 // todo: some inertia would be cool
@@ -21,9 +23,9 @@ class Controller(private val sensitivity: Float = 0.005f, private val velocity: 
 
     val position = Vector3f()
 
-    private var yaw = Math.toRadians(-90.0).toFloat()
-    private var pitch = 0f
-    private var roll = 0f
+    var yaw = Math.toRadians(-90.0).toFloat()
+    var pitch = 0f
+    var roll = 0f
 
     val forward = Vector3f(0f, 0f, -1f)
 
@@ -31,8 +33,16 @@ class Controller(private val sensitivity: Float = 0.005f, private val velocity: 
         yaw += (radians * sensitivity)
     }
 
+    private val maxPitch = Math.PI.toFloat() / 2f - 0.1f
+    private val minPitch = -Math.PI.toFloat() / 2f + 0.1f
     fun pitch(radians: Float) {
         pitch += (radians * sensitivity)
+        if (pitch > maxPitch) {
+            pitch = maxPitch
+        }
+        if (pitch < minPitch) {
+            pitch = minPitch
+        }
     }
 
     fun roll(radians: Float) {

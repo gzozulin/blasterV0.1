@@ -16,9 +16,6 @@ import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
 
-private const val WIDTH = 800
-private const val HEIGHT = 600
-
 private val assetStream = AssetStream()
 private val pixelDecoder = PixelDecoder()
 private val texturesLib = TexturesLib(assetStream, pixelDecoder)
@@ -36,10 +33,11 @@ private lateinit var model3: Model
 
 private val controller = Controller()
 
-private val camera: Camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
+private lateinit var camera: Camera
 
-private val window = object : LwjglWindow(WIDTH, HEIGHT) {
-    override fun onCreate() {
+private val window = object : LwjglWindow() {
+    override fun onCreate(width: Int, height: Int) {
+        camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0f, 0f, 3f))
         simpleTechnique.prepare(shadersLib)
         mesh = Mesh.triangle()
