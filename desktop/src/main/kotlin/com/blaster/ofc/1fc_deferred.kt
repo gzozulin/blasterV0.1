@@ -50,7 +50,7 @@ private val window = object : LwjglWindow(WIDTH, HEIGHT) {
         }
         GlState.clear()
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.BRASS)
+            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.CHROME)
         }
     }
 

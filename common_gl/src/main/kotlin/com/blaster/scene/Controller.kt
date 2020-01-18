@@ -6,6 +6,7 @@ import org.joml.Vector3f
 import kotlin.math.cos
 import kotlin.math.sin
 
+// todo: some inertia would be cool
 // todo: can directly implement lwjgl listeners for keyb and cursor
 class Controller(private val sensitivity: Float = 0.005f, private val velocity: Float = 0.01f) {
     var w = false

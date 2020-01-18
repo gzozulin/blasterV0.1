@@ -73,6 +73,7 @@ abstract class LwjglWindow(
             val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
             glfwSetWindowPos(window, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
         }
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
         glfwSetKeyCallback(window, keyCallback)
         glfwMakeContextCurrent(window)
         glfwSwapInterval(1)
