@@ -17,18 +17,20 @@ import java.util.regex.Pattern
 // todo: update when needed
 
 private val example = """
-    building; pos 1 1 1; rot 1 1 1 1; scale 1 1 1;
+    building; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom: gold;
         right_top_light; pos 3 3 3;
             right_one_more; pos 5 5 5;
         left_top_light; pos -3 3 3;
     camera; pos 4 4 4; target building;
 """.trimIndent()
 
+// todo: toLeftOf, toRightOf, toBottomOf, toTopOf, toFrontOf, toBackOf instead of positions, based on AABB
 // todo: probably, also can have matrix directly
 data class Placeholer(
         val uid: String,
         val pos: vec3, val rotation: quat?, val scale: vec3?,
         val target: String?,
+        val custom: String?,
         val children: MutableList<Placeholer>)
 
 class SceneReader(
@@ -38,6 +40,7 @@ class SceneReader(
 
     private var last = 0L
 
+    // todo: streaming/comparing should be a separate feature with SceneDiffer
     fun tick() {
         val current = System.currentTimeMillis()
         if (current - last > reloadFrequency) {
@@ -48,7 +51,7 @@ class SceneReader(
 
     private fun reload() {
         val new = parse()
-        compare(scene, new)
+        diff(scene, new)
         scene.clear()
         scene.addAll(new)
     }
@@ -65,13 +68,14 @@ class SceneReader(
             var line = bufferedReader.readLine()
             while (line != null) {
 
+                val currentDepth = stack.size - 1
                 val depthToLine = removeDepth(line)
 
                 when {
-                    depthToLine.first > stack.size -> {
+                    depthToLine.first > currentDepth -> {
                         stack.peek().children.add(parsePlaceholder(depthToLine.second))
                     }
-                    depthToLine.first < stack.size -> {
+                    depthToLine.first < currentDepth -> {
                         result.add(stack.pop())
                         stack.add(parsePlaceholder(depthToLine.second))
                     }
@@ -94,6 +98,7 @@ class SceneReader(
         var rot: quat? = null
         var scale: vec3? = null
         var target: String? = null
+        var custom: String? = null
         tokens.forEach {
             when {
                 it.startsWith("pos") -> {
@@ -108,9 +113,12 @@ class SceneReader(
                 it.startsWith("target") -> {
                     target = it.removePrefix("target").trim()
                 }
+                it.startsWith("custom") -> {
+                    custom = it.removePrefix("custom").trim()
+                }
             }
         }
-        return Placeholer(uid, pos!!, rot, scale, target, mutableListOf())
+        return Placeholer(uid, pos!!, rot, scale, target, custom, mutableListOf())
     }
 
     private fun parseVec3(value: String): vec3 {
@@ -125,8 +133,10 @@ class SceneReader(
         return quat(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat())
     }
 
-    private fun compare(current: List<Placeholer>, new: List<Placeholer>) {
-
+    private fun diff(current: List<Placeholer>, new: List<Placeholer>) {
+        // onAdd
+        // onRemove
+        // onUpdate
     }
 
     private fun removeDepth(input: String): Pair<Int, String> {
