@@ -61,7 +61,7 @@ private val window = object : LwjglWindow() {
             }
         }
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.GOLD)
+            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.CONCRETE)
         }
     }
 
