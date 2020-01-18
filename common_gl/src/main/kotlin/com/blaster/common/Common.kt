@@ -15,8 +15,6 @@ val VECTOR_UP = Vector3f(0f, 1f, 0f)
 private val random = Random()
 fun randomFloat(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) =
         min + random.nextFloat() * (max - min)
-fun randomVector3f(min: Vector3f, max: Vector3f) =
-        Vector3f(randomFloat(min.x, max.x), randomFloat(min.y, max.y), randomFloat(min.z, max.z))
 
 fun extractColors(hex: String): Vector3f {
     val integerHex = Integer.parseInt(hex, 16)
@@ -24,6 +22,13 @@ fun extractColors(hex: String): Vector3f {
     val gIntValue = (integerHex / 256      ) % 256
     val bIntValue = (integerHex            ) % 256
     return Vector3f(rIntValue / 255.0f, gIntValue / 255.0f, bIntValue / 255.0f)
+}
+
+fun vec3.random(min: vec3 = vec3(0f), max: vec3 = vec3(1f)): vec3 {
+    x = randomFloat(min.x, max.x)
+    y = randomFloat(min.y, max.y)
+    z = randomFloat(min.z, max.z)
+    return this
 }
 
 fun AABBf.width() = maxX - minX

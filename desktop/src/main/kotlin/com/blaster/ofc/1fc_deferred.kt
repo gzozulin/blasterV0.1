@@ -1,6 +1,8 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
+import com.blaster.common.random
+import com.blaster.common.vec3
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.*
@@ -32,12 +34,12 @@ private val window = object : LwjglWindow() {
         GlState.apply()
         deferredTechnique.prepare(shadersLib, width, height)
         deferredTechnique.light(Light.SUNLIGHT)
-        /*for (i in 0..15) {
+        for (i in 0..16) {
             deferredTechnique.light(Light(
-                            randomVector3f(Vector3f(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
-                                    Vector3f(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
-                            randomVector3f(Vector3f(), Vector3f(2f))))
-        }*/
+                            vec3().random(vec3(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
+                                    vec3(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
+                            vec3().random(max = Vector3f(2f))))
+        }
     }
 
     override fun onDraw() {
@@ -47,7 +49,7 @@ private val window = object : LwjglWindow() {
         }
         GlState.clear()
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.CHROME)
+            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.CONCRETE)
         }
     }
 
