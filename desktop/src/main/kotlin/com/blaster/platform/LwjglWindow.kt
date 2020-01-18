@@ -3,7 +3,6 @@ package com.blaster.platform
 import org.joml.Vector2f
 import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*
-import org.lwjgl.glfw.GLFWCursorPosCallback
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWvidmode
 import org.lwjgl.opengl.GL11
@@ -12,30 +11,22 @@ import org.lwjgl.system.MemoryUtil.NULL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-// todo: swap fullscreen button
-// http://www.java-gaming.org/topics/glfw-lwjgl3-toggle-between-fullscreen-and-windowed-mode/34882/view.html
 abstract class LwjglWindow(
-        private val width: Int = 800, private val height: Int = 600,
-        private val fullscreen: Boolean = false) {
+        private val width: Int = 1024, private val height: Int = 768,
+        private val fullWidth: Int = 1920, private val fullHeight: Int = 1080) {
 
     init {
         SharedLibraryLoader.load()
     }
 
-    private val errorCallback = errorCallbackPrint(System.err)
+    private var window = 0L
 
-    private val keyCallback = object : GLFWKeyCallback() {
-        override fun invoke(window: kotlin.Long, key: kotlin.Int, scancode: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
-            if (action == GLFW_RELEASE) {
-                if (key == GLFW_KEY_ESCAPE) {
-                    glfwSetWindowShouldClose(window, GL11.GL_TRUE)
-                }
-                keyReleased(key)
-            } else if (action == GLFW_PRESS) {
-                keyPressed(key)
-            }
-        }
-    }
+    private var isFullscreen = false
+
+    private val screenWidth: Int
+        get() = if (isFullscreen) fullWidth else width
+    private val screenHeight: Int
+        get() = if (isFullscreen) fullHeight else height
 
     private val xbuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
     private val xbufDouble = xbuf.asDoubleBuffer()
@@ -43,6 +34,31 @@ abstract class LwjglWindow(
     private val ybufDouble = ybuf.asDoubleBuffer()
     private val currentPos = Vector2f()
     private val lastCursorPos = Vector2f()
+
+    private var fps = 0
+    private var last = System.currentTimeMillis()
+
+    private val errorCallback = errorCallbackPrint(System.err)
+
+    private val keyCallback = object : GLFWKeyCallback() {
+        override fun invoke(window: kotlin.Long, key: kotlin.Int, scancode: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
+            if (action == GLFW_RELEASE) {
+                when (key) {
+                    GLFW_KEY_ESCAPE -> glfwSetWindowShouldClose(window, GL11.GL_TRUE)
+                    GLFW_KEY_F12 -> switchFullscreen()
+                    else -> keyReleased(key)
+                }
+            } else if (action == GLFW_PRESS) {
+                keyPressed(key)
+            }
+        }
+    }
+
+    private fun switchFullscreen() {
+        isFullscreen = !isFullscreen
+        createWindow()
+    }
+
     private fun updateCursor(window: Long) {
         xbuf.rewind()
         xbufDouble.rewind()
@@ -59,27 +75,11 @@ abstract class LwjglWindow(
         lastCursorPos.set(currentPos)
     }
 
-    private var fps = 0
-    private var last = System.currentTimeMillis()
-
     fun show() {
         glfwSetErrorCallback(errorCallback)
         check(glfwInit() == GL11.GL_TRUE)
-        glfwDefaultWindowHints()
-        glfwWindowHint(GLFW_VISIBLE, GL11.GL_FALSE)
-        glfwWindowHint(GLFW_RESIZABLE, GL11.GL_TRUE)
-        val window = glfwCreateWindow(width, height, "Blaster!", if (fullscreen) glfwGetPrimaryMonitor() else NULL, NULL)
-        if (!fullscreen) {
-            val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
-            glfwSetWindowPos(window, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
-        }
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
-        glfwSetKeyCallback(window, keyCallback)
-        glfwMakeContextCurrent(window)
-        glfwSwapInterval(1)
-        glfwShowWindow(window)
-        GLContext.createFromCurrent()
-        onCreate()
+        createWindow()
+        onCreate(screenWidth, screenHeight)
         while (glfwWindowShouldClose(window) == GL11.GL_FALSE) {
             updateCursor(window)
             onDraw()
@@ -97,7 +97,28 @@ abstract class LwjglWindow(
         keyCallback.release()
     }
 
-    protected abstract fun onCreate()
+    private fun createWindow() {
+        val new = if (isFullscreen) {
+            glfwCreateWindow(fullWidth, fullHeight, "Blaster!", glfwGetPrimaryMonitor(), window)
+        } else {
+            val wnd = glfwCreateWindow(width, height, "Blaster!", NULL, window)
+            val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
+            glfwSetWindowPos(wnd, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
+            wnd
+        }
+        glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        glfwSetKeyCallback(new, keyCallback)
+        glfwMakeContextCurrent(new)
+        glfwSwapInterval(1)
+        GLContext.createFromCurrent()
+        if (window > NULL) {
+            glfwDestroyWindow(window)
+        }
+        window = new
+        glfwShowWindow(new)
+    }
+
+    protected abstract fun onCreate(width: Int, height: Int)
     protected abstract fun onDraw()
 
     open fun keyPressed(key: Int) {}

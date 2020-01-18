@@ -1,7 +1,6 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
-import com.blaster.common.randomVector3f
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.scene.*
@@ -9,9 +8,6 @@ import com.blaster.techniques.DeferredTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW
-
-private const val WIDTH = 800
-private const val HEIGHT = 600
 
 private val assetStream = AssetStream()
 private val pixelDecoder = PixelDecoder()
@@ -24,16 +20,17 @@ private val deferredTechnique = DeferredTechnique()
 
 private val controller = Controller(velocity = 0.05f)
 
-private var camera = Camera(WIDTH.toFloat() / HEIGHT.toFloat())
+private lateinit var camera: Camera
 
 private lateinit var model: Model
 
-private val window = object : LwjglWindow(WIDTH, HEIGHT) {
-    override fun onCreate() {
+private val window = object : LwjglWindow() {
+    override fun onCreate(width: Int, height: Int) {
+        camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0.5f, 3f, 3f))
         model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
         GlState.apply()
-        deferredTechnique.prepare(shadersLib, WIDTH, HEIGHT)
+        deferredTechnique.prepare(shadersLib, width, height)
         deferredTechnique.light(Light.SUNLIGHT)
         /*for (i in 0..15) {
             deferredTechnique.light(Light(
