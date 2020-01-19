@@ -26,10 +26,11 @@ open class Node(
             return absolutePositionBuf
         }
 
-    private val absoluteRotationBuf = Vector3f()
-    val absoluteRotation: Vector3f
+    private val absoluteRotationBuf = Quaternionf()
+    val absoluteRotation: Quaternionf
         get() {
-            TODO()
+            calculateModelM().getNormalizedRotation(absoluteRotationBuf)
+            return absoluteRotationBuf
         }
 
     private fun incrementVersion() {

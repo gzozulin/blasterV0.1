@@ -5,6 +5,7 @@ import com.blaster.common.vec3
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.lang.IllegalStateException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -18,9 +19,12 @@ import java.util.regex.Pattern
 
 private val example = """
     building; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom: gold;
-        right_top_light; pos 3 3 3;
-            right_one_more; pos 5 5 5;
-        left_top_light; pos -3 3 3;
+        build_1; pos 3 3 3;
+            build_1_1; pos 5 5 5;
+            build_1_2; pos 5 5 5;
+        build_2; pos -3 3 3;
+            build_2_1; pos 5 5 5;
+        build_3; pos -3 3 3;
     camera; pos 4 4 4; target building;
 """.trimIndent()
 
@@ -57,30 +61,30 @@ class SceneReader(
     }
 
     private fun parse(): List<Placeholer> {
-        val result = mutableListOf<Placeholer>()
-
+        val scene = parsePlaceholder("scene; pos 0 0 0;")
 
         val stack = Stack<Placeholer>()
-        stack.add(parsePlaceholder("scene; pos 0 0 0; rot 0 0 0 0; scale 1 1 1;"))
+        stack.add(scene)
 
         val bufferedReader = BufferedReader(InputStreamReader(sceneStream, Charset.defaultCharset()))
         bufferedReader.use {
             var line = bufferedReader.readLine()
             while (line != null) {
 
-                val currentDepth = stack.size - 1
-                val depthToLine = removeDepth(line)
+                val (depth, trimmed) = removeDepth(line)
+                val placeholder = parsePlaceholder(trimmed)
 
                 when {
-                    depthToLine.first > currentDepth -> {
-                        stack.peek().children.add(parsePlaceholder(depthToLine.second))
+                    depth > stack.size -> {
+                        stack.peek().children.add(placeholder)
+                        stack.add(placeholder)
                     }
-                    depthToLine.first < currentDepth -> {
-                        result.add(stack.pop())
-                        stack.add(parsePlaceholder(depthToLine.second))
+                    depth < stack.size -> {
+                        stack.pop()
+                        stack.peek().children.add(placeholder)
                     }
                     else -> {
-                        stack.add(parsePlaceholder(depthToLine.second))
+                        stack.peek().children.add(placeholder)
                     }
                 }
 
@@ -88,7 +92,7 @@ class SceneReader(
                 line = bufferedReader.readLine()
             }
         }
-        return result
+        return scene.children
     }
 
     private fun parsePlaceholder(placeholder: String): Placeholer {
@@ -147,7 +151,7 @@ class SceneReader(
             depth ++
         }
 
-        return depth / 4 to current
+        return depth / 4 + 1 to current // 4 spaces = tab + scene parent
     }
 }
 
