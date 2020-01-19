@@ -89,7 +89,7 @@ class DeferredTechnique {
         }
     }
 
-    fun draw(camera: Camera, withTransparency: Boolean = false, draw: () -> Unit) {
+    fun draw(camera: Camera, draw: () -> Unit) {
         glBind(listOf(programGeomPass, framebuffer)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
@@ -97,16 +97,10 @@ class DeferredTechnique {
             draw.invoke()
         }
         GlState.drawTransparent {
-            if (withTransparency) {
-                GlState.enableTransparency()
-            }
             glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer,
                     matAmbShineStorage, matDiffTranspStorage, matSpecularStorage)) {
                 programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
                 quadMesh.draw()
-            }
-            if (withTransparency) {
-                GlState.disableTransparency()
             }
         }
     }
