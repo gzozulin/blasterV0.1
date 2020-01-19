@@ -23,7 +23,7 @@ private val modelsLib = ModelsLib(assetStream, texturesLib)
 private val deferredTechnique = DeferredTechnique()
 private val textTechnique = TextTechnique()
 
-private val console = Console()
+private val console = Console(3000L)
 
 private val controller = Controller(velocity = 0.05f)
 
@@ -31,6 +31,42 @@ private lateinit var camera: Camera
 
 private lateinit var model: Model
 private val node = Node()
+
+private val materials = listOf(
+        "concrete" to Material.CONCRETE,
+        "brass" to Material.BRASS,
+        "bronze" to Material.BRONZE,
+        "polished bronze" to Material.POLISHED_BRONZE,
+        "chrome" to Material.CHROME,
+        "copper" to Material.COPPER,
+        "polished copper" to Material.POLISHED_COPPER,
+        "gold" to Material.GOLD,
+        "polished gold" to Material.POLISHED_GOLD,
+        "tin" to Material.TIN,
+        "silver" to Material.SILVER,
+        "polished silver" to Material.POLISHED_SILVER,
+        "emerald" to Material.EMERALD,
+        "jade" to Material.JADE,
+        "obsidian" to Material.OBSIDIAN,
+        "perl" to Material.PERL,
+        "ruby" to Material.RUBY)
+private var currentMaterial = 0
+
+private fun nextMaterial() {
+    currentMaterial++
+    if (currentMaterial == materials.size) {
+        currentMaterial = 0
+    }
+    console.success("Material: ${materials[currentMaterial].first}")
+}
+
+private fun prevMaterial() {
+    currentMaterial--
+    if (currentMaterial < 0) {
+        currentMaterial = materials.size - 1
+    }
+    console.success("Material: ${materials[currentMaterial].first}")
+}
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
@@ -62,7 +98,7 @@ private val window = object : LwjglWindow() {
             }
         }
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, node.calculateModelM(), model.diffuse, Material.CONCRETE)
+            deferredTechnique.instance(model.mesh, node.calculateModelM(), model.diffuse, materials[currentMaterial].second)
         }
     }
 
@@ -79,6 +115,8 @@ private val window = object : LwjglWindow() {
             GLFW.GLFW_KEY_D -> controller.d = true
             GLFW.GLFW_KEY_E -> controller.e = true
             GLFW.GLFW_KEY_Q -> controller.q = true
+            GLFW.GLFW_KEY_LEFT_BRACKET -> nextMaterial()
+            GLFW.GLFW_KEY_RIGHT_BRACKET -> prevMaterial()
         }
     }
 
