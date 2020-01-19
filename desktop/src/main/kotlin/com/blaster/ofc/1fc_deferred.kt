@@ -115,8 +115,8 @@ private val window = object : LwjglWindow() {
             GLFW.GLFW_KEY_D -> controller.d = true
             GLFW.GLFW_KEY_E -> controller.e = true
             GLFW.GLFW_KEY_Q -> controller.q = true
-            GLFW.GLFW_KEY_LEFT_BRACKET -> nextMaterial()
-            GLFW.GLFW_KEY_RIGHT_BRACKET -> prevMaterial()
+            GLFW.GLFW_KEY_LEFT_BRACKET -> prevMaterial()
+            GLFW.GLFW_KEY_RIGHT_BRACKET -> nextMaterial()
         }
     }
 
