@@ -12,6 +12,7 @@ uniform vec3 uMatAmbient;
 uniform vec3 uMatDiffuse;
 uniform vec3 uMatSpecular;
 uniform float uMatShine;
+uniform float uMatTransp;
 
 out vec4 vFragPosition;
 out vec2 vTexCoord;
@@ -21,6 +22,7 @@ out vec3 vMatAmbient;
 out vec3 vMatDiffuse;
 out vec3 vMatSpecular;
 out float vMatShine;
+out float vMatTransp;
 
 void main()
 {
@@ -38,4 +40,5 @@ void main()
     vMatDiffuse = uMatDiffuse;
     vMatSpecular = uMatSpecular;
     vMatShine = uMatShine;
+    vMatTransp = uMatTransp;
 }

@@ -11,7 +11,7 @@ enum class GlUniform(val label: String) {
     UNIFORM_TEXTURE_DIFFUSE     ("uTexDiffuse"),
 
     UNIFORM_TEXTURE_MAT_AMB_SHINE("uTexMatAmbientShine"),
-    UNIFORM_TEXTURE_MAT_DIFFUSE ("uTexMatDiffuse"),
+    UNIFORM_TEXTURE_MAT_DIFF_TRANSP ("uTexMatDiffTransp"),
     UNIFORM_TEXTURE_MAT_SPECULAR("uTexMatSpecular"),
 
     UNIFORM_LIGHTS_POINT_CNT    ("uLightsPointCnt"),
@@ -23,6 +23,7 @@ enum class GlUniform(val label: String) {
     UNIFORM_MAT_DIFFUSE         ("uMatDiffuse"),
     UNIFORM_MAT_SPECULAR        ("uMatSpecular"),
     UNIFORM_MAT_SHINE           ("uMatShine"),
+    UNIFORM_MAT_TRANSP          ("uMatTransp"),
 
     UNIFORM_COLOR               ("uColor"),
 

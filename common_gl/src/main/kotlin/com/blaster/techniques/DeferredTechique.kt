@@ -26,7 +26,7 @@ class DeferredTechnique {
     private lateinit var diffuseStorage: GlTexture
 
     private lateinit var matAmbShineStorage: GlTexture // ambient + shine
-    private lateinit var matDiffuseStorage: GlTexture
+    private lateinit var matDiffTranspStorage: GlTexture // diffuse + transparency
     private lateinit var matSpecularStorage: GlTexture
 
     private lateinit var depthBuffer: GlRenderBuffer
@@ -55,10 +55,10 @@ class DeferredTechnique {
                 unit = 3,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,
                 pixelFormat = backend.GL_RGBA, pixelType = backend.GL_FLOAT)
-        matDiffuseStorage = GlTexture(
+        matDiffTranspStorage = GlTexture(
                 unit = 4,
-                width = width, height = height, internalFormat = backend.GL_RGB16F,
-                pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
+                width = width, height = height, internalFormat = backend.GL_RGBA16F,
+                pixelFormat = backend.GL_RGBA, pixelType = backend.GL_FLOAT)
         matSpecularStorage = GlTexture(
                 unit = 5,
                 width = width, height = height, internalFormat = backend.GL_RGB16F,
@@ -70,7 +70,7 @@ class DeferredTechnique {
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT1, normalStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT2, diffuseStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT3, matAmbShineStorage)
-            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT4, matDiffuseStorage)
+            framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT4, matDiffTranspStorage)
             framebuffer.setTexture(backend.GL_COLOR_ATTACHMENT5, matSpecularStorage)
             framebuffer.setOutputs(intArrayOf(
                     backend.GL_COLOR_ATTACHMENT0, backend.GL_COLOR_ATTACHMENT1, backend.GL_COLOR_ATTACHMENT2,
@@ -84,22 +84,30 @@ class DeferredTechnique {
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL, normalStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuseStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_AMB_SHINE, matAmbShineStorage)
-            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_DIFFUSE, matDiffuseStorage)
+            programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_DIFF_TRANSP, matDiffTranspStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_SPECULAR, matSpecularStorage)
         }
     }
 
-    fun draw(camera: Camera, draw: () -> Unit) {
+    fun draw(camera: Camera, withTransparency: Boolean = false, draw: () -> Unit) {
         glBind(listOf(programGeomPass, framebuffer)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
             draw.invoke()
         }
-        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer,
-                matAmbShineStorage, matDiffuseStorage, matSpecularStorage)) {
-            programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
-            quadMesh.draw()
+        GlState.drawTransparent {
+            if (withTransparency) {
+                GlState.enableTransparency()
+            }
+            glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer,
+                    matAmbShineStorage, matDiffTranspStorage, matSpecularStorage)) {
+                programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
+                quadMesh.draw()
+            }
+            if (withTransparency) {
+                GlState.disableTransparency()
+            }
         }
     }
 
@@ -145,6 +153,7 @@ class DeferredTechnique {
             programGeomPass.setUniform(GlUniform.UNIFORM_MAT_DIFFUSE, material.diffuse)
             programGeomPass.setUniform(GlUniform.UNIFORM_MAT_SPECULAR, material.specular)
             programGeomPass.setUniform(GlUniform.UNIFORM_MAT_SHINE, material.shine)
+            programGeomPass.setUniform(GlUniform.UNIFORM_MAT_TRANSP, material.transparency)
             programGeomPass.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             mesh.draw()
         }

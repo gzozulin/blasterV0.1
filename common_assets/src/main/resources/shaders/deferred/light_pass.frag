@@ -9,7 +9,7 @@ uniform sampler2D uTexNormal;
 uniform sampler2D uTexDiffuse;
 
 uniform sampler2D uTexMatAmbientShine;
-uniform sampler2D uTexMatDiffuse;
+uniform sampler2D uTexMatDiffTransp;
 uniform sampler2D uTexMatSpecular;
 
 uniform vec3 uEye;
@@ -84,7 +84,7 @@ void main()
     vec3 fragDiffuse = texture(uTexDiffuse, vTexCoord).rgb;
 
     vec4 matAmbientShine = texture(uTexMatAmbientShine, vTexCoord);
-    vec3 matDiffuse = texture(uTexMatDiffuse, vTexCoord).rgb;
+    vec4 matDiffuseTransp = texture(uTexMatDiffTransp, vTexCoord);
     vec3 matSpecular = texture(uTexMatSpecular, vTexCoord).rgb;
 
     vec3 viewDir  = normalize(uEye - fragPosition);
@@ -92,14 +92,15 @@ void main()
 
     for (int i = 0; i < uLightsPointCnt; ++i) {
         lighting += pointLightContrib(viewDir, fragPosition, fragNormal, uLights[i].vector, uLights[i].intensity,
-        matDiffuse, matSpecular, matAmbientShine.a);
+        matDiffuseTransp.rgb, matSpecular, matAmbientShine.a);
     }
 
     for (int i = 0; i < uLightsDirCnt; ++i) {
         lighting += dirLightContrib(viewDir, fragNormal, uLights[i].vector, uLights[i].intensity,
-        matDiffuse, matSpecular, matAmbientShine.a);
+        matDiffuseTransp.rgb, matSpecular, matAmbientShine.a);
     }
 
     lighting *= fragDiffuse;
+    // todo: oFragColor = vec4(lighting, matDiffuseTransp.a);
     oFragColor = vec4(lighting, 1.0);
 }
