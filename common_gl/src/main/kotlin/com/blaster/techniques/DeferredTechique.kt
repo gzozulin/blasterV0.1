@@ -12,6 +12,7 @@ private val backend = GlLocator.locate()
 
 const val MAX_LIGHTS = 128
 
+// todo: transparency from material
 class DeferredTechnique {
     private lateinit var programGeomPass: GlProgram
     private lateinit var programLightPass: GlProgram

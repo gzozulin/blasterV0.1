@@ -5,6 +5,7 @@ import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.scene.Mesh
 import com.blaster.scene.Model
+import com.blaster.scene.Node
 import org.joml.Matrix4f
 
 class SimpleTechnique {
@@ -22,8 +23,8 @@ class SimpleTechnique {
         }
     }
 
-    fun instance(model: Model) {
-        instance(model.mesh, model.diffuse, model.calculateModelM())
+    fun instance(model: Model, node: Node) {
+        instance(model.mesh, model.diffuse, node.calculateModelM())
     }
 
     fun instance(mesh: Mesh, diffuse: GlTexture, modelM: Matrix4f) {

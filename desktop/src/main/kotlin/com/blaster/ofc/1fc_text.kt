@@ -21,7 +21,7 @@ private val console = Console(2000L)
 private val random = Random()
 
 private val window = object : LwjglWindow(800, 600) {
-    override fun onCreate() {
+    override fun onCreate(width: Int, height: Int) {
         technique.prepare(shadersLib, textureLib)
         GlState.apply()
     }

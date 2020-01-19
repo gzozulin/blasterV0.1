@@ -1,6 +1,8 @@
 package com.blaster.assets
 
-import com.blaster.gl.*
+import com.blaster.gl.GlAttribute
+import com.blaster.gl.GlBuffer
+import com.blaster.gl.GlLocator
 import com.blaster.scene.Mesh
 import com.blaster.scene.Model
 import org.joml.AABBf

@@ -6,14 +6,14 @@ import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-open class Node : Movable {
-    private var parent: Node? = null
-    val children: List<Node> = ArrayList()
-    var graphVersion = Version()
+open class Node(
+        private var parent: Node? = null,
+        private val relativePosition: Vector3f = Vector3f(),
+        private val relativeRotation: Quaternionf = Quaternionf(),
+        private val relativeScale: Vector3f = Vector3f(1f)) {
 
-    val position: Vector3f = Vector3f()
-    val rotation: Quaternionf = Quaternionf()
-    val scale: Vector3f = Vector3f(1f)
+    private val children: List<Node> = ArrayList()
+    var graphVersion = Version()
 
     val localVersion = Version()
     private val localM = Matrix4f()
@@ -24,6 +24,12 @@ open class Node : Movable {
         get() {
             calculateModelM().getTranslation(absolutePositionBuf)
             return absolutePositionBuf
+        }
+
+    private val absoluteRotationBuf = Vector3f()
+    val absoluteRotation: Vector3f
+        get() {
+            TODO()
         }
 
     private fun incrementVersion() {
@@ -49,7 +55,7 @@ open class Node : Movable {
 
     private fun calculateLocalM(): Matrix4f {
         if (localVersion.check()) {
-            localM.identity().rotate(rotation).scale(scale).translate(position)
+            localM.identity().rotate(relativeRotation).scale(relativeScale).translate(relativePosition)
         }
         return localM
     }
@@ -64,6 +70,6 @@ open class Node : Movable {
 
     fun tick() {
         localVersion.increment()
-        rotation.rotateAxis(0.01f, VECTOR_UP)
+        relativeRotation.rotateAxis(0.01f, VECTOR_UP)
     }
 }

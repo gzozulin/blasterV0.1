@@ -7,10 +7,7 @@ import com.blaster.assets.TexturesLib
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
-import com.blaster.scene.Camera
-import com.blaster.scene.Controller
-import com.blaster.scene.Mesh
-import com.blaster.scene.Model
+import com.blaster.scene.*
 import com.blaster.techniques.SimpleTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -33,6 +30,10 @@ private lateinit var model3: Model
 
 private val controller = Controller()
 
+private val node1 = Node()
+private val node2 = Node(node1)
+private val node3 = Node(node2)
+
 private lateinit var camera: Camera
 
 private val window = object : LwjglWindow() {
@@ -47,7 +48,7 @@ private val window = object : LwjglWindow() {
         model1 = Model(mesh, tex1)
         model2 = Model(mesh, tex2)
         model3 = Model(mesh, tex3)
-        model1.attach(model2)
+
         GlState.apply(false)
     }
 
@@ -56,13 +57,14 @@ private val window = object : LwjglWindow() {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
-        model1.tick()
-        model2.tick()
+        node1.tick()
+        node2.tick()
+        node3.tick()
         GlState.clear()
         simpleTechnique.draw(camera) {
-            simpleTechnique.instance(model1)
-            simpleTechnique.instance(model2)
-            simpleTechnique.instance(model3)
+            simpleTechnique.instance(model1, node1)
+            simpleTechnique.instance(model2, node2)
+            simpleTechnique.instance(model3, node3)
         }
     }
 

@@ -30,6 +30,7 @@ private val controller = Controller(velocity = 0.05f)
 private lateinit var camera: Camera
 
 private lateinit var model: Model
+private val node = Node()
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
@@ -61,7 +62,7 @@ private val window = object : LwjglWindow() {
             }
         }
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, model.calculateModelM(), model.diffuse, Material.CONCRETE)
+            deferredTechnique.instance(model.mesh, node.calculateModelM(), model.diffuse, Material.CONCRETE)
         }
     }
 
