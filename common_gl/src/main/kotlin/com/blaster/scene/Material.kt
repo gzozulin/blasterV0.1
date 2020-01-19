@@ -21,12 +21,9 @@ data class Material(val ambient: vec3, val diffuse: vec3, val specular: vec3, va
         val OBSIDIAN        = Material(vec3(0.05375f,  0.05f,     0.06625f),  vec3(0.18275f,  0.17f,     0.22525f),  vec3(0.332741f, 0.328634f, 0.346435f),  38.4f,   0.82f)
         val PERL            = Material(vec3(0.25f,     0.20725f,  0.20725f),  vec3(1.0f,      0.829f,    0.829f),    vec3(0.296648f, 0.296648f, 0.296648f),  11.264f, 0.922f)
         val RUBY            = Material(vec3(0.1745f,   0.01175f,  0.01175f),  vec3(0.61424f,  0.04136f,  0.04136f),  vec3(0.727811f, 0.626959f, 0.626959f),  76.8f,   0.55f)
-
-        val RED_RUBBER      = Material(vec3(0.05f, 0.0f, 0.0f),               vec3(0.5f, 0.4f, 0.4f),                vec3(0.7f, 0.04f, 0.04f),               10.0f)
-    }
-
-    override fun toString(): String {
-        return String.format("ambient={%.2f, %.2f, %.2f}, diffuse={%.2f, %.2f, %.2f}, specular={%.2f, %.2f, %.2f}, shine=%.2f, transparency=%.2f",
-                ambient.x, ambient.y, ambient.z, diffuse.x, diffuse.y, diffuse.z, specular.x, specular.y, specular.z, shine, transparency)
+        val TURQUOISE       = Material(vec3(0.1f,      0.18725f,  0.1745f),   vec3(0.396f,    0.74151f,  0.69102f),  vec3(0.297254f, 0.30829f,  0.306678f),  12.8f,   0.8f)
+        val BLACK_PLASTIC   = Material(vec3(0.0f,      0.0f,      0.0f),      vec3(0.01f,     0.01f,     0.01f),     vec3(0.5f,      0.50f,     0.50f),      32.0f)
+        val CIAN_PLASTIC    = Material(vec3(0.0f,      0.1f,      0.06f),     vec3(0.0f,      0.509803f, 0.509803f), vec3(0.5f,      0.50f,     0.50f),      32.0f)
+        val RED_RUBBER      = Material(vec3(0.05f,     0.0f,      0.0f),      vec3(0.5f,      0.4f,      0.4f),      vec3(0.7f,      0.04f,     0.04f),      10.0f)
     }
 }
