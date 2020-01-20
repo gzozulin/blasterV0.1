@@ -90,21 +90,11 @@ class SceneReader(
         var custom: String? = null
         tokens.forEach {
             when {
-                it.startsWith("pos") -> {
-                    pos = parseVec3(it.removePrefix("pos").trim())
-                }
-                it.startsWith("rot") -> {
-                    rot = parseQuat(it.removePrefix("rot").trim())
-                }
-                it.startsWith("scale") -> {
-                    scale = parseVec3(it.removePrefix("scale").trim())
-                }
-                it.startsWith("target") -> {
-                    target = it.removePrefix("target").trim()
-                }
-                it.startsWith("custom") -> {
-                    custom = it.removePrefix("custom").trim()
-                }
+                it.startsWith("pos") -> pos = parseVec3(it.removePrefix("pos").trim())
+                it.startsWith("rot") -> rot = parseQuat(it.removePrefix("rot").trim())
+                it.startsWith("scale") -> scale = parseVec3(it.removePrefix("scale").trim())
+                it.startsWith("target") -> target = it.removePrefix("target").trim()
+                it.startsWith("custom") -> custom = it.removePrefix("custom").trim()
             }
         }
         return Placeholer(uid, pos!!, rot, scale, target, custom, mutableListOf())
