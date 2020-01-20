@@ -38,7 +38,7 @@ data class Placeholer(
 class SceneReader(
         private val sceneStream: InputStream, private val reloadFrequency: Long = 1000) {
 
-    private var scene: Placeholer = Placeholer("scene", vec3())
+    private val scene = mutableListOf<Placeholer>()
 
     private var last = 0L
 
@@ -54,8 +54,9 @@ class SceneReader(
     private fun reload() {
         val bufferedReader = BufferedReader(InputStreamReader(sceneStream, Charset.defaultCharset()))
         val new = parse(0, bufferedReader.readLines().toMutableList())
-        //diff(scene, new)
-        //scene = new
+        diff(scene, new)
+        scene.clear()
+        scene.addAll(new)
         return
     }
 
@@ -112,7 +113,7 @@ class SceneReader(
         return quat(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat())
     }
 
-    private fun diff(current: Placeholer, new: Placeholer) {
+    private fun diff(current: List<Placeholer>, new: List<Placeholer>) {
         // onAdd
         // onRemove
         // onUpdate
