@@ -161,22 +161,22 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
         currentPositions.add(vy)
         currentPositions.add(vz)
         updateAabb(vx, vy, vz)
-        if (vertSplit[1].isNotEmpty()) {
+        if (currentTexCoordList.isNotEmpty()) {
             val texIndex = vertSplit[1].toInt()  - 1
             currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 0])
             currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 1])
         } else {
-            currentTexCoords.add(0f)
-            currentTexCoords.add(0f)
+            currentTexCoords.add(1f)
+            currentTexCoords.add(1f)
         }
-        if (vertSplit[2].isNotEmpty()) {
+        if (currentNormalList.isNotEmpty()) {
             val normIndex = vertSplit[2].toInt() - 1
             currentNormals.add(currentNormalList  [normIndex * 3 + 0])
             currentNormals.add(currentNormalList  [normIndex * 3 + 1])
             currentNormals.add(currentNormalList  [normIndex * 3 + 2])
         } else {
             currentNormals.add(0f)
-            currentNormals.add(0f)
+            currentNormals.add(1f)
             currentNormals.add(0f)
         }
     }
