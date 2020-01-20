@@ -34,5 +34,37 @@ data class Material(val ambient: vec3, val diffuse: vec3, val specular: vec3, va
         val RED_RUBBER      = Material(vec3(0.05f,     0.0f,      0.0f),      vec3(0.5f,      0.4f,      0.4f),      vec3(0.7f,      0.04f,     0.04f),      10.0f)
         val WHITE_RUBBER    = Material(vec3(0.05f,     0.05f,     0.05f),     vec3(0.5f,      0.5f,      0.5f),      vec3(0.7f,      0.7f,      0.7f),       10.0f)
         val YELLOW_RUBBER   = Material(vec3(0.05f,     0.05f,     0.0f),      vec3(0.5f,      0.5f,      0.4f),      vec3(0.7f,      0.7f,      0.04f),      10.0f)
+
+        val MATERIALS = listOf(
+                "concrete"        to CONCRETE,
+                "brass"           to BRASS,
+                "bronze"          to BRONZE,
+                "polished bronze" to POLISHED_BRONZE,
+                "chrome"          to CHROME,
+                "copper"          to COPPER,
+                "polished copper" to POLISHED_COPPER,
+                "gold"            to GOLD,
+                "polished gold"   to POLISHED_GOLD,
+                "tin"             to TIN,
+                "silver"          to SILVER,
+                "polished silver" to POLISHED_SILVER,
+                "emerald"         to EMERALD,
+                "jade"            to JADE,
+                "obsidian"        to OBSIDIAN,
+                "perl"            to PERL,
+                "ruby"            to RUBY,
+                "turquoise"       to TURQUOISE,
+                "black plastic"   to BLACK_PLASTIC,
+                "cian plastic"    to CIAN_PLASTIC,
+                "green plastic"   to GREEN_PLASTIC,
+                "red plastic"     to RED_PLASTIC,
+                "white plastic"   to WHITE_PLASTIC,
+                "yellow plastic"  to YELLOW_PLASTIC,
+                "black rubber"    to BLACK_RUBBER,
+                "cian rubber"     to CIAN_RUBBER,
+                "green rubber"    to GREEN_RUBBER,
+                "red rubber"      to RED_RUBBER,
+                "white rubber"    to WHITE_RUBBER,
+                "yellow rubber"   to YELLOW_RUBBER)
     }
 }
