@@ -24,6 +24,15 @@ data class Material(val ambient: vec3, val diffuse: vec3, val specular: vec3, va
         val TURQUOISE       = Material(vec3(0.1f,      0.18725f,  0.1745f),   vec3(0.396f,    0.74151f,  0.69102f),  vec3(0.297254f, 0.30829f,  0.306678f),  12.8f,   0.8f)
         val BLACK_PLASTIC   = Material(vec3(0.0f,      0.0f,      0.0f),      vec3(0.01f,     0.01f,     0.01f),     vec3(0.5f,      0.50f,     0.50f),      32.0f)
         val CIAN_PLASTIC    = Material(vec3(0.0f,      0.1f,      0.06f),     vec3(0.0f,      0.509803f, 0.509803f), vec3(0.5f,      0.50f,     0.50f),      32.0f)
+        val GREEN_PLASTIC   = Material(vec3(0.0f,      0.0f,      0.0f),      vec3(0.1f,      0.35f,     0.1f),      vec3(0.45f,     0.55f,     0.45f),      32.0f)
+        val RED_PLASTIC     = Material(vec3(0.0f,      0.0f,      0.0f),      vec3(0.5f,      0.0f,      0.0f),      vec3(0.7f,      0.6f,      0.6f),       32.0f)
+        val WHITE_PLASTIC   = Material(vec3(0.0f,      0.0f,      0.0f),      vec3(0.55f,     0.55f,     0.55f),     vec3(0.70f,     0.70f,     0.70f),      32.0f)
+        val YELLOW_PLASTIC  = Material(vec3(0.0f,      0.0f,      0.0f),      vec3(0.5f,      0.5f,      0.0f),      vec3(0.60f,     0.60f,     0.50f),      32.0f)
+        val BLACK_RUBBER    = Material(vec3(0.02f,     0.02f,     0.02f),     vec3(0.01f,     0.01f,     0.01f),     vec3(0.4f,      0.4f,      0.4f),       10.0f)
+        val CIAN_RUBBER     = Material(vec3(0.0f,      0.05f,     0.05f),     vec3(0.4f,      0.5f,      0.5f),      vec3(0.04f,     0.7f,      0.7f),       10.0f)
+        val GREEN_RUBBER    = Material(vec3(0.0f,      0.05f,     0.0f),      vec3(0.4f,      0.5f,      0.4f),      vec3(0.04f,     0.7f,      0.04f),      10.0f)
         val RED_RUBBER      = Material(vec3(0.05f,     0.0f,      0.0f),      vec3(0.5f,      0.4f,      0.4f),      vec3(0.7f,      0.04f,     0.04f),      10.0f)
+        val WHITE_RUBBER    = Material(vec3(0.05f,     0.05f,     0.05f),     vec3(0.5f,      0.5f,      0.5f),      vec3(0.7f,      0.7f,      0.7f),       10.0f)
+        val YELLOW_RUBBER   = Material(vec3(0.05f,     0.05f,     0.0f),      vec3(0.5f,      0.5f,      0.4f),      vec3(0.7f,      0.7f,      0.04f),      10.0f)
     }
 }

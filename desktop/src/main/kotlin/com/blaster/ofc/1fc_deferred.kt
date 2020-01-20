@@ -32,25 +32,38 @@ private lateinit var camera: Camera
 private lateinit var model: Model
 private val node = Node()
 
-private val materials = listOf(
-        "concrete" to Material.CONCRETE,
-        "brass" to Material.BRASS,
-        "bronze" to Material.BRONZE,
-        "polished bronze" to Material.POLISHED_BRONZE,
-        "chrome" to Material.CHROME,
-        "copper" to Material.COPPER,
-        "polished copper" to Material.POLISHED_COPPER,
-        "gold" to Material.GOLD,
-        "polished gold" to Material.POLISHED_GOLD,
-        "tin" to Material.TIN,
-        "silver" to Material.SILVER,
-        "polished silver" to Material.POLISHED_SILVER,
-        "emerald" to Material.EMERALD,
-        "jade" to Material.JADE,
-        "obsidian" to Material.OBSIDIAN,
-        "perl" to Material.PERL,
-        "ruby" to Material.RUBY)
 private var currentMaterial = 0
+private val materials = listOf(
+        "concrete"          to Material.CONCRETE,
+        "brass"             to Material.BRASS,
+        "bronze"            to Material.BRONZE,
+        "polished bronze"   to Material.POLISHED_BRONZE,
+        "chrome"            to Material.CHROME,
+        "copper"            to Material.COPPER,
+        "polished copper"   to Material.POLISHED_COPPER,
+        "gold"              to Material.GOLD,
+        "polished gold"     to Material.POLISHED_GOLD,
+        "tin"               to Material.TIN,
+        "silver"            to Material.SILVER,
+        "polished silver"   to Material.POLISHED_SILVER,
+        "emerald"           to Material.EMERALD,
+        "jade"              to Material.JADE,
+        "obsidian"          to Material.OBSIDIAN,
+        "perl"              to Material.PERL,
+        "ruby"              to Material.RUBY,
+        "turquoise"         to Material.TURQUOISE,
+        "black plastic"     to Material.BLACK_PLASTIC,
+        "cian plastic"      to Material.CIAN_PLASTIC,
+        "green plastic"     to Material.GREEN_PLASTIC,
+        "red plastic"       to Material.RED_PLASTIC,
+        "white plastic"     to Material.WHITE_PLASTIC,
+        "yellow plastic"    to Material.YELLOW_PLASTIC,
+        "black rubber"      to Material.BLACK_RUBBER,
+        "cian rubber"       to Material.CIAN_RUBBER,
+        "green rubber"      to Material.GREEN_RUBBER,
+        "red rubber"        to Material.RED_RUBBER,
+        "white rubber"      to Material.WHITE_RUBBER,
+        "yellow rubber"     to Material.YELLOW_RUBBER)
 
 private fun nextMaterial() {
     currentMaterial++
