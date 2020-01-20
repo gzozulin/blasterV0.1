@@ -5,10 +5,8 @@ import com.blaster.common.vec3
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.lang.IllegalStateException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
-import java.util.*
 import java.util.regex.Pattern
 
 // todo: BlastEd
@@ -18,7 +16,7 @@ import java.util.regex.Pattern
 // todo: update when needed
 
 private val example = """
-    building; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom: gold;
+    building; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom gold;
         build_1; pos 3 3 3;
             build_1_1; pos 5 5 5;
             build_1_2; pos 5 5 5;
@@ -32,15 +30,15 @@ private val example = """
 // todo: probably, also can have matrix directly
 data class Placeholer(
         val uid: String,
-        val pos: vec3, val rotation: quat?, val scale: vec3?,
-        val target: String?,
-        val custom: String?,
-        val children: MutableList<Placeholer>)
+        val pos: vec3, val rotation: quat? = null, val scale: vec3? = null,
+        val target: String? = null,
+        val custom: String? = null,
+        val children: MutableList<Placeholer> = mutableListOf())
 
 class SceneReader(
         private val sceneStream: InputStream, private val reloadFrequency: Long = 1000) {
 
-    private val scene = mutableListOf<Placeholer>()
+    private var scene: Placeholer = Placeholer("scene", vec3())
 
     private var last = 0L
 
@@ -54,49 +52,36 @@ class SceneReader(
     }
 
     private fun reload() {
-        val new = parse()
-        diff(scene, new)
-        scene.clear()
-        scene.addAll(new)
+        val bufferedReader = BufferedReader(InputStreamReader(sceneStream, Charset.defaultCharset()))
+        val new = parse(0, bufferedReader.readLines().toMutableList())
+        //diff(scene, new)
+        //scene = new
+        return
     }
 
-    private fun parse(): List<Placeholer> {
-        val scene = parsePlaceholder("scene; pos 0 0 0;")
+    private fun peek(input: String): Int {
+        var count = 0
+        while (input[count] == ' ') {
+            count++
+        }
+        return count
+    }
 
-        val stack = Stack<Placeholer>()
-        stack.add(scene)
-
-        val bufferedReader = BufferedReader(InputStreamReader(sceneStream, Charset.defaultCharset()))
-        bufferedReader.use {
-            var line = bufferedReader.readLine()
-            while (line != null) {
-
-                val (depth, trimmed) = removeDepth(line)
-                val placeholder = parsePlaceholder(trimmed)
-
-                when {
-                    depth > stack.size -> {
-                        stack.peek().children.add(placeholder)
-                        stack.add(placeholder)
-                    }
-                    depth < stack.size -> {
-                        stack.pop()
-                        stack.peek().children.add(placeholder)
-                    }
-                    else -> {
-                        stack.peek().children.add(placeholder)
-                    }
-                }
-
-
-                line = bufferedReader.readLine()
+    private fun parse(depth: Int, remainder: MutableList<String>): List<Placeholer> {
+        val result = mutableListOf<Placeholer>()
+        loop@ while (remainder.isNotEmpty()) {
+            val currentDepth = peek(remainder[0])
+            when {
+                currentDepth == depth -> result.add(parsePlaceholder(remainder.removeAt(0)))
+                currentDepth > depth -> result.last().children.addAll(parse(currentDepth, remainder))
+                currentDepth < depth -> break@loop
             }
         }
-        return scene.children
+        return result
     }
 
     private fun parsePlaceholder(placeholder: String): Placeholer {
-        val tokens = placeholder.split(Pattern.compile(";\\s*"))
+        val tokens = placeholder.trim().split(Pattern.compile(";\\s*"))
         val uid: String = tokens[0]
         var pos: vec3? = null
         var rot: quat? = null
@@ -137,21 +122,10 @@ class SceneReader(
         return quat(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat())
     }
 
-    private fun diff(current: List<Placeholer>, new: List<Placeholer>) {
+    private fun diff(current: Placeholer, new: Placeholer) {
         // onAdd
         // onRemove
         // onUpdate
-    }
-
-    private fun removeDepth(input: String): Pair<Int, String> {
-        var current = input
-        var depth = 0
-        while (current.startsWith(' ')) {
-            current = current.removePrefix(" ")
-            depth ++
-        }
-
-        return depth / 4 + 1 to current // 4 spaces = tab + scene parent
     }
 }
 
