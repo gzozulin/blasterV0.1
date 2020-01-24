@@ -32,7 +32,17 @@ private lateinit var camera: Camera
 private lateinit var model: Model
 private val node = Node()
 
+private val sceneReader = SceneReader()
+private val sceneDiffer = SceneDiffer()
+
 private var currentMaterial = 0
+
+private val scene = """
+    building; pos 0; scaleTo 1;
+        red_light; pos 1.5;
+    sunlight; pos 0; dir -1;
+    camera; pos 1.5; target building;
+""".trimIndent()
 
 private fun nextMaterial() {
     currentMaterial++
@@ -64,6 +74,10 @@ private val window = object : LwjglWindow() {
                             vec3().random(vec3(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
                                     vec3(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
                             vec3().random(max = Vector3f(2f))))
+        }
+
+        sceneDiffer.diff(nextMarkers = sceneReader.load(scene)) {
+            parent, marker ->
         }
     }
 
