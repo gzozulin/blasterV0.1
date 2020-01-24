@@ -11,53 +11,54 @@ import java.util.regex.Pattern
 
 // todo: BlastEd
 
+// todo: scale aabb to fit, but maintain ratios
+
 // todo: create when needed
 // todo: remove when needed
 // todo: update when needed
 
-private val example = """
-    building; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom gold;
+// todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
+
+// todo: eulers in degrees for rotation
+
+// todo: probably, also can have matrix directly
+
+private val example1 = """
+    updated; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom gold;
         build_1; pos 3 3 3;
             build_1_1; pos 5 5 5;
             build_1_2; pos 5 5 5;
         build_2; pos -3 3 3;
             build_2_1; pos 5 5 5;
         build_3; pos -3 3 3;
+    removed; pos 1 2 3;
     camera; pos 4 4 4; target building;
 """.trimIndent()
 
-// todo: toLeftOf, toRightOf, toBottomOf, toTopOf, toFrontOf, toBackOf instead of positions, based on AABB
-// todo: probably, also can have matrix directly
-data class Placeholer(
+private val example2 = """
+    updated; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom gold;
+        build_1; pos 3 3 3;
+            build_1_1; pos 5 5 5;
+            build_1_2; pos 5 5 5;
+        build_2; pos -3 3 3;
+            build_2_1; pos 5 5 5;
+        build_3; pos -3 3 3;
+        build_4; pos 1 1 1;
+    added; pos 4 5 6;
+    camera; pos 4 4 4; target building;
+""".trimIndent()
+
+data class Placeholder(
         val uid: String,
         val pos: vec3, val rotation: quat? = null, val scale: vec3? = null,
         val target: String? = null,
         val custom: String? = null,
-        val children: MutableList<Placeholer> = mutableListOf())
+        val children: MutableList<Placeholder> = mutableListOf())
 
-class SceneReader(
-        private val sceneStream: InputStream, private val reloadFrequency: Long = 1000) {
-
-    private val scene = mutableListOf<Placeholer>()
-
-    private var last = 0L
-
-    // todo: streaming/comparing should be a separate feature with SceneDiffer
-    fun tick() {
-        val current = System.currentTimeMillis()
-        if (current - last > reloadFrequency) {
-            reload()
-            last = current
-        }
-    }
-
-    private fun reload() {
+class SceneReader {
+    fun load(sceneStream: InputStream): List<Placeholder> {
         val bufferedReader = BufferedReader(InputStreamReader(sceneStream, Charset.defaultCharset()))
-        val new = parse(0, bufferedReader.readLines().toMutableList())
-        diff(scene, new)
-        scene.clear()
-        scene.addAll(new)
-        return
+        return parse(0, bufferedReader.readLines().toMutableList())
     }
 
     private fun peek(input: String): Int {
@@ -68,8 +69,8 @@ class SceneReader(
         return count
     }
 
-    private fun parse(depth: Int, remainder: MutableList<String>): List<Placeholer> {
-        val result = mutableListOf<Placeholer>()
+    private fun parse(depth: Int, remainder: MutableList<String>): List<Placeholder> {
+        val result = mutableListOf<Placeholder>()
         loop@ while (remainder.isNotEmpty()) {
             val currentDepth = peek(remainder[0])
             when {
@@ -81,7 +82,7 @@ class SceneReader(
         return result
     }
 
-    private fun parsePlaceholder(placeholder: String): Placeholer {
+    private fun parsePlaceholder(placeholder: String): Placeholder {
         val tokens = placeholder.trim().split(Pattern.compile(";\\s*"))
         val uid: String = tokens[0]
         var pos: vec3? = null
@@ -98,7 +99,7 @@ class SceneReader(
                 it.startsWith("custom") -> custom = it.removePrefix("custom").trim()
             }
         }
-        return Placeholer(uid, pos!!, rot, scale, target, custom, mutableListOf())
+        return Placeholder(uid, pos!!, rot, scale, target, custom, mutableListOf())
     }
 
     private fun parseVec3(value: String): vec3 {
@@ -112,16 +113,43 @@ class SceneReader(
         check(tokens.size == 4)
         return quat(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat())
     }
+}
 
-    private fun diff(current: List<Placeholer>, new: List<Placeholer>) {
-        // onAdd
-        // onRemove
-        // onUpdate
+class SceneDiffer {
+    fun diff(current: List<Placeholder>, new: List<Placeholder>,
+             onRemove: (placeholder: Placeholder) -> Unit,
+             onUpdate: (placeholder: Placeholder) -> Unit,
+             onAdd: (placeholder: Placeholder) -> Unit) {
+        val added = mutableListOf<Placeholder>()
+        val removed = mutableListOf<Placeholder>()
+        val updated = mutableListOf<Placeholder>()
+        new.forEach{ placeholder ->
+            if (current.none { it.uid == placeholder.uid }) {
+                added.add(placeholder)
+            }
+        }
+        current.forEach{ placeholder ->
+            val filtered = new.filter { placeholder.uid == it.uid }
+            if (filtered.isEmpty()) {
+                removed.add(placeholder)
+            } else {
+                check(filtered.size == 1) { "Non unique uid?!" }
+                if (filtered.first() != placeholder) {
+                    updated.add(filtered.first())
+                }
+            }
+        }
+        removed.forEach(onRemove)
+        updated.forEach(onUpdate)
+        added.forEach(onAdd)
     }
 }
 
-private val sceneReader = SceneReader(example.byteInputStream(StandardCharsets.UTF_8))
+private val sceneReader = SceneReader()
+private val sceneDiffer = SceneDiffer()
 
 fun main() {
-    sceneReader.tick()
+    val scene1 = sceneReader.load(example1.byteInputStream(StandardCharsets.UTF_8))
+    val scene2 = sceneReader.load(example2.byteInputStream(StandardCharsets.UTF_8))
+    sceneDiffer.diff(scene1, scene2, ::println, ::println, ::println)
 }
