@@ -1,41 +1,49 @@
 package com.blaster.scene
 
 class SceneDiffer {
-    fun diff(prevMarkers: List<Marker> = listOf(), nextMarkers: List<Marker>,
-             onRemove: (parent: Marker?, marker: Marker) -> Unit = { _, _ -> },
-             onUpdate: (marker: Marker) -> Unit = { _ -> },
-             onAdd: (parent: Marker?, next: Marker) -> Unit) {
-        diffInternal(null, prevMarkers, nextMarkers, onRemove, onUpdate, onAdd)
+    open class Listener {
+        open fun onRemove(marker: Marker) {}
+        open fun onAdd(marker: Marker) {}
+        open fun onUpdate(marker: Marker) {}
+        open fun onParent(marker: Marker, parent: Marker?) {}
     }
 
-    private fun diffInternal(parent: Marker? = null,
-             prevMarkers: List<Marker>, nextMarkers: List<Marker>,
-             onRemove: (parent: Marker?, marker: Marker) -> Unit,
-             onUpdate: (marker: Marker) -> Unit,
-             onAdd: (parent: Marker?, next: Marker) -> Unit) {
-        val added = mutableListOf<Marker>()
-        val removed = mutableListOf<Marker>()
-        val updated = mutableListOf<Marker>()
-        nextMarkers.forEach{ next ->
-            if (prevMarkers.none { prev -> prev.uid == next.uid }) {
-                added.add(next)
-            }
+    fun diff(prevMarkers: List<Marker> = listOf(), nextMarkers: List<Marker>, listener: Listener) {
+        diffInternal(prevMarkers, nextMarkers, listener)
+    }
+
+    private data class ParentToChild(val parent: Marker?, val child: Marker)
+
+    private fun enumerate(parent: Marker?, markers: List<Marker>, parentToChild: MutableList<ParentToChild>) {
+        markers.forEach {
+            parentToChild.add(ParentToChild(parent, it))
+            enumerate(it, it.children, parentToChild)
         }
-        prevMarkers.forEach{ prev ->
-            val filtered = nextMarkers.filter { next -> prev.uid == next.uid }
-            if (filtered.isEmpty()) {
-                removed.add(prev)
+    }
+
+    private fun diffInternal(prevMarkers: List<Marker>, nextMarkers: List<Marker>, listener: Listener) {
+        val parentToChildPrev = mutableListOf<ParentToChild>()
+        enumerate(null, prevMarkers, parentToChildPrev)
+        val parentToChildNext = mutableListOf<ParentToChild>()
+        enumerate(null, nextMarkers, parentToChildNext)
+        parentToChildPrev.forEach { prev ->
+            val found = parentToChildNext.firstOrNull { prev.child.uid == it.child.uid }
+            if (found == null) {
+                listener.onRemove(prev.child)
             } else {
-                check(filtered.size == 1) { "Non unique uid?!" }
-                val next = filtered.first()
-                if (next != prev) {
-                    updated.add(prev)
-                    diffInternal(prev, prev.children, next.children, onRemove, onUpdate, onAdd)
+                if (found.child != prev.child) {
+                    listener.onUpdate(found.child)
+                }
+                if (found.parent != prev.parent) {
+                    listener.onParent(found.child, found.parent)
                 }
             }
         }
-        removed.forEach { onRemove.invoke(parent, it) }
-        updated.forEach(onUpdate)
-        added.forEach { onAdd.invoke(parent, it) }
+        parentToChildNext.forEach { next ->
+            val found = parentToChildPrev.firstOrNull { next.child.uid == it.child.uid }
+            if (found != null) {
+                listener.onAdd(next.child)
+            }
+        }
     }
 }

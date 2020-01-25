@@ -30,9 +30,9 @@ private lateinit var model3: Model
 
 private val controller = Controller()
 
-private val node1 = Node()
-private val node2 = Node(node1)
-private val node3 = Node(node2)
+private lateinit var node1: Node<Model>
+private lateinit var node2: Node<Model>
+private lateinit var node3: Node<Model>
 
 private lateinit var camera: Camera
 
@@ -48,7 +48,9 @@ private val window = object : LwjglWindow() {
         model1 = Model(mesh, tex1)
         model2 = Model(mesh, tex2)
         model3 = Model(mesh, tex3)
-
+        node1 = Node(payload = model1)
+        node2 = Node(parent = node1, payload = model2)
+        node3 = Node(parent = node2, payload = model3)
         GlState.apply(false)
     }
 
@@ -62,9 +64,9 @@ private val window = object : LwjglWindow() {
         node3.tick()
         GlState.clear()
         simpleTechnique.draw(camera) {
-            simpleTechnique.instance(model1, node1)
-            simpleTechnique.instance(model2, node2)
-            simpleTechnique.instance(model3, node3)
+            simpleTechnique.instance(model1, node1.calculateModelM())
+            simpleTechnique.instance(model2, node2.calculateModelM())
+            simpleTechnique.instance(model3, node3.calculateModelM())
         }
     }
 

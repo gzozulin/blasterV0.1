@@ -12,7 +12,6 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
-// todo: scaleTo - scale aabb to fit, but maintain ratios
 // todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
 
 // todo: vec3, euler, quat as one val
@@ -41,7 +40,7 @@ class SceneReader {
         loop@ while (remainder.isNotEmpty()) {
             val currentDepth = peek(remainder[0])
             when {
-                currentDepth == depth -> result.add(parsePlaceholder(remainder.removeAt(0)))
+                currentDepth == depth -> result.add(parseMarker(remainder.removeAt(0)))
                 currentDepth > depth -> result.last().children.addAll(parse(currentDepth, remainder))
                 currentDepth < depth -> break@loop
             }
@@ -49,14 +48,14 @@ class SceneReader {
         return result
     }
 
-    private fun parsePlaceholder(placeholder: String): Marker {
-        val tokens = placeholder.trim().split(Pattern.compile(";\\s*"))
+    private fun parseMarker(marker: String): Marker {
+        val tokens = marker.trim().split(Pattern.compile(";\\s*"))
         val uid: String = tokens[0]
         var pos: vec3? = null
         var quat: quat? = null
         var euler: euler3? = null
         var scale: vec3? = null
-        var scaleTo: vec3? = null
+        var aabb: vec3? = null
         var dir: vec3? = null
         var target: String? = null
         var custom: String? = null
@@ -66,13 +65,13 @@ class SceneReader {
                 it.startsWith("quat") -> quat = parseQuat(it.removePrefix("quat").trim())
                 it.startsWith("euler") -> euler = parseVec3(it.removePrefix("euler").trim())
                 it.startsWith("scale") -> scale = parseVec3(it.removePrefix("scale").trim())
-                it.startsWith("scaleTo") -> scaleTo = parseVec3(it.removePrefix("scaleTo").trim())
+                it.startsWith("aabb") -> aabb = parseVec3(it.removePrefix("aabb").trim())
                 it.startsWith("dir") -> dir = parseVec3(it.removePrefix("dir").trim())
                 it.startsWith("target") -> target = it.removePrefix("target").trim()
                 it.startsWith("custom") -> custom = it.removePrefix("custom").trim()
             }
         }
-        return Marker(uid, pos!!, euler, quat, scale, scaleTo, dir, target, custom, mutableListOf())
+        return Marker(uid, pos!!, euler, quat, scale, aabb, dir, target, custom, mutableListOf())
     }
 
     // todo: a little bit of parsing inefficiency down there:

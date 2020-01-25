@@ -12,8 +12,13 @@ data class Marker(
         val pos: vec3,
         val euler: euler3? = null, val quat: quat? = null,
         val scale: vec3? = null,
-        val scaleTo: vec3? = null,
+        val aabb: vec3? = null,
         val dir: vec3? = null,
         val target: String? = null,
         val custom: String? = null,
         val children: MutableList<Marker> = mutableListOf())
+
+
+fun <T> Marker.apply(node: Node<T>) {
+    // todo: somehow apply info from marker to node
+}

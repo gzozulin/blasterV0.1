@@ -6,6 +6,7 @@ import com.blaster.assets.TexturesLib
 import com.blaster.common.Console
 import com.blaster.common.center
 import com.blaster.common.lerpf
+import com.blaster.common.mat4
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
@@ -56,7 +57,7 @@ private val console = Console(1000L)
 private lateinit var camera: Camera
 
 private val controller = Controller(velocity = 0.05f)
-private val node = Node()
+private val identityM = mat4()
 
 class Snowflake(origin: Vector3f) : Particle(origin) {
     val origin = Vector3f(origin)
@@ -167,12 +168,12 @@ private val window = object : LwjglWindow() {
         }
         billboardsTechnique.draw(camera) {
             GlState.drawTransparent {
-                billboardsTechnique.instance(snow, node, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE, updateScale = false)
+                billboardsTechnique.instance(snow, identityM, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE, updateScale = false)
                 GlState.drawWithNoDepth {
-                    billboardsTechnique.instance(flame, node, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
-                    billboardsTechnique.instance(smoke, node, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)
-                    billboardsTechnique.instance(flame2, node, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
-                    billboardsTechnique.instance(smoke2, node, smokeDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
+                    billboardsTechnique.instance(flame, identityM, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                    billboardsTechnique.instance(smoke, identityM, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                    billboardsTechnique.instance(flame2, identityM, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
+                    billboardsTechnique.instance(smoke2, identityM, smokeDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
                 }
             }
         }

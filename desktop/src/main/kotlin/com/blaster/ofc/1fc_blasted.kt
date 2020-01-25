@@ -1,5 +1,6 @@
 package com.blaster.ofc
 
+import com.blaster.scene.Marker
 import com.blaster.scene.SceneDiffer
 import com.blaster.scene.SceneReader
 
@@ -38,11 +39,10 @@ private val sceneDiffer = SceneDiffer()
 fun main() {
     val scene1 = sceneReader.load(example1)
     val scene2 = sceneReader.load(example2)
-    sceneDiffer.diff(scene1, scene2, {
-        parent, marker -> println("$marker was removed from $parent")
-    }, {
-        marker -> println("$marker was updated")
-    }, {
-        parent, marker -> println("$marker was added to $parent")
-    })
+    sceneDiffer.diff(scene1, scene2,
+            listener = object : SceneDiffer.Listener() {
+                override fun onAdd(marker: Marker) {
+
+                }
+            })
 }

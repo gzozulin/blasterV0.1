@@ -2,6 +2,7 @@ package com.blaster.ofc
 
 import com.blaster.assets.*
 import com.blaster.common.Console
+import com.blaster.common.mat4
 import com.blaster.common.random
 import com.blaster.common.vec3
 import com.blaster.gl.GlState
@@ -30,19 +31,8 @@ private val controller = Controller(velocity = 0.05f)
 private lateinit var camera: Camera
 
 private lateinit var model: Model
-private val node = Node()
-
-private val sceneReader = SceneReader()
-private val sceneDiffer = SceneDiffer()
 
 private var currentMaterial = 0
-
-private val scene = """
-    building; pos 0; scaleTo 1;
-        red_light; pos 1.5;
-    sunlight; pos 0; dir -1;
-    camera; pos 1.5; target building;
-""".trimIndent()
 
 private fun nextMaterial() {
     currentMaterial++
@@ -75,10 +65,6 @@ private val window = object : LwjglWindow() {
                                     vec3(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
                             vec3().random(max = Vector3f(2f))))
         }
-
-        sceneDiffer.diff(nextMarkers = sceneReader.load(scene)) {
-            parent, marker ->
-        }
     }
 
     override fun onDraw() {
@@ -94,7 +80,7 @@ private val window = object : LwjglWindow() {
             }
         }
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, node.calculateModelM(), model.diffuse, Material.MATERIALS[currentMaterial].second)
+            deferredTechnique.instance(model.mesh, mat4(), model.diffuse, Material.MATERIALS[currentMaterial].second)
         }
     }
 

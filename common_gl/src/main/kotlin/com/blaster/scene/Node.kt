@@ -6,13 +6,14 @@ import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-open class Node(
-        private var parent: Node? = null,
-        private val relativePosition: Vector3f = Vector3f(),
-        private val relativeRotation: Quaternionf = Quaternionf(),
-        private val relativeScale: Vector3f = Vector3f(1f)) {
+class Node<T>(
+        private var parent: Node<T>? = null,
+        private val position: Vector3f = Vector3f(),
+        private val rotation: Quaternionf = Quaternionf(),
+        private val scale: Vector3f = Vector3f(1f),
+        var payload: T? = null) {
 
-    private val children: List<Node> = ArrayList()
+    private val children: List<Node<T>> = ArrayList()
     var graphVersion = Version()
 
     val localVersion = Version()
@@ -40,7 +41,7 @@ open class Node(
         }
     }
 
-    fun attach(child: Node) {
+    fun attach(child: Node<T>) {
         if (!children.contains(child)) {
             (children as ArrayList).add(child)
             child.parent = this
@@ -48,7 +49,7 @@ open class Node(
         }
     }
 
-    fun detach(child: Node) {
+    fun detach(child: Node<T>) {
         (children as ArrayList).remove(child)
         child.parent = null
         incrementVersion()
@@ -56,7 +57,7 @@ open class Node(
 
     private fun calculateLocalM(): Matrix4f {
         if (localVersion.check()) {
-            localM.identity().rotate(relativeRotation).scale(relativeScale).translate(relativePosition)
+            localM.identity().rotate(rotation).scale(scale).translate(position)
         }
         return localM
     }
@@ -69,8 +70,9 @@ open class Node(
         return modelM
     }
 
+    // todo: remove
     fun tick() {
         localVersion.increment()
-        relativeRotation.rotateAxis(0.01f, VECTOR_UP)
+        rotation.rotateAxis(0.01f, VECTOR_UP)
     }
 }

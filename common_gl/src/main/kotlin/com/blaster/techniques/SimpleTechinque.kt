@@ -23,8 +23,8 @@ class SimpleTechnique {
         }
     }
 
-    fun instance(model: Model, node: Node) {
-        instance(model.mesh, model.diffuse, node.calculateModelM())
+    fun instance(model: Model, modelM: Matrix4f) {
+        instance(model.mesh, model.diffuse, modelM)
     }
 
     fun instance(mesh: Mesh, diffuse: GlTexture, modelM: Matrix4f) {
