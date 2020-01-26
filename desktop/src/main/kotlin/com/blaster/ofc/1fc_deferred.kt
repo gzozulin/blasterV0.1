@@ -7,6 +7,7 @@ import com.blaster.common.random
 import com.blaster.common.vec3
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
+import com.blaster.platform.WasdInput
 import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.TextTechnique
@@ -26,9 +27,9 @@ private val textTechnique = TextTechnique()
 
 private val console = Console(3000L)
 
-private val controller = Controller(velocity = 0.05f)
-
 private lateinit var camera: Camera
+private val controller = Controller(velocity = 0.05f)
+private val wasd = WasdInput(controller)
 
 private lateinit var model: Model
 
@@ -85,32 +86,19 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        controller.yaw(delta.x)
-        controller.pitch(-delta.y)
+        wasd.onCursorDelta(delta)
     }
 
     override fun keyPressed(key: Int) {
+        wasd.keyPressed(key)
         when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = true
-            GLFW.GLFW_KEY_A -> controller.a = true
-            GLFW.GLFW_KEY_S -> controller.s = true
-            GLFW.GLFW_KEY_D -> controller.d = true
-            GLFW.GLFW_KEY_E -> controller.e = true
-            GLFW.GLFW_KEY_Q -> controller.q = true
             GLFW.GLFW_KEY_LEFT_BRACKET -> prevMaterial()
             GLFW.GLFW_KEY_RIGHT_BRACKET -> nextMaterial()
         }
     }
 
     override fun keyReleased(key: Int) {
-        when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = false
-            GLFW.GLFW_KEY_A -> controller.a = false
-            GLFW.GLFW_KEY_S -> controller.s = false
-            GLFW.GLFW_KEY_D -> controller.d = false
-            GLFW.GLFW_KEY_E -> controller.e = false
-            GLFW.GLFW_KEY_Q -> controller.q = false
-        }
+        wasd.keyReleased(key)
     }
 }
 

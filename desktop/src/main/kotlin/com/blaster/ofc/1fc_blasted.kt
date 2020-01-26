@@ -8,10 +8,10 @@ import com.blaster.common.mat4
 import com.blaster.common.vec3
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
+import com.blaster.platform.WasdInput
 import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
 import org.joml.Vector2f
-import org.lwjgl.glfw.GLFW
 
 // todo: step 1 - use only scene reader
 // todo: step 2 - BlastEd with WYSIWYG
@@ -40,6 +40,7 @@ private val deferredTechnique = DeferredTechnique()
 
 private lateinit var camera: Camera
 private val controller = Controller(velocity = 0.05f)
+private val wasd = WasdInput(controller)
 
 private val listener = object : SceneDiffer.Listener() {
 
@@ -70,30 +71,15 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        controller.yaw(delta.x)
-        controller.pitch(-delta.y)
+        wasd.onCursorDelta(delta)
     }
 
     override fun keyPressed(key: Int) {
-        when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = true
-            GLFW.GLFW_KEY_A -> controller.a = true
-            GLFW.GLFW_KEY_S -> controller.s = true
-            GLFW.GLFW_KEY_D -> controller.d = true
-            GLFW.GLFW_KEY_E -> controller.e = true
-            GLFW.GLFW_KEY_Q -> controller.q = true
-        }
+        wasd.keyPressed(key)
     }
 
     override fun keyReleased(key: Int) {
-        when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = false
-            GLFW.GLFW_KEY_A -> controller.a = false
-            GLFW.GLFW_KEY_S -> controller.s = false
-            GLFW.GLFW_KEY_D -> controller.d = false
-            GLFW.GLFW_KEY_E -> controller.e = false
-            GLFW.GLFW_KEY_Q -> controller.q = false
-        }
+        wasd.keyReleased(key)
     }
 }
 

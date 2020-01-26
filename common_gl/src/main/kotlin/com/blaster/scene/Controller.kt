@@ -4,19 +4,18 @@ import com.blaster.common.VECTOR_UP
 import org.joml.Math
 import org.joml.Vector3f
 import kotlin.math.cos
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.sin
 
+// todo: separate controller moder and create class for input from kb and mouse
 // todo: some inertia would be cool
 // todo: can directly implement lwjgl listeners for keyb and cursor
 class Controller(private val sensitivity: Float = 0.005f, private val velocity: Float = 0.01f) {
-    var w = false
-    var a = false
-    var s = false
-    var d = false
-    var q = false
-    var e = false
+    var moveForward     = false
+    var moveLeft        = false
+    var moveBack        = false
+    var moveRight       = false
+    var moveDown        = false
+    var moveUp          = false
 
     // todo: 0-9 - teleports
     // 0 - starting point
@@ -64,22 +63,22 @@ class Controller(private val sensitivity: Float = 0.005f, private val velocity: 
         forward.cross(right, up)
         up.normalize()
         up.negate(down)
-        if (w) {
+        if (moveForward) {
             delta.add(forward)
         }
-        if (a) {
+        if (moveLeft) {
             delta.add(right)
         }
-        if (s) {
+        if (moveBack) {
             delta.add(back)
         }
-        if (d) {
+        if (moveRight) {
             delta.add(left)
         }
-        if (q) {
+        if (moveDown) {
             delta.add(down)
         }
-        if (e) {
+        if (moveUp) {
             delta.add(up)
         }
         delta.mul(velocity)

@@ -7,6 +7,7 @@ import com.blaster.assets.TexturesLib
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
+import com.blaster.platform.WasdInput
 import com.blaster.scene.*
 import com.blaster.techniques.SimpleTechnique
 import org.joml.Vector2f
@@ -28,13 +29,13 @@ private lateinit var model1: Model
 private lateinit var model2: Model
 private lateinit var model3: Model
 
-private val controller = Controller()
-
 private lateinit var node1: Node<Model>
 private lateinit var node2: Node<Model>
 private lateinit var node3: Node<Model>
 
 private lateinit var camera: Camera
+private val controller = Controller()
+private val wasd = WasdInput(controller)
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
@@ -71,30 +72,15 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        controller.yaw(delta.x)
-        controller.pitch(-delta.y)
+        wasd.onCursorDelta(delta)
     }
 
     override fun keyPressed(key: Int) {
-        when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = true
-            GLFW.GLFW_KEY_A -> controller.a = true
-            GLFW.GLFW_KEY_S -> controller.s = true
-            GLFW.GLFW_KEY_D -> controller.d = true
-            GLFW.GLFW_KEY_E -> controller.e = true
-            GLFW.GLFW_KEY_Q -> controller.q = true
-        }
+        wasd.keyPressed(key)
     }
 
     override fun keyReleased(key: Int) {
-        when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = false
-            GLFW.GLFW_KEY_A -> controller.a = false
-            GLFW.GLFW_KEY_S -> controller.s = false
-            GLFW.GLFW_KEY_D -> controller.d = false
-            GLFW.GLFW_KEY_E -> controller.e = false
-            GLFW.GLFW_KEY_Q -> controller.q = false
-        }
+        wasd.keyReleased(key)
     }
 }
 

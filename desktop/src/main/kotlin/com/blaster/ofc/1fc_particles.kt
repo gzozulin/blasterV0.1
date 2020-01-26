@@ -10,6 +10,7 @@ import com.blaster.common.mat4
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
+import com.blaster.platform.WasdInput
 import com.blaster.scene.*
 import com.blaster.techniques.BillboardsTechnique
 import com.blaster.techniques.ImmediateTechnique
@@ -55,8 +56,10 @@ private val smoke2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vec
 private val console = Console(1000L)
 
 private lateinit var camera: Camera
-
 private val controller = Controller(velocity = 0.05f)
+private val wasd = WasdInput(controller)
+
+
 private val identityM = mat4()
 
 class Snowflake(origin: Vector3f) : Particle(origin) {
@@ -180,30 +183,15 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        controller.yaw(delta.x)
-        controller.pitch(-delta.y)
+        wasd.onCursorDelta(delta)
     }
 
     override fun keyPressed(key: Int) {
-        when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = true
-            GLFW.GLFW_KEY_A -> controller.a = true
-            GLFW.GLFW_KEY_S -> controller.s = true
-            GLFW.GLFW_KEY_D -> controller.d = true
-            GLFW.GLFW_KEY_E -> controller.e = true
-            GLFW.GLFW_KEY_Q -> controller.q = true
-        }
+        wasd.keyPressed(key)
     }
 
     override fun keyReleased(key: Int) {
-        when (key) {
-            GLFW.GLFW_KEY_W -> controller.w = false
-            GLFW.GLFW_KEY_A -> controller.a = false
-            GLFW.GLFW_KEY_S -> controller.s = false
-            GLFW.GLFW_KEY_D -> controller.d = false
-            GLFW.GLFW_KEY_E -> controller.e = false
-            GLFW.GLFW_KEY_Q -> controller.q = false
-        }
+        wasd.keyReleased(key)
     }
 }
 

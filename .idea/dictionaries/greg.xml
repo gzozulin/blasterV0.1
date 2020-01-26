@@ -11,6 +11,7 @@
       <w>quat</w>
       <w>texcoords</w>
       <w>transp</w>
+      <w>wasd</w>
     </words>
   </dictionary>
 </component>
