@@ -4,8 +4,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.scene.Mesh
-import com.blaster.scene.Model
-import com.blaster.scene.Node
+import com.blaster.entity.Model
 import org.joml.Matrix4f
 
 class SimpleTechnique {

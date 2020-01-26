@@ -5,6 +5,9 @@ import com.blaster.common.Console
 import com.blaster.common.mat4
 import com.blaster.common.random
 import com.blaster.common.vec3
+import com.blaster.entity.Light
+import com.blaster.entity.Material
+import com.blaster.entity.Model
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
@@ -62,9 +65,9 @@ private val window = object : LwjglWindow() {
         deferredTechnique.light(Light.SUNLIGHT)
         for (i in 0..16) {
             deferredTechnique.light(Light(
-                            vec3().random(vec3(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
-                                    vec3(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
-                            vec3().random(max = Vector3f(2f))))
+                    vec3().random(vec3(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
+                            vec3(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
+                    vec3().random(max = Vector3f(2f))))
         }
     }
 

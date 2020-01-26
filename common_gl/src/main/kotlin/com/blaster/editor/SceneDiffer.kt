@@ -1,4 +1,6 @@
-package com.blaster.scene
+package com.blaster.editor
+
+import com.blaster.entity.Marker
 
 class SceneDiffer {
     open class Listener {

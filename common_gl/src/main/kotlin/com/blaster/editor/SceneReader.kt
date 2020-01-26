@@ -1,24 +1,20 @@
-package com.blaster.scene
+package com.blaster.editor
 
-import com.blaster.common.aabb
 import com.blaster.common.euler3
 import com.blaster.common.quat
 import com.blaster.common.vec3
+import com.blaster.entity.Marker
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.lang.IllegalArgumentException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
 // todo: templates by id
-
 // todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
-
-// todo: vec3, euler, quat as one val
-
 // todo: probably, also can have matrix directly
+// todo: target as a name
 
 class SceneReader {
     fun load(sceneString: String) = load(sceneStream = sceneString.byteInputStream(StandardCharsets.UTF_8))
@@ -57,9 +53,9 @@ class SceneReader {
         var quat: quat? = null
         var euler: euler3? = null
         var scale: vec3? = null
-        var aabb: vec3? = null
+        var bound: Float? = null
         var dir: vec3? = null
-        var target: String? = null
+        var target: vec3? = null
         var custom: String? = null
         tokens.forEach {
             when {
@@ -67,13 +63,13 @@ class SceneReader {
                 it.startsWith("quat") -> quat = parseQuat(it.removePrefix("quat").trim())
                 it.startsWith("euler") -> euler = parseVec3(it.removePrefix("euler").trim())
                 it.startsWith("scale") -> scale = parseVec3(it.removePrefix("scale").trim())
-                it.startsWith("aabb") -> aabb = parseVec3(it.removePrefix("aabb").trim())
+                it.startsWith("bound") -> bound = it.removePrefix("bound").trim().toFloat()
                 it.startsWith("dir") -> dir = parseVec3(it.removePrefix("dir").trim())
-                it.startsWith("target") -> target = it.removePrefix("target").trim()
+                it.startsWith("target") -> target = parseVec3(it.removePrefix("target").trim())
                 it.startsWith("custom") -> custom = it.removePrefix("custom").trim()
             }
         }
-        return Marker(uid, pos!!, euler, quat, scale, aabb, dir, target, custom, mutableListOf())
+        return Marker(uid, pos!!, euler, quat, scale, bound, dir, target, custom, mutableListOf())
     }
 
     // todo: a little bit of parsing inefficiency down there:
@@ -92,15 +88,6 @@ class SceneReader {
         return when (tokens.size) {
             4 -> quat(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat())
             1 -> quat(tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat())
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    private fun parseAabb(value: String): aabb {
-        val tokens = value.split(Pattern.compile("\\s+"))
-        return when (tokens.size) {
-            6 -> aabb(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat(), tokens[4].toFloat(), tokens[5].toFloat())
-            1 -> aabb(tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat())
             else -> throw IllegalArgumentException()
         }
     }

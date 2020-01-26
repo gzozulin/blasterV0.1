@@ -1,6 +1,7 @@
 package com.blaster.common
 
 import org.joml.*
+import java.lang.Math
 import java.util.Random
 
 typealias vec3 = Vector3f
@@ -13,6 +14,9 @@ typealias aabb = AABBf
 
 // todo: remove - mutable
 val VECTOR_UP = Vector3f(0f, 1f, 0f)
+
+fun radf(degrees: Float) = Math.toRadians(degrees.toDouble()).toFloat()
+fun radf(degrees: Double) = Math.toRadians(degrees).toFloat()
 
 private val random = Random()
 fun randomFloat(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) =
@@ -37,7 +41,22 @@ fun aabb.width() = maxX - minX
 fun aabb.height() = maxY - minY
 fun aabb.depth() = maxZ - minZ
 fun aabb.center() = Vector3f(minX + (maxX - minX) / 2f, minY + (maxY - minY) / 2f, minZ + (maxZ - minZ) / 2f)
-fun aabb.scaleTo(to: vec3) = vec3(to.x / width(), to.y / height(), to.z / depth())
 
-// todo: proportional
-fun lerpf(from: Float, to: Float, t: Float, proportional: Boolean = true) = (1f - t) * from + t * to
+fun aabb.scaleTo(to: Float): Float {
+    var factor = Float.MIN_VALUE
+    val wF = to / width()
+    if (wF > factor) {
+        factor = wF
+    }
+    val wH = to / height()
+    if (wH > factor) {
+        factor = wH
+    }
+    val wD = to / depth()
+    if (wD > factor) {
+        factor = wD
+    }
+    return factor
+}
+
+fun lerpf(from: Float, to: Float, t: Float) = (1f - t) * from + t * to

@@ -6,9 +6,11 @@
       <w>coords</w>
       <w>fovy</w>
       <w>inplace</w>
+      <w>lerpf</w>
       <w>lumina</w>
       <w>proj</w>
       <w>quat</w>
+      <w>radf</w>
       <w>texcoords</w>
       <w>transp</w>
       <w>wasd</w>

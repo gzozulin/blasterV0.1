@@ -4,7 +4,7 @@ import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
 import com.blaster.scene.Mesh
-import com.blaster.scene.Model
+import com.blaster.entity.Model
 import org.joml.AABBf
 import org.joml.Vector3f
 import java.io.BufferedReader

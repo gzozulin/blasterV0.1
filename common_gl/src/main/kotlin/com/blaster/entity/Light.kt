@@ -1,4 +1,4 @@
-package com.blaster.scene
+package com.blaster.entity
 
 import com.blaster.common.color
 import com.blaster.common.vec3

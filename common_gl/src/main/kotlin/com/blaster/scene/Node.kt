@@ -1,9 +1,6 @@
 package com.blaster.scene
 
 import com.blaster.common.*
-import org.joml.Matrix4f
-import org.joml.Quaternionf
-import org.joml.Vector3f
 
 interface Payload {
     val aabb: aabb
@@ -14,12 +11,12 @@ class Node<T : Payload>(
         private val position: vec3 = vec3(),
         private val rotation: quat = quat(),
         private val scale: vec3 = vec3(1f),
-        var payload: T? = null) {
+        val payload: T? = null) {
 
     private val children: List<Node<T>> = ArrayList()
-    var graphVersion = Version()
+    private var graphVersion = Version()
 
-    val localVersion = Version()
+    private val localVersion = Version()
     private val localM = mat4()
     private val modelM = mat4()
 
@@ -44,14 +41,14 @@ class Node<T : Payload>(
         incrementGraph()
     }
 
-    private fun calculateLocalM(): Matrix4f {
+    private fun calculateLocalM(): mat4 {
         if (localVersion.check()) {
-            localM.identity().rotate(rotation).scale(scale).translate(position)
+            localM.identity().scale(scale).translate(position).rotate(rotation)
         }
         return localM
     }
 
-    fun calculateModelM(): Matrix4f {
+    fun calculateM(): mat4 {
         if (parent == null) {
             return calculateLocalM() // root
         }
@@ -65,8 +62,8 @@ class Node<T : Payload>(
         return this
     }
 
-    fun setEuler(euler: vec3): Node<T> {
-        rotation.identity().rotateXYZ(euler.x, euler.y, euler.z)
+    fun setRotation(rot: quat): Node<T> {
+        rotation.set(rot)
         localVersion.increment()
         return this
     }
@@ -77,8 +74,29 @@ class Node<T : Payload>(
         return this
     }
 
-    fun rotate(axis: vec3, angle: Float) {
+    fun setEulerDeg(degrees: vec3): Node<T> {
+        rotation.identity().rotateXYZ(radf(degrees.x), radf(degrees.y), radf(degrees.z))
+        localVersion.increment()
+        return this
+    }
+
+    fun rotate(axis: vec3, angle: Float): Node<T> {
         rotation.rotateAxis(angle, axis)
         localVersion.increment()
+        return this
+    }
+
+    fun lookAlong(direction: vec3): Node<T> {
+        rotation.lookAlong(direction, VECTOR_UP)
+        localVersion.increment()
+        return this
+    }
+
+    fun lookAt(target: vec3): Node<T> {
+        val direction = vec3()
+        target.sub(position, direction)
+        rotation.lookAlong(direction, VECTOR_UP)
+        localVersion.increment()
+        return this
     }
 }

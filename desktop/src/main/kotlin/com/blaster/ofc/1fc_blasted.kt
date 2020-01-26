@@ -5,6 +5,12 @@ import com.blaster.assets.ModelsLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.vec3
+import com.blaster.editor.SceneDiffer
+import com.blaster.editor.SceneReader
+import com.blaster.entity.Light
+import com.blaster.entity.Marker
+import com.blaster.entity.Material
+import com.blaster.entity.Model
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
@@ -12,14 +18,11 @@ import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
 import org.joml.Vector2f
 
-// todo: step 1 - use only scene reader
-// todo: step 2 - BlastEd with WYSIWYG
-
 private val scene = """
-    building; pos 0; aabb 1;
-        building2; pos 1;
-        building3; pos 2;
-        building4; pos 3;
+    building0; pos 0;
+    building2; pos 44 0 0; bound 1; euler -90 0 0;
+    building3; pos 55 0 0; bound 2; euler 0 -90 0;
+    building4; pos 66 0 0; bound 3; euler 0 0 -90;
 """.trimIndent()
 
 private val assetStream = AssetStream()
@@ -33,7 +36,7 @@ private val sceneDiffer = SceneDiffer()
 private val deferredTechnique = DeferredTechnique()
 
 private lateinit var camera: Camera
-private val controller = Controller(velocity = 0.05f)
+private val controller = Controller(velocity = 0.5f)
 private val wasd = WasdInput(controller)
 
 private lateinit var baseModel: Model
@@ -52,6 +55,17 @@ private val listener = object : SceneDiffer.Listener() {
             nodes[parent.uid]!!.attach(nodes[marker.uid]!!)
         }
     }
+}
+
+class BlastEd {
+    // todo: WYSIWYG, throttling, error handling
+
+    // Template libraries are independent from BlasteEd
+    // Rendering is independent from BlastEd
+
+    // 1 - throttle
+    // 2 - read from template
+    // 3 - update scene
 }
 
 private val window = object : LwjglWindow() {
@@ -74,7 +88,7 @@ private val window = object : LwjglWindow() {
         deferredTechnique.draw(camera) {
             for (node in nodes.values) {
                 val model = node.payload!!
-                deferredTechnique.instance(model.mesh, node.calculateModelM(), model.diffuse, Material.CONCRETE)
+                deferredTechnique.instance(model.mesh, node.calculateM(), model.diffuse, Material.CONCRETE)
             }
         }
     }
