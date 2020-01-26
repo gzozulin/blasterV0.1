@@ -4,7 +4,6 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ModelsLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.common.mat4
 import com.blaster.common.vec3
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
@@ -17,24 +16,19 @@ import org.joml.Vector2f
 // todo: step 2 - BlastEd with WYSIWYG
 
 private val scene = """
-    updated; pos 1 1 1; rot 1 1 1 1; scale 1 1 1; custom gold;
-        build_1; pos 3 3 3;
-            build_1_1; pos 5 5 5;
-            build_1_2; pos 5 5 5;
-        build_2; pos -3 3 3;
-            build_2_1; pos 5 5 5;
-        build_3; pos -3 3 3;
-    removed; pos 1 2 3;
-    camera; pos 4 4 4; target building;
+    building; pos 0; aabb 1;
+        building2; pos 1;
+        building3; pos 2;
+        building4; pos 3;
 """.trimIndent()
-
-private val sceneReader = SceneReader()
-private val sceneDiffer = SceneDiffer()
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 private val modelsLib = ModelsLib(assetStream, texturesLib)
+
+private val sceneReader = SceneReader()
+private val sceneDiffer = SceneDiffer()
 
 private val deferredTechnique = DeferredTechnique()
 
@@ -42,17 +36,29 @@ private lateinit var camera: Camera
 private val controller = Controller(velocity = 0.05f)
 private val wasd = WasdInput(controller)
 
+private lateinit var baseModel: Model
+
+private val nodes = mutableMapOf<String, Node<Model>>()
+
 private val listener = object : SceneDiffer.Listener() {
+    override fun onAdd(marker: Marker) {
+        val node = Node(payload = baseModel)
+        marker.apply(node)
+        nodes[marker.uid] = node
+    }
 
+    override fun onParent(marker: Marker, parent: Marker?) {
+        if (parent != null) {
+            nodes[parent.uid]!!.attach(nodes[marker.uid]!!)
+        }
+    }
 }
-
-private lateinit var model: Model
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
         GlState.apply()
         controller.position.set(vec3(0.5f, 3f, 3f))
-        model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
+        baseModel = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
         deferredTechnique.prepare(shadersLib, width, height)
         camera = Camera(width.toFloat() / height.toFloat())
         sceneDiffer.diff(nextMarkers = sceneReader.load(scene), listener = listener)
@@ -66,7 +72,10 @@ private val window = object : LwjglWindow() {
         }
         GlState.clear()
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, mat4(), model.diffuse, Material.CONCRETE)
+            for (node in nodes.values) {
+                val model = node.payload!!
+                deferredTechnique.instance(model.mesh, node.calculateModelM(), model.diffuse, Material.CONCRETE)
+            }
         }
     }
 

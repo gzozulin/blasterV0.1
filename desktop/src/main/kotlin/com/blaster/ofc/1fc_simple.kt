@@ -4,6 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
+import com.blaster.common.VECTOR_UP
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
@@ -60,9 +61,9 @@ private val window = object : LwjglWindow() {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
-        node1.tick()
-        node2.tick()
-        node3.tick()
+        node1.rotate(VECTOR_UP, 0.01f)
+        node2.rotate(VECTOR_UP, 0.01f)
+        node3.rotate(VECTOR_UP, 0.01f)
         GlState.clear()
         simpleTechnique.draw(camera) {
             simpleTechnique.instance(model1, node1.calculateModelM())

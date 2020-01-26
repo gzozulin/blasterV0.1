@@ -12,6 +12,8 @@ import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.regex.Pattern
 
+// todo: templates by id
+
 // todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
 
 // todo: vec3, euler, quat as one val

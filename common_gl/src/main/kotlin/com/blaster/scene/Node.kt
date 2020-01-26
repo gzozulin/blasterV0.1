@@ -1,40 +1,29 @@
 package com.blaster.scene
 
-import com.blaster.common.Version
-import com.blaster.common.VECTOR_UP
+import com.blaster.common.*
 import org.joml.Matrix4f
 import org.joml.Quaternionf
 import org.joml.Vector3f
 
-class Node<T>(
+interface Payload {
+    val aabb: aabb
+}
+
+class Node<T : Payload>(
         private var parent: Node<T>? = null,
-        private val position: Vector3f = Vector3f(),
-        private val rotation: Quaternionf = Quaternionf(),
-        private val scale: Vector3f = Vector3f(1f),
+        private val position: vec3 = vec3(),
+        private val rotation: quat = quat(),
+        private val scale: vec3 = vec3(1f),
         var payload: T? = null) {
 
     private val children: List<Node<T>> = ArrayList()
     var graphVersion = Version()
 
     val localVersion = Version()
-    private val localM = Matrix4f()
-    private val modelM = Matrix4f()
+    private val localM = mat4()
+    private val modelM = mat4()
 
-    private val absolutePositionBuf = Vector3f()
-    val absolutePosition: Vector3f
-        get() {
-            calculateModelM().getTranslation(absolutePositionBuf)
-            return absolutePositionBuf
-        }
-
-    private val absoluteRotationBuf = Quaternionf()
-    val absoluteRotation: Quaternionf
-        get() {
-            calculateModelM().getNormalizedRotation(absoluteRotationBuf)
-            return absoluteRotationBuf
-        }
-
-    private fun incrementVersion() {
+    private fun incrementGraph() {
         graphVersion.increment()
         if (parent != null) {
             parent!!.graphVersion.increment()
@@ -45,14 +34,14 @@ class Node<T>(
         if (!children.contains(child)) {
             (children as ArrayList).add(child)
             child.parent = this
-            incrementVersion()
+            incrementGraph()
         }
     }
 
     fun detach(child: Node<T>) {
         (children as ArrayList).remove(child)
         child.parent = null
-        incrementVersion()
+        incrementGraph()
     }
 
     private fun calculateLocalM(): Matrix4f {
@@ -70,9 +59,26 @@ class Node<T>(
         return modelM
     }
 
-    // todo: remove
-    fun tick() {
+    fun setPosition(pos: vec3): Node<T> {
+        position.set(pos)
         localVersion.increment()
-        rotation.rotateAxis(0.01f, VECTOR_UP)
+        return this
+    }
+
+    fun setEuler(euler: vec3): Node<T> {
+        rotation.identity().rotateXYZ(euler.x, euler.y, euler.z)
+        localVersion.increment()
+        return this
+    }
+
+    fun setScale(value: vec3): Node<T> {
+        scale.set(value)
+        localVersion.increment()
+        return this
+    }
+
+    fun rotate(axis: vec3, angle: Float) {
+        rotation.rotateAxis(angle, axis)
+        localVersion.increment()
     }
 }

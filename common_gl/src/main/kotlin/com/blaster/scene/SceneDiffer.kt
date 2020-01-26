@@ -41,8 +41,9 @@ class SceneDiffer {
         }
         parentToChildNext.forEach { next ->
             val found = parentToChildPrev.firstOrNull { next.child.uid == it.child.uid }
-            if (found != null) {
+            if (found == null) {
                 listener.onAdd(next.child)
+                listener.onParent(next.child, next.parent)
             }
         }
     }
