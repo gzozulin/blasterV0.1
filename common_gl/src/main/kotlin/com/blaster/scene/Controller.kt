@@ -1,5 +1,6 @@
 package com.blaster.scene
 
+import com.blaster.common.VECTOR_DOWN
 import com.blaster.common.VECTOR_UP
 import org.joml.Math
 import org.joml.Vector3f
@@ -52,17 +53,12 @@ class Controller(private val sensitivity: Float = 0.005f, private val velocity: 
     private val back = Vector3f()
     private val right = Vector3f()
     private val left = Vector3f()
-    private val up = Vector3f()
-    private val down = Vector3f()
     private fun updatePosition() {
         delta.zero()
         VECTOR_UP.cross(forward, right)
         right.normalize()
         forward.negate(back)
         right.negate(left)
-        forward.cross(right, up)
-        up.normalize()
-        up.negate(down)
         if (moveForward) {
             delta.add(forward)
         }
@@ -76,10 +72,10 @@ class Controller(private val sensitivity: Float = 0.005f, private val velocity: 
             delta.add(left)
         }
         if (moveDown) {
-            delta.add(down)
+            delta.add(VECTOR_DOWN)
         }
         if (moveUp) {
-            delta.add(up)
+            delta.add(VECTOR_UP)
         }
         delta.mul(velocity)
         position.add(delta)

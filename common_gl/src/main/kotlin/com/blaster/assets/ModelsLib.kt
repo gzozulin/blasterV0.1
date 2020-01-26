@@ -56,6 +56,7 @@ class ModelsLib (private val assetStream: AssetStream, private val texturesLib: 
     private var maxZ = 0f
 
     // todo: create Native(Float)Buffer directly, instead of copying arrays
+    // todo: only model! no diffuse
     fun loadModel(meshFilename: String, diffuseFilename: String): Model {
         minX = 0f
         minY = 0f

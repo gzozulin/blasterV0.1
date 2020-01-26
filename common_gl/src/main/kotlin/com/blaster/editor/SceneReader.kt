@@ -1,8 +1,6 @@
 package com.blaster.editor
 
-import com.blaster.common.euler3
-import com.blaster.common.quat
-import com.blaster.common.vec3
+import com.blaster.common.*
 import com.blaster.entity.Marker
 import java.io.BufferedReader
 import java.io.InputStream
@@ -15,6 +13,15 @@ import java.util.regex.Pattern
 // todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
 // todo: probably, also can have matrix directly
 // todo: target as a name
+
+private const val START_POS = "pos "
+private const val START_QUAT = "quat "
+private const val START_EULER = "euler "
+private const val START_SCALE = "scale "
+private const val START_BOUND = "bound "
+private const val START_DIR = "dir "
+private const val START_TARGET = "target "
+private const val START_CUSTOM = "custom "
 
 class SceneReader {
     fun load(sceneString: String) = load(sceneStream = sceneString.byteInputStream(StandardCharsets.UTF_8))
@@ -47,7 +54,7 @@ class SceneReader {
     }
 
     private fun parseMarker(marker: String): Marker {
-        val tokens = marker.trim().split(Pattern.compile(";\\s*"))
+        val tokens = marker.trim().split(Pattern.compile(";")).dropLast(1)
         val uid: String = tokens[0]
         var pos: vec3? = null
         var quat: quat? = null
@@ -57,38 +64,20 @@ class SceneReader {
         var dir: vec3? = null
         var target: vec3? = null
         var custom: String? = null
-        tokens.forEach {
+        tokens.forEachIndexed { index, token ->
+            val trimmed = token.trim()
             when {
-                it.startsWith("pos") -> pos = parseVec3(it.removePrefix("pos").trim())
-                it.startsWith("quat") -> quat = parseQuat(it.removePrefix("quat").trim())
-                it.startsWith("euler") -> euler = parseVec3(it.removePrefix("euler").trim())
-                it.startsWith("scale") -> scale = parseVec3(it.removePrefix("scale").trim())
-                it.startsWith("bound") -> bound = it.removePrefix("bound").trim().toFloat()
-                it.startsWith("dir") -> dir = parseVec3(it.removePrefix("dir").trim())
-                it.startsWith("target") -> target = parseVec3(it.removePrefix("target").trim())
-                it.startsWith("custom") -> custom = it.removePrefix("custom").trim()
+                trimmed.startsWith(START_POS)    -> pos      = trimmed.removePrefix(START_POS).toVec3()
+                trimmed.startsWith(START_QUAT)   -> quat     = trimmed.removePrefix(START_QUAT).toQuat()
+                trimmed.startsWith(START_EULER)  -> euler    = trimmed.removePrefix(START_EULER).toVec3()
+                trimmed.startsWith(START_SCALE)  -> scale    = trimmed.removePrefix(START_SCALE).toVec3()
+                trimmed.startsWith(START_BOUND)  -> bound    = trimmed.removePrefix(START_BOUND).toFloat()
+                trimmed.startsWith(START_DIR)    -> dir      = trimmed.removePrefix(START_DIR).toVec3()
+                trimmed.startsWith(START_TARGET) -> target   = trimmed.removePrefix(START_TARGET).toVec3()
+                trimmed.startsWith(START_CUSTOM) -> custom   = trimmed.removePrefix(START_CUSTOM)
+                else -> if (index != 0) { fail("Unhandled: $token") }
             }
         }
         return Marker(uid, pos!!, euler, quat, scale, bound, dir, target, custom, mutableListOf())
-    }
-
-    // todo: a little bit of parsing inefficiency down there:
-
-    private fun parseVec3(value: String): vec3 {
-        val tokens = value.split(Pattern.compile("\\s+"))
-        return when (tokens.size) {
-            3 -> vec3(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat())
-            1 -> vec3(tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat())
-            else -> throw IllegalArgumentException()
-        }
-    }
-
-    private fun parseQuat(value: String): quat {
-        val tokens = value.split(Pattern.compile("\\s+"))
-        return when (tokens.size) {
-            4 -> quat(tokens[0].toFloat(), tokens[1].toFloat(), tokens[2].toFloat(), tokens[3].toFloat())
-            1 -> quat(tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat(), tokens[0].toFloat())
-            else -> throw IllegalArgumentException()
-        }
     }
 }

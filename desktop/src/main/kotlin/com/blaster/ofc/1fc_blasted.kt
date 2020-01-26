@@ -4,6 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ModelsLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
+import com.blaster.common.vec2
 import com.blaster.common.vec3
 import com.blaster.editor.SceneDiffer
 import com.blaster.editor.SceneReader
@@ -36,7 +37,7 @@ private val sceneDiffer = SceneDiffer()
 private val deferredTechnique = DeferredTechnique()
 
 private lateinit var camera: Camera
-private val controller = Controller(velocity = 0.5f)
+private val controller = Controller(velocity = 0.3f)
 private val wasd = WasdInput(controller)
 
 private lateinit var baseModel: Model
@@ -60,7 +61,8 @@ private val listener = object : SceneDiffer.Listener() {
 class BlastEd {
     // todo: WYSIWYG, throttling, error handling
 
-    // Template libraries are independent from BlasteEd
+    // Caches aren independent from BlastEd
+    // Template libraries are independent from BlastEd
     // Rendering is independent from BlastEd
 
     // 1 - throttle
@@ -93,7 +95,7 @@ private val window = object : LwjglWindow() {
         }
     }
 
-    override fun onCursorDelta(delta: Vector2f) {
+    override fun onCursorDelta(delta: vec2) {
         wasd.onCursorDelta(delta)
     }
 
