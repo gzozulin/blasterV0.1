@@ -23,7 +23,7 @@ private val pixelDecoder = PixelDecoder()
 
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream, pixelDecoder)
-private val modelsLib = MeshLib(assetStream, texturesLib)
+private val meshLib = MeshLib(assetStream)
 
 private val deferredTechnique = DeferredTechnique()
 private val textTechnique = TextTechnique()
@@ -58,7 +58,9 @@ private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
         camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0.5f, 3f, 3f))
-        model = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
+        val (mesh, aabb) = meshLib.loadMesh("models/house/low.obj")
+        val diffuse = texturesLib.loadTexture("models/house/house_diffuse.png")
+        model = Model(mesh, diffuse, aabb)
         GlState.apply()
         textTechnique.prepare(shadersLib, texturesLib)
         deferredTechnique.prepare(shadersLib, width, height)

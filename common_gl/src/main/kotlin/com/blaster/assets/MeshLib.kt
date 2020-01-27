@@ -4,7 +4,6 @@ import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
 import com.blaster.scene.Mesh
-import com.blaster.entity.Model
 import org.joml.AABBf
 import org.joml.Vector3f
 import java.io.BufferedReader
@@ -35,7 +34,7 @@ private fun arrayListIntToByteBuffer(list: List<Int>): ByteBuffer {
 // todo: info about model: vert/ind count, times, progress loading, etc
 // todo: load material from *.mtl
 // todo: use buffers directly
-class MeshLib (private val assetStream: AssetStream, private val texturesLib: TexturesLib) {
+class MeshLib (private val assetStream: AssetStream) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
 
@@ -57,7 +56,7 @@ class MeshLib (private val assetStream: AssetStream, private val texturesLib: Te
 
     // todo: create Native(Float)Buffer directly, instead of copying arrays
     // todo: only model! no diffuse
-    fun loadModel(meshFilename: String, diffuseFilename: String): Model {
+    fun loadMesh(meshFilename: String): Pair<Mesh, AABBf> {
         minX = 0f
         minY = 0f
         minZ = 0f
@@ -92,8 +91,7 @@ class MeshLib (private val assetStream: AssetStream, private val texturesLib: Te
         currentTexCoords.clear()
         currentNormals.clear()
         currentIndices.clear()
-        return Model(mesh, texturesLib.loadTexture(diffuseFilename),
-                AABBf(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ)))
+        return mesh to AABBf(Vector3f(minX, minY, minZ), Vector3f(maxX, maxY, maxZ))
     }
 
     private fun parseLine(line: String) {
