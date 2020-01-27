@@ -73,6 +73,8 @@ fun aabb.scaleTo(to: Float): Float {
 
 // todo: a little bit of parsing inefficiency down there:
 
+fun String.dropBeforeDigit() = this.dropWhile { !it.isDigit() }
+
 fun String.toVec3(): vec3 {
     val tokens = this.split(Pattern.compile("\\s+"))
     return when (tokens.size) {

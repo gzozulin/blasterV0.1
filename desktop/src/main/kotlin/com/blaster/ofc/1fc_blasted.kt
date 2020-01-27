@@ -1,11 +1,10 @@
 package com.blaster.ofc
 
 import com.blaster.assets.AssetStream
-import com.blaster.assets.ModelsLib
+import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.common.vec2
-import com.blaster.common.vec3
+import com.blaster.common.*
 import com.blaster.editor.SceneDiffer
 import com.blaster.editor.SceneReader
 import com.blaster.entity.Light
@@ -17,19 +16,23 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
-import org.joml.Vector2f
+import java.lang.IllegalArgumentException
+
+// todo: aabb with immediate technique
 
 private val scene = """
-    building0; pos 0;
-    building2; pos 44 0 0; bound 1; euler -90 0 0;
-    building3; pos 55 0 0; bound 2; euler 0 -90 0;
-    building4; pos 66 0 0; bound 3; euler 0 0 -90;
+    building0; pos 0 0 0; bound 20;
+    building1; pos 10 0 0; bound 20;
+    building2; pos 20 0 0; bound 20;
+    building3; pos 0 0 10; bound 20; euler 0 -180 0;
+    building4; pos 10 0 10; bound 20; euler 0 -180 0;
+    building5; pos 20 0 10; bound 20; euler 0 -180 0;
 """.trimIndent()
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
-private val modelsLib = ModelsLib(assetStream, texturesLib)
+private val modelsLib = MeshLib(assetStream, texturesLib)
 
 private val sceneReader = SceneReader()
 private val sceneDiffer = SceneDiffer()
@@ -44,7 +47,7 @@ private lateinit var baseModel: Model
 
 private val nodes = mutableMapOf<String, Node<Model>>()
 
-private val listener = object : SceneDiffer.Listener() {
+private val sceneListener = object : SceneDiffer.Listener() {
     override fun onAdd(marker: Marker) {
         val node = Node(payload = baseModel)
         marker.apply(node)
@@ -70,6 +73,97 @@ class BlastEd {
     // 3 - update scene
 }
 
+sealed class Template
+
+const val START_MATERIAL = "material "
+const val START_MODEL = "model "
+const val START_PARTICLES = "particles "
+const val START_LIGHT = "light "
+
+data class MaterialTemplate(
+        val uid: String,
+        val ambient: vec3, val diffuse: vec3, val specular: vec3,
+        val shine: Float, val transparency: Float) : Template() {
+
+    companion object {
+        fun parse(uid: String, iterator: Iterator<String>) =
+                MaterialTemplate(uid,
+                        iterator.next().dropBeforeDigit().toVec3(), iterator.next().dropBeforeDigit().toVec3(), iterator.next().dropBeforeDigit().toVec3(),
+                        iterator.next().dropBeforeDigit().toFloat(), iterator.next().dropBeforeDigit().toFloat())
+    }
+}
+
+//  todo: material
+
+data class ModelTemplate(val uid: String, val obj: String, val diffuse: String) : Template() {
+    companion object {
+        fun parse(uid: String, iterator: Iterator<String>)
+                = ModelTemplate(uid, iterator.next().trim().removePrefix("obj "), iterator.next().trim().removePrefix("diffuse "))
+    }
+}
+
+class ParticlesTemplate : Template()
+class LightTemplate : Template()
+
+private val TEMPLATE_EXAMPLE = """
+    material Metal
+        ambient 1 1 1
+        diffuse 1 1 1
+        specular 1 1 1
+        shine 1
+        transparency 1
+        
+    material Glass
+        ambient 1 1 1
+        diffuse 1 1 1
+        specular 1 1 1
+        shine 1 
+        transparency 1
+        
+    model House
+        obj models/house/low.obj
+        diffuse models/house/house_diffuse.png
+""".trimIndent()
+
+class TemplateReader {
+    fun load(string: String) : List<Template> {
+        val result = mutableListOf<Template>()
+        val lines = string.lines()
+        val iterator = lines.iterator()
+        while (iterator.hasNext()) {
+            val line = iterator.next()
+            if (line.isBlank()) {
+                continue
+            }
+            result.add(when {
+                line.startsWith(START_MATERIAL) -> MaterialTemplate.parse(line.removePrefix(START_MATERIAL), iterator)
+                line.startsWith(START_MODEL) -> ModelTemplate.parse(line.removePrefix(START_MODEL), iterator)
+                else -> throw IllegalArgumentException("Wtf?! $line")
+            })
+        }
+        return result
+    }
+}
+
+class TemplateDiffer {
+    fun diff(prev: List<Template> = listOf(), next: List<Template>, listener: Listener) {
+
+    }
+
+    open class Listener {
+        fun onRemoved(template: Template) {}
+        fun onUpdated(template: Template) {}
+        fun onAdded(template: Template) {}
+    }
+}
+
+private val templateReader = TemplateReader()
+private val templateDiffer = TemplateDiffer()
+
+private val templateListener = object : TemplateDiffer.Listener() {
+
+}
+
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
         GlState.apply()
@@ -77,8 +171,12 @@ private val window = object : LwjglWindow() {
         baseModel = modelsLib.loadModel("models/house/low.obj", "models/house/house_diffuse.png")
         deferredTechnique.prepare(shadersLib, width, height)
         camera = Camera(width.toFloat() / height.toFloat())
-        sceneDiffer.diff(nextMarkers = sceneReader.load(scene), listener = listener)
+        sceneDiffer.diff(nextMarkers = sceneReader.load(scene), listener = sceneListener)
         deferredTechnique.light(Light.SUNLIGHT)
+
+
+        val templates = templateReader.load(TEMPLATE_EXAMPLE)
+        templateDiffer.diff(next = templates, listener = templateListener)
     }
 
     override fun onDraw() {

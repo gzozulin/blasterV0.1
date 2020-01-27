@@ -23,7 +23,7 @@ private val pixelDecoder = PixelDecoder()
 
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream, pixelDecoder)
-private val modelsLib = ModelsLib(assetStream, texturesLib)
+private val modelsLib = MeshLib(assetStream, texturesLib)
 
 private val deferredTechnique = DeferredTechnique()
 private val textTechnique = TextTechnique()

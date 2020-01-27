@@ -35,7 +35,7 @@ private fun arrayListIntToByteBuffer(list: List<Int>): ByteBuffer {
 // todo: info about model: vert/ind count, times, progress loading, etc
 // todo: load material from *.mtl
 // todo: use buffers directly
-class ModelsLib (private val assetStream: AssetStream, private val texturesLib: TexturesLib) {
+class MeshLib (private val assetStream: AssetStream, private val texturesLib: TexturesLib) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
 
