@@ -16,18 +16,9 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
-import java.lang.IllegalArgumentException
+import java.io.File
 
 // todo: aabb with immediate technique
-
-private val scene = """
-    building0; pos 0 0 0; bound 20;
-    building1; pos 10 0 0; bound 20;
-    building2; pos 20 0 0; bound 20;
-    building3; pos 0 0 10; bound 20; euler 0 -180 0;
-    building4; pos 10 0 10; bound 20; euler 0 -180 0;
-    building5; pos 20 0 10; bound 20; euler 0 -180 0;
-""".trimIndent()
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
@@ -47,6 +38,9 @@ private lateinit var baseModel: Model
 
 private val nodes = mutableMapOf<String, Node<Model>>()
 
+private var lastUpdate = 0L
+private var currentScene = listOf<Marker>()
+
 private val sceneListener = object : SceneDiffer.Listener() {
     override fun onAdd(marker: Marker) {
         val node = Node(payload = baseModel)
@@ -61,18 +55,6 @@ private val sceneListener = object : SceneDiffer.Listener() {
     }
 }
 
-class BlastEd {
-    // todo: WYSIWYG, throttling, error handling
-
-    // Caches aren independent from BlastEd
-    // Template libraries are independent from BlastEd
-    // Rendering is independent from BlastEd
-
-    // 1 - throttle
-    // 2 - read from template
-    // 3 - update scene
-}
-
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
         GlState.apply()
@@ -82,11 +64,22 @@ private val window = object : LwjglWindow() {
         baseModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
         deferredTechnique.prepare(shadersLib, width, height)
         camera = Camera(width.toFloat() / height.toFloat())
-        sceneDiffer.diff(nextMarkers = sceneReader.load(scene), listener = sceneListener)
+
         deferredTechnique.light(Light.SUNLIGHT)
     }
 
-    override fun onDraw() {
+    private fun throttleScene() {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastUpdate > 1000L) {
+            val nextScene = sceneReader.load(File("scene_file").inputStream())
+            sceneDiffer.diff(prevMarkers = currentScene, nextMarkers = nextScene, listener = sceneListener)
+            currentScene = nextScene
+            lastUpdate = currentTime
+        }
+    }
+
+    override fun onTick() {
+        throttleScene()
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)

@@ -83,7 +83,7 @@ abstract class LwjglWindow(
         onCreate(screenWidth, screenHeight)
         while (glfwWindowShouldClose(window) == GL11.GL_FALSE) {
             updateCursor(window)
-            onDraw()
+            onTick()
             glfwSwapBuffers(window)
             glfwPollEvents()
             fps++
@@ -122,7 +122,7 @@ abstract class LwjglWindow(
     }
 
     protected abstract fun onCreate(width: Int, height: Int)
-    protected abstract fun onDraw()
+    protected abstract fun onTick()
 
     open fun keyPressed(key: Int) {}
     open fun keyReleased(key: Int) {}

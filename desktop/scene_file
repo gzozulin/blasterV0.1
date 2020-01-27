@@ -1,0 +1,6 @@
+building0; pos 0 0 0; bound 20;
+building1; pos 10 0 0; bound 20;
+building2; pos 20 0 0; bound 20;
+building3; pos 0 0 10; bound 20; euler 0 -180 0;
+building4; pos 10 0 10; bound 20; euler 0 -180 0;
+building5; pos 20 0 10; bound 20; euler 0 -180 0;
