@@ -34,7 +34,7 @@ private val deferredTechnique = DeferredTechnique()
 private val immediateTechnique = ImmediateTechnique()
 private val textTechnique = TextTechnique()
 
-private val console = Console(2000L)
+private val console = Console(1000L)
 
 private lateinit var camera: Camera
 private val controller = Controller(velocity = 0.3f)

@@ -34,7 +34,7 @@ class SceneReader {
 
     private fun peek(input: String): Int {
         var count = 0
-        while (input[count] == ' ') {
+        while (input[count] == ' ' || input[count] == '\t') {
             count++
         }
         return count

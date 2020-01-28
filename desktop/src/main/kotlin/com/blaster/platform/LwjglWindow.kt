@@ -13,6 +13,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 // todo: hold cursor only if focused
+// todo: on resize
 abstract class LwjglWindow(
         private val width: Int = 1024, private val height: Int = 768,
         private val fullWidth: Int = 1920, private val fullHeight: Int = 1080,
