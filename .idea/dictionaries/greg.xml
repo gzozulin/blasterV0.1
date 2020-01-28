@@ -4,6 +4,7 @@
       <w>aabb</w>
       <w>coord</w>
       <w>coords</w>
+      <w>darkskies</w>
       <w>fovy</w>
       <w>inplace</w>
       <w>lerpf</w>
@@ -11,6 +12,7 @@
       <w>proj</w>
       <w>quat</w>
       <w>radf</w>
+      <w>skybox</w>
       <w>texcoords</w>
       <w>transp</w>
       <w>wasd</w>

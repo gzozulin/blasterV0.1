@@ -174,7 +174,7 @@ class SceneReader {
                 else -> if (index != 0) { fail("Unhandled: $token") }
             }
         }
-        return Marker(uid, pos!!, euler, quat, scale, bound, dir, target, custom, mutableListOf())
+        return Marker(uid, pos ?: vec3(), euler, quat, scale, bound, dir, target, custom, mutableListOf())
     }
 }
 
