@@ -8,4 +8,4 @@ import com.blaster.scene.Payload
 data class Model (
         val mesh: Mesh, val diffuse: GlTexture,
         override val aabb: aabb = aabb(),
-        val material: Material = Material.DUMMY) : Payload
+        val material: Material = Material.CONCRETE) : Payload

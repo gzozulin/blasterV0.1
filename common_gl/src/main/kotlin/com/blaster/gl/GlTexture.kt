@@ -15,9 +15,9 @@ class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GL
         glBind(this) {
             glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MIN_FILTER, backend.GL_NEAREST) }
             glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MAG_FILTER, backend.GL_NEAREST) }
-            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_S, backend.GL_REPEAT) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
-            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_T, backend.GL_REPEAT) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
-            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_R, backend.GL_REPEAT) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_S, backend.GL_CLAMP_TO_EDGE) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_T, backend.GL_CLAMP_TO_EDGE) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_R, backend.GL_CLAMP_TO_EDGE) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
         }
     }
 

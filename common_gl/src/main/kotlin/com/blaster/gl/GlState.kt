@@ -7,7 +7,10 @@ private val backend = GlLocator.locate()
 class GlState private constructor() {
     companion object {
         fun enableDepthTest() {
-            glCheck { backend.glEnable(backend.GL_DEPTH_TEST) }
+            glCheck {
+                backend.glEnable(backend.GL_DEPTH_TEST)
+                backend.glDepthFunc(backend.GL_LEQUAL)
+            }
         }
 
         fun disableDepthTest() {

@@ -46,6 +46,7 @@ class GlBackendImpl : GlBackend {
     override val GL_TEXTURE_WRAP_T:     Int get() = GL11.GL_TEXTURE_WRAP_T
     override val GL_TEXTURE_WRAP_R:     Int get() = GL12.GL_TEXTURE_WRAP_R
     override val GL_REPEAT:             Int get() = GL11.GL_REPEAT
+    override val GL_CLAMP_TO_EDGE:      Int get() = GL12.GL_CLAMP_TO_EDGE
     override val GL_RGBA16F:            Int get() = GL30.GL_RGBA16F
     override val GL_RGB16F:             Int get() = GL30.GL_RGB16F
     override val GL_COLOR_ATTACHMENT0:  Int get() = GL30.GL_COLOR_ATTACHMENT0
@@ -63,6 +64,7 @@ class GlBackendImpl : GlBackend {
     override val GL_BLEND:              Int get() = GL11.GL_BLEND
     override val GL_ONE_MINUS_SRC_ALPHA: Int get() = GL11.GL_ONE_MINUS_SRC_ALPHA
     override val GL_SRC_ALPHA:          Int get() = GL11.GL_SRC_ALPHA
+    override val GL_LEQUAL:             Int get() = GL11.GL_LEQUAL
     override val GL_MODELVIEW:          Int get() = GL11.GL_MODELVIEW
     override val GL_PROJECTION:         Int get() = GL11.GL_PROJECTION
 
@@ -70,6 +72,7 @@ class GlBackendImpl : GlBackend {
     override fun gluErrorString(error: Int) = "Undeciphered error $error"
     override fun glEnable(cap: Int) = GL11.glEnable(cap)
     override fun glDisable(cap: Int) = GL11.glDisable(cap)
+    override fun glDepthFunc(func: Int) = GL11.glDepthFunc(func)
     override fun glClearColor(red: Float, green: Float, blue: Float, alpha: Float)  =
             GL11.glClearColor(red, green, blue, alpha)
     override fun glViewport(x: Int, y: Int, width: Int, height: Int) =

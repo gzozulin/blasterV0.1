@@ -59,6 +59,7 @@ interface GlBackend {
     val GL_TEXTURE_WRAP_T: Int
     val GL_TEXTURE_WRAP_R: Int
     val GL_REPEAT: Int
+    val GL_CLAMP_TO_EDGE: Int
     val GL_RGBA16F: Int
     val GL_RGB16F: Int
     val GL_COLOR_ATTACHMENT0: Int
@@ -75,6 +76,7 @@ interface GlBackend {
     val GL_READ_WRITE: Int
     val GL_BLEND: Int
     val GL_SRC_ALPHA: Int
+    val GL_LEQUAL: Int
     val GL_ONE_MINUS_SRC_ALPHA: Int
     val GL_MODELVIEW: Int
     val GL_PROJECTION: Int
@@ -83,6 +85,7 @@ interface GlBackend {
     fun gluErrorString(error: Int): String
     fun glEnable(cap: Int)
     fun glDisable(cap: Int)
+    fun glDepthFunc(func: Int)
     fun glClearColor(red: Float, green: Float, blue: Float, alpha: Float)
     fun glViewport(x: Int, y: Int, width: Int, height: Int)
     fun glFrontFace(mode: Int)
