@@ -41,6 +41,7 @@ private val wasd = WasdInput(controller)
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
+        GlState.apply()
         camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0f, 0f, 3f))
         simpleTechnique.prepare(shadersLib)
@@ -54,7 +55,6 @@ private val window = object : LwjglWindow() {
         node1 = Node(payload = model1)
         node2 = Node(parent = node1, payload = model2)
         node3 = Node(parent = node2, payload = model3)
-        GlState.apply(false)
     }
 
     override fun onTick() {
@@ -66,10 +66,12 @@ private val window = object : LwjglWindow() {
         node2.rotate(VECTOR_UP, 0.01f)
         node3.rotate(VECTOR_UP, 0.01f)
         GlState.clear()
-        simpleTechnique.draw(camera) {
-            simpleTechnique.instance(model1, node1.calculateM())
-            simpleTechnique.instance(model2, node2.calculateM())
-            simpleTechnique.instance(model3, node3.calculateM())
+        GlState.drawWithNoCulling {
+            simpleTechnique.draw(camera) {
+                simpleTechnique.instance(model1, node1.calculateM())
+                simpleTechnique.instance(model2, node2.calculateM())
+                simpleTechnique.instance(model3, node3.calculateM())
+            }
         }
     }
 

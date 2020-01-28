@@ -13,6 +13,7 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
+import com.blaster.techniques.SkyboxTechnique
 import com.blaster.techniques.TextTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -27,6 +28,7 @@ private val meshLib = MeshLib(assetStream)
 
 private val deferredTechnique = DeferredTechnique()
 private val textTechnique = TextTechnique()
+private val skyboxTechnique = SkyboxTechnique()
 
 private val console = Console(3000L)
 
@@ -56,13 +58,14 @@ private fun prevMaterial() {
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
+        GlState.apply()
         camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0.5f, 3f, 3f))
         val (mesh, aabb) = meshLib.loadMesh("models/house/low.obj")
         val diffuse = texturesLib.loadTexture("models/house/house_diffuse.png")
         model = Model(mesh, diffuse, aabb)
-        GlState.apply()
         textTechnique.prepare(shadersLib, texturesLib)
+        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/darkskies")
         deferredTechnique.prepare(shadersLib, width, height)
         deferredTechnique.light(Light.SUNLIGHT)
         for (i in 0..16) {
@@ -73,12 +76,15 @@ private val window = object : LwjglWindow() {
         }
     }
 
-    override fun onTick() {
+    private fun tick() {
         console.tick()
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+    }
+
+    private fun draw() {
         GlState.clear()
         textTechnique.draw {
             console.render { pos, text, color, scale ->
@@ -88,6 +94,14 @@ private val window = object : LwjglWindow() {
         deferredTechnique.draw(camera) {
             deferredTechnique.instance(model.mesh, mat4(), model.diffuse, Material.MATERIALS[currentMaterial].second)
         }
+        GlState.drawWithNoCulling {
+            skyboxTechnique.skybox(camera)
+        }
+    }
+
+    override fun onTick() {
+        tick()
+        draw()
     }
 
     override fun onCursorDelta(delta: Vector2f) {

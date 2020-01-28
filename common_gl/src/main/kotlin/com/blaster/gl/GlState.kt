@@ -23,13 +23,25 @@ class GlState private constructor() {
             enableDepthTest()
         }
 
-        fun apply(culling: Boolean = true, color: Vector3f = Vector3f(0.9f, 9.9f, 1f)) {
+        fun enableCulling() {
+            glCheck { backend.glFrontFace(backend.GL_CCW) }
+            glCheck { backend.glEnable(backend.GL_CULL_FACE) }
+        }
+
+        fun disableCulling() {
+            glCheck { backend.glDisable(backend.GL_CULL_FACE) }
+        }
+
+        fun drawWithNoCulling(draw: () -> Unit) {
+            disableCulling()
+            draw.invoke()
+            enableCulling()
+        }
+
+        fun apply(color: Vector3f = Vector3f(0.9f, 9.9f, 1f)) {
             glCheck { backend.glClearColor(color.x, color.y, color.z, 0f) }
             enableDepthTest()
-            if (culling) {
-                glCheck { backend.glFrontFace(backend.GL_CCW) }
-                glCheck { backend.glEnable(backend.GL_CULL_FACE) }
-            }
+            enableCulling()
         }
 
         fun clear() {

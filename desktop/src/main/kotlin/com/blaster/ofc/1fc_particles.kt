@@ -11,14 +11,16 @@ import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
-import com.blaster.scene.*
+import com.blaster.scene.Camera
+import com.blaster.scene.Controller
+import com.blaster.scene.Particle
+import com.blaster.scene.Particles
 import com.blaster.techniques.BillboardsTechnique
 import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.TextTechnique
 import org.joml.AABBf
 import org.joml.Vector2f
 import org.joml.Vector3f
-import org.lwjgl.glfw.GLFW
 import java.util.*
 import kotlin.math.sin
 
