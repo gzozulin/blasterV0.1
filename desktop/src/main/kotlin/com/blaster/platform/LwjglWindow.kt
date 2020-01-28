@@ -11,9 +11,11 @@ import org.lwjgl.system.MemoryUtil.NULL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+// todo: hold cursor only if focused
 abstract class LwjglWindow(
         private val width: Int = 1024, private val height: Int = 768,
-        private val fullWidth: Int = 1920, private val fullHeight: Int = 1080) {
+        private val fullWidth: Int = 1920, private val fullHeight: Int = 1080,
+        private val isHoldingCursor: Boolean = true) {
 
     init {
         SharedLibraryLoader.load()
@@ -22,7 +24,6 @@ abstract class LwjglWindow(
     private var window = 0L
 
     private var isFullscreen = false
-    private val isHoldingCursor = true
 
     private val screenWidth: Int
         get() = if (isFullscreen) fullWidth else width

@@ -8,9 +8,9 @@ interface Payload {
 
 class Node<T : Payload>(
         private var parent: Node<T>? = null,
-        private val position: vec3 = vec3(),
-        private val rotation: quat = quat(),
-        private val scale: vec3 = vec3(1f),
+        val position: vec3 = vec3(),
+        val rotation: quat = quat(),
+        val scale: vec3 = vec3(1f),
         val payload: T? = null) {
 
     private val children: List<Node<T>> = ArrayList()
@@ -38,6 +38,11 @@ class Node<T : Payload>(
     fun detach(child: Node<T>) {
         (children as ArrayList).remove(child)
         child.parent = null
+        incrementGraph()
+    }
+
+    fun detachFromParent() {
+        parent?.detach(this)
         incrementGraph()
     }
 

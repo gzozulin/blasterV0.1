@@ -57,7 +57,7 @@ private val window = object : LwjglWindow() {
         GlState.apply(false)
     }
 
-    override fun onDraw() {
+    override fun onTick() {
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)

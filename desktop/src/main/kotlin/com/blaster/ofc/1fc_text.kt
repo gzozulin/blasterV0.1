@@ -26,7 +26,7 @@ private val window = object : LwjglWindow(800, 600) {
         GlState.apply()
     }
 
-    override fun onDraw() {
+    override fun onTick() {
         GlState.clear()
         console.tick()
         technique.draw {

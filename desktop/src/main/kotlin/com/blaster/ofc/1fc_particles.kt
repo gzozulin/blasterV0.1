@@ -151,7 +151,7 @@ private val window = object : LwjglWindow() {
         console.success("All ready..")
     }
 
-    override fun onDraw() {
+    override fun onTick() {
         GlState.clear()
         snow.tick()
         flame.tick()
@@ -163,7 +163,7 @@ private val window = object : LwjglWindow() {
             camera.lookAlong(direction)
         }
         console.tick()
-        immediateTechnique.aabb(camera, sceneAABB)
+        immediateTechnique.aabb(camera, sceneAABB, mat4())
         textTechnique.draw {
             console.render { position, text, color, scale ->
                 textTechnique.text(text, position, scale, color)

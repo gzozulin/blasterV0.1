@@ -73,7 +73,7 @@ private val window = object : LwjglWindow() {
         }
     }
 
-    override fun onDraw() {
+    override fun onTick() {
         console.tick()
         controller.apply { position, direction ->
             camera.setPosition(position)
