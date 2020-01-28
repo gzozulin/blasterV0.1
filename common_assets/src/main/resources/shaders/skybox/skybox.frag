@@ -4,11 +4,11 @@ precision mediump float;
 
 in vec3 vTexCoord;
 
-uniform samplerCube uTexSkybox;
+uniform samplerCube uTexDiffuse;
 
 layout (location = 0) out vec4 oFragColor;
 
 void main()
 {
-    oFragColor = texture(uTexSkybox, vTexCoord);
+    oFragColor = texture(uTexDiffuse, vTexCoord);
 }

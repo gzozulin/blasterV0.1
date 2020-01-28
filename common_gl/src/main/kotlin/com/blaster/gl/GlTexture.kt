@@ -4,16 +4,7 @@ import java.nio.ByteBuffer
 
 private val backend = GlLocator.locate()
 
-class GlTexture(
-        val target: Int = backend.GL_TEXTURE_2D,
-        val unit: Int = 0,
-        private val width: Int,
-        private val height: Int,
-        internalFormat: Int = backend.GL_RGBA,
-        pixelFormat: Int = backend.GL_RGBA,
-        pixelType: Int = backend.GL_UNSIGNED_BYTE,
-        pixels: ByteBuffer? = null) : GLBindable {
-
+class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GLBindable {
     val handle: Int = glCheck { backend.glGenTextures() }
 
     init {
@@ -21,13 +12,35 @@ class GlTexture(
     }
 
     init {
-        glCheck { backend.glBindTexture(target, handle) }
-        glCheck { backend.glTexImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, pixels) }
-        glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MIN_FILTER, backend.GL_NEAREST) }
-        glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MAG_FILTER, backend.GL_NEAREST) }
-        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_S, backend.GL_REPEAT) } // todo: mirrored repeat
-        glCheck { backend.glTexParameteri(backend.GL_TEXTURE_2D, backend.GL_TEXTURE_WRAP_T, backend.GL_REPEAT) } // todo: mirrored repeat
-        glCheck { backend.glBindTexture(target, 0) }
+        glBind(this) {
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MIN_FILTER, backend.GL_NEAREST) }
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_MAG_FILTER, backend.GL_NEAREST) }
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_S, backend.GL_REPEAT) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_T, backend.GL_REPEAT) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
+            glCheck { backend.glTexParameteri(target, backend.GL_TEXTURE_WRAP_R, backend.GL_REPEAT) } // todo: mirrored repeat, GL_CLAMP_TO_EDGE
+        }
+    }
+
+    constructor(target: Int = backend.GL_TEXTURE_2D, unit: Int = 0,
+                width: Int, height: Int,
+                internalFormat: Int = backend.GL_RGBA, pixelFormat: Int = backend.GL_RGBA, pixelType: Int = backend.GL_UNSIGNED_BYTE,
+                pixels: ByteBuffer? = null) : this(target, unit) {
+        glBind(this) {
+            glCheck { backend.glTexImage2D(target, 0, internalFormat, width, height, 0, pixelFormat, pixelType, pixels) }
+        }
+    }
+
+    data class TexData(
+            val internalFormat: Int = backend.GL_RGBA, val pixelFormat: Int = backend.GL_RGBA, val pixelType: Int = backend.GL_UNSIGNED_BYTE,
+            val width: Int, val height: Int, val pixels: ByteBuffer?)
+
+    constructor(unit: Int = 0, sides: List<TexData>) : this(backend.GL_TEXTURE_CUBE_MAP, unit) {
+        glBind(this) {
+            sides.forEachIndexed { index, side ->
+                glCheck { backend.glTexImage2D(backend.GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, 0,
+                        side.internalFormat, side.width, side.height, 0, side.pixelFormat, side.pixelType, side.pixels) }
+            }
+        }
     }
 
     override fun bind() {

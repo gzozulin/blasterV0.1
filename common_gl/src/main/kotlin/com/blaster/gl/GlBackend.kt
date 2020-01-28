@@ -49,12 +49,15 @@ interface GlBackend {
     val GL_RGB: Int
     val GL_RGBA: Int
     val GL_TEXTURE_2D: Int
+    val GL_TEXTURE_CUBE_MAP: Int
+    val GL_TEXTURE_CUBE_MAP_POSITIVE_X: Int
     val GL_TEXTURE0: Int
     val GL_TEXTURE_MIN_FILTER: Int
     val GL_TEXTURE_MAG_FILTER: Int
     val GL_NEAREST: Int
     val GL_TEXTURE_WRAP_S: Int
     val GL_TEXTURE_WRAP_T: Int
+    val GL_TEXTURE_WRAP_R: Int
     val GL_REPEAT: Int
     val GL_RGBA16F: Int
     val GL_RGB16F: Int

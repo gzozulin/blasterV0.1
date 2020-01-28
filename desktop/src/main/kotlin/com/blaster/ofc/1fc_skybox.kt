@@ -4,8 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.gl.GlProgram
-import com.blaster.gl.GlState
+import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.scene.Camera
@@ -25,24 +24,30 @@ private val wasd = WasdInput(controller)
 class SkyboxTechnique {
     private lateinit var program: GlProgram
     private lateinit var cube: Mesh
+    private lateinit var diffuse: GlTexture
 
     fun prepare(shadersLib: ShadersLib, textureLib: TexturesLib, skybox: String) {
         program = shadersLib.loadProgram("shaders/skybox/skybox.vert", "shaders/skybox/skybox.frag")
-        val (mesh, aabb) = meshLib.loadMesh("models/cube/cube.obj")
+        val (mesh, _) = meshLib.loadMesh("models/cube/cube.obj")
         cube = mesh
+        diffuse = textureLib.loadSkybox(skybox)
     }
 
-    fun skybox() {
-
+    fun skybox(camera: Camera) {
+        glBind(listOf(program, cube, diffuse)) {
+            program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+            program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+            cube.draw()
+        }
     }
 }
-
 
 private val skyboxTechnique = SkyboxTechnique()
 
 private val window = object: LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
-        GlState.apply()
+        GlState.apply(culling = false)
         camera = Camera(width.toFloat() / height.toFloat())
         skyboxTechnique.prepare(shadersLib, texturesLib, "textures/darkskies")
     }
@@ -53,6 +58,7 @@ private val window = object: LwjglWindow() {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+        skyboxTechnique.skybox(camera)
     }
 
     override fun onCursorDelta(delta: Vector2f) {

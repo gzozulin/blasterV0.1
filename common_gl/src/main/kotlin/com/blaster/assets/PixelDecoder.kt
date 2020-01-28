@@ -9,7 +9,7 @@ import javax.imageio.ImageIO
 open class PixelDecoder {
     data class Decoded(val pixels: ByteBuffer, val width: Int, val height: Int)
 
-    open fun decodePixels(inputStream: InputStream, mirror: Boolean): Decoded {
+    open fun decodePixels(inputStream: InputStream, mirror: Boolean = false): Decoded {
         val bufferedImage = ImageIO.read(inputStream)
         val pixelNum = bufferedImage.width * bufferedImage.height
         val byteBuffer = ByteBuffer.allocateDirect(pixelNum * 4).order(ByteOrder.nativeOrder())

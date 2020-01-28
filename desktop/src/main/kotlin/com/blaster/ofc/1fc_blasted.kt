@@ -105,6 +105,7 @@ class SceneDiffer {
 // todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
 // todo: probably, also can have matrix directly?
 // todo: target as a name
+// todo: the rest of the string is custom stuff
 
 private const val START_POS = "pos "
 private const val START_QUAT = "quat "

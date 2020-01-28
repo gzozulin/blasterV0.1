@@ -36,12 +36,15 @@ class GlBackendImpl : GlBackend {
     override val GL_RGB:                Int get() = GL11.GL_RGB
     override val GL_RGBA:               Int get() = GL11.GL_RGBA
     override val GL_TEXTURE_2D:         Int get() = GL11.GL_TEXTURE_2D
+    override val GL_TEXTURE_CUBE_MAP:   Int get() = GL13.GL_TEXTURE_CUBE_MAP
+    override val GL_TEXTURE_CUBE_MAP_POSITIVE_X:   Int get() = GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X
     override val GL_TEXTURE0:           Int get() = GL13.GL_TEXTURE0
     override val GL_TEXTURE_MIN_FILTER: Int get() = GL11.GL_TEXTURE_MIN_FILTER
     override val GL_TEXTURE_MAG_FILTER: Int get() = GL11.GL_TEXTURE_MAG_FILTER
     override val GL_NEAREST:            Int get() = GL11.GL_NEAREST
     override val GL_TEXTURE_WRAP_S:     Int get() = GL11.GL_TEXTURE_WRAP_S
     override val GL_TEXTURE_WRAP_T:     Int get() = GL11.GL_TEXTURE_WRAP_T
+    override val GL_TEXTURE_WRAP_R:     Int get() = GL12.GL_TEXTURE_WRAP_R
     override val GL_REPEAT:             Int get() = GL11.GL_REPEAT
     override val GL_RGBA16F:            Int get() = GL30.GL_RGBA16F
     override val GL_RGB16F:             Int get() = GL30.GL_RGB16F
