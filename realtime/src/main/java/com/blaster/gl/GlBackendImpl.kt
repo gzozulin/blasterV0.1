@@ -3,6 +3,7 @@ package com.blaster.gl
 import android.opengl.GLES11
 import android.opengl.GLES30
 import android.opengl.GLU
+import com.blaster.common.vec3
 import java.nio.ByteBuffer
 
 class GlBackendImpl : GlBackend {
@@ -201,6 +202,12 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_COLOR_ATTACHMENT1
     override val GL_COLOR_ATTACHMENT2: Int
         get() = GLES30.GL_COLOR_ATTACHMENT2
+    override val GL_COLOR_ATTACHMENT3: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_COLOR_ATTACHMENT4: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_COLOR_ATTACHMENT5: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_DEPTH_ATTACHMENT: Int
         get() = GLES30.GL_DEPTH_ATTACHMENT
     override val GL_MAP_UNSYNCHRONIZED_BIT: Int
@@ -261,6 +268,10 @@ class GlBackendImpl : GlBackend {
     }
 
     override fun glVertex3f(x: Float, y: Float, z: Float) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glVertex3f(xyz: vec3) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

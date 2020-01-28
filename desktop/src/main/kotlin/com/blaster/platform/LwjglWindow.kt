@@ -4,6 +4,7 @@ import org.joml.Vector2f
 import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWKeyCallback
+import org.lwjgl.glfw.GLFWMouseButtonCallback
 import org.lwjgl.glfw.GLFWvidmode
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GLContext
@@ -52,6 +53,16 @@ abstract class LwjglWindow(
                 }
             } else if (action == GLFW_PRESS) {
                 keyPressed(key)
+            }
+        }
+    }
+
+    private val mouseBtnCallback = object : GLFWMouseButtonCallback() {
+        override fun invoke(window: kotlin.Long, button: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
+            if (action == GLFW_RELEASE) {
+                mouseBtnReleased(button)
+            } else if (action == GLFW_PRESS) {
+                mouseBtnPressed(button)
             }
         }
     }
@@ -111,6 +122,7 @@ abstract class LwjglWindow(
         if (isHoldingCursor) {
             glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
         }
+        glfwSetMouseButtonCallback(new, mouseBtnCallback)
         glfwSetKeyCallback(new, keyCallback)
         glfwMakeContextCurrent(new)
         glfwSwapInterval(1)
@@ -124,6 +136,9 @@ abstract class LwjglWindow(
 
     protected abstract fun onCreate(width: Int, height: Int)
     protected abstract fun onTick()
+
+    open fun mouseBtnPressed(btn: Int) {}
+    open fun mouseBtnReleased(btn: Int) {}
 
     open fun keyPressed(key: Int) {}
     open fun keyReleased(key: Int) {}

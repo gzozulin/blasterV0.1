@@ -18,10 +18,9 @@ import com.blaster.scene.*
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.TextTechnique
+import org.lwjgl.glfw.GLFW
 import java.io.File
 import java.lang.Exception
-
-// todo: aabb with immediate technique
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
@@ -47,6 +46,10 @@ private val nodes = mutableMapOf<String, Node<Model>>()
 
 private var lastUpdate = 0L
 private var currentScene = listOf<Marker>()
+
+private var mouseControl = false
+
+// todo: materials, models, particles, lights and camera
 
 private val sceneListener = object : SceneDiffer.Listener() {
     override fun onRemove(marker: Marker) {
@@ -77,7 +80,7 @@ private val sceneListener = object : SceneDiffer.Listener() {
     }
 }
 
-private val window = object : LwjglWindow(isHoldingCursor = true) {
+private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate(width: Int, height: Int) {
         GlState.apply()
         controller.position.set(vec3(0.5f, 3f, 3f))
@@ -130,8 +133,22 @@ private val window = object : LwjglWindow(isHoldingCursor = true) {
         }
     }
 
+    override fun mouseBtnPressed(btn: Int) {
+        if (btn == GLFW.GLFW_MOUSE_BUTTON_1) {
+            mouseControl = true
+        }
+    }
+
+    override fun mouseBtnReleased(btn: Int) {
+        if (btn == GLFW.GLFW_MOUSE_BUTTON_1) {
+            mouseControl = false
+        }
+    }
+
     override fun onCursorDelta(delta: vec2) {
-        wasd.onCursorDelta(delta)
+        if (mouseControl) {
+            wasd.onCursorDelta(delta)
+        }
     }
 
     override fun keyPressed(key: Int) {

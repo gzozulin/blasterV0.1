@@ -11,7 +11,7 @@ import java.util.regex.Pattern
 
 // todo: templates by id
 // todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
-// todo: probably, also can have matrix directly
+// todo: probably, also can have matrix directly?
 // todo: target as a name
 
 private const val START_POS = "pos "
@@ -41,11 +41,16 @@ class SceneReader {
     }
 
     private fun parse(depth: Int, remainder: MutableList<String>): List<Marker> {
+        val uids = hashSetOf<String>()
         val result = mutableListOf<Marker>()
         loop@ while (remainder.isNotEmpty()) {
+            if (remainder[0].isBlank() || remainder[0].trim().startsWith("//")) {
+                remainder.removeAt(0)
+                continue
+            }
             val currentDepth = peek(remainder[0])
             when {
-                currentDepth == depth -> result.add(parseMarker(remainder.removeAt(0)))
+                currentDepth == depth -> result.add(parseMarker(remainder.removeAt(0), uids))
                 currentDepth > depth -> result.last().children.addAll(parse(currentDepth, remainder))
                 currentDepth < depth -> break@loop
             }
@@ -53,9 +58,10 @@ class SceneReader {
         return result
     }
 
-    private fun parseMarker(marker: String): Marker {
+    private fun parseMarker(marker: String, uids: MutableSet<String>): Marker {
         val tokens = marker.trim().split(Pattern.compile(";")).dropLast(1)
         val uid: String = tokens[0]
+        check(uids.add(uid)) { "Non unique uid: $uid" }
         var pos: vec3? = null
         var quat: quat? = null
         var euler: euler3? = null

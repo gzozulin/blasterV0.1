@@ -1,5 +1,6 @@
 package com.blaster.gl
 
+import com.blaster.common.vec3
 import java.nio.ByteBuffer
 
 class GlLocator {
@@ -132,6 +133,7 @@ interface GlBackend {
     fun glEnd()
     fun glColor3f(r: Float, g: Float, b: Float)
     fun glVertex3f(x: Float, y: Float, z: Float)
+    fun glVertex3f(xyz: vec3)
     fun glBlendFunc(sfactor: Int, dfactor: Int)
     fun glMatrixMode(mode: Int)
     fun glLoadMatrix(matrix: ByteBuffer)

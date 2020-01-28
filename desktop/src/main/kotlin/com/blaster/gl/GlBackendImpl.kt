@@ -1,5 +1,6 @@
 package com.blaster.gl
 
+import com.blaster.common.vec3
 import org.lwjgl.opengl.*
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -145,6 +146,7 @@ class GlBackendImpl : GlBackend {
     override fun glEnd() = GL11.glEnd()
     override fun glColor3f(r: Float, g: Float, b: Float) = GL11.glColor3f(r, g, b)
     override fun glVertex3f(x: Float, y: Float, z: Float) = GL11.glVertex3f(x, y, z)
+    override fun glVertex3f(xyz: vec3) = GL11.glVertex3f(xyz.x, xyz.y, xyz.z)
     override fun glBlendFunc(sfactor: Int, dfactor: Int) = GL11.glBlendFunc(sfactor, dfactor)
     override fun glMatrixMode(mode: Int) = GL11.glMatrixMode(mode)
     override fun glLoadMatrix(matrix: ByteBuffer) = GL11.glLoadMatrixf(matrix)
