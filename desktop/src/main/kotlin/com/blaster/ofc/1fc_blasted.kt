@@ -17,6 +17,7 @@ import com.blaster.scene.Controller
 import com.blaster.scene.Node
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.ImmediateTechnique
+import com.blaster.techniques.SkyboxTechnique
 import com.blaster.techniques.TextTechnique
 import org.lwjgl.glfw.GLFW
 import java.io.BufferedReader
@@ -34,6 +35,7 @@ private val meshLib = MeshLib(assetStream)
 private val deferredTechnique = DeferredTechnique()
 private val immediateTechnique = ImmediateTechnique()
 private val textTechnique = TextTechnique()
+private val skyboxTechnique = SkyboxTechnique()
 
 private val console = Console(1000L)
 
@@ -223,9 +225,10 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         deferredTechnique.light(Light.SUNLIGHT)
         immediateTechnique.prepare(camera)
         textTechnique.prepare(shadersLib, texturesLib)
+        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/sincity")
     }
 
-    private fun tickScene() {
+    private fun tick() {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastUpdate > 1000L) {
             try {
@@ -238,15 +241,14 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             lastUpdate = currentTime
             console.success("Scene reloaded..")
         }
-    }
-
-    override fun onTick() {
-        tickScene()
         console.tick()
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+    }
+
+    private fun draw() {
         GlState.clear()
         textTechnique.draw {
             console.render { position, text, color, scale ->
@@ -262,6 +264,14 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 deferredTechnique.instance(model.mesh, node.calculateM(), model.diffuse, model.material)
             }
         }
+        GlState.drawWithNoCulling {
+            skyboxTechnique.skybox(camera)
+        }
+    }
+
+    override fun onTick() {
+        tick()
+        draw()
     }
 
     override fun mouseBtnPressed(btn: Int) {
