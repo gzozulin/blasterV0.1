@@ -12,7 +12,6 @@ import org.lwjgl.system.MemoryUtil.NULL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-// todo: hold cursor only if focused
 // todo: on resize
 abstract class LwjglWindow(
         private val width: Int = 1024, private val height: Int = 768,

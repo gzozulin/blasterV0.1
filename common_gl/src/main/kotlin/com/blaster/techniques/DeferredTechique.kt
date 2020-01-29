@@ -110,11 +110,6 @@ class DeferredTechnique {
         updateLightsUniforms()
     }
 
-    fun setLights(lights: List<Light>) {
-        this.lights.addAll(lights)
-        updateLightsUniforms()
-    }
-
     private fun updateLightsUniforms() {
         check(lights.size <= MAX_LIGHTS) { "More lights than defined in shader!" }
         val pointLights = mutableListOf<Light>()

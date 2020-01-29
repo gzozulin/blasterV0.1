@@ -28,6 +28,8 @@ val VECTOR_DOWN = Vector3f(0f, -1f, 0f)
 
 fun radf(degrees: Float) = Math.toRadians(degrees.toDouble()).toFloat()
 fun radf(degrees: Double) = Math.toRadians(degrees).toFloat()
+fun degf(radians: Float) = Math.toDegrees(radians.toDouble()).toFloat()
+fun degf(radians: Double) = Math.toDegrees(radians).toFloat()
 
 fun lerpf(from: Float, to: Float, t: Float) = (1f - t) * from + t * to
 

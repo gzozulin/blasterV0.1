@@ -1,9 +1,7 @@
 package com.blaster.entity
 
-import com.blaster.common.euler3
-import com.blaster.common.quat
-import com.blaster.common.scaleTo
-import com.blaster.common.vec3
+import com.blaster.common.*
+import com.blaster.scene.Controller
 import com.blaster.scene.Node
 import com.blaster.scene.Payload
 
@@ -34,6 +32,15 @@ data class Marker(
             node.setScale(vec3(factor))
         } else if (scale != null) {
             node.setScale(scale)
+        }
+    }
+
+    fun apply(controller: Controller) {
+        controller.position.set(pos)
+        if (euler != null) {
+            controller.pitch = radf(euler.x)
+            controller.yaw = radf(euler.y)
+            controller.roll = radf(euler.z)
         }
     }
 }

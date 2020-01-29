@@ -1,19 +1,4 @@
-building0; pos 0 0 0; bound 10; euler 0 0 0;
-building1; pos 12 0 0; bound 10; euler 0 0 0;
-building2; pos 24 0 0; bound 10; euler 0 0 0;
-building3; pos 36 0 0; bound 10; euler 0 0 0;
-building4; pos 48 0 0; bound 10; euler 0 0 0;
-building5; pos 60 0 0; bound 10; euler 0 0 0;
-building6; pos 72 0 0; bound 10; euler 0 0 0;
-building7; pos 84 0 0; bound 10; euler 0 0 0;
-building8; pos 96 0 0; bound 10; euler 0 0 0;
+camera; pos -7 17 16; euler -40 -50 0;
 
-building9; pos 0 0 -14; bound 10;  euler 0 180 0;
-building10; pos 12 0 -14; bound 10; euler 0 180 0;
-building11; pos 24 0 -14; bound 10; euler 0 180 0;
-building12; pos 36 0 -14; bound 10; euler 0 180 0;
-building13; pos 48 0 -14; bound 10; euler 0 180 0;
-building14; pos 60 0 -14; bound 10; euler 0 180 0;
-building15; pos 72 0 -14; bound 10; euler 0 180 0;
-building16; pos 84 0 -14; bound 10; euler 0 180 0;
-building17; pos 96 0 -14; bound 10; euler 0 180 0;
+teapot0; pos 0 0 0; euler 0 0 0; bound 10;
+teapot1; pos 10 0 0; euler 0 0 0; bound 10;
