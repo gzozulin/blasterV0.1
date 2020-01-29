@@ -58,20 +58,17 @@ fun aabb.depth() = maxZ - minZ
 fun aabb.center() = Vector3f(minX + (maxX - minX) / 2f, minY + (maxY - minY) / 2f, minZ + (maxZ - minZ) / 2f)
 
 fun aabb.scaleTo(to: Float): Float {
-    var factor = Float.MIN_VALUE
-    val wF = to / width()
-    if (wF > factor) {
-        factor = wF
+    var maxSide = Float.MIN_VALUE
+    if (width() > maxSide) {
+        maxSide = width()
     }
-    val wH = to / height()
-    if (wH > factor) {
-        factor = wH
+    if (height() > maxSide) {
+        maxSide = height()
     }
-    val wD = to / depth()
-    if (wD > factor) {
-        factor = wD
+    if (depth() > maxSide) {
+        maxSide = depth()
     }
-    return factor
+    return to / maxSide
 }
 
 // todo: a little bit of parsing inefficiency down there:

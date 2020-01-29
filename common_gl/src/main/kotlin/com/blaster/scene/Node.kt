@@ -5,7 +5,7 @@ import com.blaster.common.*
 class Node<T>(
         private var parent: Node<T>? = null,
         val position: vec3 = vec3(),
-        val rotation: quat = quat(),
+        val rotation: quat = quat().identity(),
         val scale: vec3 = vec3(1f),
         val payload: T? = null) {
 
