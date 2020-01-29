@@ -1,2 +1,4 @@
 building0; pos 0 0 0; bound 10; euler 0 0 0;
-	building1; pos 11; euler 0 0 0;
+building1; pos 11; euler 0 -90 0; scale 0.5;
+	building2; pos 11; euler 0 -90 0; scale 0.5;
+		building3; pos 11; euler 0 -90 0; scale 0.5;

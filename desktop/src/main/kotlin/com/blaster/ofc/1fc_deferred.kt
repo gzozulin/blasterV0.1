@@ -65,7 +65,7 @@ private val window = object : LwjglWindow() {
         val diffuse = texturesLib.loadTexture("models/house/house_diffuse.png")
         model = Model(mesh, diffuse, aabb)
         textTechnique.prepare(shadersLib, texturesLib)
-        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/darkskies")
+        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/hangingstone")
         deferredTechnique.prepare(shadersLib, width, height)
         deferredTechnique.light(Light.SUNLIGHT)
         for (i in 0..16) {

@@ -48,7 +48,7 @@ class Node<T : Payload>(
 
     private fun calculateLocalM(): mat4 {
         if (localVersion.check()) {
-            localM.identity().scale(scale).translate(position).rotate(rotation)
+            localM.translationRotateScale(position, rotation, scale)
         }
         return localM
     }
