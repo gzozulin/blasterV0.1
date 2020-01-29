@@ -43,6 +43,9 @@ private lateinit var camera: Camera
 private val controller = Controller(velocity = 0.3f)
 private val wasd = WasdInput(controller)
 
+private val sunlight = Light(color(0.8f), point = false)
+private val sunlightNode = Node(payload = sunlight).lookAlong(vec3(-1f))
+
 private lateinit var baseModel: Model
 
 private val nodes = mutableMapOf<String, Node<Model>>()
@@ -237,7 +240,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         baseModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
         deferredTechnique.prepare(shadersLib, width, height)
         camera = Camera(width.toFloat() / height.toFloat())
-        //deferredTechnique.light(Light.SUNLIGHT)
+        deferredTechnique.light(sunlight, sunlightNode.calculateM())
         immediateTechnique.prepare(camera)
         textTechnique.prepare(shadersLib, texturesLib)
         skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/gatekeeper")
