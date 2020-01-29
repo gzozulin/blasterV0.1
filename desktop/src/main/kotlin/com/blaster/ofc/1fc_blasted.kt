@@ -237,7 +237,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         baseModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
         deferredTechnique.prepare(shadersLib, width, height)
         camera = Camera(width.toFloat() / height.toFloat())
-        deferredTechnique.light(Light.SUNLIGHT)
+        //deferredTechnique.light(Light.SUNLIGHT)
         immediateTechnique.prepare(camera)
         textTechnique.prepare(shadersLib, texturesLib)
         skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/gatekeeper")

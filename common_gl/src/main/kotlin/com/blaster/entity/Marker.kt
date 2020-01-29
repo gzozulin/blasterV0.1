@@ -3,7 +3,6 @@ package com.blaster.entity
 import com.blaster.common.*
 import com.blaster.scene.Controller
 import com.blaster.scene.Node
-import com.blaster.scene.Payload
 
 // the higher the level of command, the higher is the priority:
 // target >> dir >> euler >> quat >> matrix
@@ -19,7 +18,13 @@ data class Marker(
         val custom: String? = null,
         val children: MutableList<Marker> = mutableListOf()) {
 
-    fun <T : Payload> apply(node: Node<T>) {
+    fun <T> apply(node: Node<T>) {
+        when (node.payload) {
+            is Model -> applyToModel(node as Node<Model>)
+        }
+    }
+
+    private fun applyToModel(node: Node<Model>) {
         node.setPosition(pos)
         when {
             target != null -> node.lookAt(target)

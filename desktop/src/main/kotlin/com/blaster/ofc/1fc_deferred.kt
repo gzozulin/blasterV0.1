@@ -1,10 +1,7 @@
 package com.blaster.ofc
 
 import com.blaster.assets.*
-import com.blaster.common.Console
-import com.blaster.common.mat4
-import com.blaster.common.random
-import com.blaster.common.vec3
+import com.blaster.common.*
 import com.blaster.entity.Light
 import com.blaster.entity.Material
 import com.blaster.entity.Model
@@ -38,6 +35,9 @@ private val wasd = WasdInput(controller)
 
 private lateinit var model: Model
 
+private val sunlight = Light(color(3f), point = false)
+private val sunlightNode = Node(payload = sunlight).lookAlong(vec3(-1f))
+
 private var currentMaterial = 0
 
 private fun nextMaterial() {
@@ -67,13 +67,7 @@ private val window = object : LwjglWindow() {
         textTechnique.prepare(shadersLib, texturesLib)
         skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/hangingstone")
         deferredTechnique.prepare(shadersLib, width, height)
-        deferredTechnique.light(Light.SUNLIGHT)
-        for (i in 0..16) {
-            deferredTechnique.light(Light(
-                    vec3().random(vec3(model.aabb.minX - 1f, model.aabb.minY, model.aabb.minZ),
-                            vec3(model.aabb.maxX + 1f, model.aabb.maxY, model.aabb.maxZ)),
-                    vec3().random(max = Vector3f(2f))))
-        }
+        deferredTechnique.light(sunlight, sunlightNode.calculateM())
     }
 
     private fun tick() {

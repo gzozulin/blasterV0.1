@@ -2,11 +2,7 @@ package com.blaster.scene
 
 import com.blaster.common.*
 
-interface Payload {
-    val aabb: aabb
-}
-
-class Node<T : Payload>(
+class Node<T>(
         private var parent: Node<T>? = null,
         val position: vec3 = vec3(),
         val rotation: quat = quat(),
@@ -98,8 +94,7 @@ class Node<T : Payload>(
     }
 
     fun lookAt(target: vec3): Node<T> {
-        val direction = vec3()
-        target.sub(position, direction)
+        val direction = vec3(target).sub(position)
         rotation.lookAlong(direction, VECTOR_UP)
         localVersion.increment()
         return this

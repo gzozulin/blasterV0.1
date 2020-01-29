@@ -1,6 +1,9 @@
 package com.blaster.techniques
 
 import com.blaster.assets.ShadersLib
+import com.blaster.common.mat3
+import com.blaster.common.mat4
+import com.blaster.common.vec3
 import com.blaster.gl.*
 import com.blaster.scene.Camera
 import com.blaster.entity.Light
@@ -31,7 +34,9 @@ class DeferredTechnique {
 
     private lateinit var depthBuffer: GlRenderBuffer
 
-    private val lights = mutableListOf<Light>()
+    private val lightVectorBuf = vec3()
+    private data class LightData(val light: Light, val modelM: Matrix4f)
+    private val lights = mutableListOf<LightData>()
 
     fun prepare(shadersLib: ShadersLib, width: Int, height: Int) {
         programGeomPass = shadersLib.loadProgram(
@@ -105,17 +110,17 @@ class DeferredTechnique {
         }
     }
 
-    fun light(light: Light) {
-        lights.add(light)
+    fun light(light: Light, modelM: Matrix4f) {
+        lights.add(LightData(light, modelM))
         updateLightsUniforms()
     }
 
     private fun updateLightsUniforms() {
         check(lights.size <= MAX_LIGHTS) { "More lights than defined in shader!" }
-        val pointLights = mutableListOf<Light>()
-        val dirLights = mutableListOf<Light>()
+        val pointLights = mutableListOf<LightData>()
+        val dirLights = mutableListOf<LightData>()
         lights.forEach {
-            if (it.point) {
+            if (it.light.point) {
                 pointLights.add(it)
             } else {
                 dirLights.add(it)
@@ -125,12 +130,15 @@ class DeferredTechnique {
             programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLights.size)
             programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLights.size)
             pointLights.forEachIndexed { index, light ->
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, light.vector)
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, light.intensity)
+                light.modelM.translation(lightVectorBuf)
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, lightVectorBuf)
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, light.light.intensity)
             }
-            dirLights.forEachIndexed { index, light ->
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, light.vector)
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, light.intensity)
+            dirLights.forEachIndexed { index, lightData ->
+                lightData.modelM.getRow(2, lightVectorBuf) // transpose
+                lightVectorBuf.negate() // -Z
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, lightVectorBuf)
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, lightData.light.intensity)
             }
         }
     }
