@@ -15,8 +15,8 @@ data class Marker(
         val bound: Float? = null,
         val dir: vec3? = null,
         val target: vec3? = null,
-        val custom: String? = null,
-        val children: MutableList<Marker> = mutableListOf()) {
+        val custom: List<String>,
+        val children: MutableList<Marker>) {
 
     fun <T> apply(node: Node<T>) {
         when (node.payload) {

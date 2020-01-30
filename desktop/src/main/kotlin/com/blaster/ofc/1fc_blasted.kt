@@ -5,6 +5,8 @@ import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.*
+import com.blaster.editor.SceneDiffer
+import com.blaster.editor.SceneReader
 import com.blaster.entity.Light
 import com.blaster.entity.Marker
 import com.blaster.entity.Material
@@ -20,12 +22,8 @@ import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.SkyboxTechnique
 import com.blaster.techniques.TextTechnique
 import org.lwjgl.glfw.GLFW
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.nio.charset.Charset
-import java.util.regex.Pattern
+import java.lang.IllegalStateException
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
@@ -56,187 +54,89 @@ private var currentScene = listOf<Marker>()
 private var mouseControl = false
 private var showImmediate = true
 
-class SceneDiffer {
-    open class Listener {
-        open fun onRemove(marker: Marker) {}
-        open fun onAdd(marker: Marker) {}
-        open fun onUpdate(marker: Marker) {}
-        open fun onParent(marker: Marker, parent: Marker?) {}
-    }
-
-    fun diff(prevMarkers: List<Marker> = listOf(), nextMarkers: List<Marker>, listener: Listener) {
-        diffInternal(prevMarkers, nextMarkers, listener)
-    }
-
-    private data class ParentToChild(val parent: Marker?, val child: Marker)
-
-    private fun enumerate(parent: Marker?, markers: List<Marker>, parentToChild: MutableList<ParentToChild>) {
-        markers.forEach {
-            parentToChild.add(ParentToChild(parent, it))
-            enumerate(it, it.children, parentToChild)
-        }
-    }
-
-    private fun diffInternal(prevMarkers: List<Marker>, nextMarkers: List<Marker>, listener: Listener) {
-        val parentToChildPrev = mutableListOf<ParentToChild>()
-        enumerate(null, prevMarkers, parentToChildPrev)
-        val parentToChildNext = mutableListOf<ParentToChild>()
-        enumerate(null, nextMarkers, parentToChildNext)
-        parentToChildPrev.forEach { prev ->
-            val found = parentToChildNext.firstOrNull { prev.child.uid == it.child.uid }
-            if (found == null) {
-                listener.onRemove(prev.child)
-            } else {
-                if (found.child != prev.child) {
-                    listener.onUpdate(found.child)
-                }
-                val uidFoundParent = found.parent?.uid
-                val uidPrevParent = prev.parent?.uid
-                if (uidFoundParent != uidPrevParent) {
-                    listener.onParent(found.child, found.parent)
-                }
-            }
-        }
-        parentToChildNext.forEach { next ->
-            val found = parentToChildPrev.firstOrNull { next.child.uid == it.child.uid }
-            if (found == null) {
-                listener.onAdd(next.child)
-                listener.onParent(next.child, next.parent)
-            }
-        }
-    }
-}
-
-// todo: templates by id
-// todo: toLeftOf, toRightOf, toTopOf, toBottomOf, toFrontOf, toBackOf - by aabb (which is always axis aligned)
-// todo: probably, also can have matrix directly?
-// todo: target as a name
-// todo: the rest of the string is custom stuff
-
-private const val START_POS = "pos "
-private const val START_QUAT = "quat "
-private const val START_EULER = "euler "
-private const val START_SCALE = "scale "
-private const val START_BOUND = "bound "
-private const val START_DIR = "dir "
-private const val START_TARGET = "target "
-private const val START_CUSTOM = "custom "
-
-class SceneReader {
-    fun load(sceneStream: InputStream): List<Marker> {
-        val lines = BufferedReader(InputStreamReader(sceneStream, Charset.defaultCharset()))
-                .readLines().toMutableList()
-        return parse(0, lines)
-    }
-
-    private fun peek(input: String): Int {
-        var count = 0
-        while (input[count] == ' ' || input[count] == '\t') {
-            count++
-        }
-        return count
-    }
-
-    private fun parse(depth: Int, remainder: MutableList<String>): List<Marker> {
-        val uids = hashSetOf<String>()
-        val result = mutableListOf<Marker>()
-        loop@ while (remainder.isNotEmpty()) {
-            if (remainder[0].isBlank() || remainder[0].trim().startsWith("//")) {
-                remainder.removeAt(0)
-                continue
-            }
-            val currentDepth = peek(remainder[0])
-            when {
-                currentDepth == depth -> result.add(parseMarker(remainder.removeAt(0), uids))
-                currentDepth > depth -> result.last().children.addAll(parse(currentDepth, remainder))
-                currentDepth < depth -> break@loop
-            }
-        }
-        return result
-    }
-
-    private fun parseMarker(marker: String, uids: MutableSet<String>): Marker {
-        val tokens = marker.trim().split(Pattern.compile(";")).dropLast(1)
-        val uid: String = tokens[0]
-        check(uids.add(uid)) { "Non unique uid: $uid" }
-        var pos: vec3? = null
-        var quat: quat? = null
-        var euler: euler3? = null
-        var scale: vec3? = null
-        var bound: Float? = null
-        var dir: vec3? = null
-        var target: vec3? = null
-        var custom: String? = null
-        tokens.forEachIndexed { index, token ->
-            val trimmed = token.trim()
-            when {
-                trimmed.startsWith(START_POS)    -> pos      = trimmed.removePrefix(START_POS).toVec3()
-                trimmed.startsWith(START_QUAT)   -> quat     = trimmed.removePrefix(START_QUAT).toQuat()
-                trimmed.startsWith(START_EULER)  -> euler    = trimmed.removePrefix(START_EULER).toVec3()
-                trimmed.startsWith(START_SCALE)  -> scale    = trimmed.removePrefix(START_SCALE).toVec3()
-                trimmed.startsWith(START_BOUND)  -> bound    = trimmed.removePrefix(START_BOUND).toFloat()
-                trimmed.startsWith(START_DIR)    -> dir      = trimmed.removePrefix(START_DIR).toVec3()
-                trimmed.startsWith(START_TARGET) -> target   = trimmed.removePrefix(START_TARGET).toVec3()
-                trimmed.startsWith(START_CUSTOM) -> custom   = trimmed.removePrefix(START_CUSTOM)
-                else -> if (index != 0) { fail("Unhandled: $token") }
-            }
-        }
-        return Marker(uid, pos ?: vec3(), euler, quat, scale, bound, dir, target, custom, mutableListOf())
-    }
-}
-
 private val sceneReader = SceneReader()
 private val sceneDiffer = SceneDiffer()
 
-// todo: materials, models, lights and camera
 
-private val sceneListener = object : SceneDiffer.Listener() {
+private val cameraListener = object : SceneDiffer.Listener() {
+    override fun onAdd(marker: Marker) {
+        marker.apply(controller)
+    }
+
+    override fun onUpdate(marker: Marker) {
+        marker.apply(controller)
+    }
+}
+
+private val lightListener = object : SceneDiffer.Listener() {
+
+}
+
+private val teapotListener = object : SceneDiffer.Listener() {
     override fun onRemove(marker: Marker) {
         val node = nodes[marker.uid]!!
         node.detachFromParent()
         nodes.remove(marker.uid)
-        console.info("Marker removed: ${marker.uid}")
     }
 
     override fun onAdd(marker: Marker) {
-        when {
-            marker.uid.startsWith("camera") -> {
-                marker.apply(controller)
-            }
-            else -> {
-                val node = Node(payload = baseModel)
-                marker.apply(node)
-                nodes[marker.uid] = node
-            }
-        }
-        console.info("Marker added: ${marker.uid}")
+        val material = if (marker.custom.isNotEmpty()) Material.MATERIALS.getValue(marker.custom.first()) else Material.CONCRETE
+        val node = Node(payload = baseModel.copy(material = material))
+        marker.apply(node)
+        nodes[marker.uid] = node
     }
 
     override fun onUpdate(marker: Marker) {
-        when {
-            marker.uid.startsWith("camera") -> {
-                marker.apply(controller)
-            }
-            else -> {
-                val node = nodes[marker.uid]!!
-                marker.apply(node)
-            }
-        }
-        console.info("Marker updated: ${marker.uid}")
+        val node = nodes[marker.uid]!!
+        marker.apply(node)
     }
 
     override fun onParent(marker: Marker, parent: Marker?) {
-        if (marker.uid.startsWith("camera")) {
-            return
-        }
         if (parent != null) {
             nodes[parent.uid]!!.attach(nodes[marker.uid]!!)
         } else {
             nodes[marker.uid]!!.detachFromParent()
         }
-        console.info("Marker ${marker.uid} attached to ${parent?.uid}")
     }
 }
+
+private class MultiListener(private val console: Console? = null, private val listeners: Map<String, SceneDiffer.Listener>)
+    : SceneDiffer.Listener() {
+    override fun onRemove(marker: Marker) {
+        getListener(marker).onRemove(marker)
+        console?.info("Marker removed: ${marker.uid}")
+    }
+
+    override fun onUpdate(marker: Marker) {
+        getListener(marker).onUpdate(marker)
+        console?.info("Marker updated: ${marker.uid}")
+    }
+
+    override fun onAdd(marker: Marker) {
+        getListener(marker).onAdd(marker)
+        console?.info("Marker added: ${marker.uid}")
+    }
+
+    override fun onParent(marker: Marker, parent: Marker?) {
+        getListener(marker).onParent(marker, parent)
+        console?.info("Marker ${marker.uid} attached to ${parent?.uid}")
+    }
+
+    private fun getListener(marker: Marker): SceneDiffer.Listener {
+        listeners.forEach {
+            if (marker.uid.startsWith(it.key)) {
+                return it.value
+            }
+        }
+        throw IllegalStateException("Listener is not registered! ${marker.uid}")
+    }
+}
+
+private val sceneListener = MultiListener(console = console, listeners = mapOf(
+        "camera" to cameraListener,
+        "teapot" to teapotListener,
+        "light" to lightListener
+))
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate(width: Int, height: Int) {

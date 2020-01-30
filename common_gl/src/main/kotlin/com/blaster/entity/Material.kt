@@ -35,7 +35,7 @@ data class Material(val ambient: vec3, val diffuse: vec3, val specular: vec3, va
         val WHITE_RUBBER    = Material(vec3(0.05f, 0.05f, 0.05f), vec3(0.5f, 0.5f, 0.5f), vec3(0.7f, 0.7f, 0.7f), 10.0f)
         val YELLOW_RUBBER   = Material(vec3(0.05f, 0.05f, 0.0f), vec3(0.5f, 0.5f, 0.4f), vec3(0.7f, 0.7f, 0.04f), 10.0f)
 
-        val MATERIALS = listOf(
+        val MATERIALS = mapOf(
                 "concrete"        to CONCRETE,
                 "brass"           to BRASS,
                 "bronze"          to BRONZE,

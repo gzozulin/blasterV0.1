@@ -38,22 +38,17 @@ private lateinit var model: Model
 private val sunlight = Light(color(3f), point = false)
 private val sunlightNode = Node(payload = sunlight).lookAlong(vec3(-1f))
 
-private var currentMaterial = 0
+private var materialIterator = Material.MATERIALS.iterator()
+private var currentMaterial = materialIterator.next()
 
 private fun nextMaterial() {
-    currentMaterial++
-    if (currentMaterial == Material.MATERIALS.size) {
-        currentMaterial = 0
+    if (materialIterator.hasNext()) {
+        currentMaterial = materialIterator.next()
+    } else {
+        materialIterator = Material.MATERIALS.iterator()
+        currentMaterial = materialIterator.next()
     }
-    console.success("Material: ${Material.MATERIALS[currentMaterial].first}")
-}
-
-private fun prevMaterial() {
-    currentMaterial--
-    if (currentMaterial < 0) {
-        currentMaterial = Material.MATERIALS.size - 1
-    }
-    console.success("Material: ${Material.MATERIALS[currentMaterial].first}")
+    console.success("Material: ${currentMaterial.key}")
 }
 
 private val window = object : LwjglWindow() {
@@ -86,7 +81,7 @@ private val window = object : LwjglWindow() {
             }
         }
         deferredTechnique.draw(camera) {
-            deferredTechnique.instance(model.mesh, mat4(), model.diffuse, Material.MATERIALS[currentMaterial].second)
+            deferredTechnique.instance(model.mesh, mat4(), model.diffuse, currentMaterial.value)
         }
         GlState.drawWithNoCulling {
             skyboxTechnique.skybox(camera)
@@ -105,7 +100,6 @@ private val window = object : LwjglWindow() {
     override fun keyPressed(key: Int) {
         wasd.keyPressed(key)
         when (key) {
-            GLFW.GLFW_KEY_LEFT_BRACKET -> prevMaterial()
             GLFW.GLFW_KEY_RIGHT_BRACKET -> nextMaterial()
         }
     }
