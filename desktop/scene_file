@@ -1,4 +1,5 @@
-camera; pos -7 17 16; euler -40 -50 0;
+camera; pos 11 21 22; euler -30 -55 0;
 
-teapot0; pos 15; euler 0 0 0; bound 10;
-	teapot1; pos 10 0 0; euler 0 0 0;
+teapot0; bound 10;
+	teapot1; pos 10;
+		teapot2; pos 10;

@@ -8,7 +8,7 @@ data class Version(private var version: Long = 0L, private var last: Long = Long
 
     fun check(): Boolean {
         return if (version != last) {
-            version = last
+            last = version
             true
         }
         else {

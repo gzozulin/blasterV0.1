@@ -9,94 +9,108 @@ class Node<T>(
         val scale: vec3 = vec3(1f),
         val payload: T? = null) {
 
-    private val children: List<Node<T>> = ArrayList()
-    private var graphVersion = Version()
+    private val children = mutableListOf<Node<T>>()
 
-    private val localVersion = Version()
+    private val version = Version()
     private val localM = mat4()
     private val modelM = mat4()
 
-    private fun incrementGraph() {
-        graphVersion.increment()
-        if (parent != null) {
-            parent!!.graphVersion.increment()
-        }
-    }
-
     fun attach(child: Node<T>) {
         if (!children.contains(child)) {
-            (children as ArrayList).add(child)
+            children.add(child)
             child.parent = this
-            incrementGraph()
+            child.version.increment()
         }
     }
 
-    fun detach(child: Node<T>) {
+    private fun detach(child: Node<T>) {
         (children as ArrayList).remove(child)
         child.parent = null
-        incrementGraph()
+        child.version.increment()
     }
 
     fun detachFromParent() {
         parent?.detach(this)
-        incrementGraph()
     }
 
     private fun calculateLocalM(): mat4 {
-        if (localVersion.check()) {
-            localM.translationRotateScale(position, rotation, scale)
+        if (version.check()) {
+            localM.identity().translationRotateScale(position, rotation, scale)
         }
         return localM
     }
 
     fun calculateM(): mat4 {
-        if (parent == null) {
-            return calculateLocalM() // root
+        val p = parent
+        if (p == null) {
+            modelM.set(calculateLocalM()) // root
+        } else {
+            p.calculateM().mul(calculateLocalM(), modelM)
         }
-        calculateLocalM().mul(parent!!.calculateLocalM(), modelM)
         return modelM
     }
 
     fun setPosition(pos: vec3): Node<T> {
         position.set(pos)
-        localVersion.increment()
+        version.increment()
         return this
     }
 
     fun setRotation(rot: quat): Node<T> {
         rotation.set(rot)
-        localVersion.increment()
+        version.increment()
         return this
     }
 
     fun setScale(value: vec3): Node<T> {
         scale.set(value)
-        localVersion.increment()
+        version.increment()
+        return this
+    }
+
+    fun setScale(value: Float): Node<T> {
+        scale.set(value)
+        version.increment()
         return this
     }
 
     fun setEulerDeg(degrees: vec3): Node<T> {
         rotation.identity().rotateXYZ(radf(degrees.x), radf(degrees.y), radf(degrees.z))
-        localVersion.increment()
+        version.increment()
         return this
     }
 
     fun rotate(axis: vec3, angle: Float): Node<T> {
         rotation.rotateAxis(angle, axis)
-        localVersion.increment()
+        version.increment()
         return this
     }
 
     fun lookAlong(direction: vec3): Node<T> {
         rotation.lookAlong(direction, VECTOR_UP)
-        localVersion.increment()
+        version.increment()
         return this
     }
 
     fun lookAt(target: vec3): Node<T> {
         val direction = vec3(target).sub(position)
         rotation.lookAlong(direction, VECTOR_UP)
-        localVersion.increment()
+        version.increment()
         return this
+    }
+
+    fun setDefaultPosition() {
+        position.zero()
+        version.increment()
+    }
+
+    fun setDefaultRotation() {
+        rotation.identity()
+        version.increment()
+    }
+
+    fun setDefaultScale() {
+        scale.set(1f)
+        version.increment()
     }
 }

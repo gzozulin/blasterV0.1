@@ -31,12 +31,12 @@ data class Marker(
             dir != null -> node.lookAlong(dir)
             euler != null -> node.setEulerDeg(euler)
             quat != null -> node.setRotation(quat)
+            else -> node.setDefaultRotation()
         }
-        if (bound != null) {
-            val factor = node.payload!!.aabb.scaleTo(bound)
-            node.setScale(vec3(factor))
-        } else if (scale != null) {
-            node.setScale(scale)
+        when {
+            bound != null -> node.setScale(node.payload!!.aabb.scaleTo(bound))
+            scale != null -> node.setScale(scale)
+            else -> node.setDefaultScale()
         }
     }
 

@@ -6,6 +6,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.VECTOR_UP
 import com.blaster.common.aabb
+import com.blaster.common.vec3
 import com.blaster.entity.Model
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
@@ -39,6 +40,8 @@ private lateinit var camera: Camera
 private val controller = Controller()
 private val wasd = WasdInput(controller)
 
+private val axis = vec3(1f)
+
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
         GlState.apply()
@@ -62,9 +65,9 @@ private val window = object : LwjglWindow() {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
-        node1.rotate(VECTOR_UP, 0.01f)
-        node2.rotate(VECTOR_UP, 0.01f)
-        node3.rotate(VECTOR_UP, 0.01f)
+        node1.rotate(axis, 0.01f)
+        node2.rotate(axis, 0.01f)
+        node3.rotate(axis, 0.01f)
         GlState.clear()
         GlState.drawWithNoCulling {
             simpleTechnique.draw(camera) {

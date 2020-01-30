@@ -37,7 +37,7 @@ private val immediateTechnique = ImmediateTechnique()
 private val textTechnique = TextTechnique()
 private val skyboxTechnique = SkyboxTechnique()
 
-private val console = Console(1000L)
+private val console = Console(5000L)
 
 private lateinit var camera: Camera
 private val controller = Controller(velocity = 0.3f)
@@ -90,7 +90,9 @@ class SceneDiffer {
                 if (found.child != prev.child) {
                     listener.onUpdate(found.child)
                 }
-                if (found.parent != prev.parent) {
+                val uidFoundParent = found.parent?.uid
+                val uidPrevParent = prev.parent?.uid
+                if (uidFoundParent != uidPrevParent) {
                     listener.onParent(found.child, found.parent)
                 }
             }
@@ -224,8 +226,13 @@ private val sceneListener = object : SceneDiffer.Listener() {
     }
 
     override fun onParent(marker: Marker, parent: Marker?) {
+        if (marker.uid.startsWith("camera")) {
+            return
+        }
         if (parent != null) {
             nodes[parent.uid]!!.attach(nodes[marker.uid]!!)
+        } else {
+            nodes[marker.uid]!!.detachFromParent()
         }
         console.info("Marker ${marker.uid} attached to ${parent?.uid}")
     }
@@ -257,10 +264,6 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 console.failure(e.message!!)
             }
             lastUpdate = currentTime
-            console.success(
-                    "Scene reloaded. Cam pos: (%.1f, %.1f, %.1f), euler: (%.1f, %.1f, %.1f)".format(
-                            controller.position.x, controller.position.y, controller.position.z,
-                            degf(controller.pitch), degf(controller.yaw), degf(controller.roll)))
         }
         console.tick()
         controller.apply { position, direction ->
@@ -317,8 +320,11 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun keyPressed(key: Int) {
         wasd.keyPressed(key)
-        if (key == GLFW.GLFW_KEY_ENTER) {
-            showAabb = !showAabb
+        when (key) {
+            GLFW.GLFW_KEY_F1 -> console.success("Cam pos: (%.1f, %.1f, %.1f), euler: (%.1f, %.1f, %.1f)".format(
+                    controller.position.x, controller.position.y, controller.position.z,
+                    degf(controller.pitch), degf(controller.yaw), degf(controller.roll)))
+            GLFW.GLFW_KEY_F2 -> showAabb = !showAabb
         }
     }
 
