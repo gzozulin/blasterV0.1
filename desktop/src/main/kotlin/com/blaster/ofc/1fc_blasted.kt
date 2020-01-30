@@ -54,7 +54,7 @@ private var lastUpdate = 0L
 private var currentScene = listOf<Marker>()
 
 private var mouseControl = false
-private var showAabb = true
+private var showImmediate = true
 
 class SceneDiffer {
     open class Listener {
@@ -279,7 +279,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 textTechnique.text(text, position, scale, color)
             }
         }
-        if (showAabb) {
+        if (showImmediate) {
+            immediateTechnique.marker(camera, vec3(), mat4(),
+                    color1 = color(1f, 0f, 0f), color2 = color(0f, 1f, 0f), color3 = color(0f, 0f, 1f), scale = 5f)
             nodes.values.forEach {
                 immediateTechnique.aabb(camera, it.payload!!.aabb, it.calculateM(), color(1f, 0f, 0f))
             }
@@ -324,7 +326,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             GLFW.GLFW_KEY_F1 -> console.success("Cam pos: (%.1f, %.1f, %.1f), euler: (%.1f, %.1f, %.1f)".format(
                     controller.position.x, controller.position.y, controller.position.z,
                     degf(controller.pitch), degf(controller.yaw), degf(controller.roll)))
-            GLFW.GLFW_KEY_F2 -> showAabb = !showAabb
+            GLFW.GLFW_KEY_F2 -> showImmediate = !showImmediate
         }
     }
 

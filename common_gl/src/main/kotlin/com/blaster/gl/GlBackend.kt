@@ -1,5 +1,6 @@
 package com.blaster.gl
 
+import com.blaster.common.color
 import com.blaster.common.vec3
 import java.nio.ByteBuffer
 
@@ -137,6 +138,7 @@ interface GlBackend {
     fun glMapBufferRange(target: Int, offset: Long, length: Long, access: Int, oldBuffer: ByteBuffer): ByteBuffer
     fun glBegin(mode: Int)
     fun glEnd()
+    fun glColor3f(rgb: color)
     fun glColor3f(r: Float, g: Float, b: Float)
     fun glVertex3f(x: Float, y: Float, z: Float)
     fun glVertex3f(xyz: vec3)

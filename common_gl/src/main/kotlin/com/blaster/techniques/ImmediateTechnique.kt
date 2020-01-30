@@ -23,7 +23,7 @@ class ImmediateTechnique {
         }
     }
 
-    fun aabb(camera: Camera, aabb: AABBf, modelM: mat4, color: Vector3f = Vector3f(1f)) {
+    fun aabb(camera: Camera, aabb: AABBf, modelM: mat4, color: vec3 = vec3(1f)) {
         glCheck {
             backend.glMatrixMode(backend.GL_MODELVIEW)
             val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
@@ -67,6 +67,49 @@ class ImmediateTechnique {
         }
     }
 
-    // todo: draw light
+    fun marker(camera: Camera, center: vec3, modelM: mat4, color1: vec3 = vec3(1f), color2: vec3 = vec3(1f), color3: vec3 = vec3(1f), scale: Float = 1f) {
+        glCheck {
+            backend.glMatrixMode(backend.GL_MODELVIEW)
+            val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
+            modelViewM.get(bufferMat4)
+            backend.glLoadMatrix(bufferMat4)
+            backend.glBegin(backend.GL_LINES)
+
+
+            val start = vec3()
+            val end = vec3()
+
+            start.set(center)
+            start.x -= scale / 2f
+            end.set(center)
+            end.x += scale / 2f
+            backend.glColor3f(color1)
+            backend.glVertex3f(start)
+            backend.glVertex3f(end)
+
+
+            start.set(center)
+            start.y -= scale / 2f
+            end.set(center)
+            end.y += scale / 2f
+            backend.glColor3f(color2)
+            backend.glVertex3f(start)
+            backend.glVertex3f(end)
+
+
+            start.set(center)
+            start.z -= scale / 2f
+            end.set(center)
+            end.z += scale / 2f
+            backend.glColor3f(color3)
+            backend.glVertex3f(start)
+            backend.glVertex3f(end)
+
+            backend.glEnd()
+        }
+    }
+
+
+
     // todo: draw axis
 }
