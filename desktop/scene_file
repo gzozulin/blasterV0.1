@@ -3,3 +3,7 @@ camera; pos 10 8 16; euler -25 -83 0;
 teapot0; pos 0 0 0; bound 10; brass;
 teapot1; pos 10 0 0; bound 10; emerald;
 teapot2; pos 20 0 0; bound 10; ruby;
+
+light0; pos 10; 1 0 0;
+light1; pos 15; 0 1 0;
+light2; pos 20; 0 0 1;

@@ -19,12 +19,6 @@ data class Marker(
         val children: MutableList<Marker>) {
 
     fun <T> apply(node: Node<T>) {
-        when (node.payload) {
-            is Model -> applyToModel(node as Node<Model>)
-        }
-    }
-
-    private fun applyToModel(node: Node<Model>) {
         node.setPosition(pos)
         when {
             target != null -> node.lookAt(target)
@@ -34,7 +28,10 @@ data class Marker(
             else -> node.setDefaultRotation()
         }
         when {
-            bound != null -> node.setScale(node.payload!!.aabb.scaleTo(bound))
+            bound != null -> {
+                val model = node.payload as Model // only applicable to Models
+                node.setScale(model.aabb.scaleTo(bound))
+            }
             scale != null -> node.setScale(scale)
             else -> node.setDefaultScale()
         }

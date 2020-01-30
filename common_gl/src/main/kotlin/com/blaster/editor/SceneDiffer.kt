@@ -1,6 +1,8 @@
 package com.blaster.editor
 
+import com.blaster.common.Console
 import com.blaster.entity.Marker
+import java.lang.IllegalStateException
 
 class SceneDiffer {
     open class Listener {
@@ -50,6 +52,38 @@ class SceneDiffer {
                 listener.onParent(next.child, next.parent)
             }
         }
+    }
+}
+
+class MultiListener(private val console: Console? = null, private val listeners: Map<String, SceneDiffer.Listener>)
+    : SceneDiffer.Listener() {
+    override fun onRemove(marker: Marker) {
+        getListener(marker).onRemove(marker)
+        console?.info("Marker removed: ${marker.uid}")
+    }
+
+    override fun onUpdate(marker: Marker) {
+        getListener(marker).onUpdate(marker)
+        console?.info("Marker updated: ${marker.uid}")
+    }
+
+    override fun onAdd(marker: Marker) {
+        getListener(marker).onAdd(marker)
+        console?.info("Marker added: ${marker.uid}")
+    }
+
+    override fun onParent(marker: Marker, parent: Marker?) {
+        getListener(marker).onParent(marker, parent)
+        console?.info("Marker ${marker.uid} attached to ${parent?.uid}")
+    }
+
+    private fun getListener(marker: Marker): SceneDiffer.Listener {
+        listeners.forEach {
+            if (marker.uid.startsWith(it.key)) {
+                return it.value
+            }
+        }
+        throw IllegalStateException("Listener is not registered! ${marker.uid}")
     }
 }
 

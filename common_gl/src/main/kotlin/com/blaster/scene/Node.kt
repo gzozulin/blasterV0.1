@@ -17,6 +17,7 @@ class Node<T>(
 
     fun attach(child: Node<T>) {
         if (!children.contains(child)) {
+            child.detachFromParent()
             children.add(child)
             child.parent = this
             child.version.increment()

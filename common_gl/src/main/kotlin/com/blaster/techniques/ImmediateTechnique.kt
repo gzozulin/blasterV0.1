@@ -1,5 +1,6 @@
 package com.blaster.techniques
 
+import com.blaster.common.color
 import com.blaster.common.mat4
 import com.blaster.common.vec3
 import com.blaster.gl.GlLocator
@@ -67,18 +68,21 @@ class ImmediateTechnique {
         }
     }
 
-    fun marker(camera: Camera, center: vec3, modelM: mat4, color1: vec3 = vec3(1f), color2: vec3 = vec3(1f), color3: vec3 = vec3(1f), scale: Float = 1f) {
+    fun marker(camera: Camera, modelM: mat4, color: color, scale: Float = 1f) {
+        marker(camera, modelM, color, color, color, scale)
+    }
+
+    fun marker(camera: Camera, modelM: mat4, color1: vec3, color2: vec3, color3: vec3, scale: Float = 1f) {
         glCheck {
             backend.glMatrixMode(backend.GL_MODELVIEW)
             val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
             modelViewM.get(bufferMat4)
             backend.glLoadMatrix(bufferMat4)
             backend.glBegin(backend.GL_LINES)
-
-
+            val center = vec3()
+            modelM.translation(center)
             val start = vec3()
             val end = vec3()
-
             start.set(center)
             start.x -= scale / 2f
             end.set(center)
@@ -86,8 +90,6 @@ class ImmediateTechnique {
             backend.glColor3f(color1)
             backend.glVertex3f(start)
             backend.glVertex3f(end)
-
-
             start.set(center)
             start.y -= scale / 2f
             end.set(center)
@@ -95,8 +97,6 @@ class ImmediateTechnique {
             backend.glColor3f(color2)
             backend.glVertex3f(start)
             backend.glVertex3f(end)
-
-
             start.set(center)
             start.z -= scale / 2f
             end.set(center)
@@ -104,7 +104,6 @@ class ImmediateTechnique {
             backend.glColor3f(color3)
             backend.glVertex3f(start)
             backend.glVertex3f(end)
-
             backend.glEnd()
         }
     }

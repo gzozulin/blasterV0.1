@@ -5,6 +5,7 @@ import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.*
+import com.blaster.editor.MultiListener
 import com.blaster.editor.SceneDiffer
 import com.blaster.editor.SceneReader
 import com.blaster.entity.Light
@@ -43,10 +44,11 @@ private val wasd = WasdInput(controller)
 
 private val sunlight = Light(color(0.8f), point = false)
 private val sunlightNode = Node(payload = sunlight).lookAlong(vec3(-1f))
+private val lightNodes = mutableMapOf<String, Node<Light>>()
 
 private lateinit var baseModel: Model
 
-private val nodes = mutableMapOf<String, Node<Model>>()
+private val teapotNodes = mutableMapOf<String, Node<Model>>()
 
 private var lastUpdate = 0L
 private var currentScene = listOf<Marker>()
@@ -56,7 +58,6 @@ private var showImmediate = true
 
 private val sceneReader = SceneReader()
 private val sceneDiffer = SceneDiffer()
-
 
 private val cameraListener = object : SceneDiffer.Listener() {
     override fun onAdd(marker: Marker) {
@@ -69,66 +70,60 @@ private val cameraListener = object : SceneDiffer.Listener() {
 }
 
 private val lightListener = object : SceneDiffer.Listener() {
+    override fun onRemove(marker: Marker) {
+        val node = lightNodes[marker.uid]!!
+        node.detachFromParent()
+        lightNodes.remove(marker.uid)
+    }
 
+    override fun onAdd(marker: Marker) {
+        val intensity = marker.custom.first().toVec3()
+        val node = Node(payload = Light(intensity, point = true))
+        marker.apply(node)
+        lightNodes[marker.uid] = node
+    }
+
+    override fun onUpdate(marker: Marker) {
+        val node = lightNodes[marker.uid]!!
+        marker.apply(node)
+    }
+
+    override fun onParent(marker: Marker, parent: Marker?) {
+        val node = lightNodes[marker.uid]!!
+        if (parent != null) {
+            lightNodes[parent.uid]!!.attach(node)
+        } else {
+            node.detachFromParent()
+        }
+    }
 }
 
 private val teapotListener = object : SceneDiffer.Listener() {
     override fun onRemove(marker: Marker) {
-        val node = nodes[marker.uid]!!
+        val node = teapotNodes[marker.uid]!!
         node.detachFromParent()
-        nodes.remove(marker.uid)
+        teapotNodes.remove(marker.uid)
     }
 
     override fun onAdd(marker: Marker) {
         val material = if (marker.custom.isNotEmpty()) Material.MATERIALS.getValue(marker.custom.first()) else Material.CONCRETE
         val node = Node(payload = baseModel.copy(material = material))
         marker.apply(node)
-        nodes[marker.uid] = node
+        teapotNodes[marker.uid] = node
     }
 
     override fun onUpdate(marker: Marker) {
-        val node = nodes[marker.uid]!!
+        val node = teapotNodes[marker.uid]!!
         marker.apply(node)
     }
 
     override fun onParent(marker: Marker, parent: Marker?) {
+        val node = teapotNodes[marker.uid]!!
         if (parent != null) {
-            nodes[parent.uid]!!.attach(nodes[marker.uid]!!)
+            teapotNodes[parent.uid]!!.attach(node)
         } else {
-            nodes[marker.uid]!!.detachFromParent()
+            node.detachFromParent()
         }
-    }
-}
-
-private class MultiListener(private val console: Console? = null, private val listeners: Map<String, SceneDiffer.Listener>)
-    : SceneDiffer.Listener() {
-    override fun onRemove(marker: Marker) {
-        getListener(marker).onRemove(marker)
-        console?.info("Marker removed: ${marker.uid}")
-    }
-
-    override fun onUpdate(marker: Marker) {
-        getListener(marker).onUpdate(marker)
-        console?.info("Marker updated: ${marker.uid}")
-    }
-
-    override fun onAdd(marker: Marker) {
-        getListener(marker).onAdd(marker)
-        console?.info("Marker added: ${marker.uid}")
-    }
-
-    override fun onParent(marker: Marker, parent: Marker?) {
-        getListener(marker).onParent(marker, parent)
-        console?.info("Marker ${marker.uid} attached to ${parent?.uid}")
-    }
-
-    private fun getListener(marker: Marker): SceneDiffer.Listener {
-        listeners.forEach {
-            if (marker.uid.startsWith(it.key)) {
-                return it.value
-            }
-        }
-        throw IllegalStateException("Listener is not registered! ${marker.uid}")
     }
 }
 
@@ -141,16 +136,16 @@ private val sceneListener = MultiListener(console = console, listeners = mapOf(
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate(width: Int, height: Int) {
         GlState.apply()
+        camera = Camera(width.toFloat() / height.toFloat())
+        deferredTechnique.prepare(shadersLib, width, height)
+        immediateTechnique.prepare(camera)
+        textTechnique.prepare(shadersLib, texturesLib)
+        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/gatekeeper")
         controller.position.set(vec3(0.5f, 3f, 3f))
         val (mesh, aabb) = meshLib.loadMesh("models/teapot/teapot.obj")
         val diffuse = texturesLib.loadTexture("textures/marble.jpeg")
         baseModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
-        deferredTechnique.prepare(shadersLib, width, height)
-        camera = Camera(width.toFloat() / height.toFloat())
         deferredTechnique.light(sunlight, sunlightNode.calculateM())
-        immediateTechnique.prepare(camera)
-        textTechnique.prepare(shadersLib, texturesLib)
-        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/gatekeeper")
     }
 
     private fun tick() {
@@ -180,14 +175,18 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             }
         }
         if (showImmediate) {
-            immediateTechnique.marker(camera, vec3(), mat4(),
+            immediateTechnique.marker(camera, mat4(),
                     color1 = color(1f, 0f, 0f), color2 = color(0f, 1f, 0f), color3 = color(0f, 0f, 1f), scale = 5f)
-            nodes.values.forEach {
+            teapotNodes.values.forEach {
                 immediateTechnique.aabb(camera, it.payload!!.aabb, it.calculateM(), color(1f, 0f, 0f))
+            }
+            lightNodes.values.forEach {
+                val light = it.payload as Light
+                immediateTechnique.marker(camera, it.calculateM(), light.intensity)
             }
         }
         deferredTechnique.draw(camera) {
-            for (node in nodes.values) {
+            for (node in teapotNodes.values) {
                 val model = node.payload!!
                 deferredTechnique.instance(model.mesh, node.calculateM(), model.diffuse, model.material)
             }
