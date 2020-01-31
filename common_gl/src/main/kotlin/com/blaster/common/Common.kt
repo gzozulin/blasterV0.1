@@ -4,6 +4,8 @@ import org.joml.*
 import java.lang.Math
 import java.util.Random
 import java.util.regex.Pattern
+import kotlin.math.cos
+import kotlin.math.sin
 
 typealias vec3 = Vector3f
 typealias euler3 = Vector3f
@@ -30,6 +32,12 @@ fun radf(degrees: Float) = Math.toRadians(degrees.toDouble()).toFloat()
 fun radf(degrees: Double) = Math.toRadians(degrees).toFloat()
 fun degf(radians: Float) = Math.toDegrees(radians.toDouble()).toFloat()
 fun degf(radians: Double) = Math.toDegrees(radians).toFloat()
+
+fun sinf(value: Float) = sin(value.toDouble()).toFloat()
+fun sinf(value: Double) = sin(value).toFloat()
+
+fun cosf(value: Float) = cos(value.toDouble()).toFloat()
+fun cosf(value: Double) = cos(value).toFloat()
 
 fun lerpf(from: Float, to: Float, t: Float) = (1f - t) * from + t * to
 

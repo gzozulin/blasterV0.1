@@ -37,38 +37,38 @@ teapot28; pos 40 0 60; bound 10; white rubber;
 teapot29; pos 50 0 60; bound 10; yellow rubber;
 
 lightDynamic; 0 0 0;
-	light00; pos 10 5 10; 1 0 0;
-	light01; pos 20 5 10; 0 1 0;
-	light02; pos 30 5 10; 0 0 1;
-	light03; pos 40 5 10; 1 1 0;
-	light04; pos 50 5 10; 0 1 1;
+	light00; pos 10 4 10; 5 0 0;
+	light01; pos 20 4 10; 0 5 0;
+	light02; pos 30 4 10; 0 0 1;
+	light03; pos 40 4 10; 5 5 0;
+	light04; pos 50 4 10; 0 5 1;
 
-	light05; pos 10 5 20; 0 0 1;
-	light06; pos 20 5 20; 1 1 0;
-	light07; pos 30 5 20; 0 1 1;
-	light08; pos 40 5 20; 0 0 1;
-	light09; pos 50 5 20; 1 1 1;
+	light05; pos 10 4 20; 0 0 1;
+	light06; pos 20 4 20; 5 5 0;
+	light07; pos 30 4 20; 0 5 1;
+	light08; pos 40 4 20; 0 0 1;
+	light09; pos 50 4 20; 5 5 1;
 
-	light10; pos 10 5 30; 0 1 0;
-	light11; pos 20 5 30; 0 0 1;
-	light12; pos 30 5 30; 1 1 0;
-	light13; pos 40 5 30; 0 1 1;
-	light14; pos 50 5 30; 0 0 1;
+	light10; pos 10 4 30; 0 5 0;
+	light11; pos 20 4 30; 0 0 5;
+	light12; pos 30 4 30; 5 5 0;
+	light13; pos 40 4 30; 0 5 5;
+	light14; pos 50 4 30; 0 0 5;
 
-	light15; pos 10 5 40; 1 0 0;
-	light16; pos 20 5 40; 0 1 0;
-	light17; pos 30 5 40; 0 0 1;
-	light18; pos 40 5 40; 1 1 0;
-	light19; pos 50 5 40; 0 1 1;
+	light15; pos 10 4 40; 5 0 0;
+	light16; pos 20 4 40; 0 5 0;
+	light17; pos 30 4 40; 0 0 5;
+	light18; pos 40 4 40; 5 5 0;
+	light19; pos 50 4 40; 0 5 5;
 
-	light20; pos 10 5 50; 0 1 0;
-	light21; pos 20 5 50; 0 0 1;
-	light22; pos 30 5 50; 1 1 0;
-	light23; pos 40 5 50; 0 1 1;
-	light24; pos 50 5 50; 0 0 1;
+	light20; pos 10 4 50; 0 5 0;
+	light21; pos 20 4 50; 0 0 5;
+	light22; pos 30 4 50; 5 5 0;
+	light23; pos 40 4 50; 0 5 5;
+	light24; pos 50 4 50; 0 0 5;
 
-	light25; pos 10 5 60; 0 0 1;
-	light26; pos 20 5 60; 1 1 0;
-	light27; pos 30 5 60; 0 1 1;
-	light28; pos 40 5 60; 0 0 1;
-	light29; pos 50 5 60; 1 1 1;
+	light25; pos 10 4 60; 0 0 5;
+	light26; pos 20 4 60; 5 5 0;
+	light27; pos 30 4 60; 0 5 5;
+	light28; pos 40 4 60; 0 0 5;
+	light29; pos 50 4 60; 5 5 5;

@@ -41,7 +41,7 @@ private lateinit var camera: Camera
 private val controller = Controller(velocity = 0.3f)
 private val wasd = WasdInput(controller)
 
-private val sunlight = Light(color(0.8f), point = false)
+private val sunlight = Light(color(0.3f), point = false)
 private val sunlightNode = Node(payload = sunlight).lookAlong(vec3(-1f))
 private val lightNodes = mutableMapOf<String, Node<Light>>()
 
@@ -53,7 +53,7 @@ private var lastUpdate = 0L
 private var currentScene = listOf<Marker>()
 
 private var mouseControl = false
-private var showImmediate = true
+private var showImmediate = false
 
 private val sceneReader = SceneReader()
 private val sceneDiffer = SceneDiffer()
@@ -155,8 +155,11 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         updateLights()
     }
 
+    private var value = 0f
     private fun updateLights() {
-        lightNodes["lightDynamic"]?.setPosition(vec3(0f, randomFloat(0f, 2f), 0f))
+        value += 0.05f
+        val dynamic = lightNodes["lightDynamic"]
+        dynamic?.setPosition(vec3(sinf(value) * 3f, 0f, cosf(value) * 3f))
         val data = mutableListOf<DeferredTechnique.LightData>()
         lightNodes.forEach {
             data.add(DeferredTechnique.LightData(it.value.payload!!, it.value.calculateM()))
@@ -175,7 +178,6 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             } catch (e: Exception) {
                 console.failure(e.message!!)
             }
-            updateLights()
             lastUpdate = currentTime
         }
         console.tick()
@@ -183,6 +185,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+        updateLights()
     }
 
     private fun draw() {
