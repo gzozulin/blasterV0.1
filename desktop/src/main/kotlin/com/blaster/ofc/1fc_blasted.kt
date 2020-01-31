@@ -45,8 +45,7 @@ private val sunlight = Light(color(0.3f), point = false)
 private val sunlightNode = Node(payload = sunlight).lookAlong(vec3(-1f))
 private val lightNodes = mutableMapOf<String, Node<Light>>()
 
-private lateinit var baseModel: Model
-
+private lateinit var teapotModel: Model
 private val teapotNodes = mutableMapOf<String, Node<Model>>()
 
 private var lastUpdate = 0L
@@ -84,8 +83,7 @@ private val lightListener = object : SceneDiffer.Listener() {
     override fun onUpdate(marker: Marker) {
         val node = lightNodes[marker.uid]!!
         marker.apply(node)
-        val light = node.payload as Light
-        light.intensity.set(intensity(marker))
+        node.payload().intensity.set(intensity(marker))
     }
 
     override fun onParent(marker: Marker, parent: Marker?) {
@@ -109,7 +107,7 @@ private val teapotListener = object : SceneDiffer.Listener() {
 
     override fun onAdd(marker: Marker) {
         val material = if (marker.custom.isNotEmpty()) Material.MATERIALS.getValue(marker.custom.first()) else Material.CONCRETE
-        val node = Node(payload = baseModel.copy(material = material))
+        val node = Node(payload = teapotModel.copy(material = material))
         marker.apply(node)
         teapotNodes[marker.uid] = node
     }
@@ -119,8 +117,7 @@ private val teapotListener = object : SceneDiffer.Listener() {
         marker.apply(node)
         val bound = marker.bound
         if (bound != null) {
-            val model = node.payload as Model
-            node.setScale(model.aabb.scaleTo(bound))
+            node.setScale(node.payload().aabb.scaleTo(bound))
         }
     }
 
@@ -151,7 +148,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         controller.position.set(vec3(0.5f, 3f, 3f))
         val (mesh, aabb) = meshLib.loadMesh("models/teapot/teapot.obj")
         val diffuse = texturesLib.loadTexture("textures/marble.jpeg")
-        baseModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
+        teapotModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
         updateLights()
     }
 
@@ -162,7 +159,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         dynamic?.setPosition(vec3(sinf(value) * 3f, 0f, cosf(value) * 3f))
         val data = mutableListOf<DeferredTechnique.LightData>()
         lightNodes.forEach {
-            data.add(DeferredTechnique.LightData(it.value.payload!!, it.value.calculateM()))
+            data.add(DeferredTechnique.LightData(it.value.payload(), it.value.calculateM()))
         }
         deferredTechnique.setLights(data)
         deferredTechnique.light(sunlight, sunlightNode.calculateM())
@@ -190,14 +187,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun draw() {
         GlState.clear()
-        textTechnique.draw {
-            console.render { position, text, color, scale ->
-                textTechnique.text(text, position, scale, color)
-            }
-        }
         deferredTechnique.draw(camera) {
             for (node in teapotNodes.values) {
-                val model = node.payload!!
+                val model = node.payload()
                 deferredTechnique.instance(model.mesh, node.calculateM(), model.diffuse, model.material)
             }
         }
@@ -209,12 +201,16 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 immediateTechnique.marker(camera, mat4(),
                         color1 = color(1f, 0f, 0f), color2 = color(0f, 1f, 0f), color3 = color(0f, 0f, 1f), scale = 5f)
                 teapotNodes.values.forEach {
-                    immediateTechnique.aabb(camera, it.payload!!.aabb, it.calculateM(), color(1f, 0f, 0f))
+                    immediateTechnique.aabb(camera, it.payload().aabb, it.calculateM(), color(1f, 0f, 0f))
                 }
                 lightNodes.values.forEach {
-                    val light = it.payload as Light
-                    immediateTechnique.marker(camera, it.calculateM(), light.intensity)
+                    immediateTechnique.marker(camera, it.calculateM(), it.payload().intensity)
                 }
+            }
+        }
+        textTechnique.draw {
+            console.render { position, text, color, scale ->
+                textTechnique.text(text, position, scale, color)
             }
         }
     }

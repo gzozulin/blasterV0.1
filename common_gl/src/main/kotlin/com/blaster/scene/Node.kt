@@ -7,13 +7,15 @@ class Node<T>(
         val position: vec3 = vec3(),
         val rotation: quat = quat().identity(),
         val scale: vec3 = vec3(1f),
-        val payload: T? = null) {
+        private val payload: T? = null) {
 
     private val children = mutableListOf<Node<T>>()
 
     private val version = Version()
     private val localM = mat4()
     private val modelM = mat4()
+
+    fun payload() = payload!!
 
     fun attach(child: Node<T>) {
         if (!children.contains(child)) {
