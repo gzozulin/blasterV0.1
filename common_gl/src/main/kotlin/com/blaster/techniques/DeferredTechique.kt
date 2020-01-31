@@ -34,8 +34,8 @@ class DeferredTechnique {
 
     private lateinit var depthBuffer: GlRenderBuffer
 
+    data class LightData(val light: Light, val modelM: Matrix4f)
     private val lightVectorBuf = vec3()
-    private data class LightData(val light: Light, val modelM: Matrix4f)
     private val lights = mutableListOf<LightData>()
 
     fun prepare(shadersLib: ShadersLib, width: Int, height: Int) {
@@ -115,6 +115,12 @@ class DeferredTechnique {
         updateLightsUniforms()
     }
 
+    fun setLights(data: List<LightData>) {
+        lights.clear()
+        lights.addAll(data)
+        updateLightsUniforms()
+    }
+
     private fun updateLightsUniforms() {
         check(lights.size <= MAX_LIGHTS) { "More lights than defined in shader!" }
         val pointLights = mutableListOf<LightData>()
@@ -129,10 +135,10 @@ class DeferredTechnique {
         glBind(programLightPass) {
             programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLights.size)
             programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLights.size)
-            pointLights.forEachIndexed { index, light ->
-                light.modelM.translation(lightVectorBuf)
+            pointLights.forEachIndexed { index, lightData ->
+                lightData.modelM.getColumn(3, lightVectorBuf)
                 programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, lightVectorBuf)
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, light.light.intensity)
+                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, lightData.light.intensity)
             }
             dirLights.forEachIndexed { index, lightData ->
                 lightData.modelM.getRow(2, lightVectorBuf) // transpose

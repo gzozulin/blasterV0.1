@@ -76,8 +76,7 @@ private val lightListener = object : SceneDiffer.Listener() {
     }
 
     override fun onAdd(marker: Marker) {
-        val intensity = marker.custom.first().toVec3()
-        val node = Node(payload = Light(intensity, point = true))
+        val node = Node(payload = Light(intensity(marker), point = true))
         marker.apply(node)
         lightNodes[marker.uid] = node
     }
@@ -85,6 +84,8 @@ private val lightListener = object : SceneDiffer.Listener() {
     override fun onUpdate(marker: Marker) {
         val node = lightNodes[marker.uid]!!
         marker.apply(node)
+        val light = node.payload as Light
+        light.intensity.set(intensity(marker))
     }
 
     override fun onParent(marker: Marker, parent: Marker?) {
@@ -95,6 +96,8 @@ private val lightListener = object : SceneDiffer.Listener() {
             node.detachFromParent()
         }
     }
+
+    private fun intensity(marker: Marker) = marker.custom.first().toVec3()
 }
 
 private val teapotListener = object : SceneDiffer.Listener() {
@@ -114,6 +117,11 @@ private val teapotListener = object : SceneDiffer.Listener() {
     override fun onUpdate(marker: Marker) {
         val node = teapotNodes[marker.uid]!!
         marker.apply(node)
+        val bound = marker.bound
+        if (bound != null) {
+            val model = node.payload as Model
+            node.setScale(model.aabb.scaleTo(bound))
+        }
     }
 
     override fun onParent(marker: Marker, parent: Marker?) {
@@ -144,6 +152,16 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         val (mesh, aabb) = meshLib.loadMesh("models/teapot/teapot.obj")
         val diffuse = texturesLib.loadTexture("textures/marble.jpeg")
         baseModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
+        updateLights()
+    }
+
+    private fun updateLights() {
+        lightNodes["lightDynamic"]?.setPosition(vec3(0f, randomFloat(0f, 2f), 0f))
+        val data = mutableListOf<DeferredTechnique.LightData>()
+        lightNodes.forEach {
+            data.add(DeferredTechnique.LightData(it.value.payload!!, it.value.calculateM()))
+        }
+        deferredTechnique.setLights(data)
         deferredTechnique.light(sunlight, sunlightNode.calculateM())
     }
 
@@ -157,6 +175,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             } catch (e: Exception) {
                 console.failure(e.message!!)
             }
+            updateLights()
             lastUpdate = currentTime
         }
         console.tick()

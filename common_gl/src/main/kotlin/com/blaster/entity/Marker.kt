@@ -28,10 +28,6 @@ data class Marker(
             else -> node.setDefaultRotation()
         }
         when {
-            bound != null -> {
-                val model = node.payload as Model // only applicable to Models
-                node.setScale(model.aabb.scaleTo(bound))
-            }
             scale != null -> node.setScale(scale)
             else -> node.setDefaultScale()
         }
