@@ -24,7 +24,6 @@ import com.blaster.techniques.SkyboxTechnique
 import com.blaster.techniques.TextTechnique
 import org.lwjgl.glfw.GLFW
 import java.io.File
-import java.lang.IllegalStateException
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
@@ -174,17 +173,6 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 textTechnique.text(text, position, scale, color)
             }
         }
-        if (showImmediate) {
-            immediateTechnique.marker(camera, mat4(),
-                    color1 = color(1f, 0f, 0f), color2 = color(0f, 1f, 0f), color3 = color(0f, 0f, 1f), scale = 5f)
-            teapotNodes.values.forEach {
-                immediateTechnique.aabb(camera, it.payload!!.aabb, it.calculateM(), color(1f, 0f, 0f))
-            }
-            lightNodes.values.forEach {
-                val light = it.payload as Light
-                immediateTechnique.marker(camera, it.calculateM(), light.intensity)
-            }
-        }
         deferredTechnique.draw(camera) {
             for (node in teapotNodes.values) {
                 val model = node.payload!!
@@ -193,6 +181,19 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         }
         GlState.drawWithNoCulling {
             skyboxTechnique.skybox(camera)
+        }
+        if (showImmediate) {
+            GlState.drawWithNoDepth {
+                immediateTechnique.marker(camera, mat4(),
+                        color1 = color(1f, 0f, 0f), color2 = color(0f, 1f, 0f), color3 = color(0f, 0f, 1f), scale = 5f)
+                teapotNodes.values.forEach {
+                    immediateTechnique.aabb(camera, it.payload!!.aabb, it.calculateM(), color(1f, 0f, 0f))
+                }
+                lightNodes.values.forEach {
+                    val light = it.payload as Light
+                    immediateTechnique.marker(camera, it.calculateM(), light.intensity)
+                }
+            }
         }
     }
 
