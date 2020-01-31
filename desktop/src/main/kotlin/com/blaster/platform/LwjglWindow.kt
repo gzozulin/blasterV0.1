@@ -98,12 +98,13 @@ abstract class LwjglWindow(
             onTick()
             glfwSwapBuffers(window)
             glfwPollEvents()
-            fps++
             val current = System.currentTimeMillis()
             if (current - last > 1000L) {
                 glfwSetWindowTitle(window, "Blaster! $fps fps")
                 last = current
                 fps = 0
+            } else {
+                fps++
             }
         }
         glfwDestroyWindow(window)
