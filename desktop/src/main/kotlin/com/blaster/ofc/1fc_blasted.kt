@@ -139,20 +139,19 @@ private val sceneListener = MultiListener(console = console, listeners = mapOf(
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate(width: Int, height: Int) {
-        GlState.apply()
+        GlState.apply(width, height)
         camera = Camera(width.toFloat() / height.toFloat())
         deferredTechnique.prepare(shadersLib, width, height)
         immediateTechnique.prepare(camera)
         textTechnique.prepare(shadersLib, texturesLib)
         skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/gatekeeper")
-        controller.position.set(vec3(0.5f, 3f, 3f))
         val (mesh, aabb) = meshLib.loadMesh("models/teapot/teapot.obj")
         val diffuse = texturesLib.loadTexture("textures/marble.jpeg")
         teapotModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
     }
 
     override fun onResize(width: Int, height: Int) {
-        GlState.apply()
+        GlState.apply(width, height)
         camera.setPerspective(width.toFloat() / height.toFloat())
         deferredTechnique.prepare(shadersLib, width, height)
         immediateTechnique.prepare(camera)

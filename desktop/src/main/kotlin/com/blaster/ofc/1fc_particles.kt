@@ -149,7 +149,7 @@ private val window = object : LwjglWindow() {
         smokeDiffuse = texturesLib.loadTexture("textures/smoke.png")
         smokeDiffuse2 = texturesLib.loadTexture("textures/smoke.png", mirror = true)
         console.info("Textures loaded..")
-        GlState.apply(color = Vector3f())
+        GlState.apply(width, height, color = Vector3f())
         console.success("All ready..")
     }
 

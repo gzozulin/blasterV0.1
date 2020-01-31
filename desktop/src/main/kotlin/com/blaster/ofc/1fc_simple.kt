@@ -44,7 +44,7 @@ private val axis = vec3(1f)
 
 private val window = object : LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
-        GlState.apply()
+        GlState.apply(width, height)
         camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0f, 0f, 3f))
         simpleTechnique.prepare(shadersLib)

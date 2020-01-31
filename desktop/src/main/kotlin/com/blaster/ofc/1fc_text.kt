@@ -23,7 +23,7 @@ private val random = Random()
 private val window = object : LwjglWindow(800, 600) {
     override fun onCreate(width: Int, height: Int) {
         technique.prepare(shadersLib, textureLib)
-        GlState.apply()
+        GlState.apply(width, height)
     }
 
     override fun onResize(width: Int, height: Int) {

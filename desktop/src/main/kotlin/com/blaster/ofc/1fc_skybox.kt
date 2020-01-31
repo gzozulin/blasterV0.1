@@ -25,7 +25,7 @@ private val skyboxTechnique = SkyboxTechnique()
 
 private val window = object: LwjglWindow() {
     override fun onCreate(width: Int, height: Int) {
-        GlState.apply()
+        GlState.apply(width, height)
         camera = Camera(width.toFloat() / height.toFloat())
         skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/darkskies")
     }

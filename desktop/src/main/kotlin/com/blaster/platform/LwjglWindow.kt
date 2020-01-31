@@ -13,7 +13,6 @@ import org.lwjgl.system.MemoryUtil.NULL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-// todo: on resize
 abstract class LwjglWindow(
         private val width: Int = 1024, private val height: Int = 768,
         private val fullWidth: Int = 1920, private val fullHeight: Int = 1080,
@@ -95,6 +94,17 @@ abstract class LwjglWindow(
         lastCursorPos.set(currentPos)
     }
 
+    private fun updateFps() {
+        val current = System.currentTimeMillis()
+        if (current - last > 1000L) {
+            glfwSetWindowTitle(window, "Blaster! $fps fps")
+            last = current
+            fps = 0
+        } else {
+            fps++
+        }
+    }
+
     fun show() {
         glfwSetErrorCallback(errorCallback)
         check(glfwInit() == GL11.GL_TRUE)
@@ -105,14 +115,7 @@ abstract class LwjglWindow(
             onTick()
             glfwSwapBuffers(window)
             glfwPollEvents()
-            val current = System.currentTimeMillis()
-            if (current - last > 1000L) {
-                glfwSetWindowTitle(window, "Blaster! $fps fps")
-                last = current
-                fps = 0
-            } else {
-                fps++
-            }
+            updateFps()
         }
         glfwDestroyWindow(window)
         keyCallback.release()
@@ -122,10 +125,7 @@ abstract class LwjglWindow(
         val new = if (isFullscreen) {
             glfwCreateWindow(fullWidth, fullHeight, "Blaster!", glfwGetPrimaryMonitor(), window)
         } else {
-            val wnd = glfwCreateWindow(width, height, "Blaster!", NULL, window)
-            val videoMode = glfwGetVideoMode(glfwGetPrimaryMonitor())
-            glfwSetWindowPos(wnd, (GLFWvidmode.width(videoMode) - width) / 2, (GLFWvidmode.height(videoMode) - height) / 2)
-            wnd
+            glfwCreateWindow(width, height, "Blaster!", NULL, window)
         }
         if (isHoldingCursor) {
             glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)

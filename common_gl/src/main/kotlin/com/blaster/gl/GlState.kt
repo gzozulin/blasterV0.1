@@ -38,7 +38,8 @@ class GlState private constructor() {
             enableCulling()
         }
 
-        fun apply(color: Vector3f = Vector3f(0.9f, 9.9f, 1f)) {
+        fun apply(width: Int, height: Int, color: Vector3f = Vector3f(0.9f, 9.9f, 1f)) {
+            glCheck { backend.glViewport(0, 0, width, height) }
             glCheck { backend.glClearColor(color.x, color.y, color.z, 0f) }
             enableDepthTest()
             enableCulling()
