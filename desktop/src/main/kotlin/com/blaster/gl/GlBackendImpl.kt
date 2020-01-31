@@ -85,6 +85,7 @@ class GlBackendImpl : GlBackend {
     override fun glBufferData(target: Int, data: ByteBuffer, usage: Int) =
             GL15.glBufferData(target, data, usage)
     override fun glGenFramebuffers() = ARBFramebufferObject.glGenFramebuffers()
+    override fun glDeleteFramebuffers(handle: Int) = ARBFramebufferObject.glDeleteFramebuffers(handle)
     override fun glBindFramebuffer(target: Int, framebuffer: Int) =
             ARBFramebufferObject.glBindFramebuffer(target, framebuffer)
     override fun glFramebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int) =
@@ -134,11 +135,13 @@ class GlBackendImpl : GlBackend {
     override fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: ByteBuffer) =
             GL20.glUniformMatrix4fv(location, count, transpose, value)
     override fun glGenRenderbuffers() = GL30.glGenRenderbuffers()
+    override fun glDeleteRenderBuffers(handle: Int) = GL30.glDeleteRenderbuffers(handle)
     override fun glBindRenderbuffer(target: Int, renderbuffer: Int) =
             GL30.glBindRenderbuffer(target, renderbuffer)
     override fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int) =
             GL30.glRenderbufferStorage(target, internalformat, width, height)
     override fun glGenTextures() = GL11.glGenTextures()
+    override fun glDeleteTextures(handle: Int) = GL11.glDeleteTextures(handle)
     override fun glBindTexture(target: Int, texture: Int) = GL11.glBindTexture(target, texture)
     override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?) =
         GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)

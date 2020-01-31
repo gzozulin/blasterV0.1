@@ -17,7 +17,7 @@ class SkyboxTechnique {
     private lateinit var diffuse: GlTexture
     private lateinit var cube: Mesh
 
-    fun prepare(shadersLib: ShadersLib, textureLib: TexturesLib, meshLib: MeshLib, skybox: String) {
+    fun create(shadersLib: ShadersLib, textureLib: TexturesLib, meshLib: MeshLib, skybox: String) {
         program = shadersLib.loadProgram("shaders/skybox/skybox.vert", "shaders/skybox/skybox.frag")
         diffuse = textureLib.loadSkybox(skybox)
         val (mesh, _) = meshLib.loadMesh("models/cube/cube.obj")

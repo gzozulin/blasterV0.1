@@ -52,20 +52,22 @@ private fun nextMaterial() {
 }
 
 private val window = object : LwjglWindow() {
-    override fun onCreate(width: Int, height: Int) {
-        GlState.apply(width, height)
-        camera = Camera(width.toFloat() / height.toFloat())
+    override fun onCreate() {
+        camera = Camera()
         controller.position.set(Vector3f(0.5f, 3f, 3f))
         val (mesh, aabb) = meshLib.loadMesh("models/house/low.obj")
         val diffuse = texturesLib.loadTexture("models/house/house_diffuse.png")
         model = Model(mesh, diffuse, aabb)
-        textTechnique.prepare(shadersLib, texturesLib)
-        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/hangingstone")
-        deferredTechnique.prepare(shadersLib, width, height)
+        textTechnique.create(shadersLib, texturesLib)
+        skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/hangingstone")
+        deferredTechnique.create(shadersLib)
         deferredTechnique.light(sunlight, sunlightNode.calculateM())
     }
 
     override fun onResize(width: Int, height: Int) {
+        GlState.apply(width, height)
+        deferredTechnique.resize(width, height)
+        // cam
         TODO()
     }
 

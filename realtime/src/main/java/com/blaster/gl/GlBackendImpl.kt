@@ -3,6 +3,7 @@ package com.blaster.gl
 import android.opengl.GLES11
 import android.opengl.GLES30
 import android.opengl.GLU
+import com.blaster.common.color
 import com.blaster.common.vec3
 import java.nio.ByteBuffer
 
@@ -32,6 +33,10 @@ class GlBackendImpl : GlBackend {
 
     override fun glEnable(cap: Int) = GLES30.glEnable(cap)
     override fun glDisable(cap: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glDepthFunc(func: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
@@ -173,6 +178,10 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_RGBA
     override val GL_TEXTURE_2D: Int
         get() = GLES30.GL_TEXTURE_2D
+    override val GL_TEXTURE_CUBE_MAP: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_TEXTURE_CUBE_MAP_POSITIVE_X: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_TEXTURE0: Int
         get() = GLES30.GL_TEXTURE0
     override val GL_TEXTURE_MIN_FILTER: Int
@@ -185,8 +194,12 @@ class GlBackendImpl : GlBackend {
         get() = GLES30.GL_TEXTURE_WRAP_S
     override val GL_TEXTURE_WRAP_T: Int
         get() = GLES30.GL_TEXTURE_WRAP_T
+    override val GL_TEXTURE_WRAP_R: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_REPEAT: Int
         get() = GLES30.GL_REPEAT
+    override val GL_CLAMP_TO_EDGE: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override val GL_UNSIGNED_BYTE: Int
         get() = GLES30.GL_UNSIGNED_BYTE
@@ -224,6 +237,8 @@ class GlBackendImpl : GlBackend {
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_SRC_ALPHA: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_LEQUAL: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_ONE_MINUS_SRC_ALPHA: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_MODELVIEW: Int
@@ -260,6 +275,10 @@ class GlBackendImpl : GlBackend {
     }
 
     override fun glEnd() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glColor3f(rgb: color) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 

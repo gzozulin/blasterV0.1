@@ -76,6 +76,7 @@ abstract class LwjglWindow(
     fun switchFullscreen() {
         isFullscreen = !isFullscreen
         createWindow()
+        onResize(screenWidth, screenHeight)
     }
 
     private fun updateCursor(window: Long) {
@@ -109,7 +110,8 @@ abstract class LwjglWindow(
         glfwSetErrorCallback(errorCallback)
         check(glfwInit() == GL11.GL_TRUE)
         createWindow()
-        onCreate(screenWidth, screenHeight)
+        onCreate()
+        onResize(screenWidth, screenHeight)
         while (glfwWindowShouldClose(window) == GL11.GL_FALSE) {
             updateCursor(window)
             onTick()
@@ -143,7 +145,7 @@ abstract class LwjglWindow(
         glfwShowWindow(new)
     }
 
-    protected abstract fun onCreate(width: Int, height: Int)
+    protected abstract fun onCreate()
     protected abstract fun onResize(width: Int, height: Int)
     protected abstract fun onTick()
 

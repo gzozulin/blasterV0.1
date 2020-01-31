@@ -16,7 +16,7 @@ private val backend = GlLocator.locate()
 class ImmediateTechnique {
     private val bufferMat4 = ByteBuffer.allocateDirect(16 * 4).order(ByteOrder.nativeOrder())
 
-    fun prepare(camera: Camera) {
+    fun resize(camera: Camera) {
         glCheck {
             backend.glMatrixMode(backend.GL_PROJECTION)
             camera.projectionM.get(bufferMat4)

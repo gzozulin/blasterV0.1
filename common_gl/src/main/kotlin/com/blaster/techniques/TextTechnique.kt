@@ -12,7 +12,7 @@ class TextTechnique {
     private lateinit var font: GlTexture
     private lateinit var rect: Mesh
 
-    fun prepare(shadersLib: ShadersLib, textureLib: TexturesLib) {
+    fun create(shadersLib: ShadersLib, textureLib: TexturesLib) {
         program = shadersLib.loadProgram("shaders/text/text.vert", "shaders/text/text.frag")
         font = textureLib.loadTexture("textures/font.png")
         rect = Mesh.rect()

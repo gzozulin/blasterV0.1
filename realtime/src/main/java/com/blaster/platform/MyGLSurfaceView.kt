@@ -1,21 +1,11 @@
 package com.blaster.platform
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.opengl.GLSurfaceView
 import android.util.AttributeSet
-import com.blaster.assets.PixelDecoder
-import com.blaster.renderers.DeferredRenderer
-import com.blaster.renderers.SimpleRenderer
-import java.io.InputStream
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
 class MyGLSurfaceView(context: Context?, attrs: AttributeSet?) : GLSurfaceView(context, attrs) {
-    private val pixelDecoder = object : PixelDecoder() {
+    /*private val pixelDecoder = object : PixelDecoder() {
         override fun decodePixels(inputStream: InputStream): Decoded {
             val options = BitmapFactory.Options()
             options.inPreferredConfig = Bitmap.Config.ARGB_8888
@@ -29,7 +19,7 @@ class MyGLSurfaceView(context: Context?, attrs: AttributeSet?) : GLSurfaceView(c
     }
 
     private val simple = object : Renderer {
-        private val renderer = SimpleRenderer(pixelDecoder)
+        //private val renderer = SimpleRenderer(pixelDecoder)
 
         override fun onDrawFrame(gl: GL10?) {
             renderer.onDraw()
@@ -64,5 +54,5 @@ class MyGLSurfaceView(context: Context?, attrs: AttributeSet?) : GLSurfaceView(c
         setEGLContextClientVersion(2)
         //setRenderer(simple)
         setRenderer(deferred)
-    }
+    }*/
 }

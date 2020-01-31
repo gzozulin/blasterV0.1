@@ -95,6 +95,7 @@ interface GlBackend {
     fun glBindBuffer(target: Int, buffer: Int)
     fun glBufferData(target: Int, data: ByteBuffer, usage: Int)
     fun glGenFramebuffers(): Int
+    fun glDeleteFramebuffers(handle: Int)
     fun glBindFramebuffer(target: Int, framebuffer: Int)
     fun glFramebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int)
     fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int)
@@ -126,9 +127,11 @@ interface GlBackend {
     fun glUniform3fv(location: Int, v: ByteBuffer)
     fun glUniformMatrix4fv(location: Int, count: Int, transpose: Boolean, value: ByteBuffer)
     fun glGenRenderbuffers() : Int
+    fun glDeleteRenderBuffers(handle: Int)
     fun glBindRenderbuffer(target: Int, renderbuffer: Int)
     fun glRenderbufferStorage(target: Int, internalformat: Int, width: Int, height: Int)
     fun glGenTextures(): Int
+    fun glDeleteTextures(handle: Int)
     fun glBindTexture(target: Int, texture: Int)
     fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?)
     fun glTexParameteri(target: Int, pname: Int, param: Int)

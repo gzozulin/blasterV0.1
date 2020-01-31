@@ -134,14 +134,14 @@ private fun updateSmoke(particle: Particle): Boolean {
 }
 
 private val window = object : LwjglWindow() {
-    override fun onCreate(width: Int, height: Int) {
-        camera = Camera(width.toFloat() / height.toFloat())
+    override fun onCreate() {
+        //camera = Camera(width.toFloat() / height.toFloat())
         controller.position.set(Vector3f(0f, 0f, 3f))
         console.info("Controller set..")
         billboardsTechnique.prepare(shadersLib)
         console.info("Particles ready..")
-        textTechnique.prepare(shadersLib, texturesLib)
-        immediateTechnique.prepare(camera)
+        textTechnique.create(shadersLib, texturesLib)
+        immediateTechnique.resize(camera)
         console.info("Techniques ready..")
         snowflakeDiffuse = texturesLib.loadTexture("textures/snowflake.png")
         flameDiffuse = texturesLib.loadTexture("textures/flame.png")
@@ -149,7 +149,7 @@ private val window = object : LwjglWindow() {
         smokeDiffuse = texturesLib.loadTexture("textures/smoke.png")
         smokeDiffuse2 = texturesLib.loadTexture("textures/smoke.png", mirror = true)
         console.info("Textures loaded..")
-        GlState.apply(width, height, color = Vector3f())
+        //GlState.apply(width, height, color = Vector3f())
         console.success("All ready..")
     }
 

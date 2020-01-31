@@ -37,7 +37,7 @@ private val skyboxTechnique = SkyboxTechnique()
 
 private val console = Console(5000L)
 
-private lateinit var camera: Camera
+private val camera = Camera()
 private val controller = Controller(velocity = 0.3f)
 private val wasd = WasdInput(controller)
 
@@ -138,13 +138,10 @@ private val sceneListener = MultiListener(console = console, listeners = mapOf(
 ))
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
-    override fun onCreate(width: Int, height: Int) {
-        GlState.apply(width, height)
-        camera = Camera(width.toFloat() / height.toFloat())
-        deferredTechnique.prepare(shadersLib, width, height)
-        immediateTechnique.prepare(camera)
-        textTechnique.prepare(shadersLib, texturesLib)
-        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/gatekeeper")
+    override fun onCreate() {
+        deferredTechnique.create(shadersLib)
+        textTechnique.create(shadersLib, texturesLib)
+        skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/gatekeeper")
         val (mesh, aabb) = meshLib.loadMesh("models/teapot/teapot.obj")
         val diffuse = texturesLib.loadTexture("textures/marble.jpeg")
         teapotModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
@@ -153,8 +150,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onResize(width: Int, height: Int) {
         GlState.apply(width, height)
         camera.setPerspective(width.toFloat() / height.toFloat())
-        deferredTechnique.prepare(shadersLib, width, height)
-        immediateTechnique.prepare(camera)
+        deferredTechnique.resize(width, height)
+        immediateTechnique.resize(camera)
     }
 
     private var value = 0f

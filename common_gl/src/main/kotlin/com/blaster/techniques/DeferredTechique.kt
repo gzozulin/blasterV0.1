@@ -13,7 +13,6 @@ private val backend = GlLocator.locate()
 
 const val MAX_LIGHTS = 128
 
-// todo: transparency from material
 class DeferredTechnique {
     private lateinit var programGeomPass: GlProgram
     private lateinit var programLightPass: GlProgram
@@ -36,7 +35,7 @@ class DeferredTechnique {
     private val lightVectorBuf = vec3()
     private val lights = mutableListOf<LightData>()
 
-    private fun createShaders(shadersLib: ShadersLib) {
+    fun create(shadersLib: ShadersLib) {
         programGeomPass = shadersLib.loadProgram(
                 "shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram(
@@ -44,8 +43,17 @@ class DeferredTechnique {
         quadMesh = Mesh.rect()
     }
 
-    private fun createBuffers(width: Int, height: Int) {
-        // todo: delete previous
+    fun resize(width: Int, height: Int) {
+        if (::framebuffer.isInitialized) {
+            framebuffer.free()
+            positionStorage.free()
+            normalStorage.free()
+            diffuseStorage.free()
+            matAmbShineStorage.free()
+            matDiffTranspStorage.free()
+            matSpecularStorage.free()
+            depthBuffer.free()
+        }
         positionStorage = GlTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,
@@ -94,14 +102,6 @@ class DeferredTechnique {
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_DIFF_TRANSP, matDiffTranspStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_SPECULAR, matSpecularStorage)
         }
-    }
-
-    fun prepare(shadersLib: ShadersLib, width: Int, height: Int) {
-        if (!::programGeomPass.isInitialized && !::programLightPass.isInitialized) {
-            createShaders(shadersLib)
-        }
-        // todo: remove previous before creating new ones
-        createBuffers(width, height)
     }
 
     fun draw(camera: Camera, draw: () -> Unit) {

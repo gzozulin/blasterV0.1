@@ -7,9 +7,8 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 
 // todo: attach to node
-class Camera(aspectRatio: Float) {
-    val projectionM: mat4 =
-            mat4().identity().perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 0.1f, 1000f)
+class Camera() {
+    val projectionM: mat4 = mat4()
 
     val position: vec3 = vec3()
     val rotation: quat = quat()

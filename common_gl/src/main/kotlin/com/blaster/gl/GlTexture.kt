@@ -5,10 +5,11 @@ import java.nio.ByteBuffer
 private val backend = GlLocator.locate()
 
 class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GLBindable {
-    val handle: Int = glCheck { backend.glGenTextures() }
+    var handle: Int? = null
 
     init {
-        check(handle > 0)
+        handle = glCheck { backend.glGenTextures() }
+        check(handle!! > 0)
     }
 
     init {
@@ -43,9 +44,14 @@ class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GL
         }
     }
 
+    fun free() {
+        glCheck { backend.glDeleteTextures(handle!!) }
+        handle = null
+    }
+
     override fun bind() {
         glCheck { backend.glActiveTexture(backend.GL_TEXTURE0 + unit) } // passing GL_TEXTURE1?
-        glCheck { backend.glBindTexture(target, handle) }
+        glCheck { backend.glBindTexture(target, handle!!) }
     }
 
     override fun unbind() {

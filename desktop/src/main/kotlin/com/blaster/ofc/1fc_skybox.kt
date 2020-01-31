@@ -24,10 +24,10 @@ private val wasd = WasdInput(controller)
 private val skyboxTechnique = SkyboxTechnique()
 
 private val window = object: LwjglWindow() {
-    override fun onCreate(width: Int, height: Int) {
-        GlState.apply(width, height)
-        camera = Camera(width.toFloat() / height.toFloat())
-        skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/darkskies")
+    override fun onCreate() {
+        //GlState.apply(width, height)
+        //camera = Camera(width.toFloat() / height.toFloat())
+        skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/darkskies")
     }
 
     override fun onResize(width: Int, height: Int) {
