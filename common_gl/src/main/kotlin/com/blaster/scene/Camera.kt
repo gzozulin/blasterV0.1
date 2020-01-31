@@ -8,10 +8,11 @@ import org.joml.Vector3f
 
 // todo: attach to node
 class Camera(aspectRatio: Float) {
-    val projectionM = Matrix4f().perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 0.1f, 1000f)
+    val projectionM: mat4 =
+            mat4().identity().perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 0.1f, 1000f)
 
-    val position: Vector3f = Vector3f()
-    val rotation: Quaternionf = Quaternionf()
+    val position: vec3 = vec3()
+    val rotation: quat = quat()
 
     private var viewVersion = Version()
     private val viewM = Matrix4f()
@@ -23,6 +24,12 @@ class Camera(aspectRatio: Float) {
             viewM.identity().rotate(rotation).translate(negatedBuf)
         }
         return viewM
+    }
+
+    fun setPerspective(aspectRatio: Float): Camera {
+        projectionM.identity().perspective(Math.toRadians(90.0).toFloat(), aspectRatio, 0.1f, 1000f)
+        viewVersion.increment()
+        return this
     }
 
     private val directionBuf = Vector3f()
@@ -49,12 +56,12 @@ class Camera(aspectRatio: Float) {
     }
 
     fun setPosition(newPostion: Vector3f) {
-        viewVersion.increment()
         position.set(newPostion)
+        viewVersion.increment()
     }
 
     fun lookAlong(direction: Vector3f) {
-        viewVersion.increment()
         rotation.identity().lookAlong(direction, VECTOR_UP)
+        viewVersion.increment()
     }
 }

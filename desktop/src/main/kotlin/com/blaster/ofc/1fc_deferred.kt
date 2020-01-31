@@ -65,6 +65,10 @@ private val window = object : LwjglWindow() {
         deferredTechnique.light(sunlight, sunlightNode.calculateM())
     }
 
+    override fun onResize(width: Int, height: Int) {
+        TODO()
+    }
+
     private fun tick() {
         console.tick()
         controller.apply { position, direction ->

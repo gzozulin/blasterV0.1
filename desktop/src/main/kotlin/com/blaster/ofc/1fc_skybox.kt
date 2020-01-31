@@ -30,6 +30,10 @@ private val window = object: LwjglWindow() {
         skyboxTechnique.prepare(shadersLib, texturesLib, meshLib, "textures/darkskies")
     }
 
+    override fun onResize(width: Int, height: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onTick() {
         GlState.clear()
         controller.apply { position, direction ->

@@ -5,6 +5,7 @@ import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWMouseButtonCallback
+import org.lwjgl.glfw.GLFWWindowSizeCallback
 import org.lwjgl.glfw.GLFWvidmode
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GLContext
@@ -43,6 +44,12 @@ abstract class LwjglWindow(
 
     private val errorCallback = errorCallbackPrint(System.err)
 
+    private val windowSizeCallback = object : GLFWWindowSizeCallback() {
+        override fun invoke(window: kotlin.Long, width: kotlin.Int, height: kotlin.Int) {
+            onResize(width, height)
+        }
+    }
+
     private val keyCallback = object : GLFWKeyCallback() {
         override fun invoke(window: kotlin.Long, key: kotlin.Int, scancode: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
             if (action == GLFW_RELEASE) {
@@ -67,7 +74,7 @@ abstract class LwjglWindow(
         }
     }
 
-    private fun switchFullscreen() {
+    fun switchFullscreen() {
         isFullscreen = !isFullscreen
         createWindow()
     }
@@ -123,6 +130,7 @@ abstract class LwjglWindow(
         if (isHoldingCursor) {
             glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
         }
+        glfwSetWindowSizeCallback(new, windowSizeCallback)
         glfwSetMouseButtonCallback(new, mouseBtnCallback)
         glfwSetKeyCallback(new, keyCallback)
         glfwMakeContextCurrent(new)
@@ -136,6 +144,7 @@ abstract class LwjglWindow(
     }
 
     protected abstract fun onCreate(width: Int, height: Int)
+    protected abstract fun onResize(width: Int, height: Int)
     protected abstract fun onTick()
 
     open fun mouseBtnPressed(btn: Int) {}

@@ -1,8 +1,6 @@
 package com.blaster.techniques
 
 import com.blaster.assets.ShadersLib
-import com.blaster.common.mat3
-import com.blaster.common.mat4
 import com.blaster.common.vec3
 import com.blaster.gl.*
 import com.blaster.scene.Camera
@@ -38,12 +36,16 @@ class DeferredTechnique {
     private val lightVectorBuf = vec3()
     private val lights = mutableListOf<LightData>()
 
-    fun prepare(shadersLib: ShadersLib, width: Int, height: Int) {
+    private fun createShaders(shadersLib: ShadersLib) {
         programGeomPass = shadersLib.loadProgram(
                 "shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram(
                 "shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
         quadMesh = Mesh.rect()
+    }
+
+    private fun createBuffers(width: Int, height: Int) {
+        // todo: delete previous
         positionStorage = GlTexture(
                 unit = 0,
                 width = width, height = height, internalFormat = backend.GL_RGBA16F,
@@ -92,6 +94,14 @@ class DeferredTechnique {
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_DIFF_TRANSP, matDiffTranspStorage)
             programLightPass.setTexture(GlUniform.UNIFORM_TEXTURE_MAT_SPECULAR, matSpecularStorage)
         }
+    }
+
+    fun prepare(shadersLib: ShadersLib, width: Int, height: Int) {
+        if (!::programGeomPass.isInitialized && !::programLightPass.isInitialized) {
+            createShaders(shadersLib)
+        }
+        // todo: remove previous before creating new ones
+        createBuffers(width, height)
     }
 
     fun draw(camera: Camera, draw: () -> Unit) {

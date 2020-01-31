@@ -149,7 +149,13 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         val (mesh, aabb) = meshLib.loadMesh("models/teapot/teapot.obj")
         val diffuse = texturesLib.loadTexture("textures/marble.jpeg")
         teapotModel = Model(mesh, diffuse, aabb, Material.CONCRETE)
-        updateLights()
+    }
+
+    override fun onResize(width: Int, height: Int) {
+        GlState.apply()
+        camera.setPerspective(width.toFloat() / height.toFloat())
+        deferredTechnique.prepare(shadersLib, width, height)
+        immediateTechnique.prepare(camera)
     }
 
     private var value = 0f
@@ -245,6 +251,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                     controller.position.x, controller.position.y, controller.position.z,
                     degf(controller.pitch), degf(controller.yaw), degf(controller.roll)))
             GLFW.GLFW_KEY_F2 -> showImmediate = !showImmediate
+            GLFW.GLFW_KEY_ENTER -> switchFullscreen()
         }
     }
 
