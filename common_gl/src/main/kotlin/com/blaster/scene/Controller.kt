@@ -8,11 +8,16 @@ import org.joml.Vector3f
 import kotlin.math.cos
 import kotlin.math.sin
 
+// todo: 0-9 - teleports
+// 0 - starting point
 // todo: separate controller moder and create class for input from kb and mouse
 // todo: some inertia would be cool
 // todo: can directly implement lwjgl listeners for keyb and cursor
 class Controller(
         val position: vec3 = vec3(),
+        var yaw: Float = Math.toRadians(-90.0).toFloat(),
+        var pitch: Float = 0f,
+        var roll: Float = 0f,
         private val sensitivity: Float = 0.005f, private val velocity: Float = 0.01f
 ) {
     var moveForward     = false
@@ -21,13 +26,6 @@ class Controller(
     var moveRight       = false
     var moveDown        = false
     var moveUp          = false
-
-    // todo: 0-9 - teleports
-    // 0 - starting point
-
-    var yaw = Math.toRadians(-90.0).toFloat()
-    var pitch = 0f
-    var roll = 0f
 
     val forward = Vector3f(0f, 0f, -1f)
 
