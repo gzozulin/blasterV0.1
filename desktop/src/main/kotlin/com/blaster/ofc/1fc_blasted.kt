@@ -155,7 +155,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     }
 
     private var value = 0f
-    private fun updateLights() {
+    private fun tickLights() {
         value += 0.05f
         val dynamic = lightNodes["lightDynamic"]
         dynamic?.setPosition(vec3(sinf(value) * 3f, 0f, cosf(value) * 3f))
@@ -178,7 +178,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
-        updateLights()
+        tickLights()
     }
 
     private fun draw() {
@@ -246,7 +246,6 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                     controller.position.x, controller.position.y, controller.position.z,
                     degf(controller.pitch), degf(controller.yaw), degf(controller.roll)))
             GLFW.GLFW_KEY_F2 -> showImmediate = !showImmediate
-            GLFW.GLFW_KEY_ENTER -> switchFullscreen()
         }
     }
 

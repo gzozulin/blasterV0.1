@@ -31,6 +31,10 @@ class Camera() {
         return this
     }
 
+    fun setPerspective(width: Int, height: Int) {
+        setPerspective(width.toFloat() / height.toFloat())
+    }
+
     private val directionBuf = Vector3f()
     fun lookAt(from: Vector3f, to: Vector3f): Camera {
         viewVersion.increment()

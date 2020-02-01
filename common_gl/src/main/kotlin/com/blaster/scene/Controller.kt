@@ -2,6 +2,7 @@ package com.blaster.scene
 
 import com.blaster.common.VECTOR_DOWN
 import com.blaster.common.VECTOR_UP
+import com.blaster.common.vec3
 import org.joml.Math
 import org.joml.Vector3f
 import kotlin.math.cos
@@ -10,7 +11,10 @@ import kotlin.math.sin
 // todo: separate controller moder and create class for input from kb and mouse
 // todo: some inertia would be cool
 // todo: can directly implement lwjgl listeners for keyb and cursor
-class Controller(private val sensitivity: Float = 0.005f, private val velocity: Float = 0.01f) {
+class Controller(
+        val position: vec3 = vec3(),
+        private val sensitivity: Float = 0.005f, private val velocity: Float = 0.01f
+) {
     var moveForward     = false
     var moveLeft        = false
     var moveBack        = false
@@ -20,8 +24,6 @@ class Controller(private val sensitivity: Float = 0.005f, private val velocity: 
 
     // todo: 0-9 - teleports
     // 0 - starting point
-
-    val position = Vector3f()
 
     var yaw = Math.toRadians(-90.0).toFloat()
     var pitch = 0f

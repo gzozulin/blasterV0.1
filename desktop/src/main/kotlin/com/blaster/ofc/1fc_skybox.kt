@@ -17,7 +17,7 @@ private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
 private val meshLib = MeshLib(assetStream)
 
-private lateinit var camera: Camera
+private val camera = Camera()
 private val controller = Controller()
 private val wasd = WasdInput(controller)
 
@@ -25,13 +25,12 @@ private val skyboxTechnique = SkyboxTechnique()
 
 private val window = object: LwjglWindow() {
     override fun onCreate() {
-        //GlState.apply(width, height)
-        //camera = Camera(width.toFloat() / height.toFloat())
         skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/darkskies")
     }
 
     override fun onResize(width: Int, height: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        GlState.apply(width, height)
+        camera.setPerspective(width, height)
     }
 
     override fun onTick() {

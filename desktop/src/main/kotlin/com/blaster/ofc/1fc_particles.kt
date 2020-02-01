@@ -57,8 +57,8 @@ private val smoke2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vec
 
 private val console = Console(1000L)
 
-private lateinit var camera: Camera
-private val controller = Controller(velocity = 0.05f)
+private val camera = Camera()
+private val controller = Controller(Vector3f(0f, 0f, 3f), velocity = 0.05f)
 private val wasd = WasdInput(controller)
 
 
@@ -135,26 +135,22 @@ private fun updateSmoke(particle: Particle): Boolean {
 
 private val window = object : LwjglWindow() {
     override fun onCreate() {
-        //camera = Camera(width.toFloat() / height.toFloat())
-        controller.position.set(Vector3f(0f, 0f, 3f))
-        console.info("Controller set..")
         billboardsTechnique.prepare(shadersLib)
         console.info("Particles ready..")
         textTechnique.create(shadersLib, texturesLib)
-        immediateTechnique.resize(camera)
         console.info("Techniques ready..")
         snowflakeDiffuse = texturesLib.loadTexture("textures/snowflake.png")
         flameDiffuse = texturesLib.loadTexture("textures/flame.png")
         flameDiffuse2 = texturesLib.loadTexture("textures/flame.png", mirror = true)
         smokeDiffuse = texturesLib.loadTexture("textures/smoke.png")
         smokeDiffuse2 = texturesLib.loadTexture("textures/smoke.png", mirror = true)
-        console.info("Textures loaded..")
-        //GlState.apply(width, height, color = Vector3f())
         console.success("All ready..")
     }
 
     override fun onResize(width: Int, height: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        GlState.apply(width, height, color = Vector3f())
+        camera.setPerspective(width, height)
+        immediateTechnique.resize(camera)
     }
 
     override fun onTick() {

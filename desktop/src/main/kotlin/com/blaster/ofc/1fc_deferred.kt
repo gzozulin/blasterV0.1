@@ -29,8 +29,8 @@ private val skyboxTechnique = SkyboxTechnique()
 
 private val console = Console(3000L)
 
-private lateinit var camera: Camera
-private val controller = Controller(velocity = 0.05f)
+private val camera = Camera()
+private val controller = Controller(Vector3f(0.5f, 3f, 3f), velocity = 0.05f)
 private val wasd = WasdInput(controller)
 
 private lateinit var model: Model
@@ -53,8 +53,6 @@ private fun nextMaterial() {
 
 private val window = object : LwjglWindow() {
     override fun onCreate() {
-        camera = Camera()
-        controller.position.set(Vector3f(0.5f, 3f, 3f))
         val (mesh, aabb) = meshLib.loadMesh("models/house/low.obj")
         val diffuse = texturesLib.loadTexture("models/house/house_diffuse.png")
         model = Model(mesh, diffuse, aabb)
@@ -66,8 +64,7 @@ private val window = object : LwjglWindow() {
     override fun onResize(width: Int, height: Int) {
         GlState.apply(width, height)
         deferredTechnique.resize(width, height)
-        // cam
-        TODO()
+        camera.setPerspective(width, height)
     }
 
     private fun tick() {

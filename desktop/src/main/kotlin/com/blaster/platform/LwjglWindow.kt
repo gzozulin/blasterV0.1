@@ -54,7 +54,7 @@ abstract class LwjglWindow(
             if (action == GLFW_RELEASE) {
                 when (key) {
                     GLFW_KEY_ESCAPE -> glfwSetWindowShouldClose(window, GL11.GL_TRUE)
-                    GLFW_KEY_F12 -> switchFullscreen()
+                    GLFW_KEY_F -> switchFullscreen()
                     else -> keyReleased(key)
                 }
             } else if (action == GLFW_PRESS) {

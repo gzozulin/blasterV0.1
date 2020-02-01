@@ -23,11 +23,10 @@ private val random = Random()
 private val window = object : LwjglWindow(800, 600) {
     override fun onCreate() {
         technique.create(shadersLib, textureLib)
-        //GlState.apply(width, height)
     }
 
     override fun onResize(width: Int, height: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        GlState.apply(width, height)
     }
 
     override fun onTick() {

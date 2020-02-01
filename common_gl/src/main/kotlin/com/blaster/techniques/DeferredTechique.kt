@@ -31,9 +31,6 @@ class DeferredTechnique {
 
     private lateinit var depthBuffer: GlRenderBuffer
 
-    data class LightData(val light: Light, val modelM: Matrix4f)
-    private val lightVectorBuf = vec3()
-
     fun create(shadersLib: ShadersLib) {
         programGeomPass = shadersLib.loadProgram(
                 "shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
@@ -124,6 +121,7 @@ class DeferredTechnique {
         }
     }
 
+    private val lightVectorBuf = vec3()
     fun light(light: Light, modelM: Matrix4f) {
        if (light.point) {
            modelM.getColumn(3, lightVectorBuf)

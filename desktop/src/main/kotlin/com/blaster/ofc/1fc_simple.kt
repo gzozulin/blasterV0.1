@@ -36,17 +36,14 @@ private lateinit var node1: Node<Model>
 private lateinit var node2: Node<Model>
 private lateinit var node3: Node<Model>
 
-private lateinit var camera: Camera
-private val controller = Controller()
+private val camera = Camera()
+private val controller = Controller(Vector3f(0f, 0f, 3f))
 private val wasd = WasdInput(controller)
 
 private val axis = vec3(1f)
 
 private val window = object : LwjglWindow() {
     override fun onCreate() {
-        //GlState.apply(width, height)
-        //camera = Camera(width.toFloat() / height.toFloat())
-        controller.position.set(Vector3f(0f, 0f, 3f))
         simpleTechnique.prepare(shadersLib)
         mesh = Mesh.triangle()
         tex1 = texturesLib.loadTexture("textures/lumina.png")
@@ -61,7 +58,8 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onResize(width: Int, height: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        GlState.apply(width, height)
+        camera.setPerspective(width, height)
     }
 
     override fun onTick() {
