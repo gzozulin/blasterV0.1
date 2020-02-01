@@ -9,6 +9,7 @@
       <w>inplace</w>
       <w>lerpf</w>
       <w>lumina</w>
+      <w>lwjgl</w>
       <w>proj</w>
       <w>quat</w>
       <w>radf</w>
@@ -16,6 +17,8 @@
       <w>texcoords</w>
       <w>transp</w>
       <w>wasd</w>
+      <w>xbuf</w>
+      <w>ybuf</w>
     </words>
   </dictionary>
 </component>

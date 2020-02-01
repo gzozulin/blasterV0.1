@@ -1,12 +1,13 @@
 package com.blaster.platform
 
+import com.blaster.common.Once
+import com.blaster.common.vec2
 import org.joml.Vector2f
 import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWMouseButtonCallback
 import org.lwjgl.glfw.GLFWWindowSizeCallback
-import org.lwjgl.glfw.GLFWvidmode
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GLContext
 import org.lwjgl.system.MemoryUtil.NULL
@@ -14,29 +15,30 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 abstract class LwjglWindow(
-        private val width: Int = 1024, private val height: Int = 768,
+        private val winWidth: Int = 1024, private val winHeight: Int = 768,
         private val fullWidth: Int = 1920, private val fullHeight: Int = 1080,
-        private val isHoldingCursor: Boolean = true) {
+        private val winX: Int = 448, private val winY: Int = 156,
+        private val isHoldingCursor: Boolean = true,
+        private var isFullscreen: Boolean = false) {
 
     init {
         SharedLibraryLoader.load()
     }
 
-    private var window = 0L
+    private var window = NULL
+    private val contextCreated = Once()
 
-    private var isFullscreen = false
-
-    private val screenWidth: Int
-        get() = if (isFullscreen) fullWidth else width
-    private val screenHeight: Int
-        get() = if (isFullscreen) fullHeight else height
+    private val currentWidth: Int
+        get() = if (isFullscreen) fullWidth else winWidth
+    private val currentHeight: Int
+        get() = if (isFullscreen) fullHeight else winHeight
 
     private val xbuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
     private val xbufDouble = xbuf.asDoubleBuffer()
     private val ybuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
     private val ybufDouble = ybuf.asDoubleBuffer()
-    private val currentPos = Vector2f()
-    private val lastCursorPos = Vector2f()
+    private val currentPos = vec2()
+    private val lastCursorPos = vec2()
 
     private var fps = 0
     private var last = System.currentTimeMillis()
@@ -73,10 +75,11 @@ abstract class LwjglWindow(
         }
     }
 
-    fun switchFullscreen() {
+    private fun switchFullscreen() {
         isFullscreen = !isFullscreen
-        createWindow()
-        onResize(screenWidth, screenHeight)
+        val oldWindow = window
+        window = createWindow()
+        destroyWindow(oldWindow)
     }
 
     private fun updateCursor(window: Long) {
@@ -109,9 +112,7 @@ abstract class LwjglWindow(
     fun show() {
         glfwSetErrorCallback(errorCallback)
         check(glfwInit() == GL11.GL_TRUE)
-        createWindow()
-        onCreate()
-        onResize(screenWidth, screenHeight)
+        window = createWindow()
         while (glfwWindowShouldClose(window) == GL11.GL_FALSE) {
             updateCursor(window)
             onTick()
@@ -119,15 +120,18 @@ abstract class LwjglWindow(
             glfwPollEvents()
             updateFps()
         }
-        glfwDestroyWindow(window)
+        destroyWindow(window)
         keyCallback.release()
     }
 
-    private fun createWindow() {
+    private fun createWindow(): Long {
         val new = if (isFullscreen) {
             glfwCreateWindow(fullWidth, fullHeight, "Blaster!", glfwGetPrimaryMonitor(), window)
         } else {
-            glfwCreateWindow(width, height, "Blaster!", NULL, window)
+            glfwCreateWindow(winWidth, winHeight, "Blaster!", NULL, window)
+        }
+        if (!isFullscreen) {
+            glfwSetWindowPos(new, winX, winY)
         }
         if (isHoldingCursor) {
             glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
@@ -138,11 +142,17 @@ abstract class LwjglWindow(
         glfwMakeContextCurrent(new)
         glfwSwapInterval(1)
         GLContext.createFromCurrent()
-        if (window > NULL) {
-            glfwDestroyWindow(window)
-        }
-        window = new
         glfwShowWindow(new)
+        if (contextCreated.check()) {
+            onCreate()
+        }
+        onResize(currentWidth, currentHeight)
+        return new
+    }
+
+    private fun destroyWindow(handle: Long) {
+        check(handle > NULL) { "Invalid handle!" }
+        glfwDestroyWindow(handle)
     }
 
     protected abstract fun onCreate()
