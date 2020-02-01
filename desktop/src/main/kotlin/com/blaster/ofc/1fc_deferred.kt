@@ -61,7 +61,6 @@ private val window = object : LwjglWindow() {
         textTechnique.create(shadersLib, texturesLib)
         skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/hangingstone")
         deferredTechnique.create(shadersLib)
-        deferredTechnique.light(sunlight, sunlightNode.calculateM())
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -86,9 +85,11 @@ private val window = object : LwjglWindow() {
                 textTechnique.text(text, pos, scale, color)
             }
         }
-        deferredTechnique.draw(camera) {
+        deferredTechnique.draw(camera, meshes =  {
             deferredTechnique.instance(model.mesh, mat4(), model.diffuse, currentMaterial.value)
-        }
+        }, lights = {
+            deferredTechnique.light(sunlight, sunlightNode.calculateM())
+        })
         GlState.drawWithNoCulling {
             skyboxTechnique.skybox(camera)
         }

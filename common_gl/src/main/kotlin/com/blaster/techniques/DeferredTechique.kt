@@ -33,7 +33,6 @@ class DeferredTechnique {
 
     data class LightData(val light: Light, val modelM: Matrix4f)
     private val lightVectorBuf = vec3()
-    private val lights = mutableListOf<LightData>()
 
     fun create(shadersLib: ShadersLib) {
         programGeomPass = shadersLib.loadProgram(
@@ -104,59 +103,41 @@ class DeferredTechnique {
         }
     }
 
-    fun draw(camera: Camera, draw: () -> Unit) {
+    private var pointLightCnt = 0
+    private var dirLightCnt = 0
+    fun draw(camera: Camera, meshes: () -> Unit, lights: () -> Unit) {
+        pointLightCnt = 0
+        dirLightCnt = 0
         glBind(listOf(programGeomPass, framebuffer)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
-            draw.invoke()
+            meshes.invoke()
         }
-        GlState.drawTransparent {
-            glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer,
-                    matAmbShineStorage, matDiffTranspStorage, matSpecularStorage)) {
-                programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
-                quadMesh.draw()
-            }
+        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer,
+                matAmbShineStorage, matDiffTranspStorage, matSpecularStorage)) {
+            lights.invoke()
+            programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)
+            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLightCnt)
+            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLightCnt)
+            quadMesh.draw()
         }
     }
 
     fun light(light: Light, modelM: Matrix4f) {
-        lights.add(LightData(light, modelM))
-        updateLightsUniforms()
-    }
-
-    fun setLights(data: List<LightData>) {
-        lights.clear()
-        lights.addAll(data)
-        updateLightsUniforms()
-    }
-
-    private fun updateLightsUniforms() {
-        check(lights.size <= MAX_LIGHTS) { "More lights than defined in shader!" }
-        val pointLights = mutableListOf<LightData>()
-        val dirLights = mutableListOf<LightData>()
-        lights.forEach {
-            if (it.light.point) {
-                pointLights.add(it)
-            } else {
-                dirLights.add(it)
-            }
-        }
-        glBind(programLightPass) {
-            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLights.size)
-            programLightPass.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLights.size)
-            pointLights.forEachIndexed { index, lightData ->
-                lightData.modelM.getColumn(3, lightVectorBuf)
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, lightVectorBuf)
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, lightData.light.intensity)
-            }
-            dirLights.forEachIndexed { index, lightData ->
-                lightData.modelM.getRow(2, lightVectorBuf) // transpose
-                lightVectorBuf.negate() // -Z
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, index, lightVectorBuf)
-                programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, index, lightData.light.intensity)
-            }
-        }
+       if (light.point) {
+           modelM.getColumn(3, lightVectorBuf)
+           programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, pointLightCnt, lightVectorBuf)
+           programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, pointLightCnt, light.intensity)
+           pointLightCnt++
+       } else {
+           modelM.getRow(2, lightVectorBuf) // transpose
+           lightVectorBuf.negate() // -Z
+           programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, dirLightCnt, lightVectorBuf)
+           programLightPass.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, dirLightCnt, light.intensity)
+           dirLightCnt++
+       }
+        check(pointLightCnt + dirLightCnt < MAX_LIGHTS) { "More lights than defined in shader!" }
     }
 
     fun instance(mesh: Mesh, modelM: Matrix4f, diffuse: GlTexture, material: Material) {

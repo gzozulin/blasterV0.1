@@ -159,12 +159,6 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         value += 0.05f
         val dynamic = lightNodes["lightDynamic"]
         dynamic?.setPosition(vec3(sinf(value) * 3f, 0f, cosf(value) * 3f))
-        val data = mutableListOf<DeferredTechnique.LightData>()
-        lightNodes.forEach {
-            data.add(DeferredTechnique.LightData(it.value.payload(), it.value.calculateM()))
-        }
-        deferredTechnique.setLights(data)
-        deferredTechnique.light(sunlight, sunlightNode.calculateM())
     }
 
     private fun tick() {
@@ -189,12 +183,17 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun draw() {
         GlState.clear()
-        deferredTechnique.draw(camera) {
+        deferredTechnique.draw(camera, meshes =  {
             for (node in teapotNodes.values) {
                 val model = node.payload()
                 deferredTechnique.instance(model.mesh, node.calculateM(), model.diffuse, model.material)
             }
-        }
+        }, lights = {
+            lightNodes.forEach {
+                deferredTechnique.light(it.value.payload(), it.value.calculateM())
+            }
+            deferredTechnique.light(sunlight, sunlightNode.calculateM())
+        })
         GlState.drawWithNoCulling {
             skyboxTechnique.skybox(camera)
         }
