@@ -10,12 +10,15 @@ import com.blaster.techniques.ImmediateTechnique
 import org.lwjgl.glfw.GLFW
 import java.util.regex.Pattern
 
-// todo: flat terrain, aabb grid
-// todo: level of details for meshes from simple rules (l-systems)
+const val HEIGHT = 50f
+const val SIDE = 25f // 25m each building side
+const val COUNT = 50 // 50 buildings in a row/column
+
+// todo: flat terrain, aabb grid, endless repeating of grid
+// todo: level of details for meshes from split grammars
 // todo: animated details with billboards
 // todo: no roads: everything is flying in echelons
 // todo: graph of navigation for vehicles/pedestrians
-// todo: endless to traverse by repeating the grid
 
 private val SPLIT_LINE = Pattern.compile(":\\s+")
 private val SPLIT_RULES = Pattern.compile("\\s+")
@@ -27,18 +30,24 @@ private enum class GrammarNodeCnt {
     ONE_OR_MORE,    // +
 }
 
-private data class GrammarNode(val label: String, val cnt: GrammarNodeCnt, val children: List<GrammarNode>?)
+private data class GrammarNode(
+        val label: String,
+        val splitRule: SplitRule,
+        val children: List<Pair<GrammarNode, GrammarNodeCnt>>?)
+
+typealias SplitRule = (aabb: aabb) -> List<aabb>
 
 class Grammar private constructor() {
 
     private var root: GrammarNode? = null
 
-    fun walk(terminals: Map<String, () -> Unit>) {
+    fun walk() {
 
     }
 
     companion object {
-        fun compile(grammar: String): Grammar {
+        fun compile(grammar: String, splitRules: Map<String, SplitRule>): Grammar
+        {
             var rootLabel: String? = null
             val parsed = mutableMapOf<String, List<String>>()
             grammar.lines().forEach {
@@ -56,45 +65,77 @@ class Grammar private constructor() {
                 }
             }
             val result = Grammar()
-            result.root = parseNode(rootLabel!!, parsed)
+            result.root = parseNode(rootLabel!!, parsed, splitRules)
             return result
         }
 
-        private fun parseNode(rule: String, parsed: Map<String, List<String>>): GrammarNode {
-            val (label, cnt) = when {
-                rule.endsWith("?") -> rule.removeSuffix("?") to GrammarNodeCnt.NONE_OR_ONE
-                rule.endsWith("*") -> rule.removeSuffix("*") to GrammarNodeCnt.NONE_OR_MORE
-                rule.endsWith("+") -> rule.removeSuffix("+") to GrammarNodeCnt.ONE_OR_MORE
-                else -> rule to GrammarNodeCnt.ONE
-            }
+        private fun parseNode(label: String,
+                              parsed: Map<String, List<String>>,
+                              splitRules: Map<String, SplitRule>): GrammarNode {
             if (label.filter { !it.isUpperCase() }.count() == 0) {
-                return GrammarNode(label, cnt, null) // terminal node
+                return GrammarNode(label, splitRules.getValue(label), null) // terminal node
             }
             val rules = parsed.getValue(label)
-            val children = mutableListOf<GrammarNode>()
-            rules.forEach { children.add(parseNode(it, parsed)) }
-            return GrammarNode(label, cnt, children)
+            val children = mutableListOf<Pair<GrammarNode, GrammarNodeCnt>>()
+            rules.forEach {
+                val (child, cnt) = when {
+                    it.endsWith("?") -> it.removeSuffix("?") to GrammarNodeCnt.NONE_OR_ONE
+                    it.endsWith("*") -> it.removeSuffix("*") to GrammarNodeCnt.NONE_OR_MORE
+                    it.endsWith("+") -> it.removeSuffix("+") to GrammarNodeCnt.ONE_OR_MORE
+                    else -> it to GrammarNodeCnt.ONE
+                }
+
+                children.add(parseNode(child, parsed, splitRules) to cnt)
+            }
+            return GrammarNode(label, splitRules.getValue(label), children)
         }
     }
 }
 
-// each rule takes a rectangular piece of volume from the rest of the aabb
-// if there is not enough space left - terminated
-
-// section: split-xz non-intersecting
-// building: split-xz intersecting
-// base, floor, roof - split-y non-intersecting
-
 private val grammar = Grammar.compile(
-    """
-        mooncity: section+
-        section: pavilion+
-        pavilion: base floor+ roof
-        base: SHAPE
-        floor: SHAPE
-        roof: SHAPE
-    """
-)
+        """
+        mooncity:   block+
+        block:      building+
+        building:   base roof floor+ 
+        base:       SHAPE
+        floor:      SHAPE
+        roof:       SHAPE
+    """,
+        mapOf(
+                "mooncity"  to ::mooncity,
+                "block"     to ::block,
+                "building"  to ::building,
+                "base"      to ::base,
+                "roof"      to ::roof,
+                "floor"     to ::floor,
+                "SHAPE"     to ::shape
+        ))
+
+fun mooncity(aabb: aabb) = aabb.randomSplit(SIDE, listOf(0, 2))
+
+fun block(aabb: aabb): List<aabb> {
+    TODO()
+}
+
+fun building(aabb: aabb): List<aabb> {
+    TODO()
+}
+
+fun base(aabb: aabb): List<aabb> {
+    TODO()
+}
+
+fun roof(aabb: aabb): List<aabb> {
+    TODO()
+}
+
+fun floor(aabb: aabb): List<aabb> {
+    TODO()
+}
+
+fun shape(aabb: aabb): List<aabb> {
+    TODO()
+}
 
 fun aabb.randomSplit(min: Float, axises: List<Int> = listOf(0, 1, 2)): List<aabb> {
     val axisesCopy = ArrayList(axises)
@@ -132,15 +173,6 @@ fun aabb.randomSplitByAxis(axis: Int, min: Float): List<aabb>? {
         else -> throw IllegalArgumentException("wtf?!")
     }
 }
-
-fun section(bounds: aabb) {
-    // has own constants/parameters
-    // returns aabb, which it took or null if terminated
-}
-
-const val HEIGHT = 50f
-const val SIDE = 25f // 25m each building side
-const val COUNT = 50 // 50 buildings in a row/column
 
 private val immediateTechnique = ImmediateTechnique()
 
