@@ -2,6 +2,7 @@
   <dictionary name="greg">
     <words>
       <w>aabb</w>
+      <w>aabbs</w>
       <w>coord</w>
       <w>coords</w>
       <w>darkskies</w>
@@ -10,12 +11,14 @@
       <w>lerpf</w>
       <w>lumina</w>
       <w>lwjgl</w>
+      <w>mooncity</w>
       <w>proj</w>
       <w>quat</w>
       <w>radf</w>
       <w>skybox</w>
       <w>texcoords</w>
       <w>transp</w>
+      <w>voxels</w>
       <w>wasd</w>
       <w>xbuf</w>
       <w>ybuf</w>

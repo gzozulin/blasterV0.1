@@ -6,29 +6,150 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.scene.Camera
 import com.blaster.scene.Controller
-import com.blaster.scene.Node
 import com.blaster.techniques.ImmediateTechnique
 import org.lwjgl.glfw.GLFW
+import java.util.regex.Pattern
 
 // todo: flat terrain, aabb grid
 // todo: level of details for meshes from simple rules (l-systems)
 // todo: animated details with billboards
 // todo: no roads: everything is flying in echelons
 // todo: graph of navigation for vehicles/pedestrians
+// todo: endless to traverse by repeating the grid
+
+private val SPLIT_LINE = Pattern.compile(":\\s+")
+private val SPLIT_RULES = Pattern.compile("\\s+")
+
+private enum class GrammarNodeCnt {
+    ONE,            // 1
+    NONE_OR_ONE,    // ?
+    NONE_OR_MORE,   // *
+    ONE_OR_MORE,    // +
+}
+
+private data class GrammarNode(val label: String, val cnt: GrammarNodeCnt, val children: List<GrammarNode>?)
+
+class Grammar private constructor() {
+
+    private var root: GrammarNode? = null
+
+    fun walk(terminals: Map<String, () -> Unit>) {
+
+    }
+
+    companion object {
+        fun compile(grammar: String): Grammar {
+            var rootLabel: String? = null
+            val parsed = mutableMapOf<String, List<String>>()
+            grammar.lines().forEach {
+                if (!it.isBlank()) {
+                    val trimmed = it.trim()
+                    val split = trimmed.split(SPLIT_LINE)
+                    val label = split[0]
+                    val rules = split[1]
+                    if (rootLabel == null) {
+                        rootLabel = label
+                    }
+                    val rulesSplit = rules.split(SPLIT_RULES)
+                    check(!parsed.contains(label))
+                    parsed[label] = rulesSplit
+                }
+            }
+            val result = Grammar()
+            result.root = parseNode(rootLabel!!, parsed)
+            return result
+        }
+
+        private fun parseNode(rule: String, parsed: Map<String, List<String>>): GrammarNode {
+            val (label, cnt) = when {
+                rule.endsWith("?") -> rule.removeSuffix("?") to GrammarNodeCnt.NONE_OR_ONE
+                rule.endsWith("*") -> rule.removeSuffix("*") to GrammarNodeCnt.NONE_OR_MORE
+                rule.endsWith("+") -> rule.removeSuffix("+") to GrammarNodeCnt.ONE_OR_MORE
+                else -> rule to GrammarNodeCnt.ONE
+            }
+            if (label.filter { !it.isUpperCase() }.count() == 0) {
+                return GrammarNode(label, cnt, null) // terminal node
+            }
+            val rules = parsed.getValue(label)
+            val children = mutableListOf<GrammarNode>()
+            rules.forEach { children.add(parseNode(it, parsed)) }
+            return GrammarNode(label, cnt, children)
+        }
+    }
+}
+
+// each rule takes a rectangular piece of volume from the rest of the aabb
+// if there is not enough space left - terminated
+
+// section: split-xz non-intersecting
+// building: split-xz intersecting
+// base, floor, roof - split-y non-intersecting
+
+private val grammar = Grammar.compile(
+    """
+        mooncity: section+
+        section: pavilion+
+        pavilion: base floor+ roof
+        base: SHAPE
+        floor: SHAPE
+        roof: SHAPE
+    """
+)
+
+fun aabb.randomSplit(min: Float, axises: List<Int> = listOf(0, 1, 2)): List<aabb> {
+    val axisesCopy = ArrayList(axises)
+    while(axisesCopy.isNotEmpty()) {
+        val randomAxis = axisesCopy.random()
+        val split = randomSplitByAxis(randomAxis, min)
+        if (split != null) {
+            return split.flatMap { it.randomSplit(min, axises) }
+        } else {
+            axisesCopy.remove(randomAxis)
+        }
+    }
+    return listOf(this) // terminal
+}
+
+fun aabb.randomSplitByAxis(axis: Int, min: Float): List<aabb>? {
+    val (from, to) = when (axis) {
+        0 -> minX to maxX
+        1 -> minY to maxY
+        2 -> minZ to maxZ
+        else -> throw IllegalArgumentException("wtf?!")
+    }
+    check(to > from)
+    val space = to - from
+    if (min * 2f > space) {
+        return null
+    }
+    val randFrom = from + min
+    val randTo = to - min
+    val selected = randomf(randFrom, randTo)
+    return when (axis) {
+        0 -> listOf(aabb(from, minY, minZ, selected, maxY, maxZ), aabb(selected, minY, minZ, to, maxY, maxZ))
+        1 -> listOf(aabb(minX, from, minZ, maxX, selected, maxZ), aabb(minX, selected, minZ, maxX, to, maxZ))
+        2 -> listOf(aabb(minX, minY, from, maxX, maxY, selected), aabb(minX, minY, selected, maxX, maxY, to))
+        else -> throw IllegalArgumentException("wtf?!")
+    }
+}
+
+fun section(bounds: aabb) {
+    // has own constants/parameters
+    // returns aabb, which it took or null if terminated
+}
+
+const val HEIGHT = 50f
+const val SIDE = 25f // 25m each building side
+const val COUNT = 50 // 50 buildings in a row/column
 
 private val immediateTechnique = ImmediateTechnique()
 
 private val camera = Camera()
-private val controller = Controller(position = vec3(0f, 25f, 0f), yaw = radf(45f), velocity = 1f)
+private val controller = Controller(position = vec3(0f, HEIGHT * 2f, 0f), yaw = radf(45f), velocity = 1f)
 private val wasd = WasdInput(controller)
 private var mouseControl = false
 
-// aabb -> trunks -> stories -> panels -> textures, materials, vertices, normals, tex coords, indices
-
-const val SIDE = 25f // 25m each building side
-const val COUNT = 50 // 50 buildings in a row/column
-
-private val aabb = aabb(-SIDE, -10f, -SIDE, SIDE, 10f, SIDE)
+/*private val aabb = aabb(-SIDE, 0f, -SIDE, SIDE, HEIGHT, SIDE)
 
 data class Section(val node: Node<Any>)
 
@@ -55,7 +176,9 @@ class Grid {
     }
 }
 
-private val grid = Grid()
+private val grid = Grid()*/
+
+private val aabbs = aabb(-30f, 0f, -30f, 30f, 30f, 30f).randomSplit(10f, axises = listOf(0, 2))
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
@@ -77,9 +200,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun draw() {
         GlState.clear()
-        grid.sections.forEach {
-            immediateTechnique.aabb(camera, aabb, it.node.calculateM(), color = color(0f, 1f, 0f))
-        }
+        val identity = mat4()
+        aabbs.forEach { immediateTechnique.aabb(camera, it, identity, color = color(0f, 1f, 0f)) }
     }
 
     override fun onTick() {

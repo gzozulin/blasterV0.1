@@ -16,6 +16,8 @@ typealias mat4 = Matrix4f
 typealias quat = Quaternionf
 typealias aabb = AABBf
 
+private val random = Random()
+
 fun fail(message: String = "Failed!") {
     throw IllegalArgumentException(message)
 }
@@ -41,9 +43,11 @@ fun cosf(value: Double) = cos(value).toFloat()
 
 fun lerpf(from: Float, to: Float, t: Float) = (1f - t) * from + t * to
 
-private val random = Random()
-fun randomFloat(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) =
+fun randomf(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) =
         min + random.nextFloat() * (max - min)
+
+fun randomi(min: Int = Integer.MIN_VALUE, max: Int = Integer.MAX_VALUE) = random.nextInt((max - min) + 1) + min
+fun randomb() = random.nextBoolean()
 
 fun extractColors(hex: String): Vector3f {
     val integerHex = Integer.parseInt(hex, 16)
@@ -54,9 +58,9 @@ fun extractColors(hex: String): Vector3f {
 }
 
 fun vec3.random(min: vec3 = vec3(0f), max: vec3 = vec3(1f)): vec3 {
-    x = randomFloat(min.x, max.x)
-    y = randomFloat(min.y, max.y)
-    z = randomFloat(min.z, max.z)
+    x = randomf(min.x, max.x)
+    y = randomf(min.y, max.y)
+    z = randomf(min.z, max.z)
     return this
 }
 
