@@ -17,6 +17,7 @@ import com.blaster.scene.Mesh
 import com.blaster.scene.Node
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.ImmediateTechnique
+import com.blaster.techniques.SkyboxTechnique
 import org.lwjgl.glfw.GLFW
 
 const val HEIGHT = 100f
@@ -32,6 +33,7 @@ private val textureLib = TexturesLib(assetStream)
 
 private val immediateTechnique = ImmediateTechnique()
 private val deferredTechnique = DeferredTechnique()
+private val skyboxTechnique = SkyboxTechnique()
 
 private val camera = Camera()
 private val controller = Controller(position = vec3(0f, HEIGHT * 2f, 0f), yaw = radf(45f), velocity = 5f)
@@ -78,6 +80,7 @@ fun shape(aabb: aabb): List<aabb> {
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
+        skyboxTechnique.create(shadersLib, textureLib, meshLib, skybox = "textures/nuke")
         deferredTechnique.create(shadersLib)
         cubeTexture = textureLib.loadTexture("textures/marble.jpeg")
         val (mesh, aabb) = meshLib.loadMesh("models/cube/cube.obj")
@@ -98,11 +101,11 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+        cubeNodes.sortBy { it.position.distanceSquared(camera.position) }
     }
 
     private fun draw() {
         GlState.clear()
-        cubeNodes.sortBy { it.position.distanceSquared(camera.position) }
         deferredTechnique.draw(camera, meshes =  {
             cubeNodes.forEach {
                 val model = it.payload()
@@ -111,6 +114,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         }, lights = {
             deferredTechnique.light(daylight, daylightNode.calculateM())
         })
+        GlState.drawWithNoCulling {
+            skyboxTechnique.skybox(camera)
+        }
     }
 
     override fun onTick() {
