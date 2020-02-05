@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFW
 import java.lang.IllegalStateException
 import java.util.regex.Pattern
 
-const val HEIGHT = 20f
+const val HEIGHT = 100f
 const val SIDE = 25f // 25m each block
 const val CITY_SIDE = SIDE * 25
 
@@ -140,7 +140,7 @@ private val grammar = Grammar.compile(
         )).walk(aabb(vec3(-CITY_SIDE, 0f, -CITY_SIDE), vec3(CITY_SIDE, HEIGHT, CITY_SIDE)))
 
 fun mooncity(aabb: aabb) = aabb.randomSplit(listOf(0, 2), SIDE)
-fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 5), 5f)
+fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 5), 20f, 10f, 15f)
         .map { it.splitByAxis(1, randomf(0.7f, 1.0f)).first() }
 
 fun building(aabb: aabb): List<aabb> {
@@ -173,8 +173,11 @@ fun aabb.randomSplit(axises: List<Int> = listOf(0, 1, 2), min: Float): List<aabb
             2 -> depth()
             else -> throw IllegalStateException("wtf?!")
         }
-        if (length > min) {
-            return splitByAxis(axis, randomf(0.4f, 0.7f))
+        val from  = 0.3f
+        val to = 0.7f
+        val minLength = length * 0.3f
+        if (minLength > min) {
+            return splitByAxis(axis, randomf(from, to))
                     .flatMap { it.randomSplit(axises, min) }
         } else {
             axisesCopy.remove(axis)
@@ -202,32 +205,16 @@ fun aabb.splitByAxis(axis: Int, ratio: Float): List<aabb> {
 }
 
 // todo: right now is only xz
-fun aabb.selectCentersInside(cnt: Int, min: Float): List<aabb> {
-    check(width() > min && depth() > min)
-    val minR = min / 2f
+// circle x = r cos(t)    y = r sin(t)
+fun aabb.selectCentersInside(cnt: Int, maxDelta: Float, fromR: Float, toR: Float): List<aabb> {
     val result = mutableListOf<aabb>()
+    val current = center()
     while (result.size != cnt) {
-        val centerX = randomf(minX + minR, maxX - minR)
-        val centerZ = randomf(minZ + minR, minZ - minR)
-        var maxR = Float.MIN_VALUE
-        val toX1 = centerX - minX
-        if (toX1 < maxR) {
-            maxR = toX1
-        }
-        val toX2 = maxX - centerX
-        if (toX2 < maxR) {
-            maxR = toX2
-        }
-        val toZ1 = centerZ - minZ
-        if (toZ1 < maxR) {
-            maxR = toZ1
-        }
-        val toZ2 = maxZ - centerZ
-        if (toZ2 < maxR) {
-            maxR = toZ2
-        }
-        val r = randomf(minR, maxR)
-        result.add(aabb(vec3(centerX - r, minY, centerZ - r), vec3(centerX + r, maxY, centerZ + r)))
+        val r = randomf(0f, maxDelta)
+        val t = randomf(0f, 1f)
+        val center = vec2(current.x + r * cosf(t), current.z + r * sinf(t))
+        val size = randomf(fromR, toR)
+        result.add(aabb(center.x - size, minY, center.y - size, center.x + size, maxY, center.y + size))
     }
     return result
 }
