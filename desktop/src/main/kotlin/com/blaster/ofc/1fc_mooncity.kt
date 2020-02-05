@@ -9,17 +9,18 @@ import com.blaster.scene.Controller
 import com.blaster.techniques.ImmediateTechnique
 import org.lwjgl.glfw.GLFW
 
-const val HEIGHT = 100f
-const val SIDE = 25f // 25m each block
-const val CITY_SIDE = SIDE * 25
-
 // todo: flat terrain, aabb grid, endless repeating of grid
 // todo: level of details for meshes from split grammars
 // todo: animated details with billboards
 // todo: no roads: everything is flying in echelons
 // todo: graph of navigation for vehicles/pedestrians
 
-private val aabbs = mutableListOf<aabb>()
+const val HEIGHT = 100f
+const val BLOCK_SIDE = 25f // 25m each block
+const val CITY_SIDE = BLOCK_SIDE * 25
+
+private val mooncityAabb = aabb(vec3(-CITY_SIDE, 0f, -CITY_SIDE), vec3(CITY_SIDE, HEIGHT, CITY_SIDE))
+private val shapes = mutableListOf<aabb>()
 
 private val grammar = Grammar.compile(
     """
@@ -40,8 +41,8 @@ private val grammar = Grammar.compile(
                 "SHAPE"     to ::shape
         ))
 
-fun mooncity(aabb: aabb) = aabb.randomSplit(listOf(0, 2), SIDE)
-fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 5), 15f, SIDE)
+fun mooncity(aabb: aabb) = aabb.randomSplit(listOf(0, 2), BLOCK_SIDE)
+fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 5), 15f, BLOCK_SIDE)
         .map { it.splitByAxis(1, listOf(randomf(0.7f, 1.0f))).first() }
 
 fun building(aabb: aabb): List<aabb> {
@@ -54,7 +55,7 @@ fun roof(aabb: aabb) = listOf(aabb)
 fun floor(aabb: aabb) = listOf(aabb)
 
 fun shape(aabb: aabb): List<aabb> {
-    aabbs.add(aabb)
+    shapes.add(aabb)
     return emptyList()
 }
 
@@ -130,38 +131,9 @@ private val controller = Controller(position = vec3(0f, HEIGHT * 2f, 0f), yaw = 
 private val wasd = WasdInput(controller)
 private var mouseControl = false
 
-/*private val aabb = aabb(-SIDE, 0f, -SIDE, SIDE, HEIGHT, SIDE)
-
-data class Section(val node: Node<Any>)
-
-class Grid {
-    val sections: List<Section>
-
-    init {
-        val result = mutableListOf<Section>()
-        for (row in 0 until COUNT) {
-            for (column in 0 until COUNT) {
-                val pos = vec3(row * SIDE, 0f, column * SIDE)
-                val node = Node<Any>()
-                node.setPosition(pos)
-                result.add(Section(node))
-            }
-        }
-        sections = result
-    }
-
-    fun get(row: Int, column: Int): Section {
-        check(row in 0 until COUNT)
-        check(column in 0 until COUNT)
-        return sections[row + column * COUNT]
-    }
-}
-
-private val grid = Grid()*/
-
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
-        grammar.walk(aabb(vec3(-CITY_SIDE, 0f, -CITY_SIDE), vec3(CITY_SIDE, HEIGHT, CITY_SIDE)))
+        grammar.walk(mooncityAabb)
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -180,7 +152,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     private fun draw() {
         GlState.clear()
         val identity = mat4()
-        aabbs.forEach { immediateTechnique.aabb(camera, it, identity, color = color(0f, 1f, 0f)) }
+        shapes.forEach { immediateTechnique.aabb(camera, it, identity, color = color(0f, 1f, 0f)) }
     }
 
     override fun onTick() {
