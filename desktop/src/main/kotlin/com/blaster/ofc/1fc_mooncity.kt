@@ -8,11 +8,12 @@ import com.blaster.scene.Camera
 import com.blaster.scene.Controller
 import com.blaster.techniques.ImmediateTechnique
 import org.lwjgl.glfw.GLFW
+import java.lang.IllegalStateException
 import java.util.regex.Pattern
 
 const val HEIGHT = 50f
 const val SIDE = 25f // 25m each building side
-const val COUNT = 50 // 50 buildings in a row/column
+const val CITY_SIDE = SIDE * 25
 
 // todo: flat terrain, aabb grid, endless repeating of grid
 // todo: level of details for meshes from split grammars
@@ -39,10 +40,35 @@ typealias SplitRule = (aabb: aabb) -> List<aabb>
 
 class Grammar private constructor() {
 
-    private var root: GrammarNode? = null
+    private lateinit var root: GrammarNode
 
-    fun walk() {
+    fun walk(start: aabb) {
+        walkInternal(start, root)
+    }
 
+    private fun walkInternal(bound: aabb, node: GrammarNode) {
+        val partitions = node.splitRule.invoke(bound)
+        if (node.children == null) {
+            return // terminal
+        }
+        val iterator = partitions.iterator()
+        node.children.forEach {
+            check(iterator.hasNext()) { "Not enough partitions to cater for children!" }
+            val child = it.first
+            val cnt = it.second
+            when (cnt) {
+                GrammarNodeCnt.NONE_OR_ONE -> TODO()
+                GrammarNodeCnt.NONE_OR_MORE -> TODO()
+                GrammarNodeCnt.ONE_OR_MORE -> {
+                    while (iterator.hasNext()) {
+                        walkInternal(iterator.next(), child)
+                    }
+                }
+                GrammarNodeCnt.ONE -> {
+                    walkInternal(iterator.next(), child)
+                }
+            }
+        }
     }
 
     companion object {
@@ -109,67 +135,68 @@ private val grammar = Grammar.compile(
                 "roof"      to ::roof,
                 "floor"     to ::floor,
                 "SHAPE"     to ::shape
-        ))
+        ))//.walk(aabb(vec3(-CITY_SIDE), vec3(CITY_SIDE)))
 
 fun mooncity(aabb: aabb) = aabb.randomSplit(SIDE, listOf(0, 2))
 
 fun block(aabb: aabb): List<aabb> {
-    TODO()
+    return listOf()
 }
 
 fun building(aabb: aabb): List<aabb> {
-    TODO()
+    return listOf()
 }
 
 fun base(aabb: aabb): List<aabb> {
-    TODO()
+    return listOf()
 }
 
 fun roof(aabb: aabb): List<aabb> {
-    TODO()
+    return listOf()
 }
 
 fun floor(aabb: aabb): List<aabb> {
-    TODO()
+    return listOf()
 }
 
 fun shape(aabb: aabb): List<aabb> {
-    TODO()
+    return listOf()
 }
 
 fun aabb.randomSplit(min: Float, axises: List<Int> = listOf(0, 1, 2)): List<aabb> {
     val axisesCopy = ArrayList(axises)
     while(axisesCopy.isNotEmpty()) {
-        val randomAxis = axisesCopy.random()
-        val split = randomSplitByAxis(randomAxis, min)
-        if (split != null) {
-            return split.flatMap { it.randomSplit(min, axises) }
+        val axis = axisesCopy.random()
+        val length = when (axis) {
+            0 -> width()
+            1 -> height()
+            2 -> depth()
+            else -> throw IllegalStateException("wtf?!")
+        }
+        if (length > min) {
+            return splitByAxis(axis, randomf(0.4f, 0.7f))
+                    .flatMap { it.randomSplit(min, axises) }
         } else {
-            axisesCopy.remove(randomAxis)
+            axisesCopy.remove(axis)
         }
     }
     return listOf(this) // terminal
 }
 
-fun aabb.randomSplitByAxis(axis: Int, min: Float): List<aabb>? {
-    val (from, to) = when (axis) {
+fun aabb.splitByAxis(axis: Int, ratio: Float): List<aabb> {
+    val (start, end) = when (axis) {
         0 -> minX to maxX
         1 -> minY to maxY
         2 -> minZ to maxZ
         else -> throw IllegalArgumentException("wtf?!")
     }
-    check(to > from)
-    val space = to - from
-    if (min * 2f > space) {
-        return null
-    }
-    val randFrom = from + min
-    val randTo = to - min
-    val selected = randomf(randFrom, randTo)
+    check(end > start)
+    val length = end - start
+    val threshold = start + length * ratio
     return when (axis) {
-        0 -> listOf(aabb(from, minY, minZ, selected, maxY, maxZ), aabb(selected, minY, minZ, to, maxY, maxZ))
-        1 -> listOf(aabb(minX, from, minZ, maxX, selected, maxZ), aabb(minX, selected, minZ, maxX, to, maxZ))
-        2 -> listOf(aabb(minX, minY, from, maxX, maxY, selected), aabb(minX, minY, selected, maxX, maxY, to))
+        0 -> listOf(aabb(start, minY, minZ, threshold, maxY, maxZ), aabb(threshold, minY, minZ, end, maxY, maxZ))
+        1 -> listOf(aabb(minX, start, minZ, maxX, threshold, maxZ), aabb(minX, threshold, minZ, maxX, end, maxZ))
+        2 -> listOf(aabb(minX, minY, start, maxX, maxY, threshold), aabb(minX, minY, threshold, maxX, maxY, end))
         else -> throw IllegalArgumentException("wtf?!")
     }
 }
