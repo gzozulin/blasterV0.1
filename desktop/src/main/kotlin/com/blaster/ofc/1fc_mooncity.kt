@@ -118,6 +118,8 @@ class Grammar private constructor() {
     }
 }
 
+private val aabbs = mutableListOf<aabb>()
+
 private val grammar = Grammar.compile(
         """
         mooncity:   block+
@@ -135,35 +137,32 @@ private val grammar = Grammar.compile(
                 "roof"      to ::roof,
                 "floor"     to ::floor,
                 "SHAPE"     to ::shape
-        ))//.walk(aabb(vec3(-CITY_SIDE), vec3(CITY_SIDE)))
+        )).walk(aabb(vec3(-CITY_SIDE), vec3(CITY_SIDE)))
 
-fun mooncity(aabb: aabb) = aabb.randomSplit(SIDE, listOf(0, 2))
-
-fun block(aabb: aabb): List<aabb> {
-    return listOf()
-}
+fun mooncity(aabb: aabb) = aabb.randomSplit(listOf(0, 2), SIDE)
+fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 5), 5f)
 
 fun building(aabb: aabb): List<aabb> {
-    return listOf()
+    val result = mutableListOf<aabb>()
+    var split = aabb.splitByAxis(1, 0.1f)
+    result.add(split.first()) // base
+    split = split.last().splitByAxis(1, 0.9f)
+    result.add(split.last()) // roof
+    split = split.first().splitByAxis(1, 0.5f)
+    result.addAll(split)
+    return result
 }
 
-fun base(aabb: aabb): List<aabb> {
-    return listOf()
-}
-
-fun roof(aabb: aabb): List<aabb> {
-    return listOf()
-}
-
-fun floor(aabb: aabb): List<aabb> {
-    return listOf()
-}
+fun base(aabb: aabb) = listOf(aabb)
+fun roof(aabb: aabb) = listOf(aabb)
+fun floor(aabb: aabb) = listOf(aabb)
 
 fun shape(aabb: aabb): List<aabb> {
+    aabbs.add(aabb)
     return listOf()
 }
 
-fun aabb.randomSplit(min: Float, axises: List<Int> = listOf(0, 1, 2)): List<aabb> {
+fun aabb.randomSplit(axises: List<Int> = listOf(0, 1, 2), min: Float): List<aabb> {
     val axisesCopy = ArrayList(axises)
     while(axisesCopy.isNotEmpty()) {
         val axis = axisesCopy.random()
@@ -173,9 +172,9 @@ fun aabb.randomSplit(min: Float, axises: List<Int> = listOf(0, 1, 2)): List<aabb
             2 -> depth()
             else -> throw IllegalStateException("wtf?!")
         }
-        if (length > min) {
+        if (length > min * 2f) {
             return splitByAxis(axis, randomf(0.4f, 0.7f))
-                    .flatMap { it.randomSplit(min, axises) }
+                    .flatMap { it.randomSplit(axises, min) }
         } else {
             axisesCopy.remove(axis)
         }
@@ -199,6 +198,36 @@ fun aabb.splitByAxis(axis: Int, ratio: Float): List<aabb> {
         2 -> listOf(aabb(minX, minY, start, maxX, maxY, threshold), aabb(minX, minY, threshold, maxX, maxY, end))
         else -> throw IllegalArgumentException("wtf?!")
     }
+}
+
+// todo: right now is only xz
+fun aabb.selectCentersInside(cnt: Int, min: Float): List<aabb> {
+    val minR = min / 2f
+    val result = mutableListOf<aabb>()
+    while (result.size != cnt) {
+        val centerX = randomf(minX + minR, maxX - minR)
+        val centerZ = randomf(minZ + minR, minZ - minR)
+        var maxR = Float.MIN_VALUE
+        val toX1 = centerX - minX
+        if (toX1 < maxR) {
+            maxR = toX1
+        }
+        val toX2 = maxX - centerX
+        if (toX2 < maxR) {
+            maxR = toX2
+        }
+        val toZ1 = centerZ - minZ
+        if (toZ1 < maxR) {
+            maxR = toZ1
+        }
+        val toZ2 = maxZ - centerZ
+        if (toZ2 < maxR) {
+            maxR = toZ2
+        }
+        val r = randomf(minR, maxR)
+        result.add(aabb(vec3(centerX - r, minY, centerZ - r), vec3(centerX + r, maxY, centerZ + r)))
+    }
+    return result
 }
 
 private val immediateTechnique = ImmediateTechnique()
@@ -236,8 +265,6 @@ class Grid {
 }
 
 private val grid = Grid()*/
-
-private val aabbs = aabb(-30f, 0f, -30f, 30f, 30f, 30f).randomSplit(10f, axises = listOf(0, 2))
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
