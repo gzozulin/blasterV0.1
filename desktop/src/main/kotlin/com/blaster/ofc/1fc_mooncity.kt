@@ -41,7 +41,7 @@ private val wasd = WasdInput(controller)
 private var mouseControl = false
 
 private val daylight = Light(vec3(1f), false)
-private val daylightNode = Node(payload = daylight).lookAlong(vec3(-1f))
+private val daylightNode = Node(payload = daylight).lookAlong(vec3(-1f, -0.7f, -0.3f))
 
 private lateinit var cube: Mesh
 private lateinit var cubeAabb: aabb
