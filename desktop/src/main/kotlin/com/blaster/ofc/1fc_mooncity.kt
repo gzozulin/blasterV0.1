@@ -11,8 +11,8 @@ import org.lwjgl.glfw.GLFW
 import java.lang.IllegalStateException
 import java.util.regex.Pattern
 
-const val HEIGHT = 50f
-const val SIDE = 25f // 25m each building side
+const val HEIGHT = 20f
+const val SIDE = 25f // 25m each block
 const val CITY_SIDE = SIDE * 25
 
 // todo: flat terrain, aabb grid, endless repeating of grid
@@ -137,10 +137,11 @@ private val grammar = Grammar.compile(
                 "roof"      to ::roof,
                 "floor"     to ::floor,
                 "SHAPE"     to ::shape
-        )).walk(aabb(vec3(-CITY_SIDE), vec3(CITY_SIDE)))
+        )).walk(aabb(vec3(-CITY_SIDE, 0f, -CITY_SIDE), vec3(CITY_SIDE, HEIGHT, CITY_SIDE)))
 
 fun mooncity(aabb: aabb) = aabb.randomSplit(listOf(0, 2), SIDE)
 fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 5), 5f)
+        .map { it.splitByAxis(1, randomf(0.7f, 1.0f)).first() }
 
 fun building(aabb: aabb): List<aabb> {
     val result = mutableListOf<aabb>()
@@ -172,7 +173,7 @@ fun aabb.randomSplit(axises: List<Int> = listOf(0, 1, 2), min: Float): List<aabb
             2 -> depth()
             else -> throw IllegalStateException("wtf?!")
         }
-        if (length > min * 2f) {
+        if (length > min) {
             return splitByAxis(axis, randomf(0.4f, 0.7f))
                     .flatMap { it.randomSplit(axises, min) }
         } else {
@@ -202,6 +203,7 @@ fun aabb.splitByAxis(axis: Int, ratio: Float): List<aabb> {
 
 // todo: right now is only xz
 fun aabb.selectCentersInside(cnt: Int, min: Float): List<aabb> {
+    check(width() > min && depth() > min)
     val minR = min / 2f
     val result = mutableListOf<aabb>()
     while (result.size != cnt) {
