@@ -1,5 +1,6 @@
 package com.blaster.assets
 
+import com.blaster.aux.fail
 import com.blaster.aux.toByteBufferFloat
 import com.blaster.aux.toByteBufferInt
 import com.blaster.gl.GlAttribute
@@ -14,10 +15,8 @@ import java.nio.charset.Charset
 
 private val backend = GlLocator.locate()
 
-// todo: scaler - to bring any model to the scene dimensions
 // todo: info about model: vert/ind count, times, progress loading, etc
 // todo: load material from *.mtl
-// todo: use buffers directly
 class MeshLib (private val assetStream: AssetStream) {
     private val whitespaceRegex = "\\s+".toRegex()
     private val slashRegex = "/".toRegex()
@@ -39,7 +38,6 @@ class MeshLib (private val assetStream: AssetStream) {
     private var maxZ = 0f
 
     // todo: create Native(Float)Buffer directly, instead of copying arrays
-    // todo: only model! no diffuse
     fun loadMesh(meshFilename: String): Pair<GlMesh, AABBf> {
         minX = 0f
         minY = 0f
@@ -93,7 +91,7 @@ class MeshLib (private val assetStream: AssetStream) {
             ' ' -> parsePosition(line)
             't' -> parseTexCoordinate(line)
             'n' -> parseNormal(line)
-            else -> throw IllegalStateException("Unknown vertex attribute! $line")
+            else -> fail("Unknown vertex attribute! $line")
         }
     }
 

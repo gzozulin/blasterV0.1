@@ -20,17 +20,11 @@ typealias aabb = AABBf
 
 private val random = Random()
 
-fun fail(message: String = "Failed!") {
-    throw IllegalArgumentException(message)
-}
-
-fun fail(throwable: Throwable) {
-    throw IllegalArgumentException(throwable)
-}
-
 // todo: remove - mutable
 val VECTOR_UP = Vector3f(0f, 1f, 0f)
 val VECTOR_DOWN = Vector3f(0f, -1f, 0f)
+
+fun fail(reason: String = "wtf?!"): Nothing = throw IllegalStateException()
 
 fun radf(degrees: Float) = Math.toRadians(degrees.toDouble()).toFloat()
 fun degf(radians: Float) = Math.toDegrees(radians.toDouble()).toFloat()
