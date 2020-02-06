@@ -1,20 +1,18 @@
-package com.blaster.scene
+package com.blaster.entity
 
 import com.blaster.common.*
 
-class Node<T>(
+data class Node<T>(
         private var parent: Node<T>? = null,
         val position: vec3 = vec3(),
         val rotation: quat = quat().identity(),
         val scale: vec3 = vec3(1f),
-        private val payload: T? = null) {
-
-    private val children = mutableListOf<Node<T>>()
-
-    private val version = Version()
-    private val localM = mat4()
-    private val modelM = mat4()
-
+        private val payload: T? = null,
+        private val children: MutableList<Node<T>> = mutableListOf(),
+        private val version: Version = Version(),
+        private val localM: mat4 = mat4(),
+        private val modelM: mat4 = mat4()
+) {
     fun payload() = payload!!
 
     fun attach(child: Node<T>) {

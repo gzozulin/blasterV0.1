@@ -5,12 +5,15 @@ import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.vec3
+import com.blaster.entity.Camera
+import com.blaster.entity.Controller
 import com.blaster.entity.Model
+import com.blaster.entity.Node
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
-import com.blaster.scene.*
+import com.blaster.tools.*
 import com.blaster.techniques.SimpleTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f

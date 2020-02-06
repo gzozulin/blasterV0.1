@@ -3,10 +3,10 @@ package com.blaster.techniques
 import com.blaster.assets.ShadersLib
 import com.blaster.common.vec3
 import com.blaster.gl.*
-import com.blaster.scene.Camera
+import com.blaster.entity.Camera
 import com.blaster.entity.Light
 import com.blaster.entity.Material
-import com.blaster.scene.Mesh
+import com.blaster.tools.Mesh
 import org.joml.Matrix4f
 
 private val backend = GlLocator.locate()

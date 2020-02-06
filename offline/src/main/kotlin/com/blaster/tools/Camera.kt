@@ -1,4 +1,4 @@
-package com.blaster.scene
+package com.blaster.tools
 
 import com.blaster.math.Ray
 import com.blaster.math.Vec3

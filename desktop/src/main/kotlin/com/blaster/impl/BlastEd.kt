@@ -15,13 +15,14 @@ import com.blaster.entity.Model
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
-import com.blaster.scene.Camera
-import com.blaster.scene.Controller
-import com.blaster.scene.Node
+import com.blaster.entity.Camera
+import com.blaster.entity.Controller
+import com.blaster.entity.Node
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.SkyboxTechnique
 import com.blaster.techniques.TextTechnique
+import com.blaster.text.Console
 import org.lwjgl.glfw.GLFW
 import java.io.File
 

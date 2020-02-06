@@ -5,9 +5,8 @@ import com.blaster.common.mat4
 import com.blaster.common.vec3
 import com.blaster.gl.GlLocator
 import com.blaster.gl.glCheck
-import com.blaster.scene.Camera
+import com.blaster.entity.Camera
 import org.joml.AABBf
-import org.joml.Vector3f
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 

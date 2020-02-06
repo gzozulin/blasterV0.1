@@ -3,7 +3,7 @@ package com.blaster.tracing
 import com.blaster.hitables.Hitable
 import com.blaster.math.Ray
 import com.blaster.math.Vec3
-import com.blaster.scene.Camera
+import com.blaster.tools.Camera
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.sqrt

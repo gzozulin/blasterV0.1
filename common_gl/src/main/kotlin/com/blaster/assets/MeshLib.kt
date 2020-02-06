@@ -5,13 +5,11 @@ import com.blaster.common.arrayListIntToByteBuffer
 import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
-import com.blaster.scene.Mesh
+import com.blaster.tools.Mesh
 import org.joml.AABBf
 import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.nio.charset.Charset
 
 private val backend = GlLocator.locate()

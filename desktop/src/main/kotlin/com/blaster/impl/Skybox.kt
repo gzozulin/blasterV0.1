@@ -7,8 +7,8 @@ import com.blaster.assets.TexturesLib
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
-import com.blaster.scene.Camera
-import com.blaster.scene.Controller
+import com.blaster.entity.Camera
+import com.blaster.entity.Controller
 import com.blaster.techniques.SkyboxTechnique
 import org.joml.Vector2f
 

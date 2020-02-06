@@ -3,8 +3,8 @@ package com.blaster.techniques
 import com.blaster.assets.ShadersLib
 import com.blaster.common.mat4
 import com.blaster.gl.*
-import com.blaster.scene.Camera
-import com.blaster.scene.Mesh
+import com.blaster.entity.Camera
+import com.blaster.tools.Mesh
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer

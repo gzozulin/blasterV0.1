@@ -1,23 +1,19 @@
-package com.blaster.scene
+package com.blaster.entity
 
 import com.blaster.common.*
-import org.joml.AABBf
-import org.joml.Matrix4f
-import org.joml.Quaternionf
-import org.joml.Vector3f
 
 // todo: attach to node
-class Camera {
-    val projectionM: mat4 = mat4()
+data class Camera(
+        val projectionM: mat4 = mat4(),
+        val position: vec3 = vec3(),
+        val rotation: quat = quat()
+) {
+    private val viewVersion: Version = Version()
+    private val viewM: mat4 = mat4()
+    private val negatedBuf: vec3 = vec3()
+    private val directionBuf: vec3 = vec3()
 
-    val position: vec3 = vec3()
-    val rotation: quat = quat()
-
-    private var viewVersion = Version()
-    private val viewM = Matrix4f()
-
-    private val negatedBuf = Vector3f()
-    fun calculateViewM(): Matrix4f {
+    fun calculateViewM(): mat4 {
         if (viewVersion.check()) {
             position.negate(negatedBuf)
             viewM.identity().rotate(rotation).translate(negatedBuf)
@@ -35,8 +31,7 @@ class Camera {
         setPerspective(width.toFloat() / height.toFloat())
     }
 
-    private val directionBuf = Vector3f()
-    fun lookAt(from: Vector3f, to: Vector3f): Camera {
+    fun lookAt(from: vec3, to: vec3): Camera {
         viewVersion.increment()
         position.set(from)
         to.sub(from, directionBuf).normalize()
@@ -44,7 +39,7 @@ class Camera {
         return this
     }
 
-    fun lookAt(aabb: AABBf): Camera {
+    fun lookAt(aabb: aabb): Camera {
         viewVersion.increment()
         var maxValue = aabb.width()
         if (aabb.height() > maxValue) {
@@ -54,16 +49,16 @@ class Camera {
             maxValue = aabb.depth()
         }
         val center = aabb.center()
-        center.add(Vector3f(0f, maxValue / 2f, maxValue), position)
+        center.add(vec3(0f, maxValue / 2f, maxValue), position)
         return lookAt(position, center)
     }
 
-    fun setPosition(newPostion: Vector3f) {
+    fun setPosition(newPostion: vec3) {
         position.set(newPostion)
         viewVersion.increment()
     }
 
-    fun lookAlong(direction: Vector3f) {
+    fun lookAlong(direction: vec3) {
         rotation.identity().lookAlong(direction, VECTOR_UP)
         viewVersion.increment()
     }

@@ -3,7 +3,7 @@ package com.blaster.impl
 import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.common.Console
+import com.blaster.text.Console
 import com.blaster.common.center
 import com.blaster.common.lerpf
 import com.blaster.common.mat4
@@ -11,10 +11,10 @@ import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
-import com.blaster.scene.Camera
-import com.blaster.scene.Controller
-import com.blaster.scene.Particle
-import com.blaster.scene.Particles
+import com.blaster.entity.Camera
+import com.blaster.entity.Controller
+import com.blaster.tools.Particle
+import com.blaster.tools.Particles
 import com.blaster.techniques.BillboardsTechnique
 import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.TextTechnique

@@ -2,8 +2,8 @@ package com.blaster.techniques
 
 import com.blaster.assets.ShadersLib
 import com.blaster.gl.*
-import com.blaster.scene.Camera
-import com.blaster.scene.Mesh
+import com.blaster.entity.Camera
+import com.blaster.tools.Mesh
 import com.blaster.entity.Model
 import org.joml.Matrix4f
 

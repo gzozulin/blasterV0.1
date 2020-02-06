@@ -1,5 +1,6 @@
-package com.blaster.common
+package com.blaster.text
 
+import com.blaster.common.parseColor
 import org.joml.Vector2f
 import org.joml.Vector3f
 

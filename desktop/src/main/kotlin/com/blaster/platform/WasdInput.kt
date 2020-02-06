@@ -1,6 +1,6 @@
 package com.blaster.platform
 
-import com.blaster.scene.Controller
+import com.blaster.entity.Controller
 import org.joml.Vector2f
 import org.lwjgl.glfw.GLFW
 

@@ -9,8 +9,8 @@ import com.blaster.gl.GlProgram
 import com.blaster.gl.GlTexture
 import com.blaster.gl.GlUniform
 import com.blaster.gl.glBind
-import com.blaster.scene.Camera
-import com.blaster.scene.Mesh
+import com.blaster.entity.Camera
+import com.blaster.tools.Mesh
 
 class SkyboxTechnique {
     private lateinit var program: GlProgram

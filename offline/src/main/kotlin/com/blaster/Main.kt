@@ -1,10 +1,10 @@
 package com.blaster
 
 import com.blaster.math.Vec3
-import com.blaster.scene.Camera
+import com.blaster.tools.Camera
 import com.blaster.tracing.Raytracer
 import com.blaster.tracing.PptFile
-import com.blaster.scene.CornellScene
+import com.blaster.tools.CornellScene
 import kotlin.system.measureNanoTime
 
 const val width            = 500
