@@ -1,4 +1,4 @@
-package com.blaster.ofc
+package com.blaster.impl
 
 import com.blaster.assets.*
 import com.blaster.common.*

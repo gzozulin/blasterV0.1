@@ -1,4 +1,4 @@
-package com.blaster.ofc
+package com.blaster.impl
 
 import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
