@@ -6,6 +6,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.common.*
 import com.blaster.entity.Light
+import com.blaster.entity.Material
 import com.blaster.entity.Model
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
@@ -62,7 +63,7 @@ private val grammar = Grammar.compile(
         ))
 
 fun mooncity(aabb: aabb) = aabb.randomSplit(listOf(0, 2), BLOCK_SIDE)
-fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 5), 15f, BLOCK_SIDE)
+fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 3), 10f, 20f)
         .map { it.splitByAxis(1, listOf(randomf(0.7f, 1.0f))).first() }
 
 fun building(aabb: aabb): List<aabb> {
@@ -71,7 +72,7 @@ fun building(aabb: aabb): List<aabb> {
 }
 
 fun shape(aabb: aabb): List<aabb> {
-    val node = Node(payload = Model(cube, cubeTexture, aabb))
+    val node = Node(payload = Model(cube, cubeTexture, aabb, Material.MATERIALS.values.random()))
     node.setPosition(aabb.center())
     node.setScale(cubeAabb.scaleTo(aabb))
     cubeNodes.add(node)
