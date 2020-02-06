@@ -107,7 +107,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
-        meganode.rotate(VECTOR_UP, 0.001f)
+        meganode.rotate(angle = 0.001f)
         cubeNodes.sortBy { it.position.distanceSquared(camera.position) }
     }
 

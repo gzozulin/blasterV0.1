@@ -2,6 +2,8 @@ package com.blaster.entity
 
 import com.blaster.aux.*
 
+private val vecUp = vec3().up()
+
 data class Node<T>(
         private var parent: Node<T>? = null,
         val position: vec3 = vec3(),
@@ -81,21 +83,21 @@ data class Node<T>(
         return this
     }
 
-    fun rotate(axis: vec3, angle: Float): Node<T> {
+    fun rotate(axis: vec3 = vecUp, angle: Float): Node<T> {
         rotation.rotateAxis(angle, axis)
         version.increment()
         return this
     }
 
     fun lookAlong(direction: vec3): Node<T> {
-        rotation.lookAlong(direction, VECTOR_UP)
+        rotation.lookAlong(direction, vecUp)
         version.increment()
         return this
     }
 
     fun lookAt(target: vec3): Node<T> {
         val direction = vec3(target).sub(position)
-        rotation.lookAlong(direction, VECTOR_UP)
+        rotation.lookAlong(direction, vecUp)
         version.increment()
         return this
     }

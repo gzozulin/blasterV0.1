@@ -1,12 +1,15 @@
 package com.blaster.entity
 
-import com.blaster.aux.VECTOR_DOWN
-import com.blaster.aux.VECTOR_UP
+import com.blaster.aux.down
+import com.blaster.aux.up
 import com.blaster.aux.vec3
 import org.joml.Math
 import org.joml.Vector3f
 import kotlin.math.cos
 import kotlin.math.sin
+
+private val vecUp = vec3().up()
+private val vecDown = vec3().down()
 
 private const val maxPitch = Math.PI.toFloat() / 2f - 0.1f
 private const val minPitch = -Math.PI.toFloat() / 2f + 0.1f
@@ -58,7 +61,7 @@ data class Controller(
 
     private fun updatePosition() {
         delta.zero()
-        VECTOR_UP.cross(forward, right)
+        right.set(vecUp).cross(forward, right)
         right.normalize()
         forward.negate(back)
         right.negate(left)
@@ -75,10 +78,10 @@ data class Controller(
             delta.add(left)
         }
         if (moveDown) {
-            delta.add(VECTOR_DOWN)
+            delta.add(vecDown)
         }
         if (moveUp) {
-            delta.add(VECTOR_UP)
+            delta.add(vecUp)
         }
         delta.mul(velocity)
         position.add(delta)

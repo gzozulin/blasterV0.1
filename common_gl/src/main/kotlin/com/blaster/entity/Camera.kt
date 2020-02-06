@@ -2,6 +2,8 @@ package com.blaster.entity
 
 import com.blaster.aux.*
 
+private val vecUp = vec3().up()
+
 // todo: attach to node
 data class Camera(
         val projectionM: mat4 = mat4(),
@@ -34,7 +36,7 @@ data class Camera(
     fun lookAt(from: vec3, to: vec3): Camera {
         position.set(from)
         to.sub(from, directionBuf).normalize()
-        rotation.lookAlong(directionBuf, VECTOR_UP)
+        rotation.lookAlong(directionBuf, vecUp)
         viewVersion.increment()
         return this
     }
@@ -58,7 +60,7 @@ data class Camera(
     }
 
     fun lookAlong(direction: vec3) {
-        rotation.identity().lookAlong(direction, VECTOR_UP)
+        rotation.identity().lookAlong(direction, vecUp)
         viewVersion.increment()
     }
 }

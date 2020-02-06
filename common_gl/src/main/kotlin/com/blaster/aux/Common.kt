@@ -20,11 +20,8 @@ typealias aabb = AABBf
 
 private val random = Random()
 
-// todo: remove - mutable
-val VECTOR_UP = Vector3f(0f, 1f, 0f)
-val VECTOR_DOWN = Vector3f(0f, -1f, 0f)
-
-fun fail(reason: String = "wtf?!"): Nothing = throw IllegalStateException()
+fun fail(th: Throwable): Nothing = throw th
+fun fail(reason: String = "wtf?!"): Nothing = fail(IllegalStateException(reason))
 
 fun radf(degrees: Float) = Math.toRadians(degrees.toDouble()).toFloat()
 fun degf(radians: Float) = Math.toDegrees(radians.toDouble()).toFloat()
@@ -36,10 +33,38 @@ fun randf(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) = min + ra
 fun randi(min: Int = Integer.MIN_VALUE, max: Int = Integer.MAX_VALUE) = random.nextInt((max - min) + 1) + min
 fun randb() = random.nextBoolean()
 
-fun vec3.random(min: vec3 = vec3(0f), max: vec3 = vec3(1f)): vec3 {
+fun vec3.rand(min: vec3 = vec3(0f), max: vec3 = vec3(1f)): vec3 {
     x = randf(min.x, max.x)
     y = randf(min.y, max.y)
     z = randf(min.z, max.z)
+    return this
+}
+
+fun vec3.up(): vec3 {
+    x = 0f
+    y = 1f
+    z = 0f
+    return this
+}
+
+fun vec3.down(): vec3 {
+    x = 0f
+    y = -1f
+    z = 0f
+    return this
+}
+
+fun vec3.left(): vec3 {
+    x = -1f
+    y = 0f
+    z = 0f
+    return this
+}
+
+fun vec3.right(): vec3 {
+    x = 1f
+    y = 0f
+    z = 0f
     return this
 }
 
