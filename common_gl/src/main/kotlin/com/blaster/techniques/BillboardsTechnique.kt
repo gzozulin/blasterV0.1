@@ -4,7 +4,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.aux.mat4
 import com.blaster.gl.*
 import com.blaster.entity.Camera
-import com.blaster.tools.Mesh
+import com.blaster.tools.GlMesh
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
@@ -26,7 +26,7 @@ interface BillboardsProvider {
 
 class BillboardsTechnique(private val max: Int) {
     private lateinit var program: GlProgram
-    private lateinit var rect: Mesh
+    private lateinit var rect: GlMesh
 
     private lateinit var positions: GlBuffer
     private lateinit var scale: GlBuffer
@@ -45,7 +45,7 @@ class BillboardsTechnique(private val max: Int) {
                 GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positions,
                 GlAttribute.ATTRIBUTE_BILLBOARD_SCALE to scale,
                 GlAttribute.ATTRIBUTE_BILLBOARD_TRANSPARENCY to transparency)
-        rect = Mesh.rect(additionalAttributes = additional)
+        rect = GlMesh.rect(additionalAttributes = additional)
     }
 
     fun draw(camera: Camera, draw: () -> Unit) {

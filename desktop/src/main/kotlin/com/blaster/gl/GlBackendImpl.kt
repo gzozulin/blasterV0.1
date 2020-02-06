@@ -106,6 +106,11 @@ class GlBackendImpl : GlBackend {
     override fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long) =
             GL20.glVertexAttribPointer(indx, size, type, normalized, stride, offset)
 
+
+    override fun glGenVertexArrays() = GL30.glGenVertexArrays()
+    override fun glDeleteVertexArrays(handle: Int) = GL30.glDeleteVertexArrays(handle)
+    override fun glBindVertexArray(handle: Int) = GL30.glBindVertexArray(handle)
+
     override fun glVertexAttribDivisor(indx: Int, divisor: Int) = GL33.glVertexAttribDivisor(indx, divisor)
     override fun glDisableVertexAttribArray(index: Int) = GL20.glDisableVertexAttribArray(index)
     override fun glDrawElements(mode: Int, count: Int, type: Int, offset: Long) =

@@ -10,12 +10,12 @@ import com.blaster.gl.GlTexture
 import com.blaster.gl.GlUniform
 import com.blaster.gl.glBind
 import com.blaster.entity.Camera
-import com.blaster.tools.Mesh
+import com.blaster.tools.GlMesh
 
 class SkyboxTechnique {
     private lateinit var program: GlProgram
     private lateinit var diffuse: GlTexture
-    private lateinit var cube: Mesh
+    private lateinit var cube: GlMesh
 
     fun create(shadersLib: ShadersLib, textureLib: TexturesLib, meshLib: MeshLib, skybox: String) {
         program = shadersLib.loadProgram("shaders/skybox/skybox.vert", "shaders/skybox/skybox.frag")

@@ -25,7 +25,7 @@ private val shadersLib = ShadersLib(assetStream)
 
 private val simpleTechnique = SimpleTechnique()
 
-private lateinit var mesh: Mesh
+private lateinit var mesh: GlMesh
 private lateinit var tex1: GlTexture
 private lateinit var tex2: GlTexture
 private lateinit var tex3: GlTexture
@@ -46,7 +46,7 @@ private val axis = vec3(1f)
 private val window = object : LwjglWindow() {
     override fun onCreate() {
         simpleTechnique.prepare(shadersLib)
-        mesh = Mesh.triangle()
+        mesh = GlMesh.triangle()
         tex1 = texturesLib.loadTexture("textures/lumina.png")
         tex2 = texturesLib.loadTexture("textures/utah.jpeg")
         tex3 = texturesLib.loadTexture("textures/winner.png")

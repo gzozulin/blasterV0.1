@@ -4,10 +4,23 @@ import com.blaster.gl.*
 
 private val backend = GlLocator.locate()
 
-class Mesh(
+class GlMesh(
         private val attributes: List<Pair<GlAttribute, GlBuffer>>,
         private val indicesBuffer: GlBuffer,
         private val indicesCount: Int) : GLBindable {
+
+    var handle: Int? = null
+
+    init {
+        handle = glCheck { backend.glGenVertexArrays() }
+        check(handle!! > 0)
+    }
+
+    init {
+        glBind(this) {
+            bindVertexPointers()
+        }
+    }
 
     private fun bindVertexPointers() {
         attributes.forEach {
@@ -20,26 +33,15 @@ class Mesh(
                 }
             }
         }
-    }
-
-    private fun disableVertexPointers() {
-        attributes.forEach {
-            it.second.unbind()
-            glCheck { backend.glDisableVertexAttribArray(it.first.location) }
-            if (it.first.divisor != 0) {
-                backend.glVertexAttribDivisor(it.first.location, 0)
-            }
-        }
-    }
-
-    override fun bind() {
-        bindVertexPointers()
         indicesBuffer.bind()
     }
 
+    override fun bind() {
+        glCheck { backend.glBindVertexArray(handle!!) }
+    }
+
     override fun unbind() {
-        indicesBuffer.unbind()
-        disableVertexPointers()
+        glCheck { backend.glBindVertexArray(0) }
     }
 
     fun draw(mode: Int = backend.GL_TRIANGLES) {
@@ -51,7 +53,7 @@ class Mesh(
     }
 
     companion object {
-        fun rect(additionalAttributes: List<Pair<GlAttribute, GlBuffer>> = listOf()): Mesh {
+        fun rect(additionalAttributes: List<Pair<GlAttribute, GlBuffer>> = listOf()): GlMesh {
             val quadPositions = floatArrayOf(
                     -1f,  1f, 0f,
                     -1f, -1f, 0f,
@@ -70,10 +72,10 @@ class Mesh(
                     GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, quadTexCoords)
             )
             attributes.addAll(additionalAttributes)
-            return Mesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, quadIndices), quadIndices.size)
+            return GlMesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, quadIndices), quadIndices.size)
         }
 
-        fun triangle(): Mesh {
+        fun triangle(): GlMesh {
             val trianglePositions = floatArrayOf(
                     0f,  1f, 0f,
                     -1f, -1f, 0f,
@@ -89,7 +91,7 @@ class Mesh(
                     GlAttribute.ATTRIBUTE_POSITION to GlBuffer.create(backend.GL_ARRAY_BUFFER, trianglePositions),
                     GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, triangleTexCoords)
             )
-            return Mesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, triangleIndices), triangleIndices.size)
+            return GlMesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, triangleIndices), triangleIndices.size)
         }
     }
 }

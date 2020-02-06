@@ -5,7 +5,7 @@ import com.blaster.aux.arrayListIntToByteBuffer
 import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
-import com.blaster.tools.Mesh
+import com.blaster.tools.GlMesh
 import org.joml.AABBf
 import org.joml.Vector3f
 import java.io.BufferedReader
@@ -40,7 +40,7 @@ class MeshLib (private val assetStream: AssetStream) {
 
     // todo: create Native(Float)Buffer directly, instead of copying arrays
     // todo: only model! no diffuse
-    fun loadMesh(meshFilename: String): Pair<Mesh, AABBf> {
+    fun loadMesh(meshFilename: String): Pair<GlMesh, AABBf> {
         minX = 0f
         minY = 0f
         minZ = 0f
@@ -60,7 +60,7 @@ class MeshLib (private val assetStream: AssetStream) {
         val texCoordBuff = arrayListFloatToByteBuffer(currentTexCoords)
         val normalBuff = arrayListFloatToByteBuffer(currentNormals)
         val indicesBuff = arrayListIntToByteBuffer(currentIndices)
-        val mesh = Mesh(
+        val mesh = GlMesh(
                 listOf(
                         GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),
                         GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer(backend.GL_ARRAY_BUFFER, texCoordBuff),

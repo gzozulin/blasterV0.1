@@ -3,19 +3,19 @@ package com.blaster.techniques
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
-import com.blaster.tools.Mesh
+import com.blaster.tools.GlMesh
 import org.joml.Vector2f
 import org.joml.Vector3f
 
 class TextTechnique {
     private lateinit var program: GlProgram
     private lateinit var font: GlTexture
-    private lateinit var rect: Mesh
+    private lateinit var rect: GlMesh
 
     fun create(shadersLib: ShadersLib, textureLib: TexturesLib) {
         program = shadersLib.loadProgram("shaders/text/text.vert", "shaders/text/text.frag")
         font = textureLib.loadTexture("textures/font.png")
-        rect = Mesh.rect()
+        rect = GlMesh.rect()
     }
 
     fun draw(call: () -> Unit) {

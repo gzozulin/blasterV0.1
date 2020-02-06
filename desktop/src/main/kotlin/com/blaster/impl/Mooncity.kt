@@ -15,7 +15,7 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.entity.Camera
 import com.blaster.entity.Controller
-import com.blaster.tools.Mesh
+import com.blaster.tools.GlMesh
 import com.blaster.entity.Node
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.ImmediateTechnique
@@ -45,7 +45,7 @@ private var mouseControl = false
 private val daylight = Light(vec3(1f), false)
 private val daylightNode = Node(payload = daylight).lookAlong(vec3(-1f, -0.7f, -0.3f))
 
-private lateinit var cube: Mesh
+private lateinit var cube: GlMesh
 private lateinit var cubeAabb: aabb
 private val meganode = Node<Model>()
 private val cubeNodes = mutableListOf<Node<Model>>()

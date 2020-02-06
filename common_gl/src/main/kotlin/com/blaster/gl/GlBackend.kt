@@ -102,6 +102,9 @@ interface GlBackend {
     fun glFramebufferRenderbuffer(target: Int, attachment: Int, renderbuffertarget: Int, renderbuffer: Int)
     fun glDrawBuffers(bufs: IntArray)
     fun glCheckFramebufferStatus(target: Int): Int
+    fun glGenVertexArrays(): Int
+    fun glDeleteVertexArrays(handle: Int)
+    fun glBindVertexArray(handle: Int)
     fun glEnableVertexAttribArray(index: Int)
     fun glVertexAttribPointer(indx: Int, size: Int, type: Int, normalized: Boolean, stride: Int, offset: Long)
     fun glVertexAttribDivisor(indx: Int, divisor: Int)

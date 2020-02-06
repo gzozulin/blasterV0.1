@@ -6,7 +6,7 @@ import com.blaster.gl.*
 import com.blaster.entity.Camera
 import com.blaster.entity.Light
 import com.blaster.entity.Material
-import com.blaster.tools.Mesh
+import com.blaster.tools.GlMesh
 import org.joml.Matrix4f
 
 private val backend = GlLocator.locate()
@@ -17,7 +17,7 @@ class DeferredTechnique {
     private lateinit var programGeomPass: GlProgram
     private lateinit var programLightPass: GlProgram
 
-    private lateinit var quadMesh: Mesh
+    private lateinit var quadMesh: GlMesh
 
     private lateinit var framebuffer: GlFrameBuffer
 
@@ -36,7 +36,7 @@ class DeferredTechnique {
                 "shaders/deferred/geom_pass.vert", "shaders/deferred/geom_pass.frag")
         programLightPass = shadersLib.loadProgram(
                 "shaders/deferred/light_pass.vert", "shaders/deferred/light_pass.frag")
-        quadMesh = Mesh.rect()
+        quadMesh = GlMesh.rect()
     }
 
     fun resize(width: Int, height: Int) {
@@ -138,7 +138,7 @@ class DeferredTechnique {
         check(pointLightCnt + dirLightCnt < MAX_LIGHTS) { "More lights than defined in shader!" }
     }
 
-    fun instance(mesh: Mesh, modelM: Matrix4f, diffuse: GlTexture, material: Material) {
+    fun instance(mesh: GlMesh, modelM: Matrix4f, diffuse: GlTexture, material: Material) {
         glBind(listOf(mesh, diffuse)) {
             programGeomPass.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
             programGeomPass.setUniform(GlUniform.UNIFORM_MAT_AMBIENT, material.ambient)
