@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWKeyCallback
 import org.lwjgl.glfw.GLFWMouseButtonCallback
 import org.lwjgl.glfw.GLFWWindowSizeCallback
+import org.lwjgl.openal.Util
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GLContext
 import org.lwjgl.system.MemoryUtil.NULL
