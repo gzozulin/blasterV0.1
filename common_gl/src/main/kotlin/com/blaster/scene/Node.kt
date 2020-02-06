@@ -102,17 +102,17 @@ class Node<T>(
         return this
     }
 
-    fun setDefaultPosition() {
+    fun resetPosition() {
         position.zero()
         version.increment()
     }
 
-    fun setDefaultRotation() {
+    fun resetRotation() {
         rotation.identity()
         version.increment()
     }
 
-    fun setDefaultScale() {
+    fun resetScale() {
         scale.set(1f)
         version.increment()
     }

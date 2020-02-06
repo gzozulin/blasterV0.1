@@ -65,8 +65,8 @@ private val grammar = Grammar.compile(
         ))
 
 fun mooncity(aabb: aabb) = aabb.randomSplit(listOf(0, 2), BLOCK_SIDE)
-fun block(aabb: aabb) = aabb.selectCentersInside(randomi(1, 3), 10f, 20f)
-        .map { it.splitByAxis(1, listOf(randomf(0.7f, 1.0f))).first() }
+fun block(aabb: aabb) = aabb.selectCentersInside(randi(1, 3), 10f, 20f)
+        .map { it.splitByAxis(1, listOf(randf(0.7f, 1.0f))).first() }
 
 fun building(aabb: aabb): List<aabb> {
     val split = aabb.splitByAxis(1, listOf(0.1f, 0.8f, 0.1f))

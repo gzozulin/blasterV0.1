@@ -107,8 +107,4 @@ class ImmediateTechnique {
             backend.glEnd()
         }
     }
-
-
-
-    // todo: draw axis
 }

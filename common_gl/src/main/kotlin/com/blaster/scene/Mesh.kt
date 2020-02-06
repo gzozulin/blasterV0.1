@@ -1,6 +1,5 @@
 package com.blaster.scene
 
-import com.blaster.common.vec3
 import com.blaster.gl.*
 
 private val backend = GlLocator.locate()

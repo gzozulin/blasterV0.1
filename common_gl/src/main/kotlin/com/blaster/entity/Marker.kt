@@ -25,11 +25,11 @@ data class Marker(
             dir != null -> node.lookAlong(dir)
             euler != null -> node.setEulerDeg(euler)
             quat != null -> node.setRotation(quat)
-            else -> node.setDefaultRotation()
+            else -> node.resetRotation()
         }
         when {
             scale != null -> node.setScale(scale)
-            else -> node.setDefaultScale()
+            else -> node.resetScale()
         }
     }
 

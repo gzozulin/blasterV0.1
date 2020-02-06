@@ -3,9 +3,9 @@ package com.blaster.common
 import org.joml.Vector2f
 import org.joml.Vector3f
 
-private val COLOR_FAILURE = extractColors("ffabab")
-private val COLOR_INFO = extractColors("6eb5ff")
-private val COLOR_SUCCESS = extractColors("9ee09e")
+private val COLOR_FAILURE = parseColor("ffabab")
+private val COLOR_INFO = parseColor("6eb5ff")
+private val COLOR_SUCCESS = parseColor("9ee09e")
 
 private const val TEXT_SCALE = 0.025f
 

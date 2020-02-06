@@ -113,7 +113,7 @@ fun aabb.randomSplit(axises: List<Int> = listOf(0, 1, 2), min: Float): List<aabb
         val to = 0.7f
         val minLength = length * 0.3f
         if (minLength > min) {
-            val first = randomf(from, to)
+            val first = randf(from, to)
             val second = 1f - first
             return splitByAxis(axis, listOf(first, second))
                     .flatMap { it.randomSplit(axises, min) }
@@ -152,13 +152,13 @@ fun aabb.selectCentersInside(cnt: Int, minR: Float, maxR: Float): List<aabb> {
     check(cnt > 0 && maxR > minR)
     val result = mutableListOf<aabb>()
     while (result.size != cnt) {
-        val r = randomf(minR, maxR)
+        val r = randf(minR, maxR)
         val fromX = minX + r
         val toX = maxX - r
         val fromZ = minZ + r
         val toZ = maxZ - r
-        val x = randomf(fromX, toX)
-        val z = randomf(fromZ, toZ)
+        val x = randf(fromX, toX)
+        val z = randf(fromZ, toZ)
         result.add(aabb(x - r, minY, z - r, x + r, maxY, z + r))
     }
     return result

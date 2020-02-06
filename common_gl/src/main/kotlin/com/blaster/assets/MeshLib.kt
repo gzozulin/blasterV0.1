@@ -1,5 +1,7 @@
 package com.blaster.assets
 
+import com.blaster.common.arrayListFloatToByteBuffer
+import com.blaster.common.arrayListIntToByteBuffer
 import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
@@ -13,22 +15,6 @@ import java.nio.ByteOrder
 import java.nio.charset.Charset
 
 private val backend = GlLocator.locate()
-
-private fun arrayListFloatToByteBuffer(list: List<Float>): ByteBuffer {
-    val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
-    val typed = buffer.asFloatBuffer()
-    list.forEach { typed.put(it) }
-    buffer.position(0)
-    return buffer
-}
-
-private fun arrayListIntToByteBuffer(list: List<Int>): ByteBuffer {
-    val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
-    val typed = buffer.asIntBuffer()
-    list.forEach { typed.put(it) }
-    buffer.position(0)
-    return buffer
-}
 
 // todo: scaler - to bring any model to the scene dimensions
 // todo: info about model: vert/ind count, times, progress loading, etc

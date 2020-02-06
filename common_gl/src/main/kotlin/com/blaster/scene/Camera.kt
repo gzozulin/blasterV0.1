@@ -7,7 +7,7 @@ import org.joml.Quaternionf
 import org.joml.Vector3f
 
 // todo: attach to node
-class Camera() {
+class Camera {
     val projectionM: mat4 = mat4()
 
     val position: vec3 = vec3()
