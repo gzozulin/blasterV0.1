@@ -1,6 +1,5 @@
-package com.blaster.editor
+package com.blaster.tools
 
-import com.blaster.text.Console
 import com.blaster.entity.Marker
 import java.lang.IllegalStateException
 

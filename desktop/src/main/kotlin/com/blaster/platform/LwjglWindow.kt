@@ -1,7 +1,7 @@
 package com.blaster.platform
 
-import com.blaster.common.Once
-import com.blaster.common.vec2
+import com.blaster.aux.Once
+import com.blaster.aux.vec2
 import org.joml.Vector2f
 import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*

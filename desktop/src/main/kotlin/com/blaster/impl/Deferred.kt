@@ -1,7 +1,7 @@
 package com.blaster.impl
 
 import com.blaster.assets.*
-import com.blaster.common.*
+import com.blaster.aux.*
 import com.blaster.entity.*
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
@@ -9,7 +9,7 @@ import com.blaster.platform.WasdInput
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.SkyboxTechnique
 import com.blaster.techniques.TextTechnique
-import com.blaster.text.Console
+import com.blaster.tools.Console
 import org.joml.Vector2f
 import org.joml.Vector3f
 import org.lwjgl.glfw.GLFW

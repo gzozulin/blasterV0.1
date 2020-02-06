@@ -1,4 +1,4 @@
-package com.blaster.common
+package com.blaster.aux
 
 class Once {
     private var flag = true

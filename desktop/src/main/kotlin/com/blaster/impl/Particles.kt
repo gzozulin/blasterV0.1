@@ -3,10 +3,10 @@ package com.blaster.impl
 import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.text.Console
-import com.blaster.common.center
-import com.blaster.common.lerpf
-import com.blaster.common.mat4
+import com.blaster.tools.Console
+import com.blaster.aux.center
+import com.blaster.aux.lerpf
+import com.blaster.aux.mat4
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow

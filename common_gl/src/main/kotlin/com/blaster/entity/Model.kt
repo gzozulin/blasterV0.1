@@ -1,6 +1,6 @@
 package com.blaster.entity
 
-import com.blaster.common.aabb
+import com.blaster.aux.aabb
 import com.blaster.gl.GlTexture
 import com.blaster.tools.Mesh
 

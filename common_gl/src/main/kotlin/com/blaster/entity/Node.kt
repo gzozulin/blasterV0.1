@@ -1,6 +1,6 @@
 package com.blaster.entity
 
-import com.blaster.common.*
+import com.blaster.aux.*
 
 data class Node<T>(
         private var parent: Node<T>? = null,

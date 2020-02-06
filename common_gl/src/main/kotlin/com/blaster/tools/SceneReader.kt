@@ -1,6 +1,6 @@
-package com.blaster.editor
+package com.blaster.tools
 
-import com.blaster.common.*
+import com.blaster.aux.*
 import com.blaster.entity.Marker
 import java.io.BufferedReader
 import java.io.InputStream

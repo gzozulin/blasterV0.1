@@ -1,7 +1,7 @@
 package com.blaster.assets
 
-import com.blaster.common.arrayListFloatToByteBuffer
-import com.blaster.common.arrayListIntToByteBuffer
+import com.blaster.aux.arrayListFloatToByteBuffer
+import com.blaster.aux.arrayListIntToByteBuffer
 import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator

@@ -1,7 +1,7 @@
 package com.blaster.techniques
 
 import com.blaster.assets.ShadersLib
-import com.blaster.common.mat4
+import com.blaster.aux.mat4
 import com.blaster.gl.*
 import com.blaster.entity.Camera
 import com.blaster.tools.Mesh

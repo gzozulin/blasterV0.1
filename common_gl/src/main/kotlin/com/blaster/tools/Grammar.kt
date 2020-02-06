@@ -1,6 +1,6 @@
-package com.blaster.grammar
+package com.blaster.tools
 
-import com.blaster.common.*
+import com.blaster.aux.*
 import java.util.regex.Pattern
 
 private val SPLIT_LINE = Pattern.compile(":\\s+")
@@ -98,69 +98,4 @@ class Grammar<T> private constructor() {
             return GrammarNode(label, splitRules.getValue(label), children)
         }
     }
-}
-
-fun aabb.randomSplit(axises: List<Int> = listOf(0, 1, 2), min: Float): List<aabb> {
-    val axisesCopy = ArrayList(axises)
-    while(axisesCopy.isNotEmpty()) {
-        val axis = axisesCopy.random()
-        val length = when (axis) {
-            0 -> width()
-            1 -> height()
-            2 -> depth()
-            else -> throw IllegalStateException("wtf?!")
-        }
-        val from  = 0.3f
-        val to = 0.7f
-        val minLength = length * 0.3f
-        if (minLength > min) {
-            val first = randf(from, to)
-            val second = 1f - first
-            return splitByAxis(axis, listOf(first, second))
-                    .flatMap { it.randomSplit(axises, min) }
-        } else {
-            axisesCopy.remove(axis)
-        }
-    }
-    return listOf(this) // terminal
-}
-
-fun aabb.splitByAxis(axis: Int, ratios: List<Float>): List<aabb> {
-    val result = mutableListOf<aabb>()
-    val (from, to) = when (axis) {
-        0 -> minX to maxX
-        1 -> minY to maxY
-        2 -> minZ to maxZ
-        else -> throw IllegalArgumentException("wtf?!")
-    }
-    check(to > from)
-    val length = to - from
-    var start = from
-    ratios.forEach { ratio ->
-        val end = start + length * ratio
-        result.add(when (axis) {
-            0 -> aabb(start, minY, minZ, end, maxY, maxZ)
-            1 -> aabb(minX, start, minZ, maxX, end, maxZ)
-            2 -> aabb(minX, minY, start, maxX, maxY, end)
-            else -> throw IllegalArgumentException("wtf?!")
-        })
-        start = end
-    }
-    return result
-}
-
-fun aabb.selectCentersInside(cnt: Int, minR: Float, maxR: Float): List<aabb> {
-    check(cnt > 0 && maxR > minR)
-    val result = mutableListOf<aabb>()
-    while (result.size != cnt) {
-        val r = randf(minR, maxR)
-        val fromX = minX + r
-        val toX = maxX - r
-        val fromZ = minZ + r
-        val toZ = maxZ - r
-        val x = randf(fromX, toX)
-        val z = randf(fromZ, toZ)
-        result.add(aabb(x - r, minY, z - r, x + r, maxY, z + r))
-    }
-    return result
 }

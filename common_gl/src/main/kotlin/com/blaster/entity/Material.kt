@@ -1,6 +1,6 @@
 package com.blaster.entity
 
-import com.blaster.common.vec3
+import com.blaster.aux.vec3
 
 data class Material(val ambient: vec3, val diffuse: vec3, val specular: vec3, val shine: Float, val transparency: Float = 1f) {
     companion object {

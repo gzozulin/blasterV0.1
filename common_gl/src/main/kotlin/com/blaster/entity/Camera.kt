@@ -1,6 +1,6 @@
 package com.blaster.entity
 
-import com.blaster.common.*
+import com.blaster.aux.*
 
 // todo: attach to node
 data class Camera(
@@ -32,15 +32,14 @@ data class Camera(
     }
 
     fun lookAt(from: vec3, to: vec3): Camera {
-        viewVersion.increment()
         position.set(from)
         to.sub(from, directionBuf).normalize()
         rotation.lookAlong(directionBuf, VECTOR_UP)
+        viewVersion.increment()
         return this
     }
 
     fun lookAt(aabb: aabb): Camera {
-        viewVersion.increment()
         var maxValue = aabb.width()
         if (aabb.height() > maxValue) {
             maxValue = aabb.height()

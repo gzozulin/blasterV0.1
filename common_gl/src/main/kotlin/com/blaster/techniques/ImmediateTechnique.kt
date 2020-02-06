@@ -1,8 +1,8 @@
 package com.blaster.techniques
 
-import com.blaster.common.color
-import com.blaster.common.mat4
-import com.blaster.common.vec3
+import com.blaster.aux.color
+import com.blaster.aux.mat4
+import com.blaster.aux.vec3
 import com.blaster.gl.GlLocator
 import com.blaster.gl.glCheck
 import com.blaster.entity.Camera

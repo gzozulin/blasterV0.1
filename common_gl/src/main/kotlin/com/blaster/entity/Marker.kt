@@ -1,6 +1,6 @@
 package com.blaster.entity
 
-import com.blaster.common.*
+import com.blaster.aux.*
 
 // the higher the level of command, the higher is the priority:
 // target >> dir >> euler >> quat >> matrix

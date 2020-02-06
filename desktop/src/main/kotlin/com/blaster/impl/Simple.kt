@@ -4,7 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.PixelDecoder
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.common.vec3
+import com.blaster.aux.vec3
 import com.blaster.entity.Camera
 import com.blaster.entity.Controller
 import com.blaster.entity.Model
