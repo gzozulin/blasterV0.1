@@ -1,6 +1,5 @@
-package com.blaster.tools
+package com.blaster.toolbox
 
-import com.blaster.aux.*
 import java.util.regex.Pattern
 
 private val SPLIT_LINE = Pattern.compile(":\\s+")

@@ -1,7 +1,7 @@
 package com.blaster.assets
 
-import com.blaster.aux.arrayListFloatToByteBuffer
-import com.blaster.aux.arrayListIntToByteBuffer
+import com.blaster.aux.toByteBufferFloat
+import com.blaster.aux.toByteBufferInt
 import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
@@ -56,10 +56,10 @@ class MeshLib (private val assetStream: AssetStream) {
                 line = bufferedReader.readLine()
             }
         }
-        val positionBuff = arrayListFloatToByteBuffer(currentPositions)
-        val texCoordBuff = arrayListFloatToByteBuffer(currentTexCoords)
-        val normalBuff = arrayListFloatToByteBuffer(currentNormals)
-        val indicesBuff = arrayListIntToByteBuffer(currentIndices)
+        val positionBuff = toByteBufferFloat(currentPositions)
+        val texCoordBuff = toByteBufferFloat(currentTexCoords)
+        val normalBuff = toByteBufferFloat(currentNormals)
+        val indicesBuff = toByteBufferInt(currentIndices)
         val mesh = GlMesh(
                 listOf(
                         GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),

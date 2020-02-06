@@ -1,4 +1,4 @@
-package com.blaster.tools
+package com.blaster.toolbox
 
 import com.blaster.hitables.*
 import com.blaster.material.DiffuseMaterial

@@ -1,4 +1,4 @@
-package com.blaster.tools
+package com.blaster.toolbox
 
 import com.blaster.techniques.BillboardsProvider
 import org.joml.Vector3f

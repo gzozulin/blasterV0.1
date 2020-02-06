@@ -3,7 +3,7 @@ package com.blaster.impl
 import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.tools.Console
+import com.blaster.toolbox.Console
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.techniques.TextTechnique

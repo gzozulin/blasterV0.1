@@ -5,9 +5,9 @@ import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.aux.*
-import com.blaster.tools.MultiListener
-import com.blaster.tools.SceneDiffer
-import com.blaster.tools.SceneReader
+import com.blaster.toolbox.MultiListener
+import com.blaster.toolbox.SceneDiffer
+import com.blaster.toolbox.SceneReader
 import com.blaster.entity.Light
 import com.blaster.entity.Marker
 import com.blaster.entity.Material
@@ -22,7 +22,7 @@ import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.SkyboxTechnique
 import com.blaster.techniques.TextTechnique
-import com.blaster.tools.Console
+import com.blaster.toolbox.Console
 import org.lwjgl.glfw.GLFW
 import java.io.File
 

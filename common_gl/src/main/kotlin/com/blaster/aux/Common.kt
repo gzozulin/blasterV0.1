@@ -177,7 +177,7 @@ fun String.toAabb(): aabb {
     }
 }
 
-fun arrayListFloatToByteBuffer(list: List<Float>): ByteBuffer {
+fun toByteBufferFloat(list: List<Float>): ByteBuffer {
     val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
     val typed = buffer.asFloatBuffer()
     list.forEach { typed.put(it) }
@@ -185,7 +185,7 @@ fun arrayListFloatToByteBuffer(list: List<Float>): ByteBuffer {
     return buffer
 }
 
-fun arrayListIntToByteBuffer(list: List<Int>): ByteBuffer {
+fun toByteBufferInt(list: List<Int>): ByteBuffer {
     val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
     val typed = buffer.asIntBuffer()
     list.forEach { typed.put(it) }

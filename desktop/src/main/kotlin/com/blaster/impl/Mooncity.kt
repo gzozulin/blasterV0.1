@@ -10,7 +10,7 @@ import com.blaster.entity.Material
 import com.blaster.entity.Model
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
-import com.blaster.tools.Grammar
+import com.blaster.toolbox.Grammar
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.entity.Camera

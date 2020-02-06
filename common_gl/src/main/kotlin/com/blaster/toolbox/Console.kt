@@ -1,4 +1,4 @@
-package com.blaster.tools
+package com.blaster.toolbox
 
 import com.blaster.aux.parseColor
 import org.joml.Vector2f
