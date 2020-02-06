@@ -30,6 +30,7 @@ interface GlBackend {
     val GL_TRIANGLES: Int
     val GL_LINES: Int
     val GL_POINTS: Int
+    val GL_MULTISAMPLE: Int
     val GL_DEPTH_TEST: Int
     val GL_COLOR_BUFFER_BIT: Int
     val GL_DEPTH_BUFFER_BIT: Int

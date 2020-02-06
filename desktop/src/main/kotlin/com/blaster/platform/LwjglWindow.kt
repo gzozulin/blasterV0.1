@@ -19,7 +19,8 @@ abstract class LwjglWindow(
         private val fullWidth: Int = 1920, private val fullHeight: Int = 1080,
         private val winX: Int = 448, private val winY: Int = 156,
         private val isHoldingCursor: Boolean = true,
-        private var isFullscreen: Boolean = false) {
+        private var isFullscreen: Boolean = false,
+        private val isMultisampled: Boolean = false) {
 
     init {
         SharedLibraryLoader.load()
@@ -135,6 +136,9 @@ abstract class LwjglWindow(
         }
         if (isHoldingCursor) {
             glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        }
+        if (isMultisampled) {
+            glfwWindowHint(GLFW_SAMPLES, 4)
         }
         glfwSetWindowSizeCallback(new, windowSizeCallback)
         glfwSetMouseButtonCallback(new, mouseBtnCallback)
