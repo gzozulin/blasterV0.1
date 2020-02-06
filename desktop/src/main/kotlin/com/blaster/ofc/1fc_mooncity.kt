@@ -46,8 +46,10 @@ private val daylightNode = Node(payload = daylight).lookAlong(vec3(-1f, -0.7f, -
 
 private lateinit var cube: Mesh
 private lateinit var cubeAabb: aabb
+private val meganode = Node<Model>()
 private val cubeNodes = mutableListOf<Node<Model>>()
 private lateinit var cubeTexture: GlTexture
+private lateinit var earthNode: Node<Model>
 
 private val grammar = Grammar.compile(
     """
@@ -72,7 +74,7 @@ fun building(aabb: aabb): List<aabb> {
 }
 
 fun shape(aabb: aabb): List<aabb> {
-    val node = Node(payload = Model(cube, cubeTexture, aabb, Material.MATERIALS.values.random()))
+    val node = Node(parent = meganode, payload = Model(cube, cubeTexture, aabb, Material.MATERIALS.values.random()))
     node.setPosition(aabb.center())
     node.setScale(cubeAabb.scaleTo(aabb))
     cubeNodes.add(node)
@@ -87,6 +89,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         val (mesh, aabb) = meshLib.loadMesh("models/cube/cube.obj")
         cube = mesh
         cubeAabb = aabb
+        earthNode = Node(meganode, payload = Model(cube, cubeTexture, cubeAabb, Material.SILVER))
+        earthNode.setScale(vec3(CITY_SIDE, 0.1f, CITY_SIDE))
         grammar.walk(mooncityAabb)
     }
 
@@ -102,6 +106,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+        meganode.rotate(VECTOR_UP, 0.001f)
         cubeNodes.sortBy { it.position.distanceSquared(camera.position) }
     }
 
@@ -112,6 +117,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 val model = it.payload()
                 deferredTechnique.instance(model.mesh, it.calculateM(), model.diffuse, model.material)
             }
+            val payload = earthNode.payload()
+            deferredTechnique.instance(payload.mesh, earthNode.calculateM(), payload.diffuse, payload.material)
         }, lights = {
             deferredTechnique.light(daylight, daylightNode.calculateM())
         })
