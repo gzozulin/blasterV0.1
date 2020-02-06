@@ -5,7 +5,7 @@ import com.blaster.aux.arrayListIntToByteBuffer
 import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
-import com.blaster.tools.GlMesh
+import com.blaster.gl.GlMesh
 import org.joml.AABBf
 import org.joml.Vector3f
 import java.io.BufferedReader

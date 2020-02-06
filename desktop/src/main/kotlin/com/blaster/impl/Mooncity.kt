@@ -15,7 +15,7 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.entity.Camera
 import com.blaster.entity.Controller
-import com.blaster.tools.GlMesh
+import com.blaster.gl.GlMesh
 import com.blaster.entity.Node
 import com.blaster.techniques.DeferredTechnique
 import com.blaster.techniques.ImmediateTechnique

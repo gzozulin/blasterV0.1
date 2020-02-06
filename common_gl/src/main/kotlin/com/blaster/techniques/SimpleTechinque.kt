@@ -3,14 +3,14 @@ package com.blaster.techniques
 import com.blaster.assets.ShadersLib
 import com.blaster.gl.*
 import com.blaster.entity.Camera
-import com.blaster.tools.GlMesh
+import com.blaster.gl.GlMesh
 import com.blaster.entity.Model
 import org.joml.Matrix4f
 
 class SimpleTechnique {
     private lateinit var program: GlProgram
 
-    fun prepare(shadersLib: ShadersLib) {
+    fun create(shadersLib: ShadersLib) {
         program = shadersLib.loadProgram("shaders/simple/no_lighting.vert", "shaders/simple/no_lighting.frag")
     }
 

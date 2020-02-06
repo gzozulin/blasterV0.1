@@ -9,11 +9,11 @@ import com.blaster.entity.Camera
 import com.blaster.entity.Controller
 import com.blaster.entity.Model
 import com.blaster.entity.Node
+import com.blaster.gl.GlMesh
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
-import com.blaster.tools.*
 import com.blaster.techniques.SimpleTechnique
 import org.joml.Vector2f
 import org.joml.Vector3f
@@ -45,7 +45,7 @@ private val axis = vec3(1f)
 
 private val window = object : LwjglWindow() {
     override fun onCreate() {
-        simpleTechnique.prepare(shadersLib)
+        simpleTechnique.create(shadersLib)
         mesh = GlMesh.triangle()
         tex1 = texturesLib.loadTexture("textures/lumina.png")
         tex2 = texturesLib.loadTexture("textures/utah.jpeg")

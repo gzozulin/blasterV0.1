@@ -4,7 +4,7 @@ import com.blaster.assets.ShadersLib
 import com.blaster.aux.mat4
 import com.blaster.gl.*
 import com.blaster.entity.Camera
-import com.blaster.tools.GlMesh
+import com.blaster.gl.GlMesh
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer

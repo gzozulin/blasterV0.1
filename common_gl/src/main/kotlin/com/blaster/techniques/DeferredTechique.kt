@@ -6,7 +6,7 @@ import com.blaster.gl.*
 import com.blaster.entity.Camera
 import com.blaster.entity.Light
 import com.blaster.entity.Material
-import com.blaster.tools.GlMesh
+import com.blaster.gl.GlMesh
 import org.joml.Matrix4f
 
 private val backend = GlLocator.locate()

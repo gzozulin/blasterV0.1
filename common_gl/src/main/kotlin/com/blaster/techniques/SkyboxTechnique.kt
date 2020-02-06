@@ -10,7 +10,7 @@ import com.blaster.gl.GlTexture
 import com.blaster.gl.GlUniform
 import com.blaster.gl.glBind
 import com.blaster.entity.Camera
-import com.blaster.tools.GlMesh
+import com.blaster.gl.GlMesh
 
 class SkyboxTechnique {
     private lateinit var program: GlProgram

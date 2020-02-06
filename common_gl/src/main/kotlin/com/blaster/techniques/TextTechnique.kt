@@ -3,7 +3,7 @@ package com.blaster.techniques
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.gl.*
-import com.blaster.tools.GlMesh
+import com.blaster.gl.GlMesh
 import org.joml.Vector2f
 import org.joml.Vector3f
 

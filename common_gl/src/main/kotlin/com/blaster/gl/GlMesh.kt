@@ -1,6 +1,4 @@
-package com.blaster.tools
-
-import com.blaster.gl.*
+package com.blaster.gl
 
 private val backend = GlLocator.locate()
 
@@ -9,17 +7,16 @@ class GlMesh(
         private val indicesBuffer: GlBuffer,
         private val indicesCount: Int) : GLBindable {
 
-    var handle: Int? = null
+    private var handle: Int? = null
 
     init {
-        handle = glCheck { backend.glGenVertexArrays() }
-        check(handle!! > 0)
+        createVAO()
     }
 
-    init {
-        glBind(this) {
-            bindVertexPointers()
-        }
+    private fun createVAO() {
+        handle = glCheck { backend.glGenVertexArrays() }
+        check(handle!! > 0)
+        glBind(this) { bindVertexPointers() }
     }
 
     private fun bindVertexPointers() {
@@ -37,7 +34,12 @@ class GlMesh(
     }
 
     override fun bind() {
-        glCheck { backend.glBindVertexArray(handle!!) }
+        try {
+            glCheck { backend.glBindVertexArray(handle!!) }
+        } catch (e: GlError) {
+            createVAO() // by some reason happens after resize
+            bind()
+        }
     }
 
     override fun unbind() {
