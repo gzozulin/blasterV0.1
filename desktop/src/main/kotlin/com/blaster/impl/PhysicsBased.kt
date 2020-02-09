@@ -4,11 +4,15 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
+import com.blaster.aux.color
+import com.blaster.aux.euler3
+import com.blaster.aux.up
 import com.blaster.aux.vec3
 import com.blaster.entity.*
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
+import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.MAX_LIGHTS
 import org.joml.Matrix4f
 import org.joml.Vector2f
@@ -19,15 +23,17 @@ private val texturesLib = TexturesLib(assetStream)
 private val meshLib = MeshLib(assetStream)
 
 private val camera = Camera()
-private val controller = Controller(velocity = 1f)
+private val controller = Controller(velocity = 1f, position = vec3(25f))
 private val wasdInput = WasdInput(controller)
 
-private val light = Light(vec3(22f), true)
-private val lightNode = Node(payload = light).setPosition(vec3(10f))
+private val light = Light(vec3(500f), true)
+private val lightNode = Node(payload = light).setPosition(vec3(20f))
 
 private lateinit var mandalorian: GlMesh
 private lateinit var mandalorianMaterial: PbrMaterial
 private lateinit var mandalorianNode: Node<GlMesh>
+
+private val immediateTechnique = ImmediateTechnique()
 
 class PbrTechnique {
     private lateinit var program: GlProgram
@@ -43,9 +49,9 @@ class PbrTechnique {
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
             program.setUniform(GlUniform.UNIFORM_EYE, camera.position)
+            meshes.invoke()
             program.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLightCnt)
             //program.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLightCnt)
-            meshes.invoke()
         }
         pointLightCnt = 0
         dirLightCnt = 0
@@ -91,6 +97,7 @@ private val window = object : LwjglWindow() {
     override fun onResize(width: Int, height: Int) {
         GlState.apply(width, height)
         camera.setPerspective(width.toFloat() / height.toFloat())
+        immediateTechnique.resize(camera)
     }
 
     override fun onTick() {
@@ -103,6 +110,7 @@ private val window = object : LwjglWindow() {
             pbrTechnique.light(lightNode.payload(), lightNode.calculateM())
             pbrTechnique.instance(mandalorianNode.payload(), mandalorianNode.calculateM(), mandalorianMaterial)
         }
+        immediateTechnique.marker(camera, lightNode.calculateM(), color(1f, 0f, 0f))
     }
 
     override fun onCursorDelta(delta: Vector2f) {
