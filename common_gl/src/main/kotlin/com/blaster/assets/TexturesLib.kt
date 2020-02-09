@@ -1,5 +1,6 @@
 package com.blaster.assets
 
+import com.blaster.entity.PbrMaterial
 import com.blaster.gl.GlTexture
 import java.io.File
 
@@ -30,7 +31,20 @@ class TexturesLib (
                 GlTexture.TexData(width = top.width,    height = top.height,    pixels = top.pixels),
                 GlTexture.TexData(width = bottom.width, height = bottom.height, pixels = bottom.pixels),
                 GlTexture.TexData(width = front.width,  height = front.height,  pixels = front.pixels),
-                GlTexture.TexData(width = back.width,   height = back.height,   pixels = back.pixels)
-        ))
+                GlTexture.TexData(width = back.width,   height = back.height,   pixels = back.pixels)))
+    }
+
+    fun loadPbr(filename: String, unit: Int = 0): PbrMaterial {
+        val decodedAlbedo = pixelDecoder.decodePixels(assetStream.openAsset("$filename/albedo.png"))
+        val decodedNormal = pixelDecoder.decodePixels(assetStream.openAsset("$filename/normal.png"))
+        val decodedMetallic = pixelDecoder.decodePixels(assetStream.openAsset("$filename/metallic.png"))
+        val decodedRoughness = pixelDecoder.decodePixels(assetStream.openAsset("$filename/roughness.png"))
+        val decodedAo = pixelDecoder.decodePixels(assetStream.openAsset("$filename/ao.png"))
+        return PbrMaterial(
+                GlTexture(unit = unit, width = decodedAlbedo.width, height = decodedAlbedo.height, pixels = decodedAlbedo.pixels),
+                GlTexture(unit = unit, width = decodedNormal.width, height = decodedNormal.height, pixels = decodedNormal.pixels),
+                GlTexture(unit = unit, width = decodedMetallic.width, height = decodedMetallic.height, pixels = decodedMetallic.pixels),
+                GlTexture(unit = unit, width = decodedRoughness.width, height = decodedRoughness.height, pixels = decodedRoughness.pixels),
+                GlTexture(unit = unit, width = decodedAo.width, height = decodedAo.height, pixels = decodedAo.pixels))
     }
 }

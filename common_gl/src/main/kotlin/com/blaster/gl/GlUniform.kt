@@ -10,6 +10,11 @@ enum class GlUniform(val label: String) {
     UNIFORM_TEXTURE_NORMAL      ("uTexNormal"),
     UNIFORM_TEXTURE_DIFFUSE     ("uTexDiffuse"),
 
+    UNIFORM_TEXTURE_ALBEDO      ("uTexAlbedo"),
+    UNIFORM_TEXTURE_METALLIC    ("uTexMetallic"),
+    UNIFORM_TEXTURE_ROUGHNESS   ("uTexRoughness"),
+    UNIFORM_TEXTURE_AO          ("uTexAo"),
+
     UNIFORM_TEXTURE_MAT_AMB_SHINE("uTexMatAmbientShine"),
     UNIFORM_TEXTURE_MAT_DIFF_TRANSP ("uTexMatDiffTransp"),
     UNIFORM_TEXTURE_MAT_SPECULAR("uTexMatSpecular"),
