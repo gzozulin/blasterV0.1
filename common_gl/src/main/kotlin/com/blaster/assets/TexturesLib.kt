@@ -34,12 +34,17 @@ class TexturesLib (
                 GlTexture.TexData(width = back.width,   height = back.height,   pixels = back.pixels)))
     }
 
-    fun loadPbr(filename: String): PbrMaterial {
-        val decodedAlbedo   = pixelDecoder.decodePixels(assetStream.openAsset("$filename/albedo.png"))
-        val decodedNormal   = pixelDecoder.decodePixels(assetStream.openAsset("$filename/normal.png"))
-        val decodedMetallic = pixelDecoder.decodePixels(assetStream.openAsset("$filename/metallic.png"))
-        val decodedRoughness = pixelDecoder.decodePixels(assetStream.openAsset("$filename/roughness.png"))
-        val decodedAo       = pixelDecoder.decodePixels(assetStream.openAsset("$filename/ao.png"))
+    fun loadPbr(directory: String, extension: String = "png",
+                albedo: String = "$directory/albedo.$extension",
+                normal: String = "$directory/normal.$extension",
+                metallic: String = "$directory/metallic.$extension",
+                roughness: String = "$directory/roughness.$extension",
+                ao: String = "$directory/ao.$extension"): PbrMaterial {
+        val decodedAlbedo   = pixelDecoder.decodePixels(assetStream.openAsset(albedo))
+        val decodedNormal   = pixelDecoder.decodePixels(assetStream.openAsset(normal))
+        val decodedMetallic = pixelDecoder.decodePixels(assetStream.openAsset(metallic))
+        val decodedRoughness = pixelDecoder.decodePixels(assetStream.openAsset(roughness))
+        val decodedAo       = pixelDecoder.decodePixels(assetStream.openAsset(ao))
         return PbrMaterial(
                 GlTexture(unit = 0, width = decodedAlbedo.width,    height = decodedAlbedo.height,    pixels = decodedAlbedo.pixels),
                 GlTexture(unit = 1, width = decodedNormal.width,    height = decodedNormal.height,    pixels = decodedNormal.pixels),

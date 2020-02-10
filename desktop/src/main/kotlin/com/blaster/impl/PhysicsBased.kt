@@ -11,6 +11,7 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.ImmediateTechnique
 import com.blaster.techniques.MAX_LIGHTS
+import com.blaster.techniques.SkyboxTechnique
 import org.joml.Matrix4f
 import org.joml.Vector2f
 
@@ -27,7 +28,7 @@ private val camera = Camera()
 private val controller = Controller(velocity = 0.05f, position = vec3(0f, 2.5f, 4f))
 private val wasdInput = WasdInput(controller)
 
-private val light = Light(vec3(500f), true)
+private val light = Light(vec3(10f), true)
 private val lightMasternode = Node<Light>()
 private val lightNode1 = Node(parent = lightMasternode, payload = light).setPosition(vec3(3f))
 private val lightNode2 = Node(parent = lightMasternode, payload = light).setPosition(vec3(-3f, 3f, -3f))
@@ -37,6 +38,7 @@ private lateinit var mandalorianMaterial: PbrMaterial
 private lateinit var mandalorianNode: Node<GlMesh>
 
 private val immediateTechnique = ImmediateTechnique()
+private val skyboxTechnique = SkyboxTechnique()
 
 class PbrTechnique {
     private lateinit var program: GlProgram
@@ -92,9 +94,11 @@ private val pbrTechnique = PbrTechnique()
 private val window = object : LwjglWindow() {
     override fun onCreate() {
         pbrTechnique.create()
+        skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/snowy")
         val (mesh, aabb) = meshLib.loadMesh("models/mandalorian/mandalorian.obj")
         mandalorian = mesh
-        mandalorianMaterial = texturesLib.loadPbr("models/mandalorian")
+        mandalorianMaterial = texturesLib.loadPbr("models/mandalorian", "png",
+                albedo = "models/mandalorian/albedo_blue.png")
         mandalorianNode = Node(payload = mandalorian).setScale(aabb.scaleTo(5f))
     }
 
@@ -110,6 +114,9 @@ private val window = object : LwjglWindow() {
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
+        }
+        GlState.drawWithNoCulling {
+            skyboxTechnique.skybox(camera)
         }
         pbrTechnique.draw(
                 camera = camera,
