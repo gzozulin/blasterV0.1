@@ -50,7 +50,7 @@ class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GL
     }
 
     override fun bind() {
-        glCheck { backend.glActiveTexture(backend.GL_TEXTURE0 + unit) } // passing GL_TEXTURE1?
+        glCheck { backend.glActiveTexture(backend.GL_TEXTURE0 + unit) }
         glCheck { backend.glBindTexture(target, handle!!) }
     }
 

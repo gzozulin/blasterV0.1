@@ -95,6 +95,7 @@ class GlProgram(private val vertexShader: GlShader, private val fragmentShader: 
         glCheck { backend.glUseProgram(0) }
     }
 
+    // todo: we can send uniform only if changed
     fun setTexture(uniform: GlUniform, texture: GlTexture) {
         setUniform(uniform, texture.unit)
     }

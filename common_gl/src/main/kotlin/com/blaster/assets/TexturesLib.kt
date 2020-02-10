@@ -34,17 +34,17 @@ class TexturesLib (
                 GlTexture.TexData(width = back.width,   height = back.height,   pixels = back.pixels)))
     }
 
-    fun loadPbr(filename: String, unit: Int = 0): PbrMaterial {
-        val decodedAlbedo = pixelDecoder.decodePixels(assetStream.openAsset("$filename/albedo.png"))
-        val decodedNormal = pixelDecoder.decodePixels(assetStream.openAsset("$filename/normal.png"))
+    fun loadPbr(filename: String): PbrMaterial {
+        val decodedAlbedo   = pixelDecoder.decodePixels(assetStream.openAsset("$filename/albedo.png"))
+        val decodedNormal   = pixelDecoder.decodePixels(assetStream.openAsset("$filename/normal.png"))
         val decodedMetallic = pixelDecoder.decodePixels(assetStream.openAsset("$filename/metallic.png"))
         val decodedRoughness = pixelDecoder.decodePixels(assetStream.openAsset("$filename/roughness.png"))
-        val decodedAo = pixelDecoder.decodePixels(assetStream.openAsset("$filename/ao.png"))
+        val decodedAo       = pixelDecoder.decodePixels(assetStream.openAsset("$filename/ao.png"))
         return PbrMaterial(
-                GlTexture(unit = unit, width = decodedAlbedo.width, height = decodedAlbedo.height, pixels = decodedAlbedo.pixels),
-                GlTexture(unit = unit, width = decodedNormal.width, height = decodedNormal.height, pixels = decodedNormal.pixels),
-                GlTexture(unit = unit, width = decodedMetallic.width, height = decodedMetallic.height, pixels = decodedMetallic.pixels),
-                GlTexture(unit = unit, width = decodedRoughness.width, height = decodedRoughness.height, pixels = decodedRoughness.pixels),
-                GlTexture(unit = unit, width = decodedAo.width, height = decodedAo.height, pixels = decodedAo.pixels))
+                GlTexture(unit = 0, width = decodedAlbedo.width,    height = decodedAlbedo.height,    pixels = decodedAlbedo.pixels),
+                GlTexture(unit = 1, width = decodedNormal.width,    height = decodedNormal.height,    pixels = decodedNormal.pixels),
+                GlTexture(unit = 2, width = decodedMetallic.width,  height = decodedMetallic.height,  pixels = decodedMetallic.pixels),
+                GlTexture(unit = 3, width = decodedRoughness.width, height = decodedRoughness.height, pixels = decodedRoughness.pixels),
+                GlTexture(unit = 4, width = decodedAo.width,        height = decodedAo.height,        pixels = decodedAo.pixels))
     }
 }
