@@ -15,7 +15,8 @@ import com.blaster.techniques.SkyboxTechnique
 import org.joml.Matrix4f
 import org.joml.Vector2f
 
-private val upVec = vec3().up()
+private val vecUp = vec3().up()
+private val colorWhite = color().white()
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
@@ -112,7 +113,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun onTick() {
         GlState.clear()
-        lightMasternode.rotate(upVec, 0.01f)
+        lightMasternode.rotate(vecUp, 0.01f)
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
@@ -129,8 +130,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 meshes = {
                     pbrTechnique.instance(mandalorianNode.payload(), mandalorianNode.calculateM(), mandalorianMaterial)
                 })
-        immediateTechnique.marker(camera, lightNode1.calculateM(), color(1f, 0f, 0f))
-        immediateTechnique.marker(camera, lightNode2.calculateM(), color(1f, 0f, 0f))
+        immediateTechnique.marker(camera, lightNode1.calculateM(), colorWhite)
+        immediateTechnique.marker(camera, lightNode2.calculateM(), colorWhite)
     }
 
     override fun onCursorDelta(delta: Vector2f) {

@@ -68,6 +68,34 @@ fun vec3.right(): vec3 {
     return this
 }
 
+fun color.red(): color {
+    x = 1f
+    y = 0f
+    z = 0f
+    return this
+}
+
+fun color.green(): color {
+    x = 0f
+    y = 1f
+    z = 0f
+    return this
+}
+
+fun color.blue(): color {
+    x = 0f
+    y = 0f
+    z = 1f
+    return this
+}
+
+fun color.white(): color {
+    x = 1f
+    y = 1f
+    z = 1f
+    return this
+}
+
 fun parseColor(hex: String): color {
     val integerHex = Integer.parseInt(hex, 16)
     val rIntValue = (integerHex / 256 / 256) % 256
