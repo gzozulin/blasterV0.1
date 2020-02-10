@@ -4,10 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.aux.color
-import com.blaster.aux.euler3
-import com.blaster.aux.up
-import com.blaster.aux.vec3
+import com.blaster.aux.*
 import com.blaster.entity.*
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow
@@ -23,11 +20,11 @@ private val texturesLib = TexturesLib(assetStream)
 private val meshLib = MeshLib(assetStream)
 
 private val camera = Camera()
-private val controller = Controller(velocity = 1f, position = vec3(25f))
+private val controller = Controller(velocity = 0.5f, position = vec3(0f, 1f, 10f))
 private val wasdInput = WasdInput(controller)
 
-private val light = Light(vec3(500f), true)
-private val lightNode = Node(payload = light).setPosition(vec3(20f))
+private val light = Light(vec3(300f), true)
+private val lightNode = Node(payload = light).setPosition(vec3(7f))
 
 private lateinit var mandalorian: GlMesh
 private lateinit var mandalorianMaterial: PbrMaterial
@@ -60,11 +57,11 @@ class PbrTechnique {
     fun instance(mesh: GlMesh, modelM: Matrix4f, material: PbrMaterial) {
         glBind(listOf(mesh, material.albedo, material.normal, material.metallic, material.roughness, material.ao)) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
-            //program.setTexture(GlUniform.UNIFORM_TEXTURE_ALBEDO, material.albedo)
-            //program.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL, material.normal)
-            //program.setTexture(GlUniform.UNIFORM_TEXTURE_METALLIC, material.metallic)
-            //program.setTexture(GlUniform.UNIFORM_TEXTURE_ROUGHNESS, material.roughness)
-            //program.setTexture(GlUniform.UNIFORM_TEXTURE_AO, material.ao)
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_ALBEDO, material.albedo)
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL, material.normal)
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_METALLIC, material.metallic)
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_ROUGHNESS, material.roughness)
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_AO, material.ao)
             mesh.draw()
         }
     }
@@ -91,7 +88,7 @@ private val window = object : LwjglWindow() {
         val (mesh, aabb) = meshLib.loadMesh("models/mandalorian/mandalorian.obj")
         mandalorian = mesh
         mandalorianMaterial = texturesLib.loadPbr("models/mandalorian")
-        mandalorianNode = Node(payload = mandalorian)
+        mandalorianNode = Node(payload = mandalorian).setScale(aabb.scaleTo(5f))
     }
 
     override fun onResize(width: Int, height: Int) {

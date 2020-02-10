@@ -4,14 +4,14 @@ precision mediump float;
 
 const float PI = 3.14159265359;
 
+const float ambientTerm = 0.03;
+
+const float lightConstantAtt    = 0.9;
+const float lightLinearAtt      = 0.7;
+const float lightQuadraticAtt   = 0.3;
+
 in vec3 vWorldPos;
 in vec2 vTexCoord;
-in vec3 vNormal;
-
-vec3 albedo = vec3(0.5);
-float metallic = 0.4;
-float roughness = 0.7;
-float ao = 0.3;
 
 struct Light {
     vec3 vector;
@@ -22,11 +22,11 @@ uniform int uLightsPointCnt;
 uniform int uLightsDirCnt;
 uniform Light uLights[128];
 
-const float ambientTerm = 0.03;
-
-const float lightConstantAtt    = 0.9;
-const float lightLinearAtt      = 0.7;
-const float lightQuadraticAtt   = 0.3;
+uniform sampler2D uTexAlbedo;
+uniform sampler2D uTexNormal;
+uniform sampler2D uTexMetallic;
+uniform sampler2D uTexRoughness;
+uniform sampler2D uTexAo;
 
 uniform vec3 uEye;
 
@@ -64,7 +64,18 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0) {
 }
 
 void main() {
-    vec3 N = normalize(vNormal);
+    vec3 albedo = texture(uTexAlbedo, vTexCoord).rgb;
+    albedo.x = pow(albedo.x, 2.2);
+    albedo.y = pow(albedo.y, 2.2);
+    albedo.z = pow(albedo.z, 2.2);
+
+    vec3 normal = texture(uTexNormal, vTexCoord).rgb; /// << wrong ?!
+
+    float metallic = texture(uTexMetallic, vTexCoord).r;
+    float roughness = texture(uTexRoughness, vTexCoord).r;
+    float ao = texture(uTexAo, vTexCoord).r;
+
+    vec3 N = normalize(normal);
     vec3 V = normalize(uEye - vWorldPos);
 
     vec3 F0 = vec3(0.04);
