@@ -29,7 +29,8 @@ private val wasdInput = WasdInput(controller)
 
 private val light = Light(vec3(500f), true)
 private val lightMasternode = Node<Light>()
-private val lightNode = Node(parent = lightMasternode, payload = light).setPosition(vec3(3f))
+private val lightNode1 = Node(parent = lightMasternode, payload = light).setPosition(vec3(3f))
+private val lightNode2 = Node(parent = lightMasternode, payload = light).setPosition(vec3(-3f, 3f, -3f))
 
 private lateinit var mandalorian: GlMesh
 private lateinit var mandalorianMaterial: PbrMaterial
@@ -112,9 +113,15 @@ private val window = object : LwjglWindow() {
         }
         pbrTechnique.draw(
                 camera = camera,
-                lights = { pbrTechnique.light(lightNode.payload(), lightNode.calculateM()) },
-                meshes = { pbrTechnique.instance(mandalorianNode.payload(), mandalorianNode.calculateM(), mandalorianMaterial) })
-        immediateTechnique.marker(camera, lightNode.calculateM(), color(1f, 0f, 0f))
+                lights = {
+                    pbrTechnique.light(lightNode1.payload(), lightNode1.calculateM())
+                    pbrTechnique.light(lightNode2.payload(), lightNode2.calculateM())
+                },
+                meshes = {
+                    pbrTechnique.instance(mandalorianNode.payload(), mandalorianNode.calculateM(), mandalorianMaterial)
+                })
+        immediateTechnique.marker(camera, lightNode1.calculateM(), color(1f, 0f, 0f))
+        immediateTechnique.marker(camera, lightNode2.calculateM(), color(1f, 0f, 0f))
     }
 
     override fun onCursorDelta(delta: Vector2f) {
