@@ -54,6 +54,8 @@ class SceneDiffer {
     }
 }
 
+
+// todo: we can just log instead of console
 class MultiListener(private val console: Console? = null, private val listeners: Map<String, SceneDiffer.Listener>)
     : SceneDiffer.Listener() {
     override fun onRemove(marker: Marker) {

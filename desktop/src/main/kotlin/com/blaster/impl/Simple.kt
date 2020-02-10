@@ -43,7 +43,9 @@ private val wasd = WasdInput(controller)
 
 private val axis = vec3(1f)
 
-private val window = object : LwjglWindow() {
+private var mouseMove = false
+
+private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
         simpleTechnique.create(shadersLib)
         mesh = GlMesh.triangle()
@@ -81,8 +83,18 @@ private val window = object : LwjglWindow() {
         }
     }
 
+    override fun mouseBtnPressed(btn: Int) {
+        mouseMove = true
+    }
+
+    override fun mouseBtnReleased(btn: Int) {
+        mouseMove = false
+    }
+
     override fun onCursorDelta(delta: Vector2f) {
-        wasd.onCursorDelta(delta)
+        if (mouseMove) {
+            wasd.onCursorDelta(delta)
+        }
     }
 
     override fun keyPressed(key: Int) {

@@ -31,6 +31,10 @@ uniform sampler2D uTexAo;
 
 layout (location = 0) out vec4 oFragColor;
 
+float attenuation(float distance) {
+    return 1.0 / (lightConstantAtt + lightLinearAtt * distance + lightQuadraticAtt * distance * distance);
+}
+
 vec3 getNormalFromMap() {
     vec3 tangentNormal = texture(uTexNormal, vTexCoord).xyz * 2.0 - 1.0;
 
@@ -105,7 +109,7 @@ void main() {
         vec3 L = normalize(uLights[i].vector - vWorldPos);
         vec3 H = normalize(V + L);
         float distance = length(uLights[i].vector - vWorldPos);
-        float attenuation = 1.0 / (distance * distance);
+        float attenuation = attenuation(distance);
         vec3 radiance = uLights[i].intensity * attenuation;
 
         // Cook-Torrance BRDF

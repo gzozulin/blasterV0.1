@@ -28,7 +28,7 @@ private val camera = Camera()
 private val controller = Controller(velocity = 0.05f, position = vec3(0f, 2.5f, 4f))
 private val wasdInput = WasdInput(controller)
 
-private val light = Light(vec3(10f), true)
+private val light = Light(vec3(25f), true)
 private val lightMasternode = Node<Light>()
 private val lightNode1 = Node(parent = lightMasternode, payload = light).setPosition(vec3(3f))
 private val lightNode2 = Node(parent = lightMasternode, payload = light).setPosition(vec3(-3f, 3f, -3f))
@@ -39,6 +39,8 @@ private lateinit var mandalorianNode: Node<GlMesh>
 
 private val immediateTechnique = ImmediateTechnique()
 private val skyboxTechnique = SkyboxTechnique()
+
+private var mouseControl = false
 
 class PbrTechnique {
     private lateinit var program: GlProgram
@@ -91,7 +93,7 @@ class PbrTechnique {
 
 private val pbrTechnique = PbrTechnique()
 
-private val window = object : LwjglWindow() {
+private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
         pbrTechnique.create()
         skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/snowy")
@@ -132,7 +134,17 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        wasdInput.onCursorDelta(delta)
+        if (mouseControl) {
+            wasdInput.onCursorDelta(delta)
+        }
+    }
+
+    override fun mouseBtnPressed(btn: Int) {
+        mouseControl = true
+    }
+
+    override fun mouseBtnReleased(btn: Int) {
+        mouseControl = false
     }
 
     override fun keyPressed(key: Int) {
