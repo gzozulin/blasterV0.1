@@ -15,10 +15,16 @@ import org.lwjgl.system.MemoryUtil.NULL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
+private const val winWidth: Int = 1024
+private const val winHeight: Int = 768
+
+private const val fullWidth: Int = 1920
+private const val fullHeight: Int = 1080
+
+private const val winX: Int = 448
+private const val winY: Int = 156
+
 abstract class LwjglWindow(
-        private val winWidth: Int = 1024, private val winHeight: Int = 768,
-        private val fullWidth: Int = 1920, private val fullHeight: Int = 1080,
-        private val winX: Int = 448, private val winY: Int = 156,
         private val isHoldingCursor: Boolean = true,
         private var isFullscreen: Boolean = false,
         private val isMultisampled: Boolean = false) {
@@ -29,11 +35,6 @@ abstract class LwjglWindow(
 
     private var window = NULL
     private val contextCreated = Once()
-
-    private val currentWidth: Int
-        get() = if (isFullscreen) fullWidth else winWidth
-    private val currentHeight: Int
-        get() = if (isFullscreen) fullHeight else winHeight
 
     private val xbuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
     private val xbufDouble = xbuf.asDoubleBuffer()
@@ -151,7 +152,9 @@ abstract class LwjglWindow(
         if (contextCreated.check()) {
             onCreate()
         }
-        onResize(currentWidth, currentHeight)
+        onResize(
+                if (isFullscreen) fullWidth else winWidth,
+                if (isFullscreen) fullHeight else winHeight)
         return new
     }
 

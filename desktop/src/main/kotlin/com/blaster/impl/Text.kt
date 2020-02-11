@@ -20,7 +20,7 @@ private val console = Console(2000L)
 
 private val random = Random()
 
-private val window = object : LwjglWindow(800, 600) {
+private val window = object : LwjglWindow() {
     override fun onCreate() {
         technique.create(shadersLib, textureLib)
     }

@@ -45,9 +45,86 @@
                 .list_item_child {}
     </style>
     <body>
-        <p class="text">Hey-hey, Blaster is here!
-</p><p class="text">Hey-hey, Blaster is here!
-</p><p class="text">Hey-hey, Blaster is here!
-</p>
+        <p class="text">In this hopefully short post out
+</p><p class="text">
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt" target="_blank">desktop/com.blaster.platform.LwjglWindow</a>
+</h3>
+    <p class="code_child">abstract class LwjglWindow(        private val isHoldingCursor: Boolean = true,        private var isFullscreen: Boolean = false,        private val isMultisampled: Boolean = false)</p>
+<p class="code_child">private var window = NULL</p>
+<p class="code_child">private val contextCreated = Once()</p>
+<p class="code_child">private val xbuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())</p>
+<p class="code_child">private val xbufDouble = xbuf.asDoubleBuffer()</p>
+<p class="code_child">private val ybuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())</p>
+<p class="code_child">private val ybufDouble = ybuf.asDoubleBuffer()</p>
+<p class="code_child">private val currentPos = vec2()</p>
+<p class="code_child">private val lastCursorPos = vec2()</p>
+<p class="code_child">private var fps = 0</p>
+<p class="code_child">private var last = System.currentTimeMillis()</p>
+<p class="code_child">private val errorCallback = errorCallbackPrint(System.err)</p>
+<p class="code_child">private val windowSizeCallback = object : GLFWWindowSizeCallback() {
+    override fun invoke(window: kotlin.Long, width: kotlin.Int, height: kotlin.Int) {
+        onResize(width, height)
+    }
+}</p>
+<p class="code_child">private val keyCallback = object : GLFWKeyCallback() {
+    override fun invoke(window: kotlin.Long, key: kotlin.Int, scancode: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
+        if (action == GLFW_RELEASE) {
+            when (key) {
+                GLFW_KEY_ESCAPE -&gt; glfwSetWindowShouldClose(window, GL11.GL_TRUE)
+                GLFW_KEY_F -&gt; switchFullscreen()
+                else -&gt; keyReleased(key)
+            }
+        } else if (action == GLFW_PRESS) {
+            keyPressed(key)
+        }
+    }
+}</p>
+<p class="code_child">private val mouseBtnCallback = object : GLFWMouseButtonCallback() {
+    override fun invoke(window: kotlin.Long, button: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
+        if (action == GLFW_RELEASE) {
+            mouseBtnReleased(button)
+        } else if (action == GLFW_PRESS) {
+            mouseBtnPressed(button)
+        }
+    }
+}</p>
+<p class="code_child">private fun switchFullscreen()</p>
+<p class="code_child">private fun updateCursor(window: Long)</p>
+<p class="code_child">private fun updateFps()</p>
+<p class="code_child">fun show()</p>
+<p class="code_child">private fun createWindow(): Long</p>
+<p class="code_child">private fun destroyWindow(handle: Long)</p>
+<p class="code_child">protected abstract fun onCreate()</p>
+<p class="code_child">protected abstract fun onResize(width: Int, height: Int)</p>
+<p class="code_child">protected abstract fun onTick()</p>
+<p class="code_child">open fun mouseBtnPressed(btn: Int)</p>
+<p class="code_child">open fun mouseBtnReleased(btn: Int)</p>
+<p class="code_child">open fun keyPressed(key: Int)</p>
+<p class="code_child">open fun keyReleased(key: Int)</p>
+<p class="code_child">open fun onCursorPos(position: Vector2f)</p>
+<p class="code_child">open fun onCursorDelta(delta: Vector2f)</p>
+
+</div>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt" target="_blank">common_gl/com.blaster.gl.GlState</a>
+</h3>
+    <p class="code_child">class GlState private constructor()</p>
+<p class="code_child">fun enableDepthTest()</p>
+<p class="code_child">fun disableDepthTest()</p>
+<p class="code_child">fun drawWithNoDepth(draw: () -&gt; Unit)</p>
+<p class="code_child">fun enableCulling()</p>
+<p class="code_child">fun disableCulling()</p>
+<p class="code_child">fun drawWithNoCulling(draw: () -&gt; Unit)</p>
+<p class="code_child">fun apply(width: Int, height: Int, color: Vector3f = Vector3f(0.9f, 9.9f, 1f))</p>
+<p class="code_child">fun clear()</p>
+<p class="code_child">fun drawTransparent(draw: () -&gt; Unit)</p>
+<p class="code_child">fun enableTransparency()</p>
+<p class="code_child">fun disableTransparency()</p>
+
+</div>
+
     </body>
 </html>

@@ -101,7 +101,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         val (mesh, aabb) = meshLib.loadMesh("models/mandalorian/mandalorian.obj")
         mandalorian = mesh
         mandalorianMaterial = texturesLib.loadPbr("models/mandalorian", "png",
-                albedo = "models/mandalorian/albedo_blue.png")
+                albedo = "models/mandalorian/albedo.png")
         mandalorianNode = Node(payload = mandalorian).setScale(aabb.scaleTo(5f))
     }
 

@@ -77,6 +77,10 @@ class GlBackendImpl : GlBackend {
         return handles[0]
     }
 
+    override fun glDeleteFramebuffers(handle: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun glBindFramebuffer(target: Int, framebuffer: Int) =
             GLES30.glBindFramebuffer(target, framebuffer)
     override fun glFramebufferTexture2D(target: Int, attachment: Int, textarget: Int, texture: Int, level: Int) =
@@ -88,6 +92,18 @@ class GlBackendImpl : GlBackend {
     override fun glCheckFramebufferStatus(target: Int): Int =
             GLES30.glCheckFramebufferStatus(target)
 
+    override fun glGenVertexArrays(): Int {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glDeleteVertexArrays(handle: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun glBindVertexArray(handle: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override val GL_FLOAT: Int
         get() = GLES30.GL_FLOAT
     override val GL_UNSIGNED_INT: Int
@@ -97,6 +113,8 @@ class GlBackendImpl : GlBackend {
     override val GL_LINES: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
     override val GL_POINTS: Int
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
+    override val GL_MULTISAMPLE: Int
         get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
     override fun glEnableVertexAttribArray(index: Int) = GLES30.glEnableVertexAttribArray(index)
@@ -167,6 +185,10 @@ class GlBackendImpl : GlBackend {
         val handles = IntArray(1)
         GLES30.glGenRenderbuffers(1, handles, 0)
         return handles[0]
+    }
+
+    override fun glDeleteRenderBuffers(handle: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun glBindRenderbuffer(target: Int, renderbuffer: Int) =
@@ -250,6 +272,10 @@ class GlBackendImpl : GlBackend {
         val handles = IntArray(1)
         GLES30.glGenTextures(1, handles, 0)
         return handles[0]
+    }
+
+    override fun glDeleteTextures(handle: Int) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun glBindTexture(target: Int, texture: Int) = GLES30.glBindTexture(target, texture)
