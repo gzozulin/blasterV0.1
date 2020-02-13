@@ -46,7 +46,7 @@
                 .list_item_child {}
     </style>
     <body>
-        <p class="text">I am glad to see you on the pages of Greg's Journal! In this post I will show the internals of a small demo coincidentally called "Simple":) Despite an obvious simplicity this code can help highlight some of the foundations of my approach to realtime rendering.
+        <p class="text">I am glad to see you on the pages of Greg's Journal! In this post, I will show the internals of a small demo coincidentally called "Simple":) Despite an apparent simplicity, this code can help highlight some of the foundations of my approach to realtime rendering.
 </p><p class="text">
 </p><p class="text">Here is the link to main object of the demo:
 </p><div class="child">
@@ -61,7 +61,7 @@
 </p>    <h2>LwjglWindow</h2>
 
 <p class="text">
-</p><p class="text">I should probably start by explaining the basics. In order to hide OpenGl boilerplate code for desktop I created a class called LwjglWindow:
+</p><p class="text">I should probably start by explaining the basics. To hide OpenGL boilerplate code for desktop, I created a class called LwjglWindow:
 </p><p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L27" target="_blank">desktop/com.blaster.platform.LwjglWindow</a>
@@ -73,7 +73,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">This class handles the os windows, mouse and keyboard input, resizing and etc. I am relying on LWJGL as a backend for OpenGl handling on desktop <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>.
+</p><p class="text">This class handles the os windows, mouse and keyboard input, resizing, etc. I am relying on LWJGL as a backend for OpenGL handling on desktop <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>.
 </p><p class="text">
 </p><p class="text">Probably the most interesting part of it is the creation of the window:
 </p><p class="text">
@@ -124,14 +124,14 @@
 
 </div>
 <p class="text">
-</p><p class="text">It works for both: Windows and Linux environment.
+</p><p class="text">It works for both: Windows and Linux environments.
 </p><p class="text">
 </p><p class="text">
 </p>    <h2>Cross-platform approach</h2>
 
 <p class="text">
-</p><p class="text">Since the support for Windows and Linux comes naturally with LWJGL, I want to additionally incorporate support for mobile devices as well.
-</p><p class="text">In order to do this I abstracted all OpenGl calls behind an interface called GlBackend:
+</p><p class="text">Since the support for Windows and Linux comes naturally with LWJGL, I want to incorporate support for mobile devices as well additionally.
+</p><p class="text">To do this, I abstracted all OpenGl calls behind an interface called GlBackend:
 </p><p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBackend.kt#L22" target="_blank">common_gl/com.blaster.gl.GlBackend</a>
@@ -140,7 +140,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">This interface is implemented for both cases: "big" OpenGl and mobile OpenGl ES. Since I am rarely using advanced OpenGl capabilities this works just fine for me.
+</p><p class="text">This interface is implemented for both cases: "big" OpenGl and mobile OpenGL ES. Since I am rarely using advanced OpenGL capabilities, this works just fine for me.
 </p><p class="text">On the target platform I simply hook up the proper implementation with reflexion:
 </p><p class="text">
 </p><div class="child">
@@ -166,10 +166,10 @@
 </p>    <h2>Application resources</h2>
 
 <p class="text">
-</p><p class="text">Since there are multiple platforms which I am supporting, I want to avoid the hustle with the resources between environments.
-</p><p class="text">To achieve that, I am passing the resources as a part of a binary bundle - this is obviously a very lazy and restricted solution, but I am intentionally not writing a production ready software.
+</p><p class="text">Since there are multiple platforms that I am supporting, I want to avoid the hustle with the resources between environments.
+</p><p class="text">To achieve that, I am passing the resources as a part of a binary bundle - this is a sluggish and restricted solution. Still, I am intentionally not writing production-ready software.
 </p><p class="text">
-</p><p class="text">To access resources I have a class called AssetStream, which allows me to get the InputStream from the filename on every platform:
+</p><p class="text">To access resources, I have a class called AssetStream, which allows me to get the InputStream from the filename on every platform:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/AssetStream.kt#L5" target="_blank">common_gl/com.blaster.assets.AssetStream</a>
 </h3>
@@ -183,7 +183,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">Later on the specific resource can be decoded with one of the "libraries". Here is one example:
+</p><p class="text">Later on, the specific resource can be decoded with one of the "libraries." Here is one example:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L10" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
 </h3>
@@ -211,9 +211,9 @@
 <p class="text">
 </p>    <h2>Scene: camera, controller, node</h2>
 
-<p class="text">If you will think about it for a second - CG is a set of mathematical equations which are working with matrices. A single value is oftenly a difference between a great lighting technique and a black screen of nothingness.
+<p class="text">If you will think about it for a second - CG is a set of mathematical equations that are working with matrices. A single value is often a difference between a great lighting technique and a black screen of nothingness.
 </p><p class="text">
-</p><p class="text">To avoid costly and time consuming mistakes, I encapsulated most of the code related to scene matrix handling into easy to use abstractions. It is a very common approach when designing a rendering solution. In my case a scene is represented by a graph of nodes. Each child node is transformed into his parents space by his parent matrix:
+</p><p class="text">To avoid costly and time-consuming mistakes, I encapsulated most of the code related to scene matrix handling into easy to use abstractions. It is a ubiquitous approach when designing a rendering solution. In my case, a scene is represented by a graph of nodes. Each child node is transformed into his parents' space by his parent matrix:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Node.kt#L46" target="_blank">common_gl/com.blaster.entity.Node::calculateM</a>
 </h3>
@@ -242,7 +242,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">Version class guards from recalculating matrix each time.
+</p><p class="text">Version class guards from recalculating the matrix each time.
 </p><p class="text">
 </p><p class="text">Camera also can construct its own matrix:
 </p><div class="child">
@@ -315,7 +315,7 @@
 </p>    <h2>Techniques</h2>
 
 <p class="text">
-</p><p class="text">In order to draw in OpenGl one need to setup the pipeline in a certain way. You need shaders for passes, geometry, uniforms, lights and etc. Usually this contains quite a lot of duplicating code. In order to efficiently reuse the code between different demos and projects I group the necessary in classes called "Techniques".
+</p><p class="text">To draw in OpenGL, one needs to set up the pipeline in a certain way. It would help if you had shaders for passes, geometry, uniforms, lights, etc. Usually, this contains quite a lot of duplicating code. To efficiently reuse the code between different demos and projects, I group the necessary in classes called "Techniques."
 </p><p class="text">
 </p><p class="text">Here is the SimpleTechnique, which we will use for this demo:
 </p><div class="child">
@@ -483,12 +483,6 @@ void main() {</p>
 </p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/simple.gif" alt="Simple Demo" align="middle">
 <p class="text">
 </p><p class="text">Thanks for your attention and until next time!)
-</p><p class="text">
-</p><p class="text">
-</p><p class="text">
-</p><p class="text">
-</p><p class="text">
-</p><p class="text">
 </p><p class="text">
 </p><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
 <a id="1" class="link" href="https://www.lwjgl.org/" target="_blank">Lightweight Java Game Library</a></li></ul>
