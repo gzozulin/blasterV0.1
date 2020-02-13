@@ -1,6 +1,9 @@
 I am glad to see you on the pages of Greg's Journal! In this post, I will show the internals of a small demo coincidentally called "Simple":) Despite an apparent simplicity, this code can help highlight some of the foundations of my approach to realtime rendering.
 
-Here is the link to main object of the demo:
+Here is what we want to achieve - just a bunch of triangles rotating around predefined axis:
+#picture; Simple Demo; http://gzozulin.com/wp-content/uploads/2020/02/simple.gif
+
+And here is the main class of the demo:
 #include; decl; desktop/com.blaster.impl.Simple::window
 
 You can navigate to the code by clicking at the header of the code snippet.
@@ -100,10 +103,5 @@ Vertex shader:
 
 Fragment shader:
 #include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.frag
-
-#header; h2; Result
-
-And here is the final result:
-#picture; Simple Demo; http://gzozulin.com/wp-content/uploads/2020/02/simple.gif
 
 Thanks for your attention and until next time!)
