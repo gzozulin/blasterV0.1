@@ -12,7 +12,12 @@ uniform mat4 uViewM;
 out vec2 vTexCoord;
 
 void main() {
+    // Passing texture coordinates as is
     vTexCoord = aTexCoord;
+
+    // Calculating MVP matrix
     mat4 mvp =  uProjectionM * uViewM * uModelM;
+
+    // Calculating position for fragment
     gl_Position = mvp * vec4(aPosition, 1.0);
 }

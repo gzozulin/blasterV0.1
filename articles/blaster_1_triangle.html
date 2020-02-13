@@ -1,5 +1,6 @@
 <html>
     <style>
+
         .code,.child {
                     border-radius: 3px;
                     display: block;
@@ -45,86 +46,451 @@
                 .list_item_child {}
     </style>
     <body>
-        <p class="text">In this hopefully short post out
+        <p class="text">I am glad to see you on the pages of Greg's Journal! In this post I will show the internals of a small demo coincidentally called "Simple":) Despite an obvious simplicity this code can help highlight some of the foundations of my approach to realtime rendering.
 </p><p class="text">
-</p><p class="text">
+</p><p class="text">Here is the link to main object of the demo:
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt" target="_blank">desktop/com.blaster.platform.LwjglWindow</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L48" target="_blank">desktop/com.blaster.impl.Simple::window</a>
 </h3>
-    <p class="code_child">abstract class LwjglWindow(        private val isHoldingCursor: Boolean = true,        private var isFullscreen: Boolean = false,        private val isMultisampled: Boolean = false)</p>
-<p class="code_child">private var window = NULL</p>
-<p class="code_child">private val contextCreated = Once()</p>
-<p class="code_child">private val xbuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())</p>
-<p class="code_child">private val xbufDouble = xbuf.asDoubleBuffer()</p>
-<p class="code_child">private val ybuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())</p>
-<p class="code_child">private val ybufDouble = ybuf.asDoubleBuffer()</p>
-<p class="code_child">private val currentPos = vec2()</p>
-<p class="code_child">private val lastCursorPos = vec2()</p>
-<p class="code_child">private var fps = 0</p>
-<p class="code_child">private var last = System.currentTimeMillis()</p>
-<p class="code_child">private val errorCallback = errorCallbackPrint(System.err)</p>
-<p class="code_child">private val windowSizeCallback = object : GLFWWindowSizeCallback() {
-    override fun invoke(window: kotlin.Long, width: kotlin.Int, height: kotlin.Int) {
-        onResize(width, height)
-    }
-}</p>
-<p class="code_child">private val keyCallback = object : GLFWKeyCallback() {
-    override fun invoke(window: kotlin.Long, key: kotlin.Int, scancode: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
-        if (action == GLFW_RELEASE) {
-            when (key) {
-                GLFW_KEY_ESCAPE -&gt; glfwSetWindowShouldClose(window, GL11.GL_TRUE)
-                GLFW_KEY_F -&gt; switchFullscreen()
-                else -&gt; keyReleased(key)
-            }
-        } else if (action == GLFW_PRESS) {
-            keyPressed(key)
-        }
-    }
-}</p>
-<p class="code_child">private val mouseBtnCallback = object : GLFWMouseButtonCallback() {
-    override fun invoke(window: kotlin.Long, button: kotlin.Int, action: kotlin.Int, mods: kotlin.Int) {
-        if (action == GLFW_RELEASE) {
-            mouseBtnReleased(button)
-        } else if (action == GLFW_PRESS) {
-            mouseBtnPressed(button)
-        }
-    }
-}</p>
-<p class="code_child">private fun switchFullscreen()</p>
-<p class="code_child">private fun updateCursor(window: Long)</p>
-<p class="code_child">private fun updateFps()</p>
-<p class="code_child">fun show()</p>
-<p class="code_child">private fun createWindow(): Long</p>
-<p class="code_child">private fun destroyWindow(handle: Long)</p>
-<p class="code_child">protected abstract fun onCreate()</p>
-<p class="code_child">protected abstract fun onResize(width: Int, height: Int)</p>
-<p class="code_child">protected abstract fun onTick()</p>
-<p class="code_child">open fun mouseBtnPressed(btn: Int)</p>
-<p class="code_child">open fun mouseBtnReleased(btn: Int)</p>
-<p class="code_child">open fun keyPressed(key: Int)</p>
-<p class="code_child">open fun keyReleased(key: Int)</p>
-<p class="code_child">open fun onCursorPos(position: Vector2f)</p>
-<p class="code_child">open fun onCursorDelta(delta: Vector2f)</p>
+    <p class="code_child">private val window = object : LwjglWindow(isHoldingCursor = false)</p>
 
 </div>
 <p class="text">
+</p><p class="text">You can navigate to the code by clicking at the header of the code snippet.
+</p><p class="text">
+</p>    <h2>LwjglWindow</h2>
+
+<p class="text">
+</p><p class="text">I should probably start by explaining the basics. In order to hide OpenGl boilerplate code for desktop I created a class called LwjglWindow:
+</p><p class="text">
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt" target="_blank">common_gl/com.blaster.gl.GlState</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L27" target="_blank">desktop/com.blaster.platform.LwjglWindow</a>
 </h3>
-    <p class="code_child">class GlState private constructor()</p>
-<p class="code_child">fun enableDepthTest()</p>
-<p class="code_child">fun disableDepthTest()</p>
-<p class="code_child">fun drawWithNoDepth(draw: () -&gt; Unit)</p>
-<p class="code_child">fun enableCulling()</p>
-<p class="code_child">fun disableCulling()</p>
-<p class="code_child">fun drawWithNoCulling(draw: () -&gt; Unit)</p>
-<p class="code_child">fun apply(width: Int, height: Int, color: Vector3f = Vector3f(0.9f, 9.9f, 1f))</p>
-<p class="code_child">fun clear()</p>
-<p class="code_child">fun drawTransparent(draw: () -&gt; Unit)</p>
-<p class="code_child">fun enableTransparency()</p>
-<p class="code_child">fun disableTransparency()</p>
+    <p class="code_child">abstract class LwjglWindow(
+        private val isHoldingCursor: Boolean = true,
+        private var isFullscreen: Boolean = false,
+        private val isMultisampled: Boolean = false)</p>
 
 </div>
+<p class="text">
+</p><p class="text">This class handles the os windows, mouse and keyboard input, resizing and etc. I am relying on LWJGL as a backend for OpenGl handling on desktop <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>.
+</p><p class="text">
+</p><p class="text">Probably the most interesting part of it is the creation of the window:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L137" target="_blank">desktop/com.blaster.platform.LwjglWindow::createWindow</a>
+</h3>
+    <p class="code_child">private fun createWindow(): Long {
+    val new = if (isFullscreen) {
+        glfwCreateWindow(fullWidth, fullHeight, &quot;Blaster!&quot;, glfwGetPrimaryMonitor(), window)
+    } else {
+        glfwCreateWindow(winWidth, winHeight, &quot;Blaster!&quot;, NULL, window)
+    }
+    if (!isFullscreen) {
+        glfwSetWindowPos(new, winX, winY)
+    }
+    if (isHoldingCursor) {
+        glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+    }
+    if (isMultisampled) {
+        glfwWindowHint(GLFW_SAMPLES, 4)
+    }
+    glfwSetWindowSizeCallback(new, windowSizeCallback)
+    glfwSetMouseButtonCallback(new, mouseBtnCallback)
+    glfwSetKeyCallback(new, keyCallback)
+    glfwMakeContextCurrent(new)
+    glfwSwapInterval(1)
+    GLContext.createFromCurrent()
+    glfwShowWindow(new)
+    if (contextCreated.check()) {
+        onCreate()
+    }
+    onResize(
+            if (isFullscreen) fullWidth else winWidth,
+            if (isFullscreen) fullHeight else winHeight)
+    return new
+}</p>
 
+</div>
+<p class="text">
+</p><p class="text">One more thing to note is that we also load corresponding OpenGl binary libraries here:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L51" target="_blank">desktop/com.blaster.platform.LwjglWindow::loadSharedLibs</a>
+</h3>
+    <p class="code_child">private fun loadSharedLibs() {
+    SharedLibraryLoader.load()
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">It works for both: Windows and Linux environment.
+</p><p class="text">
+</p><p class="text">
+</p>    <h2>Cross-platform approach</h2>
+
+<p class="text">
+</p><p class="text">Since the support for Windows and Linux comes naturally with LWJGL, I want to additionally incorporate support for mobile devices as well.
+</p><p class="text">In order to do this I abstracted all OpenGl calls behind an interface called GlBackend:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBackend.kt#L22" target="_blank">common_gl/com.blaster.gl.GlBackend</a>
+</h3>
+    <p class="code_child">interface GlBackend</p>
+
+</div>
+<p class="text">
+</p><p class="text">This interface is implemented for both cases: "big" OpenGl and mobile OpenGl ES. Since I am rarely using advanced OpenGl capabilities this works just fine for me.
+</p><p class="text">On the target platform I simply hook up the proper implementation with reflexion:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBackend.kt#L7" target="_blank">common_gl/com.blaster.gl.GlBackend::GlLocator</a>
+</h3>
+    <p class="code_child">class GlLocator {
+    companion object {
+        private var instance: GlBackend? = null
+
+        fun locate(): GlBackend {
+            if (instance == null) {
+                val clazz = Class.forName(&quot;com.blaster.gl.GlBackendImpl&quot;)
+                val ctor = clazz.getConstructor()
+                instance = ctor.newInstance() as GlBackend
+            }
+            return instance!!
+        }
+    }
+}</p>
+
+</div>
+<p class="text">
+</p>    <h2>Application resources</h2>
+
+<p class="text">
+</p><p class="text">Since there are multiple platforms which I am supporting, I want to avoid the hustle with the resources between environments.
+</p><p class="text">To achieve that, I am passing the resources as a part of a binary bundle - this is obviously a very lazy and restricted solution, but I am intentionally not writing a production ready software.
+</p><p class="text">
+</p><p class="text">To access resources I have a class called AssetStream, which allows me to get the InputStream from the filename on every platform:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/AssetStream.kt#L5" target="_blank">common_gl/com.blaster.assets.AssetStream</a>
+</h3>
+    <p class="code_child">class AssetStream {
+    fun openAsset(filename: String) : InputStream {
+        val url = Thread.currentThread().contextClassLoader.getResource(filename)
+        checkNotNull(url) { &quot;Asset not found $filename&quot; }
+        return url.openStream()
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">Later on the specific resource can be decoded with one of the "libraries". Here is one example:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L10" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
+</h3>
+    <p class="code_child">class ShadersLib(private val assetStream: AssetStream) {
+    fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
+            GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
+            GlShader(GlShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
+
+    private fun slurpAsset(filename: String): String {
+        val stringBuilder = StringBuilder()
+        val inputStream = assetStream.openAsset(filename)
+        val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
+        bufferedReader.use {
+            var line = bufferedReader.readLine()
+            while (line != null) {
+                stringBuilder.append(&quot;$line\n&quot;)
+                line = bufferedReader.readLine()
+            }
+        }
+        return stringBuilder.toString()
+    }
+}</p>
+
+</div>
+<p class="text">
+</p>    <h2>Scene: camera, controller, node</h2>
+
+<p class="text">If you will think about it for a second - CG is a set of mathematical equations which are working with matrices. A single value is oftenly a difference between a great lighting technique and a black screen of nothingness.
+</p><p class="text">
+</p><p class="text">To avoid costly and time consuming mistakes, I encapsulated most of the code related to scene matrix handling into easy to use abstractions. It is a very common approach when designing a rendering solution. In my case a scene is represented by a graph of nodes. Each child node is transformed into his parents space by his parent matrix:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Node.kt#L46" target="_blank">common_gl/com.blaster.entity.Node::calculateM</a>
+</h3>
+    <p class="code_child">fun calculateM(): mat4 {
+    val p = parent
+    if (p == null) {
+        modelM.set(calculateLocalM())
+    } else {
+        p.calculateM().mul(calculateLocalM(), modelM)
+    }
+    return modelM
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">His local matrix constructed as follows:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Node.kt#L39" target="_blank">common_gl/com.blaster.entity.Node::calculateLocalM</a>
+</h3>
+    <p class="code_child">private fun calculateLocalM(): mat4 {
+    if (version.check()) {
+        localM.identity().translationRotateScale(position, rotation, scale)
+    }
+    return localM
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">Version class guards from recalculating matrix each time.
+</p><p class="text">
+</p><p class="text">Camera also can construct its own matrix:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Camera.kt#L18" target="_blank">common_gl/com.blaster.entity.Camera::calculateViewM</a>
+</h3>
+    <p class="code_child">fun calculateViewM(): mat4 {
+    if (viewVersion.check()) {
+        position.negate(negatedBuf)
+        viewM.identity().rotate(rotation).translate(negatedBuf)
+    }
+    return viewM
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">Camera controlled through the class called controller:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Controller.kt#L17" target="_blank">common_gl/com.blaster.entity.Controller</a>
+</h3>
+    <p class="code_child">data class Controller(
+        val position: vec3 = vec3(),
+        var yaw: Float = Math.toRadians(-90.0).toFloat(),
+        var pitch: Float = 0f,
+        var roll: Float = 0f,
+        private val sensitivity: Float = 0.005f,
+        private val velocity: Float = 0.01f
+)</p>
+
+</div>
+<p class="text">
+</p><p class="text">This class encapsulates a simple first-person camera code.
+</p><p class="text">
+</p><p class="text">On the desktop I can directly map the input to the controller:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/WasdInput.kt#L7" target="_blank">desktop/com.blaster.platform.WasdInput</a>
+</h3>
+    <p class="code_child">class WasdInput(private val controller: Controller) {
+
+    fun onCursorDelta(delta: Vector2f) {
+        controller.yaw(delta.x)
+        controller.pitch(-delta.y)
+    }
+
+    fun keyPressed(key: Int) {
+        when (key) {
+            GLFW.GLFW_KEY_W -&gt; controller.moveForward = true
+            GLFW.GLFW_KEY_A -&gt; controller.moveLeft = true
+            GLFW.GLFW_KEY_S -&gt; controller.moveBack = true
+            GLFW.GLFW_KEY_D -&gt; controller.moveRight = true
+            GLFW.GLFW_KEY_E -&gt; controller.moveUp = true
+            GLFW.GLFW_KEY_Q -&gt; controller.moveDown = true
+        }
+    }
+
+    fun keyReleased(key: Int) {
+        when (key) {
+            GLFW.GLFW_KEY_W -&gt; controller.moveForward = false
+            GLFW.GLFW_KEY_A -&gt; controller.moveLeft = false
+            GLFW.GLFW_KEY_S -&gt; controller.moveBack = false
+            GLFW.GLFW_KEY_D -&gt; controller.moveRight = false
+            GLFW.GLFW_KEY_E -&gt; controller.moveUp = false
+            GLFW.GLFW_KEY_Q -&gt; controller.moveDown = false
+        }
+    }
+}</p>
+
+</div>
+<p class="text">
+</p>    <h2>Techniques</h2>
+
+<p class="text">
+</p><p class="text">In order to draw in OpenGl one need to setup the pipeline in a certain way. You need shaders for passes, geometry, uniforms, lights and etc. Usually this contains quite a lot of duplicating code. In order to efficiently reuse the code between different demos and projects I group the necessary in classes called "Techniques".
+</p><p class="text">
+</p><p class="text">Here is the SimpleTechnique, which we will use for this demo:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SimpleTechnique.kt#L11" target="_blank">common_gl/com.blaster.techniques.SimpleTechnique</a>
+</h3>
+    <p class="text_child">A most straightforward technique: no lighting, just diffuse from textures
+</p><p class="code_child">class SimpleTechnique {
+    private lateinit var program: GlProgram</p>
+<p class="text_child">We want to create the shader program first
+</p><p class="code_child">    fun create(shadersLib: ShadersLib) {
+        program = shadersLib.loadProgram(&quot;shaders/simple/no_lighting.vert&quot;, &quot;shaders/simple/no_lighting.frag&quot;)
+    }</p>
+<p class="text_child">While drawing, we pass the uniforms for the whole pass
+</p><p class="code_child">    fun draw(camera: Camera, draw: () -&gt; Unit) {
+        glBind(listOf(program)) {
+            program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
+            program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+            draw.invoke()
+        }
+    }
+
+    fun instance(model: Model, modelM: Matrix4f) {
+        instance(model.mesh, model.diffuse, modelM)
+    }</p>
+<p class="text_child">For each instance we pass unique uniforms: model matrix and diffuse texture handle
+</p><p class="code_child">    fun instance(mesh: GlMesh, diffuse: GlTexture, modelM: Matrix4f) {
+        glBind(listOf(mesh, diffuse)) {
+            program.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+            mesh.draw()
+        }
+    }
+}</p>
+
+</div>
+<p class="text">
+</p>    <h2>Simple demo</h2>
+
+<p class="text">
+</p><p class="text">Now we can finally discuss the demo itself.
+</p><p class="text">
+</p><p class="text">Everything starts with onCreate method:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L49" target="_blank">desktop/com.blaster.impl.Simple::onCreate</a>
+</h3>
+    <p class="code_child">override fun onCreate() {</p>
+<p class="text_child">Bootstrapping our technique first
+</p><p class="code_child">    simpleTechnique.create(shadersLib)</p>
+<p class="text_child">Creating a mesh and textures
+</p><p class="code_child">    mesh = GlMesh.triangle()
+    tex1 = texturesLib.loadTexture(&quot;textures/lumina.png&quot;)
+    tex2 = texturesLib.loadTexture(&quot;textures/utah.jpeg&quot;)
+    tex3 = texturesLib.loadTexture(&quot;textures/winner.png&quot;)
+    model1 = Model(mesh, tex1)
+    model2 = Model(mesh, tex2)
+    model3 = Model(mesh, tex3)</p>
+<p class="text_child">Creating separate nodes to track tree instances in space
+</p><p class="code_child">    node1 = Node(payload = model1)
+    node2 = Node(parent = node1, payload = model2)
+    node3 = Node(parent = node2, payload = model3)
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">onResize allows to follow the current dimensions of the screen:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L66" target="_blank">desktop/com.blaster.impl.Simple::onResize</a>
+</h3>
+    <p class="code_child">override fun onResize(width: Int, height: Int) {
+    GlState.apply(width, height)
+    camera.setPerspective(width, height)
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">onTick is responsible for updating and drawing logic:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L71" target="_blank">desktop/com.blaster.impl.Simple::onTick</a>
+</h3>
+    <p class="code_child">override fun onTick() {
+    GlState.clear()</p>
+<p class="text_child">Applying update from WASD controller
+</p><p class="code_child">    controller.apply { position, direction -&gt;
+        camera.setPosition(position)
+        camera.lookAlong(direction)
+    }</p>
+<p class="text_child">Adding some animation to the scene
+</p><p class="code_child">    node1.rotate(axis, 0.01f)
+    node2.rotate(axis, 0.01f)
+    node3.rotate(axis, 0.01f)</p>
+<p class="text_child">Drawing instances with our technique
+</p><p class="code_child">    GlState.drawWithNoCulling {
+        simpleTechnique.draw(camera) {
+            simpleTechnique.instance(model1, node1.calculateM())
+            simpleTechnique.instance(model2, node2.calculateM())
+            simpleTechnique.instance(model3, node3.calculateM())
+        }
+    }
+}</p>
+
+</div>
+<p class="text">
+</p>    <h2>Demo shaders</h2>
+
+<p class="text">
+</p><p class="text">And finally, here are our shaders - very simple and straightforward.
+</p><p class="text">
+</p><p class="text">Vertex shader:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.vert" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.vert</a>
+</h3>
+    <p class="code_child">#version 300 es
+
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+layout (location = 1) in vec2 aTexCoord;
+
+uniform mat4 uModelM;
+uniform mat4 uProjectionM;
+uniform mat4 uViewM;
+
+out vec2 vTexCoord;
+
+void main() {</p>
+<p class="text_child">Passing texture coordinates as is
+</p><p class="code_child">    vTexCoord = aTexCoord;</p>
+<p class="text_child">Calculating MVP matrix
+</p><p class="code_child">    mat4 mvp =  uProjectionM * uViewM * uModelM;</p>
+<p class="text_child">Calculating position for fragment
+</p><p class="code_child">    gl_Position = mvp * vec4(aPosition, 1.0);
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">Fragment shader:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.frag" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.frag</a>
+</h3>
+    <p class="code_child">#version 300 es
+
+precision mediump float;
+
+in vec2 vTexCoord;
+
+uniform sampler2D uTexDiffuse;
+
+layout (location = 0) out vec4 oFragColor;
+
+void main() {</p>
+<p class="text_child">Retreiving the color directly from texture
+</p><p class="code_child">    oFragColor = texture(uTexDiffuse, vTexCoord);</p>
+<p class="text_child">Discarding by alpha
+</p><p class="code_child">    if (oFragColor.a &lt; 0.1) {
+        discard;
+    }
+}</p>
+
+</div>
+<p class="text">
+</p>    <h2>Result</h2>
+
+<p class="text">
+</p><p class="text">And here is the final result:
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/simple.gif" alt="Simple Demo" align="middle">
+<p class="text">
+</p><p class="text">Thanks for your attention and until next time!)
+</p><p class="text">
+</p><p class="text">
+</p><p class="text">
+</p><p class="text">
+</p><p class="text">
+</p><p class="text">
+</p><p class="text">
+</p><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
+<a id="1" class="link" href="https://www.lwjgl.org/" target="_blank">Lightweight Java Game Library</a></li></ul>
     </body>
 </html>

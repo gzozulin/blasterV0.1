@@ -47,7 +47,9 @@ private var mouseMove = false
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
+        // Bootstrapping our technique first
         simpleTechnique.create(shadersLib)
+        // Creating a mesh and textures
         mesh = GlMesh.triangle()
         tex1 = texturesLib.loadTexture("textures/lumina.png")
         tex2 = texturesLib.loadTexture("textures/utah.jpeg")
@@ -55,6 +57,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         model1 = Model(mesh, tex1)
         model2 = Model(mesh, tex2)
         model3 = Model(mesh, tex3)
+        // Creating separate nodes to track tree instances in space
         node1 = Node(payload = model1)
         node2 = Node(parent = node1, payload = model2)
         node3 = Node(parent = node2, payload = model3)
@@ -66,14 +69,17 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     }
 
     override fun onTick() {
+        GlState.clear()
+        // Applying update from WASD controller
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+        // Adding some animation to the scene
         node1.rotate(axis, 0.01f)
         node2.rotate(axis, 0.01f)
         node3.rotate(axis, 0.01f)
-        GlState.clear()
+        // Drawing instances with our technique
         GlState.drawWithNoCulling {
             simpleTechnique.draw(camera) {
                 simpleTechnique.instance(model1, node1.calculateM())

@@ -14,11 +14,6 @@ private val vecDown = vec3().down()
 private const val maxPitch = Math.PI.toFloat() / 2f - 0.1f
 private const val minPitch = -Math.PI.toFloat() / 2f + 0.1f
 
-// todo: 0-9 - teleports
-// todo: 0 - starting point
-// todo: separate controller moder and create class for input from kb and mouse
-// todo: some inertia would be cool
-// todo: can directly implement lwjgl listeners for keyb and cursor
 data class Controller(
         val position: vec3 = vec3(),
         var yaw: Float = Math.toRadians(-90.0).toFloat(),
@@ -99,3 +94,9 @@ data class Controller(
         apply.invoke(position, forward)
     }
 }
+
+// todo: 0-9 - teleports
+// todo: 0 - starting point
+// todo: separate controller moder and create class for input from kb and mouse
+// todo: some inertia would be cool
+// todo: can directly implement lwjgl listeners for keyb and cursor

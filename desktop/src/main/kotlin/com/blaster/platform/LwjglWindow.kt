@@ -30,7 +30,7 @@ abstract class LwjglWindow(
         private val isMultisampled: Boolean = false) {
 
     init {
-        SharedLibraryLoader.load()
+        loadSharedLibs()
     }
 
     private var window = NULL
@@ -47,6 +47,10 @@ abstract class LwjglWindow(
     private var last = System.currentTimeMillis()
 
     private val errorCallback = errorCallbackPrint(System.err)
+
+    private fun loadSharedLibs() {
+        SharedLibraryLoader.load()
+    }
 
     private val windowSizeCallback = object : GLFWWindowSizeCallback() {
         override fun invoke(window: kotlin.Long, width: kotlin.Int, height: kotlin.Int) {
@@ -101,12 +105,15 @@ abstract class LwjglWindow(
         lastCursorPos.set(currentPos)
     }
 
+    // This method allows us to count fps and update it in the title of the window
     private fun updateFps() {
         val current = System.currentTimeMillis()
+        // If more then a second passed - print and zero the counter
         if (current - last > 1000L) {
             glfwSetWindowTitle(window, "Blaster! $fps fps")
             last = current
             fps = 0
+            // else - increment it
         } else {
             fps++
         }

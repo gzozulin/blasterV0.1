@@ -1,6 +1,115 @@
-In this hopefully short post out
+I am glad to see you on the pages of Greg's Journal! In this post I will show the internals of a small demo coincidentally called "Simple":) Despite an obvious simplicity this code can help highlight some of the foundations of my approach to realtime rendering.
 
+Here is the link to main object of the demo:
+#include; decl; desktop/com.blaster.impl.Simple::window
+
+You can navigate to the code by clicking at the header of the code snippet.
+
+#header; h2; LwjglWindow
+
+I should probably start by explaining the basics. In order to hide OpenGl boilerplate code for desktop I created a class called LwjglWindow:
 
 #include; decl; desktop/com.blaster.platform.LwjglWindow
 
-#include; decl; common_gl/com.blaster.gl.GlState
+This class handles the os windows, mouse and keyboard input, resizing and etc. I am relying on LWJGL as a backend for OpenGl handling on desktop \1\.
+
+Probably the most interesting part of it is the creation of the window:
+
+#include; def; desktop/com.blaster.platform.LwjglWindow::createWindow
+
+One more thing to note is that we also load corresponding OpenGl binary libraries here:
+
+#include; def; desktop/com.blaster.platform.LwjglWindow::loadSharedLibs
+
+It works for both: Windows and Linux environment.
+
+#cite; 1; Lightweight Java Game Library; https://www.lwjgl.org/
+
+#header; h2; Cross-platform approach
+
+Since the support for Windows and Linux comes naturally with LWJGL, I want to additionally incorporate support for mobile devices as well.
+In order to do this I abstracted all OpenGl calls behind an interface called GlBackend:
+
+#include; decl; common_gl/com.blaster.gl.GlBackend
+
+This interface is implemented for both cases: "big" OpenGl and mobile OpenGl ES. Since I am rarely using advanced OpenGl capabilities this works just fine for me.
+On the target platform I simply hook up the proper implementation with reflexion:
+
+#include; def; common_gl/com.blaster.gl.GlBackend::GlLocator
+
+#header; h2; Application resources
+
+Since there are multiple platforms which I am supporting, I want to avoid the hustle with the resources between environments.
+To achieve that, I am passing the resources as a part of a binary bundle - this is obviously a very lazy and restricted solution, but I am intentionally not writing a production ready software.
+
+To access resources I have a class called AssetStream, which allows me to get the InputStream from the filename on every platform:
+#include; def; common_gl/com.blaster.assets.AssetStream
+
+Later on the specific resource can be decoded with one of the "libraries". Here is one example:
+#include; def; common_gl/com.blaster.assets.ShadersLib
+
+#header; h2; Scene: camera, controller, node
+If you will think about it for a second - CG is a set of mathematical equations which are working with matrices. A single value is oftenly a difference between a great lighting technique and a black screen of nothingness.
+
+To avoid costly and time consuming mistakes, I encapsulated most of the code related to scene matrix handling into easy to use abstractions. It is a very common approach when designing a rendering solution. In my case a scene is represented by a graph of nodes. Each child node is transformed into his parents space by his parent matrix:
+#include; def; common_gl/com.blaster.entity.Node::calculateM
+
+His local matrix constructed as follows:
+#include; def; common_gl/com.blaster.entity.Node::calculateLocalM
+
+Version class guards from recalculating matrix each time.
+
+Camera also can construct its own matrix:
+#include; def; common_gl/com.blaster.entity.Camera::calculateViewM
+
+Camera controlled through the class called controller:
+#include; decl; common_gl/com.blaster.entity.Controller
+
+This class encapsulates a simple first-person camera code.
+
+On the desktop I can directly map the input to the controller:
+
+#include; def; desktop/com.blaster.platform.WasdInput
+
+#header; h2; Techniques
+
+In order to draw in OpenGl one need to setup the pipeline in a certain way. You need shaders for passes, geometry, uniforms, lights and etc. Usually this contains quite a lot of duplicating code. In order to efficiently reuse the code between different demos and projects I group the necessary in classes called "Techniques".
+
+Here is the SimpleTechnique, which we will use for this demo:
+#include; def; common_gl/com.blaster.techniques.SimpleTechnique
+
+#header; h2; Simple demo
+
+Now we can finally discuss the demo itself.
+
+Everything starts with onCreate method:
+#include; def; desktop/com.blaster.impl.Simple::onCreate
+
+onResize allows to follow the current dimensions of the screen:
+#include; def; desktop/com.blaster.impl.Simple::onResize
+
+onTick is responsible for updating and drawing logic:
+#include; def; desktop/com.blaster.impl.Simple::onTick
+
+#header; h2; Demo shaders
+
+And finally, here are our shaders - very simple and straightforward.
+
+Vertex shader:
+#include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.vert
+
+Fragment shader:
+#include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.frag
+
+#header; h2; Result
+
+And here is the final result:
+#picture; Simple Demo; http://gzozulin.com/wp-content/uploads/2020/02/simple.gif
+
+Thanks for your attention and until next time!)
+
+
+
+
+
+

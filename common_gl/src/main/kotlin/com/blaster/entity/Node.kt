@@ -46,7 +46,7 @@ data class Node<T>(
     fun calculateM(): mat4 {
         val p = parent
         if (p == null) {
-            modelM.set(calculateLocalM()) // root
+            modelM.set(calculateLocalM())
         } else {
             p.calculateM().mul(calculateLocalM(), modelM)
         }
