@@ -57,7 +57,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         model1 = Model(mesh, tex1)
         model2 = Model(mesh, tex2)
         model3 = Model(mesh, tex3)
-        // Creating separate nodes to track tree instances in space
+        // Creating separate nodes to track three instances in space
         node1 = Node(payload = model1)
         node2 = Node(parent = node1, payload = model2)
         node3 = Node(parent = node2, payload = model3)

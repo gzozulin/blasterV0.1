@@ -41,7 +41,7 @@ class GlState private constructor() {
         fun apply(width: Int, height: Int, color: Vector3f = Vector3f(0.9f, 9.9f, 1f)) {
             glCheck { backend.glViewport(0, 0, width, height) }
             glCheck { backend.glClearColor(color.x, color.y, color.z, 0f) }
-            //glCheck { backend.glEnable(backend.GL_MULTISAMPLE) }
+            glCheck { backend.glEnable(backend.GL_MULTISAMPLE) }
             enableDepthTest()
             enableCulling()
         }

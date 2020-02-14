@@ -39,6 +39,10 @@ private val window = object: LwjglWindow() {
             camera.setPosition(position)
             camera.lookAlong(direction)
         }
+        drawSkybox()
+    }
+
+    private fun drawSkybox() {
         GlState.drawWithNoCulling {
             skyboxTechnique.skybox(camera)
         }

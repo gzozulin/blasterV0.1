@@ -34,6 +34,7 @@ class SimpleTechnique {
         glBind(listOf(mesh, diffuse)) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+            // After uniforms are ready, we can make a call to render the geometry
             mesh.draw()
         }
     }

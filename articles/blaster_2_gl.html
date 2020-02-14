@@ -1,0 +1,200 @@
+<html>
+    <style>
+
+        .code,.child {
+                    border-radius: 3px;
+                    display: block;
+                    max-width: 100%;
+                    overflow: auto;
+                    color: #666;
+                    page-break-inside: avoid;
+                    font: normal 15px/1.6 monospace;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                    word-wrap: break-word;
+                }
+
+                .child {
+                    border-radius: 3px;
+                    background: #F1ECEC;
+                    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+                }
+
+                .code {
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                }
+
+                .code_child {
+                    border-radius: 3px;
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                }
+
+                .text {}
+                .text_child {}
+
+                .link {}
+                .link_child {}
+
+                .picture {
+                    display: block;
+                    margin-left: auto;
+                    margin-right: auto;
+                    width: 40%;
+                }
+                .picture_child {}
+
+                .list_item {}
+                .list_item_child {}
+    </style>
+    <body>
+        <p class="text">Hello, and welcome to the pages of Greg's Journal.
+</p><p class="text">
+</p><p class="text">In this post, I would like to delve more in-depth on the topic of tools, which helps me to abstract OpenGL native calls.
+</p><p class="text">
+</p><p class="text">OpenGL is a state machine controlled by the API provided by the driver. Most of this API is notoriously obscure and cumbersome. Silicon Graphics began developing the OpenGl in 1991 <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>. The predominant language of that time was C with its procedural approach. Since 2006, OpenGL has been managed by the non-profit technology consortium Khronos Group, but unfortunately, not a lot had changed in terms of overall API simplicity and conciseness.
+</p><p class="text">
+</p><p class="text">
+</p><p class="text">To manage the complexity, I have created a small number of relatively versatile classes, which hides the actual API calls underneath.
+</p><p class="text">
+</p><h2 id="In-this-chapter">In this chapter</h2><ul class="list_item"><li>    <a class="link" href="#Bindable-GL-resources">Bindable GL resources</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Error-handling-for-native-GL-calls">Error handling for native GL calls</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Controlling-the-global-GL-state">Controlling the global GL state</a>
+</li></ul><p class="text">
+</p><h2 id="Bindable-GL-resources">Bindable GL resources</h2>
+<p class="text">
+</p><p class="text">Since OpenGL is essentially a state machine, the state managed by a stack of "bindings." The idea is similar to RAII principle <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup> - I want the resource to be bound while it is needed and release immediately afterward.
+</p><p class="text">
+</p><p class="text">
+</p><p class="text">Every "bindable" resource in my code is represented by the Bindable interface:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L36" target="_blank">common_gl/com.blaster.gl.GlAux::GLBindable</a>
+</h3>
+    <p class="code_child">interface GLBindable {
+    fun bind()
+    fun unbind()
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">When we want to use the resource, we can bind it on place:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L41" target="_blank">common_gl/com.blaster.gl.GlAux::glBind</a>
+</h3>
+    <p class="code_child">fun glBind(bindables: List&lt;GLBindable&gt;, action: () -&gt; Unit) {
+    bindables.forEach { it.bind() }
+    action.invoke()
+    bindables.reversed().forEach { it.unbind() }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">The calls can be inlined and combined, of course. Here is the example:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L21" target="_blank">common_gl/com.blaster.techniques.TextTechnique::draw</a>
+</h3>
+    <p class="code_child">fun draw(call: () -&gt; Unit) {
+    glBind(listOf(program, font, rect)) {
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, font)
+        call.invoke()
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">It is not an efficient approach - we're allocating memory on a JVM with each call, which can potentially lead to GC pauses, but if I care for the efficiency for specific cases - there is always a way to overcome this downfall. Do not forget about the root of all evil <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup> when optimizing :)
+</p><p class="text">
+</p><p class="text">
+</p><h2 id="Error-handling-for-native-GL-calls">Error handling for native GL calls</h2>
+<p class="text">
+</p><p class="text">The OpenGL driver is a black box of magic sometimes, and I am trying to use every possibility to discover errors early on. Every native call in my code surrounded by the following:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L30" target="_blank">common_gl/com.blaster.gl.GlAux::glCheck</a>
+</h3>
+    <p class="code_child">fun &lt;T&gt; glCheck(action: () -&gt; T): T {
+    val result = action.invoke()
+    checkForGLError()
+    return result
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">This code will execute the call and check for native errors immediately after. Once again - if I will care for the performance after the code is debugged and working, I can strip those checks out similarly to C/C++ assertions - they are removed in release variants of the program by compiler <sup id="4_origin"><a href="#4">&#91;4&#93;</a></sup>.
+</p><p class="text">
+</p><p class="text">If error is detected, it will be recognized and propagated like any other Kotlin Error:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L7" target="_blank">common_gl/com.blaster.gl.GlAux::GlError</a>
+</h3>
+    <p class="code_child">class GlError(private val errorCode: Int) : Error() {
+    override fun toString(): String {
+        val msg = when (errorCode) {
+            0x0   -&gt; &quot;GL_NO_ERROR&quot;
+            0x500 -&gt; &quot;GL_INVALID_ENUM&quot;
+            0x501 -&gt; &quot;GL_INVALID_VALUE&quot;
+            0x502 -&gt; &quot;GL_INVALID_OPERATION&quot;
+            0x503 -&gt; &quot;GL_STACK_OVERFLOW&quot;
+            0x504 -&gt; &quot;GL_STACK_UNDERFLOW&quot;
+            0x505 -&gt; &quot;GL_OUT_OF_MEMORY&quot;
+            else -&gt; throw TODO(&quot;Unknown error code: $errorCode&quot;)
+        }
+        return &quot;OpenGL error: $msg($errorCode)&quot;
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">I am converting OpenGL errors to Kotlin errors to have a possibility to react on them later on.
+</p><p class="text">
+</p><h2 id="Controlling-the-global-GL-state">Controlling the global GL state</h2>
+<p class="text">
+</p><p class="text">One more thing, which I want to mention is a helper class, which allows me to prepare and handle the common parameters of the state:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt#L7" target="_blank">common_gl/com.blaster.gl.GlState</a>
+</h3>
+    <p class="code_child">class GlState private constructor()</p>
+
+</div>
+<p class="text">
+</p><p class="text">With this class, I can, for example, disable a backface culling for a certain part of a technique and I will never forget to switch it back on:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt#L35" target="_blank">common_gl/com.blaster.gl.GlState::drawWithNoCulling</a>
+</h3>
+    <p class="code_child">fun drawWithNoCulling(draw: () -&gt; Unit) {
+    disableCulling()
+    draw.invoke()
+    enableCulling()
+}</p>
+
+</div>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Skybox.kt#L45" target="_blank">desktop/com.blaster.impl.Skybox::drawSkybox</a>
+</h3>
+    <p class="code_child">private fun drawSkybox() {
+    GlState.drawWithNoCulling {
+        skyboxTechnique.skybox(camera)
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">The main idea is to avoid having any low-level native calls across the client code to abstract the GL subsystem.
+</p><p class="text">
+</p><p class="text">I hope you found this reading enjoyable and will see you soon!
+</p><p class="text">
+</p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
+<a id="1" class="link" href="https://en.wikipedia.org/wiki/OpenGL" target="_blank">Open Graphics Library (OpenGL)</a></li></ul><ul class="list_item"><li>    <a class="link" href="#2_origin">&#8593;[2]: </a>
+<a id="2" class="link" href="https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization" target="_blank">Resource acquisition is initialization</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
+<a id="3" class="link" href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimize" target="_blank">Premature optimization</a></li></ul><ul class="list_item"><li>    <a class="link" href="#4_origin">&#8593;[4]: </a>
+<a id="4" class="link" href="http://www.cplusplus.com/reference/cassert/assert/" target="_blank">Assertion in C/C++</a></li></ul>
+    </body>
+</html>

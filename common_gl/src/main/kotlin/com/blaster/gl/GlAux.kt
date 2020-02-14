@@ -38,15 +38,15 @@ interface GLBindable {
     fun unbind()
 }
 
-fun glBind(bindable: GLBindable, action: () -> Unit) {
-    bindable.bind()
-    action.invoke()
-    bindable.unbind()
-}
-
-// todo: remove creation of the list each frame
 fun glBind(bindables: List<GLBindable>, action: () -> Unit) {
     bindables.forEach { it.bind() }
     action.invoke()
     bindables.reversed().forEach { it.unbind() }
+}
+// todo: remove creation of the list each frame
+
+fun glBind(bindable: GLBindable, action: () -> Unit) {
+    bindable.bind()
+    action.invoke()
+    bindable.unbind()
 }

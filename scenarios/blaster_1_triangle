@@ -83,6 +83,16 @@ To draw in OpenGL, one needs to set up the pipeline in a certain way. It would h
 Here is the SimpleTechnique, which we will use for this demo:
 #include; def; common_gl/com.blaster.techniques.SimpleTechnique
 
+#header; Demo shaders
+
+Here are our shaders - very simple and straightforward.
+
+Vertex shader:
+#include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.vert
+
+And fragment shader:
+#include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.frag
+
 #header; Simple demo
 
 Now we can finally discuss the demo itself.
@@ -96,14 +106,5 @@ onResize allows to follow the current dimensions of the screen:
 onTick is responsible for updating and drawing logic:
 #include; def; desktop/com.blaster.impl.Simple::onTick
 
-#header; Demo shaders
-
-And finally, here are our shaders - very simple and straightforward.
-
-Vertex shader:
-#include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.vert
-
-Fragment shader:
-#include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.frag
-
+That is it - a pretty much standard introduction into the world of OpenGL.
 Thanks for your attention and until next time!)

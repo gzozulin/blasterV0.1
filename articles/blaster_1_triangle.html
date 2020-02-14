@@ -71,8 +71,8 @@
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Application-resources">Application resources</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Scene--camera--controller--node">Scene: camera, controller, node</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Techniques">Techniques</a>
-</li></ul><ul class="list_item"><li>    <a class="link" href="#Simple-demo">Simple demo</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Demo-shaders">Demo shaders</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Simple-demo">Simple demo</a>
 </li></ul><p class="text">
 </p><h2 id="LwjglWindow">LwjglWindow</h2>
 <p class="text">
@@ -355,9 +355,67 @@
 </p><p class="code_child">    fun instance(mesh: GlMesh, diffuse: GlTexture, modelM: Matrix4f) {
         glBind(listOf(mesh, diffuse)) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
-            mesh.draw()
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)</p>
+<p class="text_child">After uniforms are ready, we can make a call to render the geometry
+</p><p class="code_child">            mesh.draw()
         }
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><h2 id="Demo-shaders">Demo shaders</h2>
+<p class="text">
+</p><p class="text">Here are our shaders - very simple and straightforward.
+</p><p class="text">
+</p><p class="text">Vertex shader:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.vert" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.vert</a>
+</h3>
+    <p class="code_child">#version 300 es
+
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+layout (location = 1) in vec2 aTexCoord;
+
+uniform mat4 uModelM;
+uniform mat4 uProjectionM;
+uniform mat4 uViewM;
+
+out vec2 vTexCoord;
+
+void main() {</p>
+<p class="text_child">Passing texture coordinates as is
+</p><p class="code_child">    vTexCoord = aTexCoord;</p>
+<p class="text_child">Calculating MVP matrix
+</p><p class="code_child">    mat4 mvp =  uProjectionM * uViewM * uModelM;</p>
+<p class="text_child">Calculating position for fragment
+</p><p class="code_child">    gl_Position = mvp * vec4(aPosition, 1.0);
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">And fragment shader:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.frag" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.frag</a>
+</h3>
+    <p class="code_child">#version 300 es
+
+precision mediump float;
+
+in vec2 vTexCoord;
+
+uniform sampler2D uTexDiffuse;
+
+layout (location = 0) out vec4 oFragColor;
+
+void main() {</p>
+<p class="text_child">Retreiving the color directly from texture
+</p><p class="code_child">    oFragColor = texture(uTexDiffuse, vTexCoord);</p>
+<p class="text_child">Discarding by alpha
+</p><p class="code_child">    if (oFragColor.a &lt; 0.1) {
+        discard;
     }
 }</p>
 
@@ -382,7 +440,7 @@
     model1 = Model(mesh, tex1)
     model2 = Model(mesh, tex2)
     model3 = Model(mesh, tex3)</p>
-<p class="text_child">Creating separate nodes to track tree instances in space
+<p class="text_child">Creating separate nodes to track three instances in space
 </p><p class="code_child">    node1 = Node(payload = model1)
     node2 = Node(parent = node1, payload = model2)
     node3 = Node(parent = node2, payload = model3)
@@ -428,63 +486,7 @@
 
 </div>
 <p class="text">
-</p><h2 id="Demo-shaders">Demo shaders</h2>
-<p class="text">
-</p><p class="text">And finally, here are our shaders - very simple and straightforward.
-</p><p class="text">
-</p><p class="text">Vertex shader:
-</p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.vert" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.vert</a>
-</h3>
-    <p class="code_child">#version 300 es
-
-precision mediump float;
-
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aTexCoord;
-
-uniform mat4 uModelM;
-uniform mat4 uProjectionM;
-uniform mat4 uViewM;
-
-out vec2 vTexCoord;
-
-void main() {</p>
-<p class="text_child">Passing texture coordinates as is
-</p><p class="code_child">    vTexCoord = aTexCoord;</p>
-<p class="text_child">Calculating MVP matrix
-</p><p class="code_child">    mat4 mvp =  uProjectionM * uViewM * uModelM;</p>
-<p class="text_child">Calculating position for fragment
-</p><p class="code_child">    gl_Position = mvp * vec4(aPosition, 1.0);
-}</p>
-
-</div>
-<p class="text">
-</p><p class="text">Fragment shader:
-</p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.frag" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.frag</a>
-</h3>
-    <p class="code_child">#version 300 es
-
-precision mediump float;
-
-in vec2 vTexCoord;
-
-uniform sampler2D uTexDiffuse;
-
-layout (location = 0) out vec4 oFragColor;
-
-void main() {</p>
-<p class="text_child">Retreiving the color directly from texture
-</p><p class="code_child">    oFragColor = texture(uTexDiffuse, vTexCoord);</p>
-<p class="text_child">Discarding by alpha
-</p><p class="code_child">    if (oFragColor.a &lt; 0.1) {
-        discard;
-    }
-}</p>
-
-</div>
-<p class="text">
+</p><p class="text">That is it - a pretty much standard introduction into the world of OpenGL.
 </p><p class="text">Thanks for your attention and until next time!)
 </p><p class="text">
 </p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>

@@ -1,0 +1,63 @@
+Hello, and welcome to the pages of Greg's Journal.
+
+In this post, I would like to delve more in-depth on the topic of tools, which helps me to abstract OpenGL native calls.
+
+OpenGL is a state machine controlled by the API provided by the driver. Most of this API is notoriously obscure and cumbersome. Silicon Graphics began developing the OpenGl in 1991 \1\. The predominant language of that time was C with its procedural approach. Since 2006, OpenGL has been managed by the non-profit technology consortium Khronos Group, but unfortunately, not a lot had changed in terms of overall API simplicity and conciseness.
+
+#cite; 1; Open Graphics Library (OpenGL); https://en.wikipedia.org/wiki/OpenGL
+
+To manage the complexity, I have created a small number of relatively versatile classes, which hides the actual API calls underneath.
+
+#content; In this chapter
+
+#header; Bindable GL resources
+
+Since OpenGL is essentially a state machine, the state managed by a stack of "bindings." The idea is similar to RAII principle \2\ - I want the resource to be bound while it is needed and release immediately afterward.
+
+#cite; 2; Resource acquisition is initialization; https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization
+
+Every "bindable" resource in my code is represented by the Bindable interface:
+
+#include; def; common_gl/com.blaster.gl.GlAux::GLBindable
+
+When we want to use the resource, we can bind it on place:
+
+#include; def; common_gl/com.blaster.gl.GlAux::glBind
+
+The calls can be inlined and combined, of course. Here is the example:
+
+#include; def; common_gl/com.blaster.techniques.TextTechnique::draw
+
+It is not an efficient approach - we're allocating memory on a JVM with each call, which can potentially lead to GC pauses, but if I care for the efficiency for specific cases - there is always a way to overcome this downfall. Do not forget about the root of all evil \3\ when optimizing :)
+
+#cite; 3; Premature optimization; https://en.wikipedia.org/wiki/Program_optimization#When_to_optimize
+
+#header; Error handling for native GL calls
+
+The OpenGL driver is a black box of magic sometimes, and I am trying to use every possibility to discover errors early on. Every native call in my code surrounded by the following:
+
+#include; def; common_gl/com.blaster.gl.GlAux::glCheck
+
+This code will execute the call and check for native errors immediately after. Once again - if I will care for the performance after the code is debugged and working, I can strip those checks out similarly to C/C++ assertions - they are removed in release variants of the program by compiler \4\.
+#cite; 4; Assertion in C/C++; http://www.cplusplus.com/reference/cassert/assert/
+
+If error is detected, it will be recognized and propagated like any other Kotlin Error:
+#include; def; common_gl/com.blaster.gl.GlAux::GlError
+
+I am converting OpenGL errors to Kotlin errors to have a possibility to react on them later on.
+
+#header; Controlling the global GL state
+
+One more thing, which I want to mention is a helper class, which allows me to prepare and handle the common parameters of the state:
+
+#include; decl; common_gl/com.blaster.gl.GlState
+
+With this class, I can, for example, disable a backface culling for a certain part of a technique and I will never forget to switch it back on:
+
+#include; def; common_gl/com.blaster.gl.GlState::drawWithNoCulling
+
+#include; def; desktop/com.blaster.impl.Skybox::drawSkybox
+
+The main idea is to avoid having any low-level native calls across the client code to abstract the GL subsystem.
+
+I hope you found this reading enjoyable and will see you soon!
