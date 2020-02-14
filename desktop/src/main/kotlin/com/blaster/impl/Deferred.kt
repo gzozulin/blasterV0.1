@@ -30,6 +30,7 @@ private val console = Console(3000L)
 private val camera = Camera()
 private val controller = Controller(Vector3f(0.5f, 3f, 3f), velocity = 0.05f)
 private val wasd = WasdInput(controller)
+private var mouseControl = false
 
 private lateinit var model: Model
 
@@ -49,7 +50,7 @@ private fun nextMaterial() {
     console.success("Material: ${currentMaterial.key}")
 }
 
-private val window = object : LwjglWindow() {
+private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
         val (mesh, aabb) = meshLib.loadMesh("models/house/low.obj")
         val diffuse = texturesLib.loadTexture("models/house/house_diffuse.png")
@@ -96,7 +97,17 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        wasd.onCursorDelta(delta)
+        if (mouseControl) {
+            wasd.onCursorDelta(delta)
+        }
+    }
+
+    override fun mouseBtnPressed(btn: Int) {
+        mouseControl = true
+    }
+
+    override fun mouseBtnReleased(btn: Int) {
+        mouseControl = false
     }
 
     override fun keyPressed(key: Int) {

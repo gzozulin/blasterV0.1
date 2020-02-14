@@ -16,15 +16,15 @@ Since OpenGL is essentially a state machine, the state managed by a stack of "bi
 
 #cite; 2; Resource acquisition is initialization; https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization
 
-Every "bindable" resource in my code is represented by the Bindable interface:
+Every "bindable" resource in my code is represented by the GlBindable interface:
 
-#include; def; common_gl/com.blaster.gl.GlAux::GLBindable
+#include; def; common_gl/com.blaster.gl.GlAux::GlBindable
 
-When we want to use the resource, we can bind it on place:
+When we want to use the resource, we can bind it on spot:
 
 #include; def; common_gl/com.blaster.gl.GlAux::glBind
 
-The calls can be inlined and combined, of course. Here is the example:
+The calls can be nested and combined:
 
 #include; def; common_gl/com.blaster.techniques.TextTechnique::draw
 
@@ -38,7 +38,10 @@ The OpenGL driver is a black box of magic sometimes, and I am trying to use ever
 
 #include; def; common_gl/com.blaster.gl.GlAux::glCheck
 
-This code will execute the call and check for native errors immediately after. Once again - if I will care for the performance after the code is debugged and working, I can strip those checks out similarly to C/C++ assertions - they are removed in release variants of the program by compiler \4\.
+Here is the example:
+#include; def; common_gl/com.blaster.gl.GlBuffer::bind
+
+This code will execute the call and check for native errors immediately after. Again, if I will care for the performance, after the code is debugged and working, I can strip those checks out similarly to C/C++ assertions - they are removed in release variants of the program by compiler \4\.
 #cite; 4; Assertion in C/C++; http://www.cplusplus.com/reference/cassert/assert/
 
 If error is detected, it will be recognized and propagated like any other Kotlin Error:

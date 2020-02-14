@@ -43,7 +43,7 @@
                     display: block;
                     margin-left: auto;
                     margin-right: auto;
-                    width: 40%;
+                    max-height: 50%;
                 }
                 .picture_child {}
 
@@ -198,7 +198,7 @@
 <p class="text">
 </p><p class="text">Later on, the specific resource can be decoded with one of the "libraries." Here is one example:
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L10" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L11" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
 </h3>
     <p class="code_child">class ShadersLib(private val assetStream: AssetStream) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
@@ -335,7 +335,7 @@
     <p class="text_child">A most straightforward technique: no lighting, just diffuse from textures
 </p><p class="code_child">class SimpleTechnique {
     private lateinit var program: GlProgram</p>
-<p class="text_child">We want to create the shader program first
+<p class="text_child">Compiling and storing shader program
 </p><p class="code_child">    fun create(shadersLib: ShadersLib) {
         program = shadersLib.loadProgram(&quot;shaders/simple/no_lighting.vert&quot;, &quot;shaders/simple/no_lighting.frag&quot;)
     }</p>

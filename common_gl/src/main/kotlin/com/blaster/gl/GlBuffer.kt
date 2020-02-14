@@ -8,7 +8,7 @@ private val backend = GlLocator.locate()
 class GlBuffer(
         private val target: Int,
         private val buffer: ByteBuffer,
-        private val usage: Int = backend.GL_STATIC_DRAW) : GLBindable {
+        private val usage: Int = backend.GL_STATIC_DRAW) : GlBindable {
 
     private val handle: Int = glCheck { backend.glGenBuffers() }
 

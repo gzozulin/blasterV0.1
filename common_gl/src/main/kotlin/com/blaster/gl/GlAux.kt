@@ -33,19 +33,19 @@ fun <T> glCheck(action: () -> T): T {
     return result
 }
 
-interface GLBindable {
+interface GlBindable {
     fun bind()
     fun unbind()
 }
 
-fun glBind(bindables: List<GLBindable>, action: () -> Unit) {
+// todo: remove creation of the list each frame
+fun glBind(bindables: List<GlBindable>, action: () -> Unit) {
     bindables.forEach { it.bind() }
     action.invoke()
     bindables.reversed().forEach { it.unbind() }
 }
-// todo: remove creation of the list each frame
 
-fun glBind(bindable: GLBindable, action: () -> Unit) {
+fun glBind(bindable: GlBindable, action: () -> Unit) {
     bindable.bind()
     action.invoke()
     bindable.unbind()

@@ -5,7 +5,7 @@ private val backend = GlLocator.locate()
 class GlMesh(
         private val attributes: List<Pair<GlAttribute, GlBuffer>>,
         private val indicesBuffer: GlBuffer,
-        private val indicesCount: Int) : GLBindable {
+        private val indicesCount: Int) : GlBindable {
 
     private var handle: Int? = null
 

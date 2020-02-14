@@ -4,7 +4,7 @@ import java.nio.ByteBuffer
 
 private val backend = GlLocator.locate()
 
-class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GLBindable {
+class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GlBindable {
     var handle: Int? = null
 
     init {

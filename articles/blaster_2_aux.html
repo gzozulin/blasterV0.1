@@ -43,7 +43,7 @@
                     display: block;
                     margin-left: auto;
                     margin-right: auto;
-                    width: 40%;
+                    max-height: 50%;
                 }
                 .picture_child {}
 
@@ -69,24 +69,24 @@
 </p><p class="text">Since OpenGL is essentially a state machine, the state managed by a stack of "bindings." The idea is similar to RAII principle <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup> - I want the resource to be bound while it is needed and release immediately afterward.
 </p><p class="text">
 </p><p class="text">
-</p><p class="text">Every "bindable" resource in my code is represented by the Bindable interface:
+</p><p class="text">Every "bindable" resource in my code is represented by the GlBindable interface:
 </p><p class="text">
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L36" target="_blank">common_gl/com.blaster.gl.GlAux::GLBindable</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L36" target="_blank">common_gl/com.blaster.gl.GlAux::GlBindable</a>
 </h3>
-    <p class="code_child">interface GLBindable {
+    <p class="code_child">interface GlBindable {
     fun bind()
     fun unbind()
 }</p>
 
 </div>
 <p class="text">
-</p><p class="text">When we want to use the resource, we can bind it on place:
+</p><p class="text">When we want to use the resource, we can bind it on spot:
 </p><p class="text">
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L41" target="_blank">common_gl/com.blaster.gl.GlAux::glBind</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L42" target="_blank">common_gl/com.blaster.gl.GlAux::glBind</a>
 </h3>
-    <p class="code_child">fun glBind(bindables: List&lt;GLBindable&gt;, action: () -&gt; Unit) {
+    <p class="code_child">fun glBind(bindables: List&lt;GlBindable&gt;, action: () -&gt; Unit) {
     bindables.forEach { it.bind() }
     action.invoke()
     bindables.reversed().forEach { it.unbind() }
@@ -94,7 +94,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">The calls can be inlined and combined, of course. Here is the example:
+</p><p class="text">The calls can be nested and combined:
 </p><p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L21" target="_blank">common_gl/com.blaster.techniques.TextTechnique::draw</a>
@@ -126,7 +126,17 @@
 
 </div>
 <p class="text">
-</p><p class="text">This code will execute the call and check for native errors immediately after. Once again - if I will care for the performance after the code is debugged and working, I can strip those checks out similarly to C/C++ assertions - they are removed in release variants of the program by compiler <sup id="4_origin"><a href="#4">&#91;4&#93;</a></sup>.
+</p><p class="text">Here is the example:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L43" target="_blank">common_gl/com.blaster.gl.GlBuffer::bind</a>
+</h3>
+    <p class="code_child">override fun bind() {
+    glCheck { backend.glBindBuffer(target, handle) }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">This code will execute the call and check for native errors immediately after. Again, if I will care for the performance, after the code is debugged and working, I can strip those checks out similarly to C/C++ assertions - they are removed in release variants of the program by compiler <sup id="4_origin"><a href="#4">&#91;4&#93;</a></sup>.
 </p><p class="text">
 </p><p class="text">If error is detected, it will be recognized and propagated like any other Kotlin Error:
 </p><div class="child">

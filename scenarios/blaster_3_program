@@ -1,0 +1,61 @@
+Hello, and welcome to the pages of Greg's Journal!
+
+In this post, I would like to discuss the abstraction of shaders in my code.
+
+"The OpenGL rendering pipeline is initiated when you perform a rendering operation. Rendering operations require the presence of a properly-defined vertex array object and a linked Program Object or Program Pipeline Object, which provides the shaders for the programmable pipeline stages." \1\
+#cite; 1; Rendering Pipeline Overview; https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview
+
+If you would strip all of the "objects" from this explanation, what they are trying to say, is that the OpenGL pipeline performs several transformations of graphics data before the colorful pixels hit the screen. And some of those transformations are programmable (so you can program, while programming).
+
+#content; What we will discuss
+
+#header; Programmable stages
+
+There are two main stages, which are of interest for me - vertex shader and fragment shader.
+#picture; OpenGl pipeline; http://gzozulin.com/wp-content/uploads/2020/02/rendering_pipeline.png
+
+Those are represented by corresponding types:
+#include; def; common_gl/com.blaster.gl.GlProgram::GlShaderType
+
+The shader itself is a relatively straightforward class, which compiles GLSL code and checks for errors:
+#include; def; common_gl/com.blaster.gl.GlProgram::GlShader
+
+I wonder if it is possible to write shaders in Kotlin directly with intermediate representation \2\. It should be - I know about some projects \3\ doing that \4\. It will definitely improve readability and maintenance for me. I will probably investigate into that direction at some point.
+#cite; 2; Standard, Portable Intermediate Representation - V (SPIR-V); https://www.khronos.org/opengl/wiki/SPIR-V
+#cite; 3; Equalizer written in Kotlin using OpenCL; https://github.com/letalvoj/fft-opencl-kotlin
+#cite; 4; AMD's Aparapi; https://aparapi.github.io/
+
+#header; Linking programs
+
+Two shaders (vertex and fragment) are combined into a program. GlProgram class performs linking and error checking:
+#include; def; common_gl/com.blaster.gl.GlProgram::createProgram
+
+One can notice that I am caching uniform locations after creation - we will talk about it shortly.
+
+#header; Uniforms caching
+
+In my code, I prefer to look for uniforms as part of the program creation process. Usually, that happens once during the initialization, which is convenient. Uniform locations are then stored in the cache for a lookup speedup when we need to send data:
+#include; def; common_gl/com.blaster.gl.GlProgram::cacheUniforms
+
+I am using a predefined set of uniform names in code:
+#include; def; common_gl/com.blaster.gl.GlUniform
+
+#header; Uniforms sending
+
+GlProgram also has a set of methods to send different type of data into the shader, for example:
+#include; def; common_gl/com.blaster.gl.GlProgram::setUniform
+
+Updating the texture unit works basically in the same way:
+#include; def; common_gl/com.blaster.gl.GlProgram::setTexture
+
+And here is an example of usage:
+#include; def; common_gl/com.blaster.techniques.SkyboxTechnique::skybox
+
+#header; Reading and loading programs
+I am storing my shaders as a part of my resources pack. To access and load them, I created a small class, which can read the program code directly from assets:
+#include; def; common_gl/com.blaster.assets.ShadersLib
+
+This class will retrieve the code and compile it into the program:
+#include; def; common_gl/com.blaster.techniques.SimpleTechnique::create
+
+That is it for now - hope you liked it. I will see you again soon!

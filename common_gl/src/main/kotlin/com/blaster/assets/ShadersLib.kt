@@ -7,6 +7,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
 
+// todo: import common functions with placeholders, like: "import shaders/common/lookat"
 class ShadersLib(private val assetStream: AssetStream) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
             GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
@@ -26,5 +27,3 @@ class ShadersLib(private val assetStream: AssetStream) {
         return stringBuilder.toString()
     }
 }
-
-// todo: import common functions with placeholders, like: "import shaders/common/lookat"

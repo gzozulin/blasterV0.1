@@ -1,0 +1,294 @@
+<html>
+    <style>
+
+        .code,.child {
+                    border-radius: 3px;
+                    display: block;
+                    max-width: 100%;
+                    overflow: auto;
+                    color: #666;
+                    page-break-inside: avoid;
+                    font: normal 15px/1.6 monospace;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                    word-wrap: break-word;
+                }
+
+                .child {
+                    border-radius: 3px;
+                    background: #F1ECEC;
+                    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+                }
+
+                .code {
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                }
+
+                .code_child {
+                    border-radius: 3px;
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                }
+
+                .text {}
+                .text_child {}
+
+                .link {}
+                .link_child {}
+
+                .picture {
+                    display: block;
+                    margin-left: auto;
+                    margin-right: auto;
+                    max-height: 50%;
+                }
+                .picture_child {}
+
+                .list_item {}
+                .list_item_child {}
+    </style>
+    <body>
+        <p class="text">Hello, and welcome to the pages of Greg's Journal!
+</p><p class="text">
+</p><p class="text">In this post, I would like to discuss the abstraction of shaders in my code.
+</p><p class="text">
+</p><p class="text">"The OpenGL rendering pipeline is initiated when you perform a rendering operation. Rendering operations require the presence of a properly-defined vertex array object and a linked Program Object or Program Pipeline Object, which provides the shaders for the programmable pipeline stages." <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>
+</p><p class="text">
+</p><p class="text">If you would strip all of the "objects" from this explanation, what they are trying to say, is that the OpenGL pipeline performs several transformations of graphics data before the colorful pixels hit the screen. And some of those transformations are programmable (so you can program, while programming).
+</p><p class="text">
+</p><h2 id="What-we-will-discuss">What we will discuss</h2><ul class="list_item"><li>    <a class="link" href="#Programmable-stages">Programmable stages</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Linking-programs">Linking programs</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Uniforms-caching">Uniforms caching</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Uniforms-sending">Uniforms sending</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Reading-and-loading-programs">Reading and loading programs</a>
+</li></ul><p class="text">
+</p><h2 id="Programmable-stages">Programmable stages</h2>
+<p class="text">
+</p><p class="text">There are two main stages, which are of interest for me - vertex shader and fragment shader.
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/rendering_pipeline.png" alt="OpenGl pipeline" align="middle">
+<p class="text">
+</p><p class="text">Those are represented by corresponding types:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L21" target="_blank">common_gl/com.blaster.gl.GlProgram::GlShaderType</a>
+</h3>
+    <p class="code_child">enum class GlShaderType(val type: Int) {
+    VERTEX_SHADER(backend.GL_VERTEX_SHADER),
+    FRAGMENT_SHADER(backend.GL_FRAGMENT_SHADER)
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">The shader itself is a relatively straightforward class, which compiles GLSL code and checks for errors:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L26" target="_blank">common_gl/com.blaster.gl.GlProgram::GlShader</a>
+</h3>
+    <p class="code_child">class GlShader(val type: GlShaderType, source: String) {
+    val handle = glCheck { backend.glCreateShader(type.type) }
+
+    init {
+        glCheck {
+            backend.glShaderSource(handle, source)
+            backend.glCompileShader(handle)
+        }
+        val isCompiled = backend.glGetShaderi(handle, backend.GL_COMPILE_STATUS)
+        if (isCompiled == backend.GL_FALSE) {</p>
+<p class="text_child">I am also printing the source of the shader to ease debugging and error deciphering
+</p><p class="code_child">            val sb = StringBuffer()
+            source.lines().forEachIndexed { index, line -&gt;
+                sb.append(&quot;$index $line\n&quot;)
+            }
+            val reason = &quot;Failed to compile shader:\n\n$sb\n\nWith reason:\n\n${backend.glGetShaderInfoLog(handle)}&quot;
+            throw IllegalStateException(reason)
+        }
+    }
+
+    fun delete() {
+        glCheck { backend.glDeleteShader(handle) }
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">I wonder if it is possible to write shaders in Kotlin directly with intermediate representation <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup>. It should be - I know about some projects <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup> doing that <sup id="4_origin"><a href="#4">&#91;4&#93;</a></sup>. It will definitely improve readability and maintenance for me. I will probably investigate into that direction at some point.
+</p><p class="text">
+</p><h2 id="Linking-programs">Linking programs</h2>
+<p class="text">
+</p><p class="text">Two shaders (vertex and fragment) are combined into a program. GlProgram class performs linking and error checking:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L64" target="_blank">common_gl/com.blaster.gl.GlProgram::createProgram</a>
+</h3>
+    <p class="code_child">private fun createProgram() {
+    check(vertexShader.type == GlShaderType.VERTEX_SHADER)
+    check(fragmentShader.type == GlShaderType.FRAGMENT_SHADER)
+    glCheck {
+        backend.glAttachShader(handle, vertexShader.handle)
+        backend.glAttachShader(handle, fragmentShader.handle)
+        backend.glLinkProgram(handle)
+    }
+    val isLinked = backend.glGetProgrami(handle, backend.GL_LINK_STATUS)
+    if (isLinked == backend.GL_FALSE) {
+        throw IllegalStateException(backend.glGetProgramInfoLog(handle))
+    }
+    cacheUniforms()
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">One can notice that I am caching uniform locations after creation - we will talk about it shortly.
+</p><p class="text">
+</p><h2 id="Uniforms-caching">Uniforms caching</h2>
+<p class="text">
+</p><p class="text">In my code, I prefer to look for uniforms as part of the program creation process. Usually, that happens once during the initialization, which is convenient. Uniform locations are then stored in the cache for a lookup speedup when we need to send data:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L79" target="_blank">common_gl/com.blaster.gl.GlProgram::cacheUniforms</a>
+</h3>
+    <p class="code_child">private fun cacheUniforms() {
+    GlUniform.values().forEach {
+        val location = glCheck { backend.glGetUniformLocation(handle, it.label) }
+        if (location != -1) {
+            uniformLocations[it] = location
+        }
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">I am using a predefined set of uniform names in code:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlUniform.kt#L3" target="_blank">common_gl/com.blaster.gl.GlUniform</a>
+</h3>
+    <p class="code_child">enum class GlUniform(val label: String) {
+    UNIFORM_MODEL_M             (&quot;uModelM&quot;),
+    UNIFORM_PROJ_M              (&quot;uProjectionM&quot;),
+    UNIFORM_VIEW_M              (&quot;uViewM&quot;),
+    UNIFORM_EYE                 (&quot;uEye&quot;),
+
+    UNIFORM_TEXTURE_POSITION    (&quot;uTexPosition&quot;),
+    UNIFORM_TEXTURE_NORMAL      (&quot;uTexNormal&quot;),
+    UNIFORM_TEXTURE_DIFFUSE     (&quot;uTexDiffuse&quot;),
+
+    UNIFORM_TEXTURE_ALBEDO      (&quot;uTexAlbedo&quot;),
+    UNIFORM_TEXTURE_METALLIC    (&quot;uTexMetallic&quot;),
+    UNIFORM_TEXTURE_ROUGHNESS   (&quot;uTexRoughness&quot;),
+    UNIFORM_TEXTURE_AO          (&quot;uTexAo&quot;),
+
+    UNIFORM_TEXTURE_MAT_AMB_SHINE(&quot;uTexMatAmbientShine&quot;),
+    UNIFORM_TEXTURE_MAT_DIFF_TRANSP (&quot;uTexMatDiffTransp&quot;),
+    UNIFORM_TEXTURE_MAT_SPECULAR(&quot;uTexMatSpecular&quot;),
+
+    UNIFORM_LIGHTS_POINT_CNT    (&quot;uLightsPointCnt&quot;),
+    UNIFORM_LIGHTS_DIR_CNT      (&quot;uLightsDirCnt&quot;),
+    UNIFORM_LIGHT_VECTOR        (&quot;uLights[%d].vector&quot;),
+    UNIFORM_LIGHT_INTENSITY     (&quot;uLights[%d].intensity&quot;),
+
+    UNIFORM_MAT_AMBIENT         (&quot;uMatAmbient&quot;),
+    UNIFORM_MAT_DIFFUSE         (&quot;uMatDiffuse&quot;),
+    UNIFORM_MAT_SPECULAR        (&quot;uMatSpecular&quot;),
+    UNIFORM_MAT_SHINE           (&quot;uMatShine&quot;),
+    UNIFORM_MAT_TRANSP          (&quot;uMatTransp&quot;),
+
+    UNIFORM_COLOR               (&quot;uColor&quot;),
+
+    UNIFORM_CHAR_INDEX          (&quot;uCharIndex&quot;),
+    UNIFORM_CHAR_START          (&quot;uCharStart&quot;),
+    UNIFORM_CHAR_SCALE          (&quot;uCharScale&quot;),
+
+    UNIFORM_WIDTH               (&quot;uWidth&quot;),
+    UNIFORM_HEIGHT              (&quot;uHeight&quot;),
+
+    UNIFORM_SCALE_FLAG          (&quot;uScaleFlag&quot;),
+    UNIFORM_TRANSPARENCY_FLAG   (&quot;uTransparencyFlag&quot;);
+}</p>
+
+</div>
+<p class="text">
+</p><h2 id="Uniforms-sending">Uniforms sending</h2>
+<p class="text">
+</p><p class="text">GlProgram also has a set of methods to send different type of data into the shader, for example:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L106" target="_blank">common_gl/com.blaster.gl.GlProgram::setUniform</a>
+</h3>
+    <p class="code_child">fun setUniform(uniform: GlUniform, value: Matrix4f) {
+    value.get(bufferMat4)
+    glCheck { backend.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">Updating the texture unit works basically in the same way:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L102" target="_blank">common_gl/com.blaster.gl.GlProgram::setTexture</a>
+</h3>
+    <p class="code_child">fun setTexture(uniform: GlUniform, texture: GlTexture) {
+    setUniform(uniform, texture.unit)
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">And here is an example of usage:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SkyboxTechnique.kt#L30" target="_blank">common_gl/com.blaster.techniques.SkyboxTechnique::skybox</a>
+</h3>
+    <p class="code_child">fun skybox(camera: Camera) {
+    onlyRotationM.set(camera.calculateViewM())
+    noTranslationM.set(onlyRotationM)
+    glBind(listOf(program, cube, diffuse)) {
+        program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+        program.setUniform(GlUniform.UNIFORM_VIEW_M, noTranslationM)
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+        cube.draw()
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><h2 id="Reading-and-loading-programs">Reading and loading programs</h2>
+<p class="text">I am storing my shaders as a part of my resources pack. To access and load them, I created a small class, which can read the program code directly from assets:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L11" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
+</h3>
+    <p class="code_child">class ShadersLib(private val assetStream: AssetStream) {
+    fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
+            GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
+            GlShader(GlShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
+
+    private fun slurpAsset(filename: String): String {
+        val stringBuilder = StringBuilder()
+        val inputStream = assetStream.openAsset(filename)
+        val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
+        bufferedReader.use {
+            var line = bufferedReader.readLine()
+            while (line != null) {
+                stringBuilder.append(&quot;$line\n&quot;)
+                line = bufferedReader.readLine()
+            }
+        }
+        return stringBuilder.toString()
+    }
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">This class will retrieve the code and compile it into the program:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SimpleTechnique.kt#L15" target="_blank">common_gl/com.blaster.techniques.SimpleTechnique::create</a>
+</h3>
+    <p class="text_child">Compiling and storing shader program
+</p><p class="code_child">fun create(shadersLib: ShadersLib) {
+    program = shadersLib.loadProgram(&quot;shaders/simple/no_lighting.vert&quot;, &quot;shaders/simple/no_lighting.frag&quot;)
+}</p>
+
+</div>
+<p class="text">
+</p><p class="text">That is it for now - hope you liked it. I will see you again soon!
+</p><p class="text">
+</p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
+<a id="1" class="link" href="https://www.khronos.org/opengl/wiki/Rendering_Pipeline_Overview" target="_blank">Rendering Pipeline Overview</a></li></ul><ul class="list_item"><li>    <a class="link" href="#2_origin">&#8593;[2]: </a>
+<a id="2" class="link" href="https://www.khronos.org/opengl/wiki/SPIR-V" target="_blank">Standard, Portable Intermediate Representation - V (SPIR-V)</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
+<a id="3" class="link" href="https://github.com/letalvoj/fft-opencl-kotlin" target="_blank">Equalizer written in Kotlin using OpenCL</a></li></ul><ul class="list_item"><li>    <a class="link" href="#4_origin">&#8593;[4]: </a>
+<a id="4" class="link" href="https://aparapi.github.io/" target="_blank">AMD&#39;s Aparapi</a></li></ul>
+    </body>
+</html>

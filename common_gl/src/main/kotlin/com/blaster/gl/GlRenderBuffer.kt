@@ -4,7 +4,7 @@ private val backend = GlLocator.locate()
 
 class GlRenderBuffer(
         private val component: Int = backend.GL_DEPTH_COMPONENT24,
-        private val width: Int, private val height: Int) : GLBindable {
+        private val width: Int, private val height: Int) : GlBindable {
 
     var handle: Int? = null
 

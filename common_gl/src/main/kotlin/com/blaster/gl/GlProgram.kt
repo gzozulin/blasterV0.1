@@ -33,11 +33,10 @@ class GlShader(val type: GlShaderType, source: String) {
         }
         val isCompiled = backend.glGetShaderi(handle, backend.GL_COMPILE_STATUS)
         if (isCompiled == backend.GL_FALSE) {
-            var index = 1
+            // I am also printing the source of the shader to ease debugging and error deciphering
             val sb = StringBuffer()
-            source.lines().forEach {
-                sb.append("$index $it\n")
-                index++
+            source.lines().forEachIndexed { index, line ->
+                sb.append("$index $line\n")
             }
             val reason = "Failed to compile shader:\n\n$sb\n\nWith reason:\n\n${backend.glGetShaderInfoLog(handle)}"
             throw IllegalStateException(reason)
@@ -51,13 +50,18 @@ class GlShader(val type: GlShaderType, source: String) {
 
 // todo use explicit locations for uniforms
 // todo we can check if the program is bound before sending uniforms
-class GlProgram(private val vertexShader: GlShader, private val fragmentShader: GlShader) : GLBindable {
+// todo: we can send uniform only if changed
+class GlProgram(private val vertexShader: GlShader, private val fragmentShader: GlShader) : GlBindable {
     private val handle = glCheck { backend.glCreateProgram() }
 
     private val uniformLocations = HashMap<GlUniform, Int>()
     private val arrayUniformLoctions = HashMap<String, Int>()
 
     init {
+        createProgram()
+    }
+
+    private fun createProgram() {
         check(vertexShader.type == GlShaderType.VERTEX_SHADER)
         check(fragmentShader.type == GlShaderType.FRAGMENT_SHADER)
         glCheck {
@@ -95,9 +99,13 @@ class GlProgram(private val vertexShader: GlShader, private val fragmentShader: 
         glCheck { backend.glUseProgram(0) }
     }
 
-    // todo: we can send uniform only if changed
     fun setTexture(uniform: GlUniform, texture: GlTexture) {
         setUniform(uniform, texture.unit)
+    }
+
+    fun setUniform(uniform: GlUniform, value: Matrix4f) {
+        value.get(bufferMat4)
+        glCheck { backend.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
     }
 
     fun setUniform(uniform: GlUniform, value: Int) {
@@ -118,13 +126,9 @@ class GlProgram(private val vertexShader: GlShader, private val fragmentShader: 
         glCheck { backend.glUniform3fv(uniformLocations[uniform]!!, bufferVec3) }
     }
 
-    fun setUniform(uniform: GlUniform, value: Matrix4f) {
-        value.get(bufferMat4)
-        glCheck { backend.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
-    }
-
+    // todo: can be improved with caching
     fun setArrayUniform(uniform: GlUniform, index: Int, value: Vector3f) {
-        val label = uniform.label.format(index) // todo: can be cached
+        val label = uniform.label.format(index)
         var location: Int? = arrayUniformLoctions[label]
         if (location == null) {
             location = glCheck { backend.glGetUniformLocation(handle, label) }

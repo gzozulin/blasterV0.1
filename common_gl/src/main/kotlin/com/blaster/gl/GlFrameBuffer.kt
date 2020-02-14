@@ -2,7 +2,7 @@ package com.blaster.gl
 
 private val backend = GlLocator.locate()
 
-class GlFrameBuffer : GLBindable {
+class GlFrameBuffer : GlBindable {
     private var handle: Int? = null
 
     init {

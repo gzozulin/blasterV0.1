@@ -11,7 +11,7 @@ import org.joml.Matrix4f
 class SimpleTechnique {
     private lateinit var program: GlProgram
 
-    // We want to create the shader program first
+    // Compiling and storing shader program
     fun create(shadersLib: ShadersLib) {
         program = shadersLib.loadProgram("shaders/simple/no_lighting.vert", "shaders/simple/no_lighting.frag")
     }
