@@ -74,10 +74,10 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L36" target="_blank">common_gl/com.blaster.gl.GlAux::GlBindable</a>
 </h3>
-    <p class="code_child">interface GlBindable {
+    <pre><code>interface GlBindable {
     fun bind()
     fun unbind()
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -86,11 +86,11 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L42" target="_blank">common_gl/com.blaster.gl.GlAux::glBind</a>
 </h3>
-    <p class="code_child">fun glBind(bindables: List&lt;GlBindable&gt;, action: () -&gt; Unit) {
+    <pre><code>fun glBind(bindables: List&lt;GlBindable&gt;, action: () -&gt; Unit) {
     bindables.forEach { it.bind() }
     action.invoke()
     bindables.reversed().forEach { it.unbind() }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -99,12 +99,12 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L21" target="_blank">common_gl/com.blaster.techniques.TextTechnique::draw</a>
 </h3>
-    <p class="code_child">fun draw(call: () -&gt; Unit) {
+    <pre><code>fun draw(call: () -&gt; Unit) {
     glBind(listOf(program, font, rect)) {
         program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, font)
         call.invoke()
     }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -118,11 +118,11 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L30" target="_blank">common_gl/com.blaster.gl.GlAux::glCheck</a>
 </h3>
-    <p class="code_child">fun &lt;T&gt; glCheck(action: () -&gt; T): T {
+    <pre><code>fun &lt;T&gt; glCheck(action: () -&gt; T): T {
     val result = action.invoke()
     checkForGLError()
     return result
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -130,9 +130,9 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L43" target="_blank">common_gl/com.blaster.gl.GlBuffer::bind</a>
 </h3>
-    <p class="code_child">override fun bind() {
+    <pre><code>override fun bind() {
     glCheck { backend.glBindBuffer(target, handle) }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -142,7 +142,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L7" target="_blank">common_gl/com.blaster.gl.GlAux::GlError</a>
 </h3>
-    <p class="code_child">class GlError(private val errorCode: Int) : Error() {
+    <pre><code>class GlError(private val errorCode: Int) : Error() {
     override fun toString(): String {
         val msg = when (errorCode) {
             0x0   -&gt; &quot;GL_NO_ERROR&quot;
@@ -156,7 +156,7 @@
         }
         return &quot;OpenGL error: $msg($errorCode)&quot;
     }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -169,7 +169,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt#L7" target="_blank">common_gl/com.blaster.gl.GlState</a>
 </h3>
-    <p class="code_child">class GlState private constructor()</p>
+    <pre><code>class GlState private constructor()</code></pre>
 
 </div>
 <p class="text">
@@ -178,22 +178,22 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt#L35" target="_blank">common_gl/com.blaster.gl.GlState::drawWithNoCulling</a>
 </h3>
-    <p class="code_child">fun drawWithNoCulling(draw: () -&gt; Unit) {
+    <pre><code>fun drawWithNoCulling(draw: () -&gt; Unit) {
     disableCulling()
     draw.invoke()
     enableCulling()
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Skybox.kt#L45" target="_blank">desktop/com.blaster.impl.Skybox::drawSkybox</a>
 </h3>
-    <p class="code_child">private fun drawSkybox() {
+    <pre><code>private fun drawSkybox() {
     GlState.drawWithNoCulling {
         skyboxTechnique.skybox(camera)
     }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -206,5 +206,6 @@
 <a id="2" class="link" href="https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization" target="_blank">Resource acquisition is initialization</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
 <a id="3" class="link" href="https://en.wikipedia.org/wiki/Program_optimization#When_to_optimize" target="_blank">Premature optimization</a></li></ul><ul class="list_item"><li>    <a class="link" href="#4_origin">&#8593;[4]: </a>
 <a id="4" class="link" href="http://www.cplusplus.com/reference/cassert/assert/" target="_blank">Assertion in C/C++</a></li></ul>
+        <br>
     </body>
 </html>

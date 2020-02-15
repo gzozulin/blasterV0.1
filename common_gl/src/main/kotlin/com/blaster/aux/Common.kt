@@ -40,61 +40,20 @@ fun vec3.rand(min: vec3 = vec3(0f), max: vec3 = vec3(1f)): vec3 {
     return this
 }
 
-fun vec3.up(): vec3 {
-    x = 0f
-    y = 1f
-    z = 0f
-    return this
-}
+fun vec3.up()       = set(0f, 1f, 0f)
+fun vec3.down()     = set(0f, -1f, 0f)
+fun vec3.left()     = set(-1f, 0f, 0f)
+fun vec3.right()    = set(1f, 0f, 0f)
+fun vec3.front()    = set(0f, 0f, 1f)
+fun vec3.back()     = set(0f, 0f, -1f)
 
-fun vec3.down(): vec3 {
-    x = 0f
-    y = -1f
-    z = 0f
-    return this
-}
-
-fun vec3.left(): vec3 {
-    x = -1f
-    y = 0f
-    z = 0f
-    return this
-}
-
-fun vec3.right(): vec3 {
-    x = 1f
-    y = 0f
-    z = 0f
-    return this
-}
-
-fun color.red(): color {
-    x = 1f
-    y = 0f
-    z = 0f
-    return this
-}
-
-fun color.green(): color {
-    x = 0f
-    y = 1f
-    z = 0f
-    return this
-}
-
-fun color.blue(): color {
-    x = 0f
-    y = 0f
-    z = 1f
-    return this
-}
-
-fun color.white(): color {
-    x = 1f
-    y = 1f
-    z = 1f
-    return this
-}
+fun color.white()   = set(1f, 1f, 1f)
+fun color.red()     = set(1f, 0f, 0f)
+fun color.green()   = set(0f, 1f, 0f)
+fun color.blue()    = set(0f, 0f, 1f)
+fun color.yellow()  = set(1f, 1f, 0f)
+fun color.magenta() = set(1f, 0f, 1f)
+fun color.cian()    = set(0f, 1f, 1f)
 
 fun parseColor(hex: String): color {
     val integerHex = Integer.parseInt(hex, 16)

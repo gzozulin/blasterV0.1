@@ -74,10 +74,10 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L21" target="_blank">common_gl/com.blaster.gl.GlProgram::GlShaderType</a>
 </h3>
-    <p class="code_child">enum class GlShaderType(val type: Int) {
+    <pre><code>enum class GlShaderType(val type: Int) {
     VERTEX_SHADER(backend.GL_VERTEX_SHADER),
     FRAGMENT_SHADER(backend.GL_FRAGMENT_SHADER)
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -85,7 +85,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L26" target="_blank">common_gl/com.blaster.gl.GlProgram::GlShader</a>
 </h3>
-    <p class="code_child">class GlShader(val type: GlShaderType, source: String) {
+    <pre><code>class GlShader(val type: GlShaderType, source: String) {
     val handle = glCheck { backend.glCreateShader(type.type) }
 
     init {
@@ -94,9 +94,9 @@
             backend.glCompileShader(handle)
         }
         val isCompiled = backend.glGetShaderi(handle, backend.GL_COMPILE_STATUS)
-        if (isCompiled == backend.GL_FALSE) {</p>
+        if (isCompiled == backend.GL_FALSE) {</code></pre>
 <p class="text_child">I am also printing the source of the shader to ease debugging and error deciphering
-</p><p class="code_child">            val sb = StringBuffer()
+</p><pre><code>            val sb = StringBuffer()
             source.lines().forEachIndexed { index, line -&gt;
                 sb.append(&quot;$index $line\n&quot;)
             }
@@ -108,7 +108,7 @@
     fun delete() {
         glCheck { backend.glDeleteShader(handle) }
     }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -120,7 +120,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L64" target="_blank">common_gl/com.blaster.gl.GlProgram::createProgram</a>
 </h3>
-    <p class="code_child">private fun createProgram() {
+    <pre><code>private fun createProgram() {
     check(vertexShader.type == GlShaderType.VERTEX_SHADER)
     check(fragmentShader.type == GlShaderType.FRAGMENT_SHADER)
     glCheck {
@@ -133,7 +133,7 @@
         throw IllegalStateException(backend.glGetProgramInfoLog(handle))
     }
     cacheUniforms()
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -145,14 +145,14 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L79" target="_blank">common_gl/com.blaster.gl.GlProgram::cacheUniforms</a>
 </h3>
-    <p class="code_child">private fun cacheUniforms() {
+    <pre><code>private fun cacheUniforms() {
     GlUniform.values().forEach {
         val location = glCheck { backend.glGetUniformLocation(handle, it.label) }
         if (location != -1) {
             uniformLocations[it] = location
         }
     }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -160,7 +160,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlUniform.kt#L3" target="_blank">common_gl/com.blaster.gl.GlUniform</a>
 </h3>
-    <p class="code_child">enum class GlUniform(val label: String) {
+    <pre><code>enum class GlUniform(val label: String) {
     UNIFORM_MODEL_M             (&quot;uModelM&quot;),
     UNIFORM_PROJ_M              (&quot;uProjectionM&quot;),
     UNIFORM_VIEW_M              (&quot;uViewM&quot;),
@@ -201,7 +201,7 @@
 
     UNIFORM_SCALE_FLAG          (&quot;uScaleFlag&quot;),
     UNIFORM_TRANSPARENCY_FLAG   (&quot;uTransparencyFlag&quot;);
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -211,10 +211,10 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L106" target="_blank">common_gl/com.blaster.gl.GlProgram::setUniform</a>
 </h3>
-    <p class="code_child">fun setUniform(uniform: GlUniform, value: Matrix4f) {
+    <pre><code>fun setUniform(uniform: GlUniform, value: Matrix4f) {
     value.get(bufferMat4)
     glCheck { backend.glUniformMatrix4fv(uniformLocations[uniform]!!, 1, false, bufferMat4) }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -222,9 +222,9 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlProgram.kt#L102" target="_blank">common_gl/com.blaster.gl.GlProgram::setTexture</a>
 </h3>
-    <p class="code_child">fun setTexture(uniform: GlUniform, texture: GlTexture) {
+    <pre><code>fun setTexture(uniform: GlUniform, texture: GlTexture) {
     setUniform(uniform, texture.unit)
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -232,7 +232,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SkyboxTechnique.kt#L30" target="_blank">common_gl/com.blaster.techniques.SkyboxTechnique::skybox</a>
 </h3>
-    <p class="code_child">fun skybox(camera: Camera) {
+    <pre><code>fun skybox(camera: Camera) {
     onlyRotationM.set(camera.calculateViewM())
     noTranslationM.set(onlyRotationM)
     glBind(listOf(program, cube, diffuse)) {
@@ -241,7 +241,7 @@
         program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
         cube.draw()
     }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -250,7 +250,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L11" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
 </h3>
-    <p class="code_child">class ShadersLib(private val assetStream: AssetStream) {
+    <pre><code>class ShadersLib(private val assetStream: AssetStream) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
             GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
             GlShader(GlShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
@@ -268,7 +268,7 @@
         }
         return stringBuilder.toString()
     }
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -277,9 +277,9 @@
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SimpleTechnique.kt#L15" target="_blank">common_gl/com.blaster.techniques.SimpleTechnique::create</a>
 </h3>
     <p class="text_child">Compiling and storing shader program
-</p><p class="code_child">fun create(shadersLib: ShadersLib) {
+</p><pre><code>fun create(shadersLib: ShadersLib) {
     program = shadersLib.loadProgram(&quot;shaders/simple/no_lighting.vert&quot;, &quot;shaders/simple/no_lighting.frag&quot;)
-}</p>
+}</code></pre>
 
 </div>
 <p class="text">
@@ -290,5 +290,6 @@
 <a id="2" class="link" href="https://www.khronos.org/opengl/wiki/SPIR-V" target="_blank">Standard, Portable Intermediate Representation - V (SPIR-V)</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
 <a id="3" class="link" href="https://github.com/letalvoj/fft-opencl-kotlin" target="_blank">Equalizer written in Kotlin using OpenCL</a></li></ul><ul class="list_item"><li>    <a class="link" href="#4_origin">&#8593;[4]: </a>
 <a id="4" class="link" href="https://aparapi.github.io/" target="_blank">AMD&#39;s Aparapi</a></li></ul>
+        <br>
     </body>
 </html>

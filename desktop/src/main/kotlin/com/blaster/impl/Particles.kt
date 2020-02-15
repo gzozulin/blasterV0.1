@@ -61,7 +61,6 @@ private val camera = Camera()
 private val controller = Controller(Vector3f(0f, 0f, 3f), velocity = 0.05f)
 private val wasd = WasdInput(controller)
 
-
 private val identityM = mat4()
 
 class Snowflake(origin: Vector3f) : Particle(origin) {
