@@ -1,0 +1,323 @@
+<html>
+    <style>
+
+        .code,.child {
+                    border-radius: 3px;
+                    display: block;
+                    max-width: 100%;
+                    overflow: auto;
+                    color: #666;
+                    page-break-inside: avoid;
+                    font: normal 15px/1.6 monospace;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                    word-wrap: break-word;
+                }
+
+                .child {
+                    border-radius: 3px;
+                    background: #F1ECEC;
+                    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+                }
+
+                .code {
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                }
+
+                .code_child {
+                    border-radius: 3px;
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                }
+
+                .text {}
+                .text_child {}
+
+                .link {}
+                .link_child {}
+
+                .picture {
+                    display: block;
+                    margin: 30px auto 45px auto;
+                    max-height: 50%;
+                }
+                .picture_child {}
+
+                .list_item {}
+                .list_item_child {}
+    </style>
+    <body>
+        <p class="text">Hello, and welcome on the pages of Greg's Journal.
+</p><p class="text">
+</p><p class="text">In this post, we will talk about storing and rendering geometry data in Blaster.
+</p><p class="text">
+</p><p class="text">To draw something with OpenGL, we need to store somehow and represent that. To avoid pushing data all the time through the bus (like how it is when using legacy Immediate Mode <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>), I am storing vertex and index data on the GPU side in high-performance graphics memory.
+</p><p class="text">
+</p><p class="text">To simplify the handling of data needed for rendering passes, I implemented several useful classes - let us have a look at them.
+</p><p class="text">
+</p><h2 id="In-this-post">In this post</h2><ul class="list_item"><li>    <a class="link" href="#Array-Buffer-and-Element-Array-Buffer">Array Buffer and Element Array Buffer</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Polygon-meshes">Polygon meshes</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Vertex-Array-Objects">Vertex Array Objects</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Rendering-the-mesh">Rendering the mesh</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Procedural-example">Procedural example</a>
+</li></ul><p class="text">
+</p><h2 id="Array-Buffer-and-Element-Array-Buffer">Array Buffer and Element Array Buffer</h2>
+<p class="text">
+</p><p class="text">Everything starts with OpenGL buffers. The two most interesting are the Array Buffer and the Element Array Buffer. Frankly, for me, that sounds a bit mouthful.
+</p><p class="text">
+</p><p class="text">First is intended for storing vertex information (positions, colors, normals, etc.); the second keeps indices - a way to describe how vertices constitute faces of our geometry.
+</p><p class="text">
+</p><p class="text">When we operate with them, from the standpoint of the API usage, the approach is almost equal; hence I am using a single class to represent both:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L9" target="_blank">common_gl/com.blaster.gl.GlBuffer</a>
+</h3>
+    <pre><code class="lang-kotlin">class GlBuffer(
+        private val target: Int,
+        private val buffer: ByteBuffer,
+        private val usage: Int = backend.GL_STATIC_DRAW) : GlBindable</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">As with most of OpenGL stuff, it is controlled through handle:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L14" target="_blank">common_gl/com.blaster.gl.GlBuffer::handle</a>
+</h3>
+    <pre><code class="lang-kotlin">private val handle: Int = glCheck { backend.glGenBuffers() }</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">After the buffer is "registered" on the GPU side, we can push data into it:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L22" target="_blank">common_gl/com.blaster.gl.GlBuffer::uploadBuffer</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun uploadBuffer() {
+    glCheck {
+        backend.glBindBuffer(target, handle)
+        backend.glBufferData(target, buffer, usage)
+        backend.glBindBuffer(target, 0)
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">The buffer also can be "mapped" onto the client-side (applicatation) memory. That is a useful feature for updating the buffer:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L38" target="_blank">common_gl/com.blaster.gl.GlBuffer::mapBuffer</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun mapBuffer(access: Int): ByteBuffer = glCheck {  backend.glMapBuffer(target, access, buffer) }</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L41" target="_blank">common_gl/com.blaster.gl.GlBuffer::updateBuffer</a>
+</h3>
+    <pre><code class="lang-kotlin">fun updateBuffer(access : Int = backend.GL_WRITE_ONLY, update: (mapped: ByteBuffer) -&gt; Unit) {
+    val mapped = mapBuffer(access)
+    update.invoke(mapped)
+    unmapBuffer()
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">One example of usage is rendering particle systems as billboards. In this case, I am updating buffer with pre-calculated information about particle instances:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/BillboardsTechnique.kt#L61" target="_blank">common_gl/com.blaster.techniques.BillboardsTechnique::updatePositions</a>
+</h3>
+    <p class="text_child">Mapping the buffer with positions, updating the buffer from provider
+</p><pre><code class="lang-kotlin">private fun updatePositions(provider: BillboardsProvider) {
+    glBind(positions) {
+        positions.updateBuffer {
+            provider.flushPositions(it.asFloatBuffer())
+        }
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">Now, let us have a look at how buffers combined into a mesh.
+</p><p class="text">
+</p><h2 id="Polygon-meshes">Polygon meshes</h2>
+<p class="text">
+</p><p class="text">To represent a collection of vertices, edges, and faces, I am using a class called GlMesh. In short, GlMesh is an association of one (or many) Array Buffers, which holds vertex data, and one Element Array Buffer with indices to define the edges between the vertices:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L5" target="_blank">common_gl/com.blaster.gl.GlMesh</a>
+</h3>
+    <pre><code class="lang-kotlin">class GlMesh(
+        private val attributes: List&lt;Pair&lt;GlAttribute, GlBuffer&gt;&gt;,
+        private val indicesBuffer: GlBuffer,
+        private val indicesCount: Int) : GlBindable</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">Each vertex in the mesh is defined by a set of attributes:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAttribute.kt#L4" target="_blank">common_gl/com.blaster.gl.GlAttribute</a>
+</h3>
+    <p class="text_child">divisor - how many attributes per draw call for instancing (0 - default == 1 item per vertex)
+</p><pre><code class="lang-kotlin">enum class GlAttribute(val size: Int, val location: Int, val divisor: Int = 0) {
+    ATTRIBUTE_POSITION  (3, 0),
+    ATTRIBUTE_TEXCOORD  (2, 1),
+    ATTRIBUTE_NORMAL    (3, 2),
+    ATTRIBUTE_COLOR     (3, 3),
+
+    ATTRIBUTE_BILLBOARD_POSITION    (3, 4, 1),
+    ATTRIBUTE_BILLBOARD_SCALE       (1, 5, 1),
+    ATTRIBUTE_BILLBOARD_TRANSPARENCY(1, 6, 1);
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">For example in this shader we have positions and texture coordinates defined per-vertex:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.vert" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.vert</a>
+</h3>
+    <pre><code class="lang-c">#version 300 es
+
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+layout (location = 1) in vec2 aTexCoord;
+
+uniform mat4 uModelM;
+uniform mat4 uProjectionM;
+uniform mat4 uViewM;
+
+out vec2 vTexCoord;
+
+void main() {
+    vTexCoord = aTexCoord;
+    mat4 mvp =  uProjectionM * uViewM * uModelM;
+    gl_Position = mvp * vec4(aPosition, 1.0);
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">To render the mesh, we need to tell the rendering pipeline the exact association between buffers, holding the data, and vertex attributes:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L22" target="_blank">common_gl/com.blaster.gl.GlMesh::bindVertexPointers</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun bindVertexPointers() {
+    attributes.forEach {
+        glCheck {
+            backend.glEnableVertexAttribArray(it.first.location)
+            it.second.bind()
+            backend.glVertexAttribPointer(it.first.location, it.first.size, backend.GL_FLOAT, false, 0, 0)
+            if (it.first.divisor != 0) {
+                backend.glVertexAttribDivisor(it.first.location, it.first.divisor)
+            }
+        }
+    }
+    indicesBuffer.bind()
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Vertex-Array-Objects">Vertex Array Objects</h2>
+<p class="text">
+</p><p class="text">Specifying attributes for each mesh each rendering pass can be costly, but there is a way to avoid that penalty - Vertex Array Object to the rescue:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L16" target="_blank">common_gl/com.blaster.gl.GlMesh::createVAO</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun createVAO() {
+    handle = glCheck { backend.glGenVertexArrays() }
+    check(handle!! &gt; 0)
+    glBind(this) { bindVertexPointers() }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">Vertex Array Object (or VAO) will hold all the necessary bindings on the GPU side after we specify it once. Next time we need to define the mesh - we can bind the VAO, and all of the bindings will be restored.
+</p><p class="text">
+</p><h2 id="Rendering-the-mesh">Rendering the mesh</h2>
+<p class="text">
+</p><p class="text">After all of the bindings are established, rendering of the mesh is a straightforward task:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L49" target="_blank">common_gl/com.blaster.gl.GlMesh::draw</a>
+</h3>
+    <pre><code class="lang-kotlin">fun draw(mode: Int = backend.GL_TRIANGLES) {
+    glCheck { backend.glDrawElements(mode, indicesCount, backend.GL_UNSIGNED_INT, 0) }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">We need to pass which type of geometry we want to output - in most cases GL_TRIANGLES.
+</p><p class="text">
+</p><p class="text">There is one more call for instanced draws - this one accepts multiple instances to render:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L53" target="_blank">common_gl/com.blaster.gl.GlMesh::drawInstanced</a>
+</h3>
+    <pre><code class="lang-kotlin">fun drawInstanced(mode: Int = backend.GL_TRIANGLES, instances: Int) {
+    glCheck { backend.glDrawElementsInstanced(mode, indicesCount, backend.GL_UNSIGNED_INT, 0, instances) }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">"Teapots in Space". Author unknown.
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/teapots.gif" alt="Teapots in Space" align="middle">
+<p class="text">
+</p><h2 id="Procedural-example">Procedural example</h2>
+<p class="text">
+</p><p class="text">Quite frequently there is a need for simple procedurally defined meshes: quads, triangles.
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L58" target="_blank">common_gl/com.blaster.gl.GlMesh::rect</a>
+</h3>
+    <pre><code class="lang-kotlin">fun rect(additionalAttributes: List&lt;Pair&lt;GlAttribute, GlBuffer&gt;&gt; = listOf()): GlMesh {
+    val vertices = floatArrayOf(
+            -1f,  1f, 0f,
+            -1f, -1f, 0f,
+             1f,  1f, 0f,
+             1f, -1f, 0f)
+    val texCoords = floatArrayOf(
+            0f, 1f,
+            0f, 0f,
+            1f, 1f,
+            1f, 0f)
+    val indices = intArrayOf(0, 1, 2, 1, 3, 2)
+    val attributes = mutableListOf(
+            GlAttribute.ATTRIBUTE_POSITION to
+                    GlBuffer.create(backend.GL_ARRAY_BUFFER, vertices),
+            GlAttribute.ATTRIBUTE_TEXCOORD to
+                    GlBuffer.create(backend.GL_ARRAY_BUFFER, texCoords))
+    attributes.addAll(additionalAttributes)
+    return GlMesh(attributes,
+            GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size)
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L80" target="_blank">common_gl/com.blaster.gl.GlMesh::triangle</a>
+</h3>
+    <pre><code class="lang-kotlin">fun triangle(additionalAttributes: List&lt;Pair&lt;GlAttribute, GlBuffer&gt;&gt; = listOf()): GlMesh {
+    val vertices = floatArrayOf(
+             0f,  1f, 0f,
+            -1f, -1f, 0f,
+             1f, -1f, 0f)
+    val texCoords = floatArrayOf(
+            0.5f, 1f,
+            0f,   0f,
+            1f,   0f)
+    val indices = intArrayOf(0, 1, 2)
+    val attributes = mutableListOf(
+            GlAttribute.ATTRIBUTE_POSITION to
+                    GlBuffer.create(backend.GL_ARRAY_BUFFER, vertices),
+            GlAttribute.ATTRIBUTE_TEXCOORD to
+                    GlBuffer.create(backend.GL_ARRAY_BUFFER, texCoords))
+    attributes.addAll(additionalAttributes)
+    return GlMesh(attributes,
+            GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size)
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">I can reuse those across the codebase.
+</p><p class="text">
+</p><p class="text">That is all for today, folks, see you next time!)
+</p><p class="text">
+</p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
+<a id="1" class="link" href="https://www.khronos.org/opengl/wiki/Legacy_OpenGL" target="_blank">Legacy OpenGL</a></li></ul>
+        <br>
+    </body>
+</html>

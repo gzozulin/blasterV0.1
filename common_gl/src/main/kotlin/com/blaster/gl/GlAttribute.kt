@@ -1,7 +1,6 @@
 package com.blaster.gl
 
 // divisor - how many attributes per draw call for instancing (0 - default == 1 item per vertex)
-
 enum class GlAttribute(val size: Int, val location: Int, val divisor: Int = 0) {
     ATTRIBUTE_POSITION  (3, 0),
     ATTRIBUTE_TEXCOORD  (2, 1),

@@ -18,6 +18,5 @@ void main() {
     vTexCoord = aTexCoord;
     vWorldPos = vec3(uModelM * vec4(aPosition, 1.0));
     vNormal = mat3(uModelM) * aNormal;
-
     gl_Position =  uProjectionM * uViewM * vec4(vWorldPos, 1.0);
 }

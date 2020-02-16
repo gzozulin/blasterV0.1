@@ -56,44 +56,45 @@ class GlMesh(
 
     companion object {
         fun rect(additionalAttributes: List<Pair<GlAttribute, GlBuffer>> = listOf()): GlMesh {
-            val quadPositions = floatArrayOf(
+            val vertices = floatArrayOf(
                     -1f,  1f, 0f,
                     -1f, -1f, 0f,
                      1f,  1f, 0f,
-                     1f, -1f, 0f
-            )
-            val quadTexCoords = floatArrayOf(
+                     1f, -1f, 0f)
+            val texCoords = floatArrayOf(
                     0f, 1f,
                     0f, 0f,
                     1f, 1f,
-                    1f, 0f
-            )
-            val quadIndices = intArrayOf(0, 1, 2, 1, 3, 2)
+                    1f, 0f)
+            val indices = intArrayOf(0, 1, 2, 1, 3, 2)
             val attributes = mutableListOf(
-                    GlAttribute.ATTRIBUTE_POSITION to GlBuffer.create(backend.GL_ARRAY_BUFFER, quadPositions),
-                    GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, quadTexCoords)
-            )
+                    GlAttribute.ATTRIBUTE_POSITION to
+                            GlBuffer.create(backend.GL_ARRAY_BUFFER, vertices),
+                    GlAttribute.ATTRIBUTE_TEXCOORD to
+                            GlBuffer.create(backend.GL_ARRAY_BUFFER, texCoords))
             attributes.addAll(additionalAttributes)
-            return GlMesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, quadIndices), quadIndices.size)
+            return GlMesh(attributes,
+                    GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size)
         }
 
-        fun triangle(): GlMesh {
-            val trianglePositions = floatArrayOf(
-                    0f,  1f, 0f,
+        fun triangle(additionalAttributes: List<Pair<GlAttribute, GlBuffer>> = listOf()): GlMesh {
+            val vertices = floatArrayOf(
+                     0f,  1f, 0f,
                     -1f, -1f, 0f,
-                    1f, -1f, 0f
-            )
-            val triangleTexCoords = floatArrayOf(
+                     1f, -1f, 0f)
+            val texCoords = floatArrayOf(
                     0.5f, 1f,
                     0f,   0f,
-                    1f,   0f
-            )
-            val triangleIndices = intArrayOf(0, 1, 2)
-            val attributes = listOf(
-                    GlAttribute.ATTRIBUTE_POSITION to GlBuffer.create(backend.GL_ARRAY_BUFFER, trianglePositions),
-                    GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer.create(backend.GL_ARRAY_BUFFER, triangleTexCoords)
-            )
-            return GlMesh(attributes, GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, triangleIndices), triangleIndices.size)
+                    1f,   0f)
+            val indices = intArrayOf(0, 1, 2)
+            val attributes = mutableListOf(
+                    GlAttribute.ATTRIBUTE_POSITION to
+                            GlBuffer.create(backend.GL_ARRAY_BUFFER, vertices),
+                    GlAttribute.ATTRIBUTE_TEXCOORD to
+                            GlBuffer.create(backend.GL_ARRAY_BUFFER, texCoords))
+            attributes.addAll(additionalAttributes)
+            return GlMesh(attributes,
+                    GlBuffer.create(backend.GL_ELEMENT_ARRAY_BUFFER, indices), indices.size)
         }
     }
 }

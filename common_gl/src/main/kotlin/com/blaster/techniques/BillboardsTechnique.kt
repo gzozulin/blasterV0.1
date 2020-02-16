@@ -57,27 +57,42 @@ class BillboardsTechnique(private val max: Int) {
         }
     }
 
-    fun instance(provider: BillboardsProvider, modelM: mat4, diffuse: GlTexture, width: Float, height: Float,
-                 updateScale: Boolean = true, updateTransparency: Boolean = true) {
+    // Mapping the buffer with positions, updating the buffer from provider
+    private fun updatePositions(provider: BillboardsProvider) {
         glBind(positions) {
             positions.updateBuffer {
                 provider.flushPositions(it.asFloatBuffer())
             }
         }
-        if (updateScale) {
-            glBind(scale) {
-                scale.updateBuffer {
-                    provider.flushScale(it.asFloatBuffer())
-                }
+    }
+
+    private fun updateScales(provider: BillboardsProvider) {
+        glBind(scale) {
+            scale.updateBuffer {
+                provider.flushScale(it.asFloatBuffer())
             }
+        }
+    }
+
+    private fun updateTransparency(provider: BillboardsProvider) {
+        glBind(transparency) {
+            transparency.updateBuffer {
+                provider.flushTransparency(it.asFloatBuffer())
+            }
+        }
+    }
+
+    fun instance(provider: BillboardsProvider, modelM: mat4, diffuse: GlTexture, width: Float, height: Float,
+                 updateScale: Boolean = true, updateTransparency: Boolean = true) {
+        updatePositions(provider)
+        // Scale and transparency updated conditionally
+        if (updateScale) {
+            updateScales(provider)
         }
         if (updateTransparency) {
-            glBind(transparency) {
-                transparency.updateBuffer {
-                    provider.flushTransparency(it.asFloatBuffer())
-                }
-            }
+            updateTransparency(provider)
         }
+        // After data is uploaded, performing an instanced draw pass
         glBind(listOf(diffuse, positions, scale, transparency)) {
             program.setUniform(GlUniform.UNIFORM_SCALE_FLAG, if (updateScale) 1 else 0)
             program.setUniform(GlUniform.UNIFORM_TRANSPARENCY_FLAG, if (updateTransparency) 1 else 0)

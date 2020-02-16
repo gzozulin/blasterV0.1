@@ -41,8 +41,7 @@
 
                 .picture {
                     display: block;
-                    margin-left: auto;
-                    margin-right: auto;
+                    margin: 30px auto 45px auto;
                     max-height: 50%;
                 }
                 .picture_child {}
@@ -60,7 +59,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L48" target="_blank">desktop/com.blaster.impl.Simple::window</a>
 </h3>
-    <pre><code>private val window = object : LwjglWindow(isHoldingCursor = false)</code></pre>
+    <pre><code class="lang-kotlin">private val window = object : LwjglWindow(isHoldingCursor = false)</code></pre>
 
 </div>
 <p class="text">
@@ -81,7 +80,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L27" target="_blank">desktop/com.blaster.platform.LwjglWindow</a>
 </h3>
-    <pre><code>abstract class LwjglWindow(
+    <pre><code class="lang-kotlin">abstract class LwjglWindow(
         private val isHoldingCursor: Boolean = true,
         private var isFullscreen: Boolean = false,
         private val isMultisampled: Boolean = false)</code></pre>
@@ -95,7 +94,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L137" target="_blank">desktop/com.blaster.platform.LwjglWindow::createWindow</a>
 </h3>
-    <pre><code>private fun createWindow(): Long {
+    <pre><code class="lang-kotlin">private fun createWindow(): Long {
     val new = if (isFullscreen) {
         glfwCreateWindow(fullWidth, fullHeight, &quot;Blaster!&quot;, glfwGetPrimaryMonitor(), window)
     } else {
@@ -133,7 +132,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L51" target="_blank">desktop/com.blaster.platform.LwjglWindow::loadSharedLibs</a>
 </h3>
-    <pre><code>private fun loadSharedLibs() {
+    <pre><code class="lang-kotlin">private fun loadSharedLibs() {
     SharedLibraryLoader.load()
 }</code></pre>
 
@@ -150,7 +149,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBackend.kt#L22" target="_blank">common_gl/com.blaster.gl.GlBackend</a>
 </h3>
-    <pre><code>interface GlBackend</code></pre>
+    <pre><code class="lang-kotlin">interface GlBackend</code></pre>
 
 </div>
 <p class="text">
@@ -160,7 +159,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBackend.kt#L7" target="_blank">common_gl/com.blaster.gl.GlBackend::GlLocator</a>
 </h3>
-    <pre><code>class GlLocator {
+    <pre><code class="lang-kotlin">class GlLocator {
     companion object {
         private var instance: GlBackend? = null
 
@@ -186,7 +185,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/AssetStream.kt#L5" target="_blank">common_gl/com.blaster.assets.AssetStream</a>
 </h3>
-    <pre><code>class AssetStream {
+    <pre><code class="lang-kotlin">class AssetStream {
     fun openAsset(filename: String) : InputStream {
         val url = Thread.currentThread().contextClassLoader.getResource(filename)
         checkNotNull(url) { &quot;Asset not found $filename&quot; }
@@ -200,7 +199,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L11" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
 </h3>
-    <pre><code>class ShadersLib(private val assetStream: AssetStream) {
+    <pre><code class="lang-kotlin">class ShadersLib(private val assetStream: AssetStream) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
             GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
             GlShader(GlShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
@@ -229,7 +228,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Node.kt#L46" target="_blank">common_gl/com.blaster.entity.Node::calculateM</a>
 </h3>
-    <pre><code>fun calculateM(): mat4 {
+    <pre><code class="lang-kotlin">fun calculateM(): mat4 {
     val p = parent
     if (p == null) {
         modelM.set(calculateLocalM())
@@ -245,7 +244,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Node.kt#L39" target="_blank">common_gl/com.blaster.entity.Node::calculateLocalM</a>
 </h3>
-    <pre><code>private fun calculateLocalM(): mat4 {
+    <pre><code class="lang-kotlin">private fun calculateLocalM(): mat4 {
     if (version.check()) {
         localM.identity().translationRotateScale(position, rotation, scale)
     }
@@ -260,7 +259,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Camera.kt#L18" target="_blank">common_gl/com.blaster.entity.Camera::calculateViewM</a>
 </h3>
-    <pre><code>fun calculateViewM(): mat4 {
+    <pre><code class="lang-kotlin">fun calculateViewM(): mat4 {
     if (viewVersion.check()) {
         position.negate(negatedBuf)
         viewM.identity().rotate(rotation).translate(negatedBuf)
@@ -274,7 +273,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/entity/Controller.kt#L17" target="_blank">common_gl/com.blaster.entity.Controller</a>
 </h3>
-    <pre><code>data class Controller(
+    <pre><code class="lang-kotlin">data class Controller(
         val position: vec3 = vec3(),
         var yaw: Float = Math.toRadians(-90.0).toFloat(),
         var pitch: Float = 0f,
@@ -292,7 +291,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/WasdInput.kt#L7" target="_blank">desktop/com.blaster.platform.WasdInput</a>
 </h3>
-    <pre><code>class WasdInput(private val controller: Controller) {
+    <pre><code class="lang-kotlin">class WasdInput(private val controller: Controller) {
 
     fun onCursorDelta(delta: Vector2f) {
         controller.yaw(delta.x)
@@ -333,14 +332,14 @@
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SimpleTechnique.kt#L11" target="_blank">common_gl/com.blaster.techniques.SimpleTechnique</a>
 </h3>
     <p class="text_child">A most straightforward technique: no lighting, just diffuse from textures
-</p><pre><code>class SimpleTechnique {
+</p><pre><code class="lang-kotlin">class SimpleTechnique {
     private lateinit var program: GlProgram</code></pre>
 <p class="text_child">Compiling and storing shader program
-</p><pre><code>    fun create(shadersLib: ShadersLib) {
+</p><pre><code class="lang-kotlin">    fun create(shadersLib: ShadersLib) {
         program = shadersLib.loadProgram(&quot;shaders/simple/no_lighting.vert&quot;, &quot;shaders/simple/no_lighting.frag&quot;)
     }</code></pre>
 <p class="text_child">While drawing, we pass the uniforms for the whole pass
-</p><pre><code>    fun draw(camera: Camera, draw: () -&gt; Unit) {
+</p><pre><code class="lang-kotlin">    fun draw(camera: Camera, draw: () -&gt; Unit) {
         glBind(listOf(program)) {
             program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
             program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
@@ -352,12 +351,12 @@
         instance(model.mesh, model.diffuse, modelM)
     }</code></pre>
 <p class="text_child">For each instance we pass unique uniforms: model matrix and diffuse texture handle
-</p><pre><code>    fun instance(mesh: GlMesh, diffuse: GlTexture, modelM: Matrix4f) {
+</p><pre><code class="lang-kotlin">    fun instance(mesh: GlMesh, diffuse: GlTexture, modelM: Matrix4f) {
         glBind(listOf(mesh, diffuse)) {
             program.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
             program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)</code></pre>
 <p class="text_child">After uniforms are ready, we can make a call to render the geometry
-</p><pre><code>            mesh.draw()
+</p><pre><code class="lang-kotlin">            mesh.draw()
         }
     }
 }</code></pre>
@@ -372,7 +371,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.vert" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.vert</a>
 </h3>
-    <pre><code>#version 300 es
+    <pre><code class="lang-c">#version 300 es
 
 precision mediump float;
 
@@ -385,13 +384,10 @@ uniform mat4 uViewM;
 
 out vec2 vTexCoord;
 
-void main() {</code></pre>
-<p class="text_child">Passing texture coordinates as is
-</p><pre><code>    vTexCoord = aTexCoord;</code></pre>
-<p class="text_child">Calculating MVP matrix
-</p><pre><code>    mat4 mvp =  uProjectionM * uViewM * uModelM;</code></pre>
-<p class="text_child">Calculating position for fragment
-</p><pre><code>    gl_Position = mvp * vec4(aPosition, 1.0);
+void main() {
+    vTexCoord = aTexCoord;
+    mat4 mvp =  uProjectionM * uViewM * uModelM;
+    gl_Position = mvp * vec4(aPosition, 1.0);
 }</code></pre>
 
 </div>
@@ -400,7 +396,7 @@ void main() {</code></pre>
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/simple/no_lighting.frag" target="_blank">common_assets/src/main/resources/shaders/simple/no_lighting.frag</a>
 </h3>
-    <pre><code>#version 300 es
+    <pre><code class="lang-c">#version 300 es
 
 precision mediump float;
 
@@ -412,9 +408,9 @@ layout (location = 0) out vec4 oFragColor;
 
 void main() {</code></pre>
 <p class="text_child">Retreiving the color directly from texture
-</p><pre><code>    oFragColor = texture(uTexDiffuse, vTexCoord);</code></pre>
+</p><pre><code class="lang-c">    oFragColor = texture(uTexDiffuse, vTexCoord);</code></pre>
 <p class="text_child">Discarding by alpha
-</p><pre><code>    if (oFragColor.a &lt; 0.1) {
+</p><pre><code class="lang-c">    if (oFragColor.a &lt; 0.1) {
         discard;
     }
 }</code></pre>
@@ -429,11 +425,11 @@ void main() {</code></pre>
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L49" target="_blank">desktop/com.blaster.impl.Simple::onCreate</a>
 </h3>
-    <pre><code>override fun onCreate() {</code></pre>
+    <pre><code class="lang-kotlin">override fun onCreate() {</code></pre>
 <p class="text_child">Bootstrapping our technique first
-</p><pre><code>    simpleTechnique.create(shadersLib)</code></pre>
+</p><pre><code class="lang-kotlin">    simpleTechnique.create(shadersLib)</code></pre>
 <p class="text_child">Creating a mesh and textures
-</p><pre><code>    mesh = GlMesh.triangle()
+</p><pre><code class="lang-kotlin">    mesh = GlMesh.triangle()
     tex1 = texturesLib.loadTexture(&quot;textures/lumina.png&quot;)
     tex2 = texturesLib.loadTexture(&quot;textures/utah.jpeg&quot;)
     tex3 = texturesLib.loadTexture(&quot;textures/winner.png&quot;)
@@ -441,7 +437,7 @@ void main() {</code></pre>
     model2 = Model(mesh, tex2)
     model3 = Model(mesh, tex3)</code></pre>
 <p class="text_child">Creating separate nodes to track three instances in space
-</p><pre><code>    node1 = Node(payload = model1)
+</p><pre><code class="lang-kotlin">    node1 = Node(payload = model1)
     node2 = Node(parent = node1, payload = model2)
     node3 = Node(parent = node2, payload = model3)
 }</code></pre>
@@ -452,7 +448,7 @@ void main() {</code></pre>
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L66" target="_blank">desktop/com.blaster.impl.Simple::onResize</a>
 </h3>
-    <pre><code>override fun onResize(width: Int, height: Int) {
+    <pre><code class="lang-kotlin">override fun onResize(width: Int, height: Int) {
     GlState.apply(width, height)
     camera.setPerspective(width, height)
 }</code></pre>
@@ -463,19 +459,19 @@ void main() {</code></pre>
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Simple.kt#L71" target="_blank">desktop/com.blaster.impl.Simple::onTick</a>
 </h3>
-    <pre><code>override fun onTick() {
+    <pre><code class="lang-kotlin">override fun onTick() {
     GlState.clear()</code></pre>
 <p class="text_child">Applying update from WASD controller
-</p><pre><code>    controller.apply { position, direction -&gt;
+</p><pre><code class="lang-kotlin">    controller.apply { position, direction -&gt;
         camera.setPosition(position)
         camera.lookAlong(direction)
     }</code></pre>
 <p class="text_child">Adding some animation to the scene
-</p><pre><code>    node1.rotate(axis, 0.01f)
+</p><pre><code class="lang-kotlin">    node1.rotate(axis, 0.01f)
     node2.rotate(axis, 0.01f)
     node3.rotate(axis, 0.01f)</code></pre>
 <p class="text_child">Drawing instances with our technique
-</p><pre><code>    GlState.drawWithNoCulling {
+</p><pre><code class="lang-kotlin">    GlState.drawWithNoCulling {
         simpleTechnique.draw(camera) {
             simpleTechnique.instance(model1, node1.calculateM())
             simpleTechnique.instance(model2, node2.calculateM())

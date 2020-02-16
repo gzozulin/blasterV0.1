@@ -1,0 +1,79 @@
+Hello, and welcome on the pages of Greg's Journal.
+
+In this post, we will talk about storing and rendering geometry data in Blaster.
+
+To draw something with OpenGL, we need to store somehow and represent that. To avoid pushing data all the time through the bus (like how it is when using legacy Immediate Mode \1\), I am storing vertex and index data on the GPU side in high-performance graphics memory.
+#cite; 1; Legacy OpenGL; https://www.khronos.org/opengl/wiki/Legacy_OpenGL
+
+To simplify the handling of data needed for rendering passes, I implemented several useful classes - let us have a look at them.
+
+#content; In this post
+
+#header; Array Buffer and Element Array Buffer
+
+Everything starts with OpenGL buffers. The two most interesting are the Array Buffer and the Element Array Buffer. Frankly, for me, that sounds a bit mouthful.
+
+First is intended for storing vertex information (positions, colors, normals, etc.); the second keeps indices - a way to describe how vertices constitute faces of our geometry.
+
+When we operate with them, from the standpoint of the API usage, the approach is almost equal; hence I am using a single class to represent both:
+#include; decl; common_gl/com.blaster.gl.GlBuffer
+
+As with most of OpenGL stuff, it is controlled through handle:
+#include; def; common_gl/com.blaster.gl.GlBuffer::handle
+
+After the buffer is "registered" on the GPU side, we can push data into it:
+#include; def; common_gl/com.blaster.gl.GlBuffer::uploadBuffer
+
+The buffer also can be "mapped" onto the client-side (applicatation) memory. That is a useful feature for updating the buffer:
+
+#include; def; common_gl/com.blaster.gl.GlBuffer::mapBuffer
+#include; def; common_gl/com.blaster.gl.GlBuffer::updateBuffer
+
+One example of usage is rendering particle systems as billboards. In this case, I am updating buffer with pre-calculated information about particle instances:
+#include; def; common_gl/com.blaster.techniques.BillboardsTechnique::updatePositions
+
+Now, let us have a look at how buffers combined into a mesh.
+
+#header; Polygon meshes
+
+To represent a collection of vertices, edges, and faces, I am using a class called GlMesh. In short, GlMesh is an association of one (or many) Array Buffers, which holds vertex data, and one Element Array Buffer with indices to define the edges between the vertices:
+#include; decl; common_gl/com.blaster.gl.GlMesh
+
+Each vertex in the mesh is defined by a set of attributes:
+#include; def; common_gl/com.blaster.gl.GlAttribute
+
+For example in this shader we have positions and texture coordinates defined per-vertex:
+#include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.vert
+
+To render the mesh, we need to tell the rendering pipeline the exact association between buffers, holding the data, and vertex attributes:
+#include; def; common_gl/com.blaster.gl.GlMesh::bindVertexPointers
+
+#header; Vertex Array Objects
+
+Specifying attributes for each mesh each rendering pass can be costly, but there is a way to avoid that penalty - Vertex Array Object to the rescue:
+#include; def; common_gl/com.blaster.gl.GlMesh::createVAO
+
+Vertex Array Object (or VAO) will hold all the necessary bindings on the GPU side after we specify it once. Next time we need to define the mesh - we can bind the VAO, and all of the bindings will be restored.
+
+#header; Rendering the mesh
+
+After all of the bindings are established, rendering of the mesh is a straightforward task:
+#include; def; common_gl/com.blaster.gl.GlMesh::draw
+
+We need to pass which type of geometry we want to output - in most cases GL_TRIANGLES.
+
+There is one more call for instanced draws - this one accepts multiple instances to render:
+#include; def; common_gl/com.blaster.gl.GlMesh::drawInstanced
+
+"Teapots in Space". Author unknown.
+#picture; Teapots in Space; http://gzozulin.com/wp-content/uploads/2020/02/teapots.gif
+
+#header; Procedural example
+
+Quite frequently there is a need for simple procedurally defined meshes: quads, triangles.
+#include; def; common_gl/com.blaster.gl.GlMesh::rect
+#include; def; common_gl/com.blaster.gl.GlMesh::triangle
+
+I can reuse those across the codebase.
+
+That is all for today, folks, see you next time!)

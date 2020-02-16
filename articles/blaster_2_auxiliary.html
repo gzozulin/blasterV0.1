@@ -41,8 +41,7 @@
 
                 .picture {
                     display: block;
-                    margin-left: auto;
-                    margin-right: auto;
+                    margin: 30px auto 45px auto;
                     max-height: 50%;
                 }
                 .picture_child {}
@@ -74,7 +73,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L36" target="_blank">common_gl/com.blaster.gl.GlAux::GlBindable</a>
 </h3>
-    <pre><code>interface GlBindable {
+    <pre><code class="lang-kotlin">interface GlBindable {
     fun bind()
     fun unbind()
 }</code></pre>
@@ -86,7 +85,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L42" target="_blank">common_gl/com.blaster.gl.GlAux::glBind</a>
 </h3>
-    <pre><code>fun glBind(bindables: List&lt;GlBindable&gt;, action: () -&gt; Unit) {
+    <pre><code class="lang-kotlin">fun glBind(bindables: List&lt;GlBindable&gt;, action: () -&gt; Unit) {
     bindables.forEach { it.bind() }
     action.invoke()
     bindables.reversed().forEach { it.unbind() }
@@ -99,7 +98,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L21" target="_blank">common_gl/com.blaster.techniques.TextTechnique::draw</a>
 </h3>
-    <pre><code>fun draw(call: () -&gt; Unit) {
+    <pre><code class="lang-kotlin">fun draw(call: () -&gt; Unit) {
     glBind(listOf(program, font, rect)) {
         program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, font)
         call.invoke()
@@ -118,7 +117,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L30" target="_blank">common_gl/com.blaster.gl.GlAux::glCheck</a>
 </h3>
-    <pre><code>fun &lt;T&gt; glCheck(action: () -&gt; T): T {
+    <pre><code class="lang-kotlin">fun &lt;T&gt; glCheck(action: () -&gt; T): T {
     val result = action.invoke()
     checkForGLError()
     return result
@@ -128,9 +127,9 @@
 <p class="text">
 </p><p class="text">Here is the example:
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L43" target="_blank">common_gl/com.blaster.gl.GlBuffer::bind</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L30" target="_blank">common_gl/com.blaster.gl.GlBuffer::bind</a>
 </h3>
-    <pre><code>override fun bind() {
+    <pre><code class="lang-kotlin">override fun bind() {
     glCheck { backend.glBindBuffer(target, handle) }
 }</code></pre>
 
@@ -142,7 +141,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAux.kt#L7" target="_blank">common_gl/com.blaster.gl.GlAux::GlError</a>
 </h3>
-    <pre><code>class GlError(private val errorCode: Int) : Error() {
+    <pre><code class="lang-kotlin">class GlError(private val errorCode: Int) : Error() {
     override fun toString(): String {
         val msg = when (errorCode) {
             0x0   -&gt; &quot;GL_NO_ERROR&quot;
@@ -169,7 +168,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt#L7" target="_blank">common_gl/com.blaster.gl.GlState</a>
 </h3>
-    <pre><code>class GlState private constructor()</code></pre>
+    <pre><code class="lang-kotlin">class GlState private constructor()</code></pre>
 
 </div>
 <p class="text">
@@ -178,7 +177,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt#L35" target="_blank">common_gl/com.blaster.gl.GlState::drawWithNoCulling</a>
 </h3>
-    <pre><code>fun drawWithNoCulling(draw: () -&gt; Unit) {
+    <pre><code class="lang-kotlin">fun drawWithNoCulling(draw: () -&gt; Unit) {
     disableCulling()
     draw.invoke()
     enableCulling()
@@ -189,7 +188,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Skybox.kt#L45" target="_blank">desktop/com.blaster.impl.Skybox::drawSkybox</a>
 </h3>
-    <pre><code>private fun drawSkybox() {
+    <pre><code class="lang-kotlin">private fun drawSkybox() {
     GlState.drawWithNoCulling {
         skyboxTechnique.skybox(camera)
     }
