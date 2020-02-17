@@ -30,9 +30,9 @@ private val controller = Controller(velocity = 0.05f, position = vec3(0f, 2.5f, 
 private val wasdInput = WasdInput(controller)
 
 private val light = Light(vec3(25f), true)
-private val lightMasternode = Node<Light>()
-private val lightNode1 = Node(parent = lightMasternode, payload = light).setPosition(vec3(3f))
-private val lightNode2 = Node(parent = lightMasternode, payload = light).setPosition(vec3(-3f, 3f, -3f))
+private val lightMasternode = Node<GlMesh>()
+private val lightNode1 = Node(payload = light).setPosition(vec3(3f))
+private val lightNode2 = Node(payload = light).setPosition(vec3(-3f, 3f, -3f))
 
 private lateinit var mandalorian: GlMesh
 private lateinit var mandalorianMaterial: PbrMaterial
@@ -97,12 +97,11 @@ private val pbrTechnique = PbrTechnique()
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
         pbrTechnique.create()
-        skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/snowy")
-        val (mesh, aabb) = meshLib.loadMesh("models/mandalorian/mandalorian.obj")
+        skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/miramar")
+        val (mesh, aabb) = meshLib.loadMesh("models/lantern/lantern.obj")
         mandalorian = mesh
-        mandalorianMaterial = texturesLib.loadPbr("models/mandalorian", "png",
-                albedo = "models/mandalorian/albedo.png")
-        mandalorianNode = Node(payload = mandalorian).setScale(aabb.scaleTo(5f))
+        mandalorianMaterial = texturesLib.loadPbr("models/lantern", "jpg")
+        mandalorianNode = Node(parent = lightMasternode, payload = mandalorian).setScale(aabb.scaleTo(5f))
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -130,8 +129,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 meshes = {
                     pbrTechnique.instance(mandalorianNode.payload(), mandalorianNode.calculateM(), mandalorianMaterial)
                 })
-        immediateTechnique.marker(camera, lightNode1.calculateM(), colorWhite)
-        immediateTechnique.marker(camera, lightNode2.calculateM(), colorWhite)
+        //immediateTechnique.marker(camera, lightNode1.calculateM(), colorWhite)
+        //immediateTechnique.marker(camera, lightNode2.calculateM(), colorWhite)
     }
 
     override fun onCursorDelta(delta: Vector2f) {

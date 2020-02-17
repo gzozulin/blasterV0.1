@@ -1,0 +1,57 @@
+OBJ (or .OBJ) is a geometry definition file format first developed by Wavefront Technologies for its Advanced Visualizer animation package. The file format is open and has been adopted by other 3D graphics application vendors.
+
+History and resources (ref to wiki, paul burke)
+
+#content; In this post
+
+Cut down version - no materials, no animations, no smoothness - just geometry.
+
+#picture; Physics Based Lantern; http://gzozulin.com/wp-content/uploads/2020/02/miramar2.gif
+
+#header; The first inefficiency
+
+Unknown number of indices - cannot preallocate buffers:
+
+#include; def; common_gl/com.blaster.assets.MeshLib::loadMesh
+
+#header; The second inefficiency
+
+Using regex while parsing:
+
+#include; def; common_gl/com.blaster.assets.MeshLib::parsePosition
+#include; def; common_gl/com.blaster.assets.MeshLib::parseTexCoordinate
+#include; def; common_gl/com.blaster.assets.MeshLib::parseNormal
+
+#header; The only efficiency
+
+Switching between branches by the character
+
+#include; def; common_gl/com.blaster.assets.MeshLib::parseLine
+#include; def; common_gl/com.blaster.assets.MeshLib::parseVertexAttribute
+
+#header; The third inefficiency
+
+Lots of data copying
+
+#include; def; common_gl/com.blaster.assets.MeshLib::parsePolygon
+#include; def; common_gl/com.blaster.assets.MeshLib::addVertex
+#include; def; common_gl/com.blaster.assets.MeshLib::addTriangle
+
+#header; Small bonus
+
+Calculating aabb while parsing
+#include; def; common_gl/com.blaster.assets.MeshLib::updateAabb
+
+#header; Free stuff!
+
+Resources with free models.
+
+~ 3D Models for Professionals - Turbosquid \1\
+#cite; 1; 3D Models for Professionals; https://www.turbosquid.com/
+
+~ Free 3D Models and Commercial Use 3D Models at great prices - Free3d \2\
+#cite; 2; Free 3D Models and Commercial Use 3D Models at great prices; https://free3d.com/
+
+~ Publish and find 3D Models online - Sketchfab \3\
+#cite; 3; Publish and find 3D Models online; https://sketchfab.com/
+

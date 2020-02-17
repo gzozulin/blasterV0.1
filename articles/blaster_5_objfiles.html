@@ -1,0 +1,323 @@
+<html>
+    <style>
+
+        .code,.child {
+                    border-radius: 3px;
+                    display: block;
+                    max-width: 100%;
+                    overflow: auto;
+                    color: #666;
+                    page-break-inside: avoid;
+                    font: normal 15px/1.6 monospace;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                    word-wrap: break-word;
+                }
+
+                .child {
+                    border-radius: 3px;
+                    background: #F1ECEC;
+                    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+                }
+
+                .code {
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                }
+
+                .code_child {
+                    border-radius: 3px;
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                }
+
+                .text {}
+                .text_child {}
+
+                .link {}
+                .link_child {}
+
+                .picture {
+                    display: block;
+                    margin: 30px auto 45px auto;
+                    max-height: 50%;
+                }
+                .picture_child {}
+
+                .list_item {}
+                .list_item_child {}
+    </style>
+    <body>
+        <p class="text">OBJ (or .OBJ) is a geometry definition file format first developed by Wavefront Technologies for its Advanced Visualizer animation package. The file format is open and has been adopted by other 3D graphics application vendors.
+</p><p class="text">
+</p><p class="text">History and resources (ref to wiki, paul burke)
+</p><p class="text">
+</p><h2 id="In-this-post">In this post</h2><ul class="list_item"><li>    <a class="link" href="#The-first-inefficiency">The first inefficiency</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#The-second-inefficiency">The second inefficiency</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#The-only-efficiency">The only efficiency</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#The-third-inefficiency">The third inefficiency</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Small-bonus">Small bonus</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Free-stuff-">Free stuff!</a>
+</li></ul><p class="text">
+</p><p class="text">Cut down version - no materials, no animations, no smoothness - just geometry.
+</p><p class="text">
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/miramar2.gif" alt="Physics Based Lantern" align="middle">
+<p class="text">
+</p><h2 id="The-first-inefficiency">The first inefficiency</h2>
+<p class="text">
+</p><p class="text">Unknown number of indices - cannot preallocate buffers:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L26" target="_blank">common_gl/com.blaster.assets.MeshLib::loadMesh</a>
+</h3>
+    <pre><code class="lang-kotlin">fun loadMesh(meshFilename: String): Pair&lt;GlMesh, AABBf&gt; {
+    val aabb = aabb()
+    val currentPositionList = mutableListOf&lt;Float&gt;()
+    val currentTexCoordList = mutableListOf&lt;Float&gt;()
+    val currentNormalList = mutableListOf&lt;Float&gt;()
+    val currentPositions = mutableListOf&lt;Float&gt;()
+    val currentTexCoords = mutableListOf&lt;Float&gt;()
+    val currentNormals = mutableListOf&lt;Float&gt;()
+    val currentIndices = mutableListOf&lt;Int&gt;()
+    val inputStream = assetStream.openAsset(meshFilename)
+    val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
+    bufferedReader.use {
+        var line = bufferedReader.readLine()
+        while (line != null) {
+            parseLine(aabb, line, currentPositionList, currentTexCoordList, currentNormalList,
+                    currentPositions, currentTexCoords, currentNormals, currentIndices)
+            line = bufferedReader.readLine()
+        }
+    }
+    val positionBuff = toByteBufferFloat(currentPositions)
+    val texCoordBuff = toByteBufferFloat(currentTexCoords)
+    val normalBuff = toByteBufferFloat(currentNormals)
+    val indicesBuff = toByteBufferInt(currentIndices)
+    val mesh = GlMesh(
+            listOf(
+                    GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),
+                    GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer(backend.GL_ARRAY_BUFFER, texCoordBuff),
+                    GlAttribute.ATTRIBUTE_NORMAL to GlBuffer(backend.GL_ARRAY_BUFFER, normalBuff)
+            ),
+            GlBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indicesBuff), currentIndices.size
+    )
+    return mesh to AABBf(aabb)
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="The-second-inefficiency">The second inefficiency</h2>
+<p class="text">
+</p><p class="text">Using regex while parsing:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L90" target="_blank">common_gl/com.blaster.assets.MeshLib::parsePosition</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun parsePosition(line: String, currentPositionList: MutableList&lt;Float&gt;) {
+    val split = line.split(whitespaceRegex)
+    currentPositionList.add(split[1].toFloat())
+    currentPositionList.add(split[2].toFloat())
+    currentPositionList.add(split[3].toFloat())
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L97" target="_blank">common_gl/com.blaster.assets.MeshLib::parseTexCoordinate</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun parseTexCoordinate(line: String, currentTexCoordList: MutableList&lt;Float&gt;) {
+    val split = line.split(whitespaceRegex)
+    currentTexCoordList.add(split[1].toFloat())
+    currentTexCoordList.add(split[2].toFloat())
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L103" target="_blank">common_gl/com.blaster.assets.MeshLib::parseNormal</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun parseNormal(line: String, currentNormalList: MutableList&lt;Float&gt;) {
+    val split = line.split(whitespaceRegex)
+    currentNormalList.add(split[1].toFloat())
+    currentNormalList.add(split[2].toFloat())
+    currentNormalList.add(split[3].toFloat())
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="The-only-efficiency">The only efficiency</h2>
+<p class="text">
+</p><p class="text">Switching between branches by the character
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L60" target="_blank">common_gl/com.blaster.assets.MeshLib::parseLine</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun parseLine(aabb: aabb, line: String,
+                      currentPositionList: MutableList&lt;Float&gt;,
+                      currentTexCoordList: MutableList&lt;Float&gt;,
+                      currentNormalList: MutableList&lt;Float&gt;,
+                      currentPositions: MutableList&lt;Float&gt;,
+                      currentTexCoords: MutableList&lt;Float&gt;,
+                      currentNormals: MutableList&lt;Float&gt;,
+                      currentIndices: MutableList&lt;Int&gt;) {
+    if (line.isEmpty()) {
+        return
+    }
+    when (line[0]) {
+        &#39;v&#39; -&gt; parseVertexAttribute(line, currentPositionList, currentTexCoordList, currentNormalList)
+        &#39;f&#39; -&gt; parsePolygon(aabb, line, currentPositionList, currentTexCoordList, currentNormalList,
+                currentPositions, currentTexCoords, currentNormals, currentIndices)
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L78" target="_blank">common_gl/com.blaster.assets.MeshLib::parseVertexAttribute</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun parseVertexAttribute(line: String,
+                                 currentPositionList: MutableList&lt;Float&gt;,
+                                 currentTexCoordList: MutableList&lt;Float&gt;,
+                                 currentNormalList: MutableList&lt;Float&gt;) {
+    when (line[1]) {
+        &#39; &#39; -&gt; parsePosition(line, currentPositionList)
+        &#39;t&#39; -&gt; parseTexCoordinate(line, currentTexCoordList)
+        &#39;n&#39; -&gt; parseNormal(line, currentNormalList)
+        else -&gt; fail(&quot;Unknown vertex attribute! $line&quot;)
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="The-third-inefficiency">The third inefficiency</h2>
+<p class="text">
+</p><p class="text">Lots of data copying
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L110" target="_blank">common_gl/com.blaster.assets.MeshLib::parsePolygon</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun parsePolygon(aabb: aabb, line: String,
+                         currentPositionList: List&lt;Float&gt;,
+                         currentTexCoordList: List&lt;Float&gt;,
+                         currentNormalList: List&lt;Float&gt;,
+                         currentPositions: MutableList&lt;Float&gt;,
+                         currentTexCoords: MutableList&lt;Float&gt;,
+                         currentNormals: MutableList&lt;Float&gt;,
+                         currentIndices: MutableList&lt;Int&gt;) {
+    val split = line.split(whitespaceRegex)
+    val verticesCnt = split.size - 1
+    val indices = ArrayList&lt;Int&gt;()
+    var nextIndex = currentPositions.size / 3
+    for (vertex in 0 until verticesCnt) {
+        addVertex(aabb, split[vertex + 1], currentPositionList, currentTexCoordList,
+                currentNormalList, currentPositions, currentTexCoords, currentNormals)
+        indices.add(nextIndex)
+        nextIndex++
+    }
+    val triangleCnt = verticesCnt - 2
+    for (triangle in 0 until triangleCnt) {
+        addTriangle(indices[0], indices[triangle + 1], indices[triangle + 2], currentIndices)
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L134" target="_blank">common_gl/com.blaster.assets.MeshLib::addVertex</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun addVertex(aabb: aabb, vertex: String,
+                      currentPositionList: List&lt;Float&gt;,
+                      currentTexCoordList: List&lt;Float&gt;,
+                      currentNormalList: List&lt;Float&gt;,
+                      currentPositions: MutableList&lt;Float&gt;,
+                      currentTexCoords: MutableList&lt;Float&gt;,
+                      currentNormals: MutableList&lt;Float&gt;) {
+    val vertSplit = vertex.split(slashRegex)
+    val vertIndex = vertSplit[0].toInt() - 1
+    val vx = currentPositionList[vertIndex * 3 + 0]
+    val vy = currentPositionList[vertIndex * 3 + 1]
+    val vz = currentPositionList[vertIndex * 3 + 2]
+    currentPositions.add(vx)
+    currentPositions.add(vy)
+    currentPositions.add(vz)
+    updateAabb(aabb, vx, vy, vz)
+    if (currentTexCoordList.isNotEmpty()) {
+        val texIndex = vertSplit[1].toInt()  - 1
+        currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 0])
+        currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 1])
+    } else {
+        currentTexCoords.add(1f)
+        currentTexCoords.add(1f)
+    }
+    if (currentNormalList.isNotEmpty()) {
+        val normIndex = vertSplit[2].toInt() - 1
+        currentNormals.add(currentNormalList  [normIndex * 3 + 0])
+        currentNormals.add(currentNormalList  [normIndex * 3 + 1])
+        currentNormals.add(currentNormalList  [normIndex * 3 + 2])
+    } else {
+        currentNormals.add(0f)
+        currentNormals.add(1f)
+        currentNormals.add(0f)
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L170" target="_blank">common_gl/com.blaster.assets.MeshLib::addTriangle</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun addTriangle(ind0: Int, ind1: Int, ind2: Int, currentIndices: MutableList&lt;Int&gt;) {
+    currentIndices.add(ind0)
+    currentIndices.add(ind1)
+    currentIndices.add(ind2)
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Small-bonus">Small bonus</h2>
+<p class="text">
+</p><p class="text">Calculating aabb while parsing
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/MeshLib.kt#L176" target="_blank">common_gl/com.blaster.assets.MeshLib::updateAabb</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun updateAabb(aabb: aabb, vx: Float, vy: Float, vz: Float) {
+    if (vx &lt; aabb.minX) {
+        aabb.minX = vx
+    }
+    if (vx &gt; aabb.maxX) {
+        aabb.maxX = vx
+    }
+    if (vy &lt; aabb.minY) {
+        aabb.minY = vy
+    }
+    if (vy &gt; aabb.maxY) {
+        aabb.maxY = vy
+    }
+    if (vz &lt; aabb.minZ) {
+        aabb.minZ = vz
+    }
+    if (vz &gt; aabb.maxZ) {
+        aabb.maxZ = vz
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Free-stuff-">Free stuff!</h2>
+<p class="text">
+</p><p class="text">Resources with free models.
+</p><p class="text">
+</p><p class="text"><ul class="list_item"><li>3D Models for Professionals - Turbosquid <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>
+</li></ul>
+</p><p class="text">
+</p><p class="text"><ul class="list_item"><li>Free 3D Models and Commercial Use 3D Models at great prices - Free3d <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup>
+</li></ul>
+</p><p class="text">
+</p><p class="text"><ul class="list_item"><li>Publish and find 3D Models online - Sketchfab <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup>
+</li></ul>
+</p><p class="text">
+</p><p class="text">
+</p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
+<a id="1" class="link" href="https://www.turbosquid.com/" target="_blank">3D Models for Professionals</a></li></ul><ul class="list_item"><li>    <a class="link" href="#2_origin">&#8593;[2]: </a>
+<a id="2" class="link" href="https://free3d.com/" target="_blank">Free 3D Models and Commercial Use 3D Models at great prices</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
+<a id="3" class="link" href="https://sketchfab.com/" target="_blank">Publish and find 3D Models online</a></li></ul>
+        <br>
+    </body>
+</html>

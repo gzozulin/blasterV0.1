@@ -25,152 +25,152 @@ class MeshLib (private val assetStream: AssetStream) {
 
     fun loadMesh(meshFilename: String): Pair<GlMesh, AABBf> {
         val aabb = aabb()
-        val currentPositionList = mutableListOf<Float>()
-        val currentTexCoordList = mutableListOf<Float>()
-        val currentNormalList = mutableListOf<Float>()
-        val currentPositions = mutableListOf<Float>()
-        val currentTexCoords = mutableListOf<Float>()
-        val currentNormals = mutableListOf<Float>()
-        val currentIndices = mutableListOf<Int>()
+        val positionList = mutableListOf<Float>()
+        val texCoordList = mutableListOf<Float>()
+        val normalList = mutableListOf<Float>()
+        val positions = mutableListOf<Float>()
+        val texCoords = mutableListOf<Float>()
+        val normals = mutableListOf<Float>()
+        val indicesList = mutableListOf<Int>()
         val inputStream = assetStream.openAsset(meshFilename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
         bufferedReader.use {
             var line = bufferedReader.readLine()
             while (line != null) {
-                parseLine(aabb, line, currentPositionList, currentTexCoordList, currentNormalList,
-                        currentPositions, currentTexCoords, currentNormals, currentIndices)
+                parseLine(aabb, line, positionList, texCoordList, normalList,
+                        positions, texCoords, normals, indicesList)
                 line = bufferedReader.readLine()
             }
         }
-        val positionBuff = toByteBufferFloat(currentPositions)
-        val texCoordBuff = toByteBufferFloat(currentTexCoords)
-        val normalBuff = toByteBufferFloat(currentNormals)
-        val indicesBuff = toByteBufferInt(currentIndices)
+        val positionBuff = toByteBufferFloat(positions)
+        val texCoordBuff = toByteBufferFloat(texCoords)
+        val normalBuff = toByteBufferFloat(normals)
+        val indicesBuff = toByteBufferInt(indicesList)
         val mesh = GlMesh(
                 listOf(
                         GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),
                         GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer(backend.GL_ARRAY_BUFFER, texCoordBuff),
                         GlAttribute.ATTRIBUTE_NORMAL to GlBuffer(backend.GL_ARRAY_BUFFER, normalBuff)
                 ),
-                GlBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indicesBuff), currentIndices.size
+                GlBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indicesBuff), indicesList.size
         )
         return mesh to AABBf(aabb)
     }
 
     private fun parseLine(aabb: aabb, line: String,
-                          currentPositionList: MutableList<Float>,
-                          currentTexCoordList: MutableList<Float>,
-                          currentNormalList: MutableList<Float>,
-                          currentPositions: MutableList<Float>,
-                          currentTexCoords: MutableList<Float>,
-                          currentNormals: MutableList<Float>,
-                          currentIndices: MutableList<Int>) {
+                          positionList: MutableList<Float>,
+                          texCoordList: MutableList<Float>,
+                          normalList: MutableList<Float>,
+                          positions: MutableList<Float>,
+                          texCoords: MutableList<Float>,
+                          normals: MutableList<Float>,
+                          indicesList: MutableList<Int>) {
         if (line.isEmpty()) {
             return
         }
         when (line[0]) {
-            'v' -> parseVertexAttribute(line, currentPositionList, currentTexCoordList, currentNormalList)
-            'f' -> parsePolygon(aabb, line, currentPositionList, currentTexCoordList, currentNormalList,
-                    currentPositions, currentTexCoords, currentNormals, currentIndices)
+            'v' -> parseVertexAttribute(line, positionList, texCoordList, normalList)
+            'f' -> parsePolygon(aabb, line, positionList, texCoordList, normalList,
+                    positions, texCoords, normals, indicesList)
         }
     }
 
     private fun parseVertexAttribute(line: String,
-                                     currentPositionList: MutableList<Float>,
-                                     currentTexCoordList: MutableList<Float>,
-                                     currentNormalList: MutableList<Float>) {
+                                     positionList: MutableList<Float>,
+                                     texCoordList: MutableList<Float>,
+                                     normalList: MutableList<Float>) {
         when (line[1]) {
-            ' ' -> parsePosition(line, currentPositionList)
-            't' -> parseTexCoordinate(line, currentTexCoordList)
-            'n' -> parseNormal(line, currentNormalList)
+            ' ' -> parsePosition(line, positionList)
+            't' -> parseTexCoordinate(line, texCoordList)
+            'n' -> parseNormal(line, normalList)
             else -> fail("Unknown vertex attribute! $line")
         }
     }
 
-    private fun parsePosition(line: String, currentPositionList: MutableList<Float>) {
+    private fun parsePosition(line: String, positionList: MutableList<Float>) {
         val split = line.split(whitespaceRegex)
-        currentPositionList.add(split[1].toFloat())
-        currentPositionList.add(split[2].toFloat())
-        currentPositionList.add(split[3].toFloat())
+        positionList.add(split[1].toFloat())
+        positionList.add(split[2].toFloat())
+        positionList.add(split[3].toFloat())
     }
 
-    private fun parseTexCoordinate(line: String, currentTexCoordList: MutableList<Float>) {
+    private fun parseTexCoordinate(line: String, texCoordList: MutableList<Float>) {
         val split = line.split(whitespaceRegex)
-        currentTexCoordList.add(split[1].toFloat())
-        currentTexCoordList.add(split[2].toFloat())
+        texCoordList.add(split[1].toFloat())
+        texCoordList.add(split[2].toFloat())
     }
 
-    private fun parseNormal(line: String, currentNormalList: MutableList<Float>) {
+    private fun parseNormal(line: String, normalList: MutableList<Float>) {
         val split = line.split(whitespaceRegex)
-        currentNormalList.add(split[1].toFloat())
-        currentNormalList.add(split[2].toFloat())
-        currentNormalList.add(split[3].toFloat())
+        normalList.add(split[1].toFloat())
+        normalList.add(split[2].toFloat())
+        normalList.add(split[3].toFloat())
     }
 
     private fun parsePolygon(aabb: aabb, line: String,
-                             currentPositionList: List<Float>,
-                             currentTexCoordList: List<Float>,
-                             currentNormalList: List<Float>,
-                             currentPositions: MutableList<Float>,
-                             currentTexCoords: MutableList<Float>,
-                             currentNormals: MutableList<Float>,
-                             currentIndices: MutableList<Int>) {
+                             positionList: List<Float>,
+                             texCoordList: List<Float>,
+                             normalList: List<Float>,
+                             positions: MutableList<Float>,
+                             texCoords: MutableList<Float>,
+                             normals: MutableList<Float>,
+                             indicesList: MutableList<Int>) {
         val split = line.split(whitespaceRegex)
         val verticesCnt = split.size - 1
         val indices = ArrayList<Int>()
-        var nextIndex = currentPositions.size / 3
+        var nextIndex = positions.size / 3
         for (vertex in 0 until verticesCnt) {
-            addVertex(aabb, split[vertex + 1], currentPositionList, currentTexCoordList,
-                    currentNormalList, currentPositions, currentTexCoords, currentNormals)
+            addVertex(aabb, split[vertex + 1], positionList, texCoordList,
+                    normalList, positions, texCoords, normals)
             indices.add(nextIndex)
             nextIndex++
         }
         val triangleCnt = verticesCnt - 2
         for (triangle in 0 until triangleCnt) {
-            addTriangle(indices[0], indices[triangle + 1], indices[triangle + 2], currentIndices)
+            addTriangle(indices[0], indices[triangle + 1], indices[triangle + 2], indicesList)
         }
     }
 
     private fun addVertex(aabb: aabb, vertex: String,
-                          currentPositionList: List<Float>,
-                          currentTexCoordList: List<Float>,
-                          currentNormalList: List<Float>,
-                          currentPositions: MutableList<Float>,
-                          currentTexCoords: MutableList<Float>,
-                          currentNormals: MutableList<Float>) {
+                          positionList: List<Float>,
+                          texCoordList: List<Float>,
+                          normalList: List<Float>,
+                          positions: MutableList<Float>,
+                          texCoords: MutableList<Float>,
+                          normals: MutableList<Float>) {
         val vertSplit = vertex.split(slashRegex)
         val vertIndex = vertSplit[0].toInt() - 1
-        val vx = currentPositionList[vertIndex * 3 + 0]
-        val vy = currentPositionList[vertIndex * 3 + 1]
-        val vz = currentPositionList[vertIndex * 3 + 2]
-        currentPositions.add(vx)
-        currentPositions.add(vy)
-        currentPositions.add(vz)
+        val vx = positionList[vertIndex * 3 + 0]
+        val vy = positionList[vertIndex * 3 + 1]
+        val vz = positionList[vertIndex * 3 + 2]
+        positions.add(vx)
+        positions.add(vy)
+        positions.add(vz)
         updateAabb(aabb, vx, vy, vz)
-        if (currentTexCoordList.isNotEmpty()) {
+        if (texCoordList.isNotEmpty()) {
             val texIndex = vertSplit[1].toInt()  - 1
-            currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 0])
-            currentTexCoords.add(currentTexCoordList[texIndex  * 2 + 1])
+            texCoords.add(texCoordList[texIndex  * 2 + 0])
+            texCoords.add(texCoordList[texIndex  * 2 + 1])
         } else {
-            currentTexCoords.add(1f)
-            currentTexCoords.add(1f)
+            texCoords.add(1f)
+            texCoords.add(1f)
         }
-        if (currentNormalList.isNotEmpty()) {
+        if (normalList.isNotEmpty()) {
             val normIndex = vertSplit[2].toInt() - 1
-            currentNormals.add(currentNormalList  [normIndex * 3 + 0])
-            currentNormals.add(currentNormalList  [normIndex * 3 + 1])
-            currentNormals.add(currentNormalList  [normIndex * 3 + 2])
+            normals.add(normalList  [normIndex * 3 + 0])
+            normals.add(normalList  [normIndex * 3 + 1])
+            normals.add(normalList  [normIndex * 3 + 2])
         } else {
-            currentNormals.add(0f)
-            currentNormals.add(1f)
-            currentNormals.add(0f)
+            normals.add(0f)
+            normals.add(1f)
+            normals.add(0f)
         }
     }
 
-    private fun addTriangle(ind0: Int, ind1: Int, ind2: Int, currentIndices: MutableList<Int>) {
-        currentIndices.add(ind0)
-        currentIndices.add(ind1)
-        currentIndices.add(ind2)
+    private fun addTriangle(ind0: Int, ind1: Int, ind2: Int, indicesList: MutableList<Int>) {
+        indicesList.add(ind0)
+        indicesList.add(ind1)
+        indicesList.add(ind2)
     }
 
     private fun updateAabb(aabb: aabb, vx: Float, vy: Float, vz: Float) {
