@@ -8,8 +8,6 @@ import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator
 import com.blaster.gl.GlMesh
-import org.joml.AABBf
-import org.joml.Vector3f
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.nio.charset.Charset
@@ -23,7 +21,7 @@ private val slashRegex = "/".toRegex()
 // todo: create Native(Float)Buffer directly, instead of copying arrays
 class MeshLib (private val assetStream: AssetStream) {
 
-    fun loadMesh(meshFilename: String): Pair<GlMesh, AABBf> {
+    fun loadMesh(meshFilename: String): Pair<GlMesh, aabb> {
         val aabb = aabb()
         val positionList = mutableListOf<Float>()
         val texCoordList = mutableListOf<Float>()
@@ -47,14 +45,14 @@ class MeshLib (private val assetStream: AssetStream) {
         val normalBuff = toByteBufferFloat(normals)
         val indicesBuff = toByteBufferInt(indicesList)
         val mesh = GlMesh(
-                listOf(
-                        GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),
-                        GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer(backend.GL_ARRAY_BUFFER, texCoordBuff),
-                        GlAttribute.ATTRIBUTE_NORMAL to GlBuffer(backend.GL_ARRAY_BUFFER, normalBuff)
-                ),
-                GlBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indicesBuff), indicesList.size
+            listOf(
+                GlAttribute.ATTRIBUTE_POSITION to GlBuffer(backend.GL_ARRAY_BUFFER, positionBuff),
+                GlAttribute.ATTRIBUTE_TEXCOORD to GlBuffer(backend.GL_ARRAY_BUFFER, texCoordBuff),
+                GlAttribute.ATTRIBUTE_NORMAL to GlBuffer(backend.GL_ARRAY_BUFFER, normalBuff)
+            ),
+            GlBuffer(backend.GL_ELEMENT_ARRAY_BUFFER, indicesBuff), indicesList.size
         )
-        return mesh to AABBf(aabb)
+        return mesh to aabb
     }
 
     private fun parseLine(aabb: aabb, line: String,
@@ -157,9 +155,9 @@ class MeshLib (private val assetStream: AssetStream) {
         }
         if (normalList.isNotEmpty()) {
             val normIndex = vertSplit[2].toInt() - 1
-            normals.add(normalList  [normIndex * 3 + 0])
-            normals.add(normalList  [normIndex * 3 + 1])
-            normals.add(normalList  [normIndex * 3 + 2])
+            normals.add(normalList[normIndex * 3 + 0])
+            normals.add(normalList[normIndex * 3 + 1])
+            normals.add(normalList[normIndex * 3 + 2])
         } else {
             normals.add(0f)
             normals.add(1f)
