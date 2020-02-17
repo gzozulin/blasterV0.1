@@ -50,27 +50,27 @@
                 .list_item_child {}
     </style>
     <body>
-        <p class="text">Hello, and welcome on the pages of Greg's Journal.
+        <p class="text">Hello, and welcome to Greg's Journal!
 </p><p class="text">
 </p><p class="text">In this post, we will talk about storing and rendering geometry data in Blaster.
 </p><p class="text">
-</p><p class="text">To draw something with OpenGL, we need to store somehow and represent that. To avoid pushing data all the time through the bus (like how it is when using legacy Immediate Mode <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>), I am storing vertex and index data on the GPU side in high-performance graphics memory.
+</p><p class="text">To draw something with OpenGL, we need to store somehow and represent that. To avoid pushing data all the time through the bus, vertices, and indices stored on the GPU side in high-performance graphics memory. There is an opposite approach - legacy OpenGL Immediate Mode <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>. We will have a look at it at some point as well.
 </p><p class="text">
-</p><p class="text">To simplify the handling of data needed for rendering passes, I implemented several useful classes - let us have a look at them.
+</p><p class="text">To simplify the handling of data needed for rendering passes, I implemented several useful classes - this chapter dedicated to them.
 </p><p class="text">
-</p><h2 id="In-this-post">In this post</h2><ul class="list_item"><li>    <a class="link" href="#Array-Buffer-and-Element-Array-Buffer">Array Buffer and Element Array Buffer</a>
+</p><h2 id="In-this-post">In this post</h2><ul class="list_item"><li>    <a class="link" href="#Array-and-Element-Array-Buffers">Array and Element Array Buffers</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Polygon-meshes">Polygon meshes</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Vertex-Array-Objects">Vertex Array Objects</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Rendering-the-mesh">Rendering the mesh</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Procedural-example">Procedural example</a>
 </li></ul><p class="text">
-</p><h2 id="Array-Buffer-and-Element-Array-Buffer">Array Buffer and Element Array Buffer</h2>
+</p><h2 id="Array-and-Element-Array-Buffers">Array and Element Array Buffers</h2>
 <p class="text">
-</p><p class="text">Everything starts with OpenGL buffers. The two most interesting are the Array Buffer and the Element Array Buffer. Frankly, for me, that sounds a bit mouthful.
+</p><p class="text">Everything starts with OpenGL buffers. The ones, which used most frequently are the Array Buffer and the Element Array Buffer. It sounds a bit mouthful, but we have what we have.
 </p><p class="text">
-</p><p class="text">First is intended for storing vertex information (positions, colors, normals, etc.); the second keeps indices - a way to describe how vertices constitute faces of our geometry.
+</p><p class="text">The first one intended for storing vertex information - positions, colors, normals, etc. The second allows us to store indices - a way to describe how vertices relate to each other.
 </p><p class="text">
-</p><p class="text">When we operate with them, from the standpoint of the API usage, the approach is almost equal; hence I am using a single class to represent both:
+</p><p class="text">From the standpoint of API usage, they are very similar - hence I am using a single class to represent both:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L9" target="_blank">common_gl/com.blaster.gl.GlBuffer</a>
 </h3>
@@ -81,7 +81,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">As with most of OpenGL stuff, it is controlled through handle:
+</p><p class="text">As with most of OpenGL entities, their lifecycles controlled through the handle. We can create and delete those handles. When the handle obtained, we can perform operations on buffer:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L14" target="_blank">common_gl/com.blaster.gl.GlBuffer::handle</a>
 </h3>
@@ -103,8 +103,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">The buffer also can be "mapped" onto the client-side (applicatation) memory. That is a useful feature for updating the buffer:
-</p><p class="text">
+</p><p class="text">The buffer also can be "mapped" onto the client-side application memory. That is a useful feature for updating the buffer:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L38" target="_blank">common_gl/com.blaster.gl.GlBuffer::mapBuffer</a>
 </h3>
@@ -122,7 +121,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">One example of usage is rendering particle systems as billboards. In this case, I am updating buffer with pre-calculated information about particle instances:
+</p><p class="text">One example of usage is rendering large amounts of billboards. In that case, I am updating buffer with pre-calculated information about instances positions:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/BillboardsTechnique.kt#L61" target="_blank">common_gl/com.blaster.techniques.BillboardsTechnique::updatePositions</a>
 </h3>
@@ -141,7 +140,7 @@
 </p><p class="text">
 </p><h2 id="Polygon-meshes">Polygon meshes</h2>
 <p class="text">
-</p><p class="text">To represent a collection of vertices, edges, and faces, I am using a class called GlMesh. In short, GlMesh is an association of one (or many) Array Buffers, which holds vertex data, and one Element Array Buffer with indices to define the edges between the vertices:
+</p><p class="text">To represent a collection of vertices, edges, and faces, I am using a class called GlMesh. In short, GlMesh is an association of multiple Array Buffers, which holds vertex data, and one Element Array Buffer with indices to define the edges between the vertices:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L5" target="_blank">common_gl/com.blaster.gl.GlMesh</a>
 </h3>
@@ -152,7 +151,7 @@
 
 </div>
 <p class="text">
-</p><p class="text">Each vertex in the mesh is defined by a set of attributes:
+</p><p class="text">A set of attributes defines each vertex in the mesh. I am using a predefined number of attribute locations in code:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAttribute.kt#L4" target="_blank">common_gl/com.blaster.gl.GlAttribute</a>
 </h3>
@@ -195,7 +194,7 @@ void main() {
 
 </div>
 <p class="text">
-</p><p class="text">To render the mesh, we need to tell the rendering pipeline the exact association between buffers, holding the data, and vertex attributes:
+</p><p class="text">To render the mesh, we need to tell the rendering pipeline the exact association between buffers with data and vertex attributes:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L22" target="_blank">common_gl/com.blaster.gl.GlMesh::bindVertexPointers</a>
 </h3>
@@ -215,9 +214,11 @@ void main() {
 
 </div>
 <p class="text">
+</p><p class="text">Next, I will show how to store preconfigured bindings on the GPU side.
+</p><p class="text">
 </p><h2 id="Vertex-Array-Objects">Vertex Array Objects</h2>
 <p class="text">
-</p><p class="text">Specifying attributes for each mesh each rendering pass can be costly, but there is a way to avoid that penalty - Vertex Array Object to the rescue:
+</p><p class="text">Specifying attributes for each mesh each rendering pass can be costly, but there is a way to avoid that penalty. With Vertex Array Object I can predefine the bindings beforehand:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L16" target="_blank">common_gl/com.blaster.gl.GlMesh::createVAO</a>
 </h3>
@@ -229,11 +230,13 @@ void main() {
 
 </div>
 <p class="text">
-</p><p class="text">Vertex Array Object (or VAO) will hold all the necessary bindings on the GPU side after we specify it once. Next time we need to define the mesh - we can bind the VAO, and all of the bindings will be restored.
+</p><p class="text">Vertex Array Object (or VAO) will hold all the necessary bindings on the GPU side after we specify it once. Next time we need to define the mesh - we can bind the VAO, and it will restore all bindings.
+</p><p class="text">
+</p><p class="text">Let us see, how geometry can be rendered with my code.
 </p><p class="text">
 </p><h2 id="Rendering-the-mesh">Rendering the mesh</h2>
 <p class="text">
-</p><p class="text">After all of the bindings are established, rendering of the mesh is a straightforward task:
+</p><p class="text">After all of the bindings are established, rendering of the mesh is a straightforward task. We only need to pass which type of geometry we want to output - in most cases, GL_TRIANGLES.
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L49" target="_blank">common_gl/com.blaster.gl.GlMesh::draw</a>
 </h3>
@@ -243,8 +246,6 @@ void main() {
 
 </div>
 <p class="text">
-</p><p class="text">We need to pass which type of geometry we want to output - in most cases GL_TRIANGLES.
-</p><p class="text">
 </p><p class="text">There is one more call for instanced draws - this one accepts multiple instances to render:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L53" target="_blank">common_gl/com.blaster.gl.GlMesh::drawInstanced</a>
@@ -255,12 +256,12 @@ void main() {
 
 </div>
 <p class="text">
-</p><p class="text">"Teapots in Space". Author unknown.
+</p><p class="text">"Teapots in Space." Author unknown.
 </p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/teapots.gif" alt="Teapots in Space" align="middle">
 <p class="text">
 </p><h2 id="Procedural-example">Procedural example</h2>
 <p class="text">
-</p><p class="text">Quite frequently there is a need for simple procedurally defined meshes: quads, triangles.
+</p><p class="text">Quite frequently there is a need for simple procedurally defined meshes: quads, triangles:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlMesh.kt#L58" target="_blank">common_gl/com.blaster.gl.GlMesh::rect</a>
 </h3>
@@ -312,9 +313,11 @@ void main() {
 
 </div>
 <p class="text">
-</p><p class="text">I can reuse those across the codebase.
+</p><p class="text">That can serve as a good example of the classes mentioned above in a typical situation.
 </p><p class="text">
-</p><p class="text">That is all for today, folks, see you next time!)
+</p><p class="text">In this post, I outlined the primary classes, which simplify geometry operations in my code. I always prefer a little bit of abstraction over low-level native calls on the spot. It simplifies the understanding of the logic by breaking down the scene into familiar pieces.
+</p><p class="text">
+</p><p class="text">That is all for today, folks, thank you for your time and hope to see you next time!)
 </p><p class="text">
 </p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
 <a id="1" class="link" href="https://www.khronos.org/opengl/wiki/Legacy_OpenGL" target="_blank">Legacy OpenGL</a></li></ul>

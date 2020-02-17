@@ -1,79 +1,82 @@
-Hello, and welcome on the pages of Greg's Journal.
+Hello, and welcome to Greg's Journal!
 
 In this post, we will talk about storing and rendering geometry data in Blaster.
 
-To draw something with OpenGL, we need to store somehow and represent that. To avoid pushing data all the time through the bus (like how it is when using legacy Immediate Mode \1\), I am storing vertex and index data on the GPU side in high-performance graphics memory.
+To draw something with OpenGL, we need to store somehow and represent that. To avoid pushing data all the time through the bus, vertices, and indices stored on the GPU side in high-performance graphics memory. There is an opposite approach - legacy OpenGL Immediate Mode \1\. We will have a look at it at some point as well.
 #cite; 1; Legacy OpenGL; https://www.khronos.org/opengl/wiki/Legacy_OpenGL
 
-To simplify the handling of data needed for rendering passes, I implemented several useful classes - let us have a look at them.
+To simplify the handling of data needed for rendering passes, I implemented several useful classes - this chapter dedicated to them.
 
 #content; In this post
 
-#header; Array Buffer and Element Array Buffer
+#header; Array and Element Array Buffers
 
-Everything starts with OpenGL buffers. The two most interesting are the Array Buffer and the Element Array Buffer. Frankly, for me, that sounds a bit mouthful.
+Everything starts with OpenGL buffers. The ones, which used most frequently are the Array Buffer and the Element Array Buffer. It sounds a bit mouthful, but we have what we have.
 
-First is intended for storing vertex information (positions, colors, normals, etc.); the second keeps indices - a way to describe how vertices constitute faces of our geometry.
+The first one intended for storing vertex information - positions, colors, normals, etc. The second allows us to store indices - a way to describe how vertices relate to each other.
 
-When we operate with them, from the standpoint of the API usage, the approach is almost equal; hence I am using a single class to represent both:
+From the standpoint of API usage, they are very similar - hence I am using a single class to represent both:
 #include; decl; common_gl/com.blaster.gl.GlBuffer
 
-As with most of OpenGL stuff, it is controlled through handle:
+As with most of OpenGL entities, their lifecycles controlled through the handle. We can create and delete those handles. When the handle obtained, we can perform operations on buffer:
 #include; def; common_gl/com.blaster.gl.GlBuffer::handle
 
 After the buffer is "registered" on the GPU side, we can push data into it:
 #include; def; common_gl/com.blaster.gl.GlBuffer::uploadBuffer
 
-The buffer also can be "mapped" onto the client-side (applicatation) memory. That is a useful feature for updating the buffer:
-
+The buffer also can be "mapped" onto the client-side application memory. That is a useful feature for updating the buffer:
 #include; def; common_gl/com.blaster.gl.GlBuffer::mapBuffer
 #include; def; common_gl/com.blaster.gl.GlBuffer::updateBuffer
 
-One example of usage is rendering particle systems as billboards. In this case, I am updating buffer with pre-calculated information about particle instances:
+One example of usage is rendering large amounts of billboards. In that case, I am updating buffer with pre-calculated information about instances positions:
 #include; def; common_gl/com.blaster.techniques.BillboardsTechnique::updatePositions
 
 Now, let us have a look at how buffers combined into a mesh.
 
 #header; Polygon meshes
 
-To represent a collection of vertices, edges, and faces, I am using a class called GlMesh. In short, GlMesh is an association of one (or many) Array Buffers, which holds vertex data, and one Element Array Buffer with indices to define the edges between the vertices:
+To represent a collection of vertices, edges, and faces, I am using a class called GlMesh. In short, GlMesh is an association of multiple Array Buffers, which holds vertex data, and one Element Array Buffer with indices to define the edges between the vertices:
 #include; decl; common_gl/com.blaster.gl.GlMesh
 
-Each vertex in the mesh is defined by a set of attributes:
+A set of attributes defines each vertex in the mesh. I am using a predefined number of attribute locations in code:
 #include; def; common_gl/com.blaster.gl.GlAttribute
 
 For example in this shader we have positions and texture coordinates defined per-vertex:
 #include; glsl; common_assets/src/main/resources/shaders/simple/no_lighting.vert
 
-To render the mesh, we need to tell the rendering pipeline the exact association between buffers, holding the data, and vertex attributes:
+To render the mesh, we need to tell the rendering pipeline the exact association between buffers with data and vertex attributes:
 #include; def; common_gl/com.blaster.gl.GlMesh::bindVertexPointers
+
+Next, I will show how to store preconfigured bindings on the GPU side.
 
 #header; Vertex Array Objects
 
-Specifying attributes for each mesh each rendering pass can be costly, but there is a way to avoid that penalty - Vertex Array Object to the rescue:
+Specifying attributes for each mesh each rendering pass can be costly, but there is a way to avoid that penalty. With Vertex Array Object I can predefine the bindings beforehand:
 #include; def; common_gl/com.blaster.gl.GlMesh::createVAO
 
-Vertex Array Object (or VAO) will hold all the necessary bindings on the GPU side after we specify it once. Next time we need to define the mesh - we can bind the VAO, and all of the bindings will be restored.
+Vertex Array Object (or VAO) will hold all the necessary bindings on the GPU side after we specify it once. Next time we need to define the mesh - we can bind the VAO, and it will restore all bindings.
+
+Let us see, how geometry can be rendered with my code.
 
 #header; Rendering the mesh
 
-After all of the bindings are established, rendering of the mesh is a straightforward task:
+After all of the bindings are established, rendering of the mesh is a straightforward task. We only need to pass which type of geometry we want to output - in most cases, GL_TRIANGLES.
 #include; def; common_gl/com.blaster.gl.GlMesh::draw
-
-We need to pass which type of geometry we want to output - in most cases GL_TRIANGLES.
 
 There is one more call for instanced draws - this one accepts multiple instances to render:
 #include; def; common_gl/com.blaster.gl.GlMesh::drawInstanced
 
-"Teapots in Space". Author unknown.
+"Teapots in Space." Author unknown.
 #picture; Teapots in Space; http://gzozulin.com/wp-content/uploads/2020/02/teapots.gif
 
 #header; Procedural example
 
-Quite frequently there is a need for simple procedurally defined meshes: quads, triangles.
+Quite frequently there is a need for simple procedurally defined meshes: quads, triangles:
 #include; def; common_gl/com.blaster.gl.GlMesh::rect
 #include; def; common_gl/com.blaster.gl.GlMesh::triangle
 
-I can reuse those across the codebase.
+That can serve as a good example of the classes mentioned above in a typical situation.
 
-That is all for today, folks, see you next time!)
+In this post, I outlined the primary classes, which simplify geometry operations in my code. I always prefer a little bit of abstraction over low-level native calls on the spot. It simplifies the understanding of the logic by breaking down the scene into familiar pieces.
+
+That is all for today, folks, thank you for your time and hope to see you next time!)
