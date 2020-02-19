@@ -22,6 +22,7 @@ private val slashRegex = "/".toRegex()
 class MeshLib (private val assetStream: AssetStream) {
 
     fun loadMesh(meshFilename: String): Pair<GlMesh, aabb> {
+        // Storage for everything
         val aabb = aabb()
         val positionList = mutableListOf<Float>()
         val texCoordList = mutableListOf<Float>()
@@ -30,6 +31,7 @@ class MeshLib (private val assetStream: AssetStream) {
         val texCoords = mutableListOf<Float>()
         val normals = mutableListOf<Float>()
         val indicesList = mutableListOf<Int>()
+        // Reading file line by line
         val inputStream = assetStream.openAsset(meshFilename)
         val bufferedReader = BufferedReader(InputStreamReader(inputStream, Charset.defaultCharset()))
         bufferedReader.use {
@@ -40,6 +42,7 @@ class MeshLib (private val assetStream: AssetStream) {
                 line = bufferedReader.readLine()
             }
         }
+        // Copying to appropriate buffers and sending to GPU memory
         val positionBuff = toByteBufferFloat(positions)
         val texCoordBuff = toByteBufferFloat(texCoords)
         val normalBuff = toByteBufferFloat(normals)
@@ -113,16 +116,19 @@ class MeshLib (private val assetStream: AssetStream) {
                              texCoords: MutableList<Float>,
                              normals: MutableList<Float>,
                              indicesList: MutableList<Int>) {
+        // Splitting the line: ind1/ind2/ind3/...
         val split = line.split(whitespaceRegex)
         val verticesCnt = split.size - 1
         val indices = ArrayList<Int>()
         var nextIndex = positions.size / 3
+        // Adding each vertex
         for (vertex in 0 until verticesCnt) {
-            addVertex(aabb, split[vertex + 1], positionList, texCoordList,
-                    normalList, positions, texCoords, normals)
+            addVertex(aabb, split[vertex + 1],
+                    positionList, texCoordList, normalList, positions, texCoords, normals)
             indices.add(nextIndex)
             nextIndex++
         }
+        // Adding each triangle for the face
         val triangleCnt = verticesCnt - 2
         for (triangle in 0 until triangleCnt) {
             addTriangle(indices[0], indices[triangle + 1], indices[triangle + 2], indicesList)
@@ -145,6 +151,7 @@ class MeshLib (private val assetStream: AssetStream) {
         positions.add(vy)
         positions.add(vz)
         updateAabb(aabb, vx, vy, vz)
+        // In case if we do not have texture coordinates, just using 1,1
         if (texCoordList.isNotEmpty()) {
             val texIndex = vertSplit[1].toInt()  - 1
             texCoords.add(texCoordList[texIndex  * 2 + 0])
@@ -153,6 +160,7 @@ class MeshLib (private val assetStream: AssetStream) {
             texCoords.add(1f)
             texCoords.add(1f)
         }
+        // If we do not have normals, using up direction
         if (normalList.isNotEmpty()) {
             val normIndex = vertSplit[2].toInt() - 1
             normals.add(normalList[normIndex * 3 + 0])

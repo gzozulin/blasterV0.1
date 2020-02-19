@@ -1,57 +1,66 @@
-OBJ (or .OBJ) is a geometry definition file format first developed by Wavefront Technologies for its Advanced Visualizer animation package. The file format is open and has been adopted by other 3D graphics application vendors.
+Obj file (*.obj) is a geometry definition format that was developed by Wavefront Technologies. Since then, the format became open and has been widely adopted by other 3D visualization packages and even games \1\.
+#cite; 1; Wavefront .obj file; https://en.wikipedia.org/wiki/Wavefront_.obj_file
 
-History and resources (ref to wiki, paul burke)
+Why is it so popular? I think it is because of its simplicity. The format doesn't hold any information about animations - therefore, it is approachable even by beginners.
+
+Right from a getgo, I would like to point out that my take on the parsing of it is very far from being complete. I am using only geometry representation. The material system of the format is a bit outdated and inflexible. I also steer clear from any advanced concepts, like negative indices, smoothing groups, etc. - that makes the code hard to read and the models hard to reuse. If you are interested in a detailed explanation, there are great resources out there \2\.
+#cite; 2; Object Files (.obj) by Paul Bourke; http://paulbourke.net/dataformats/obj/
+
+Let us jump into the implementation!
+
+#picture; Physics-Based Lantern; http://gzozulin.com/wp-content/uploads/2020/02/miramar2.gif
 
 #content; In this post
 
-Cut down version - no materials, no animations, no smoothness - just geometry.
-
-#picture; Physics Based Lantern; http://gzozulin.com/wp-content/uploads/2020/02/miramar2.gif
-
 #header; The first inefficiency
 
-Unknown number of indices - cannot preallocate buffers:
-
+My implementation is not just incomplete - it is not very efficient as well :)
+The first problem with my approach is that I do not know how many vertices/indices file contains - therefore I cannot preallocate buffers beforehand and have to copy information from lists:
 #include; def; common_gl/com.blaster.assets.MeshLib::loadMesh
 
 #header; The second inefficiency
 
-Using regex while parsing:
+The second problem with my approach is that I am relying heavily on RegEx. While being more precise, Regular Expressions will sure take its sweet time while parsing. Here I am extracting information about positions, texture coordinates and normals from lines:
 
 #include; def; common_gl/com.blaster.assets.MeshLib::parsePosition
 #include; def; common_gl/com.blaster.assets.MeshLib::parseTexCoordinate
 #include; def; common_gl/com.blaster.assets.MeshLib::parseNormal
 
+Let us see how I am deciding how to parse each line.
+
 #header; The only efficiency
 
-Switching between branches by the character
+Probably the only thing which is done right, is that I am switching between branches by characters. Characters will be unique for each case: v - vertex, vt - texture coordinate, vn - normal, f - face, and so on:
 
 #include; def; common_gl/com.blaster.assets.MeshLib::parseLine
 #include; def; common_gl/com.blaster.assets.MeshLib::parseVertexAttribute
 
 #header; The third inefficiency
 
-Lots of data copying
+As I already mentioned, there are flaws in my parser, but this one is big :)
+
+When I am traversing the file for the first time, I accumulate indexed vertex attributes into the lists. After the parsing is done, I am constructing each vertex from the information in listings. There is quite a lot of copying here.
 
 #include; def; common_gl/com.blaster.assets.MeshLib::parsePolygon
 #include; def; common_gl/com.blaster.assets.MeshLib::addVertex
+
+Adding indices for triangle is straightforward:
 #include; def; common_gl/com.blaster.assets.MeshLib::addTriangle
 
 #header; Small bonus
-
-Calculating aabb while parsing
+While parsing the mesh, it is a good time to construct the Axis Aligned Bounding Box (AABB) for it. AABB can be handy: for example, you can calculate the position of the camera at the start of the app so that the whole object will fit in viewing frustum. But the more convenient usage is, of course, for scene partitioning.
 #include; def; common_gl/com.blaster.assets.MeshLib::updateAabb
 
 #header; Free stuff!
 
-Resources with free models.
+While working on the code for Blaster, I found out that there are quite a lot of places where you can look for free models. Here are my top 3 choices:
 
-~ 3D Models for Professionals - Turbosquid \1\
-#cite; 1; 3D Models for Professionals; https://www.turbosquid.com/
+~ [3D Models for Professionals - Turbosquid; https://www.turbosquid.com/]
+~ [Free 3D Models and Commercial Use 3D Models at great prices - Free3d; https://free3d.com/]
+~ [Publish and find 3D Models online - Sketchfab; https://sketchfab.com/]
 
-~ Free 3D Models and Commercial Use 3D Models at great prices - Free3d \2\
-#cite; 2; Free 3D Models and Commercial Use 3D Models at great prices; https://free3d.com/
+There are even rigged and PBR ready models available for noncommercial use. It will not be enough to help Bethesda to fix Fallout, but it is a great way to find resources for a personal hobby.
 
-~ Publish and find 3D Models online - Sketchfab \3\
-#cite; 3; Publish and find 3D Models online; https://sketchfab.com/
+Anyway, in this post, I wanted to overview the parsing of meshes for Blaster. It is not elaborate, and I am okay with that for now. I think it is more important to leave yourself room for improvement instead of trying to do a production-ready solution from the start.
 
+I hope you liked the material and I will be back soon with more!

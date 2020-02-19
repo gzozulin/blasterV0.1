@@ -14,6 +14,7 @@ import com.blaster.techniques.MAX_LIGHTS
 import com.blaster.techniques.SkyboxTechnique
 import org.joml.Matrix4f
 import org.joml.Vector2f
+import org.lwjgl.glfw.GLFW
 
 private val vecUp = vec3().up()
 private val colorWhite = color().white()
@@ -29,19 +30,21 @@ private val camera = Camera()
 private val controller = Controller(velocity = 0.05f, position = vec3(0f, 2.5f, 4f))
 private val wasdInput = WasdInput(controller)
 
+private val masternode = Node<GlMesh>()
+
 private val light = Light(vec3(25f), true)
-private val lightMasternode = Node<GlMesh>()
 private val lightNode1 = Node(payload = light).setPosition(vec3(3f))
 private val lightNode2 = Node(payload = light).setPosition(vec3(-3f, 3f, -3f))
 
-private lateinit var mandalorian: GlMesh
-private lateinit var mandalorianMaterial: PbrMaterial
-private lateinit var mandalorianNode: Node<GlMesh>
+private lateinit var model: GlMesh
+private lateinit var pbrMaterial: PbrMaterial
+private lateinit var meshNode: Node<GlMesh>
 
 private val immediateTechnique = ImmediateTechnique()
 private val skyboxTechnique = SkyboxTechnique()
 
 private var mouseControl = false
+private var showImmediate = false
 
 class PbrTechnique {
     private lateinit var program: GlProgram
@@ -99,9 +102,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         pbrTechnique.create()
         skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/miramar")
         val (mesh, aabb) = meshLib.loadMesh("models/lantern/lantern.obj")
-        mandalorian = mesh
-        mandalorianMaterial = texturesLib.loadPbr("models/lantern", "jpg")
-        mandalorianNode = Node(parent = lightMasternode, payload = mandalorian).setScale(aabb.scaleTo(5f))
+        model = mesh
+        pbrMaterial = texturesLib.loadPbr("models/lantern", "jpg")
+        meshNode = Node(parent = masternode, payload = model).setScale(aabb.scaleTo(5f))
     }
 
     override fun onResize(width: Int, height: Int) {
@@ -112,7 +115,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun onTick() {
         GlState.clear()
-        lightMasternode.rotate(vecUp, 0.01f)
+        masternode.rotate(vecUp, 0.01f)
         controller.apply { position, direction ->
             camera.setPosition(position)
             camera.lookAlong(direction)
@@ -127,10 +130,12 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                     pbrTechnique.light(lightNode2.payload(), lightNode2.calculateM())
                 },
                 meshes = {
-                    pbrTechnique.instance(mandalorianNode.payload(), mandalorianNode.calculateM(), mandalorianMaterial)
+                    pbrTechnique.instance(meshNode.payload(), meshNode.calculateM(), pbrMaterial)
                 })
-        //immediateTechnique.marker(camera, lightNode1.calculateM(), colorWhite)
-        //immediateTechnique.marker(camera, lightNode2.calculateM(), colorWhite)
+        if (showImmediate) {
+            immediateTechnique.marker(camera, lightNode1.calculateM(), colorWhite)
+            immediateTechnique.marker(camera, lightNode2.calculateM(), colorWhite)
+        }
     }
 
     override fun onCursorDelta(delta: Vector2f) {
@@ -149,6 +154,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun keyPressed(key: Int) {
         wasdInput.keyPressed(key)
+        if (key == GLFW.GLFW_KEY_SPACE) {
+            showImmediate = !showImmediate
+        }
     }
 
     override fun keyReleased(key: Int) {
