@@ -14,17 +14,22 @@ Let us jump into the implementation!
 
 #header; The first inefficiency
 
-My implementation is not just incomplete - it is not very efficient as well :)
+My implementation is not just incomplete - it is not very efficient as well :) But let us see the code first.
+
+To avoid lengthy function declarations, I have an internal representation of an intermediate result. This class contains all of the parsed data for the mesh:
+#include; def; common_gl/com.blaster.assets.MeshLib::Intermediate
+
 The first problem with my approach is that I do not know how many vertices/indices file contains - therefore I cannot preallocate buffers beforehand and have to copy information from lists:
 #include; def; common_gl/com.blaster.assets.MeshLib::loadMesh
 
 #header; The second inefficiency
 
-The second problem with my approach is that I am relying heavily on RegEx. While being more precise, Regular Expressions will sure take its sweet time while parsing. Here I am extracting information about positions, texture coordinates and normals from lines:
+The second problem with my approach is that I am relying heavily on RegEx, even for simple things:
+#include; def; common_gl/com.blaster.assets.MeshLib::slashRegex
+
+While being more precise, Regular Expressions will sure take its sweet time while parsing. Here I am extracting information about positions, for example:
 
 #include; def; common_gl/com.blaster.assets.MeshLib::parsePosition
-#include; def; common_gl/com.blaster.assets.MeshLib::parseTexCoordinate
-#include; def; common_gl/com.blaster.assets.MeshLib::parseNormal
 
 Let us see how I am deciding how to parse each line.
 
