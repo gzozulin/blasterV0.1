@@ -3,8 +3,8 @@ package com.blaster.techniques
 import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.aux.mat3
-import com.blaster.aux.mat4
+import com.blaster.auxiliary.mat3
+import com.blaster.auxiliary.mat4
 import com.blaster.gl.GlProgram
 import com.blaster.gl.GlTexture
 import com.blaster.gl.GlUniform

@@ -1,7 +1,7 @@
 package com.blaster.impl
 
 import com.blaster.assets.*
-import com.blaster.aux.*
+import com.blaster.auxiliary.*
 import com.blaster.entity.*
 import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow

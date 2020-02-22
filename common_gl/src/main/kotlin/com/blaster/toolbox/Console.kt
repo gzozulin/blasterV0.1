@@ -1,6 +1,6 @@
 package com.blaster.toolbox
 
-import com.blaster.aux.parseColor
+import com.blaster.auxiliary.parseColor
 import org.joml.Vector2f
 import org.joml.Vector3f
 

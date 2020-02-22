@@ -4,7 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.aux.*
+import com.blaster.auxiliary.*
 import com.blaster.toolbox.MultiListener
 import com.blaster.toolbox.SceneDiffer
 import com.blaster.toolbox.SceneReader

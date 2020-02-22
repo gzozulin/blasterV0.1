@@ -1,8 +1,8 @@
 package com.blaster.entity
 
-import com.blaster.aux.down
-import com.blaster.aux.up
-import com.blaster.aux.vec3
+import com.blaster.auxiliary.down
+import com.blaster.auxiliary.up
+import com.blaster.auxiliary.vec3
 import org.joml.Math
 import org.joml.Vector3f
 import kotlin.math.cos

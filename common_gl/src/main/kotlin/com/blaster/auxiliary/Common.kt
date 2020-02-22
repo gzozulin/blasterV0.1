@@ -1,4 +1,4 @@
-package com.blaster.aux
+package com.blaster.auxiliary
 
 import org.joml.*
 import java.lang.Math

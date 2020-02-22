@@ -1,9 +1,9 @@
 package com.blaster.assets
 
-import com.blaster.aux.aabb
-import com.blaster.aux.fail
-import com.blaster.aux.toByteBufferFloat
-import com.blaster.aux.toByteBufferInt
+import com.blaster.auxiliary.aabb
+import com.blaster.auxiliary.fail
+import com.blaster.auxiliary.toByteBufferFloat
+import com.blaster.auxiliary.toByteBufferInt
 import com.blaster.gl.GlAttribute
 import com.blaster.gl.GlBuffer
 import com.blaster.gl.GlLocator

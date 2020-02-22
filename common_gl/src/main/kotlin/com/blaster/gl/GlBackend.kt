@@ -1,7 +1,7 @@
 package com.blaster.gl
 
-import com.blaster.aux.color
-import com.blaster.aux.vec3
+import com.blaster.auxiliary.color
+import com.blaster.auxiliary.vec3
 import java.nio.ByteBuffer
 
 class GlLocator {

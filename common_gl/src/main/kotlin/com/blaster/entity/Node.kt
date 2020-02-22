@@ -1,6 +1,6 @@
 package com.blaster.entity
 
-import com.blaster.aux.*
+import com.blaster.auxiliary.*
 
 private val vecUp = vec3().up()
 

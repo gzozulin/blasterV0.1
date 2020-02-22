@@ -1,6 +1,6 @@
 package com.blaster.toolbox
 
-import com.blaster.aux.*
+import com.blaster.auxiliary.*
 import com.blaster.entity.Marker
 import java.io.BufferedReader
 import java.io.InputStream

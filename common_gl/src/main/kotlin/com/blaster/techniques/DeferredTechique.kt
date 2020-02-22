@@ -1,7 +1,7 @@
 package com.blaster.techniques
 
 import com.blaster.assets.ShadersLib
-import com.blaster.aux.vec3
+import com.blaster.auxiliary.vec3
 import com.blaster.gl.*
 import com.blaster.entity.Camera
 import com.blaster.entity.Light

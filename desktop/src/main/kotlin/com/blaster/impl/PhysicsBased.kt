@@ -4,7 +4,7 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.MeshLib
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
-import com.blaster.aux.*
+import com.blaster.auxiliary.*
 import com.blaster.entity.*
 import com.blaster.gl.*
 import com.blaster.platform.LwjglWindow

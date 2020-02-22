@@ -4,9 +4,9 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.toolbox.Console
-import com.blaster.aux.center
-import com.blaster.aux.lerpf
-import com.blaster.aux.mat4
+import com.blaster.auxiliary.center
+import com.blaster.auxiliary.lerpf
+import com.blaster.auxiliary.mat4
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow

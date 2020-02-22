@@ -3,8 +3,8 @@ package com.blaster.gl
 import android.opengl.GLES11
 import android.opengl.GLES30
 import android.opengl.GLU
-import com.blaster.aux.color
-import com.blaster.aux.vec3
+import com.blaster.auxiliary.color
+import com.blaster.auxiliary.vec3
 import java.nio.ByteBuffer
 
 class GlBackendImpl : GlBackend {

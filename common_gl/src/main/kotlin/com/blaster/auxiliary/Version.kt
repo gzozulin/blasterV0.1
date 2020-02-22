@@ -1,4 +1,4 @@
-package com.blaster.aux
+package com.blaster.auxiliary
 
 data class Version(private var version: Long = 0L, private var last: Long = Long.MAX_VALUE) {
 
