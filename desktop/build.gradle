@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'org.jetbrains.kotlin.jvm'
+    id "org.jetbrains.kotlin.kapt"
 }
 
 sourceCompatibility = "7"
@@ -32,8 +33,11 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    compile "org.lwjgl:lwjgl:${lwjglVersion}"
-    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-windows"
-    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-linux"
-    compile "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
+    implementation "org.lwjgl:lwjgl:${lwjglVersion}"
+    implementation "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-windows"
+    implementation "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-linux"
+    implementation "org.lwjgl:lwjgl-platform:${lwjglVersion}:natives-osx"
+
+    implementation "org.openjdk.jmh:jmh-core:1.19"
+    implementation "org.openjdk.jmh:jmh-generator-annprocess:1.19"
 }

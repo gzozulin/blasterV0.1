@@ -10,6 +10,7 @@
       <w>shaders</w>
       <w>texcoord</w>
       <w>vert</w>
+      <w>warmup</w>
     </words>
   </dictionary>
 </component>
