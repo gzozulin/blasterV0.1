@@ -7,15 +7,11 @@ import kotlin.system.measureNanoTime
 private const val CNT = 5000000
 private const val CNT_WARMUP = (CNT * 0.1).toInt()
 
-data class AllocatingVec(val x: Float = 0f,
-                         val y: Float = 0f,
-                         val z: Float = 0f) {
-    fun cross(allocating: AllocatingVec): AllocatingVec {
-        return AllocatingVec(
-                y * allocating.z - z * allocating.y,
-                z * allocating.x - x * allocating.z,
-                x * allocating.y - y * allocating.x)
-    }
+data class AllocatingVec(val x: Float, val y: Float, val z: Float) {
+    fun cross(allocating: AllocatingVec) = AllocatingVec(
+            y * allocating.z - z * allocating.y,
+            z * allocating.x - x * allocating.z,
+            x * allocating.y - y * allocating.x)
 }
 
 val vectors1 = mutableListOf<vec3>()
