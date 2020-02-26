@@ -59,6 +59,11 @@ data class Camera(
         viewVersion.increment()
     }
 
+    fun rotate(angle: Float, axis: vec3) {
+        rotation.rotateAxis(angle, axis)
+        viewVersion.increment()
+    }
+
     fun lookAlong(direction: vec3) {
         rotation.identity().lookAlong(direction, vecUp)
         viewVersion.increment()
