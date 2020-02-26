@@ -1,0 +1,49 @@
+Hello, and welcome to Greg's Journal!
+
+Intro and giffy goes here
+
+#cite; 1; Skybox on Wikipedia; https://en.wikipedia.org/wiki/Skybox_(video_games)
+
+#picture; Physics-Based Lantern; http://gzozulin.com/wp-content/uploads/2020/02/miramar2.gif
+
+#content; In this post
+
+#header; Cube mapping
+
+#cite; 2; Cube mapping on Wikipedia; https://en.wikipedia.org/wiki/Cube_mapping
+
+#include; decl; common_gl/com.blaster.gl.GlTexture::GlTexData
+#include; def; common_gl/com.blaster.gl.GlTexture::loadCubemap
+
+#header; Cube object itself
+#include; glsl; common_assets/src/main/resources/models/cube/cube.obj
+
+#header; Skybox technique
+
+#include; def; common_gl/com.blaster.techniques.SkyboxTechnique::create
+#include; def; common_gl/com.blaster.techniques.SkyboxTechnique::skybox
+
+#header; Skybox shader
+
+#include; glsl; common_assets/src/main/resources/shaders/skybox/skybox.vert
+#include; glsl; common_assets/src/main/resources/shaders/skybox/skybox.frag
+
+#header; Skybox app
+
+#include; def; desktop/com.blaster.impl.Skybox::onCreate
+#include; def; desktop/com.blaster.impl.Skybox::drawSkybox
+
+#header; Loading skyboxes
+
+#include; def; common_gl/com.blaster.assets.TexturesLib::loadSkybox
+
+Mention mirrorings \3\
+#cite; 3; Convention of faces in OpenGL cubemapping; https://stackoverflow.com/questions/11685608/convention-of-faces-in-opengl-cubemapping
+
+#header; Free stuff!
+
+[Quake 3 Arena Skyboxes Collection; https://lvlworld.com/review/id:2023]
+
+#include; glsl; common_assets/skybox.sh
+
+

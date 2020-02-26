@@ -1,0 +1,284 @@
+<html>
+    <style>
+
+        .code,.child {
+                    border-radius: 3px;
+                    display: block;
+                    max-width: 100%;
+                    overflow: auto;
+                    color: #666;
+                    page-break-inside: avoid;
+                    font: normal 15px/1.6 monospace;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                    word-wrap: break-word;
+                }
+
+                .child {
+                    border-radius: 3px;
+                    background: #F1ECEC;
+                    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+                }
+
+                .code {
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                }
+
+                .code_child {
+                    border-radius: 3px;
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                }
+
+                .text {}
+                .text_child {}
+
+                .link {}
+                .link_child {}
+
+                .picture {
+                    display: block;
+                    margin: 30px auto 45px auto;
+                    max-height: 50%;
+                }
+                .picture_child {}
+
+                .list_item {}
+                .list_item_child {}
+    </style>
+    <body>
+        <p class="text">Hello, and welcome to Greg's Journal!
+</p><p class="text">
+</p><p class="text">Intro and giffy goes here
+</p><p class="text">
+</p><p class="text">
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/miramar2.gif" alt="Physics-Based Lantern" align="middle">
+<p class="text">
+</p><h2 id="In-this-post">In this post</h2><ul class="list_item"><li>    <a class="link" href="#Cube-mapping">Cube mapping</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Cube-object-itself">Cube object itself</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Skybox-technique">Skybox technique</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Skybox-shader">Skybox shader</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Skybox-app">Skybox app</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Loading-skyboxes">Loading skyboxes</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Free-stuff-">Free stuff!</a>
+</li></ul><p class="text">
+</p><h2 id="Cube-mapping">Cube mapping</h2>
+<p class="text">
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlTexture.kt#L7" target="_blank">common_gl/com.blaster.gl.GlTexture::GlTexData</a>
+</h3>
+    <pre><code class="lang-kotlin">data class GlTexData(
+        val internalFormat: Int = backend.GL_RGBA, val pixelFormat: Int = backend.GL_RGBA, val pixelType: Int = backend.GL_UNSIGNED_BYTE,
+        val width: Int, val height: Int, val pixels: ByteBuffer?)</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlTexture.kt#L42" target="_blank">common_gl/com.blaster.gl.GlTexture::loadCubemap</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun loadCubemap(sides: List&lt;GlTexData&gt;) {
+    glBind(this) {
+        sides.forEachIndexed { index, side -&gt;
+            glCheck { backend.glTexImage2D(backend.GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, 0,
+                    side.internalFormat, side.width, side.height, 0, side.pixelFormat, side.pixelType, side.pixels) }
+        }
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Cube-object-itself">Cube object itself</h2>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/models/cube/cube.obj" target="_blank">common_assets/src/main/resources/models/cube/cube.obj</a>
+</h3>
+    <pre><code class="lang-c">o cube
+
+v -1.0 -1.0  1.0
+v  1.0 -1.0  1.0
+v -1.0  1.0  1.0
+v  1.0  1.0  1.0
+v -1.0  1.0 -1.0
+v  1.0  1.0 -1.0
+v -1.0 -1.0 -1.0
+v  1.0 -1.0 -1.0
+
+vt 0.0 0.0
+vt 1.0 0.0
+vt 0.0 1.0
+vt 1.0 1.0
+
+vn  0.0  0.0  1.0
+vn  0.0  1.0  0.0
+vn  0.0  0.0 -1.0
+vn  0.0 -1.0  0.0
+vn  1.0  0.0  0.0
+vn -1.0  0.0  0.0
+
+f 1/1/1 2/2/1 3/3/1
+f 3/3/1 2/2/1 4/4/1
+
+f 3/1/2 4/2/2 5/3/2
+f 5/3/2 4/2/2 6/4/2
+
+f 5/4/3 6/3/3 7/2/3
+f 7/2/3 6/3/3 8/1/3
+
+f 7/1/4 8/2/4 1/3/4
+f 1/3/4 8/2/4 2/4/4
+
+f 2/1/5 8/2/5 4/3/5
+f 4/3/5 8/2/5 6/4/5
+
+f 7/1/6 1/2/6 5/3/6
+f 5/3/6 1/2/6 3/4/6</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Skybox-technique">Skybox technique</h2>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SkyboxTechnique.kt#L20" target="_blank">common_gl/com.blaster.techniques.SkyboxTechnique::create</a>
+</h3>
+    <pre><code class="lang-kotlin">fun create(shadersLib: ShadersLib, textureLib: TexturesLib, meshLib: MeshLib, skybox: String) {
+    program = shadersLib.loadProgram(&quot;shaders/skybox/skybox.vert&quot;, &quot;shaders/skybox/skybox.frag&quot;)
+    diffuse = textureLib.loadSkybox(skybox)
+    val (mesh, _) = meshLib.loadMesh(&quot;models/cube/cube.obj&quot;)
+    cube = mesh
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SkyboxTechnique.kt#L30" target="_blank">common_gl/com.blaster.techniques.SkyboxTechnique::skybox</a>
+</h3>
+    <pre><code class="lang-kotlin">fun skybox(camera: Camera) {
+    onlyRotationM.set(camera.calculateViewM())
+    noTranslationM.set(onlyRotationM)
+    glBind(listOf(program, cube, diffuse)) {
+        program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+        program.setUniform(GlUniform.UNIFORM_VIEW_M, noTranslationM)
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+        cube.draw()
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Skybox-shader">Skybox shader</h2>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/skybox/skybox.vert" target="_blank">common_assets/src/main/resources/shaders/skybox/skybox.vert</a>
+</h3>
+    <pre><code class="lang-c">#version 300 es
+
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+
+uniform mat4 uProjectionM;
+uniform mat4 uViewM;
+
+out vec3 vTexCoord;
+
+void main()
+{
+    vTexCoord = aPosition;
+    vec4 pos = uProjectionM * uViewM * vec4(aPosition, 1.0);
+    gl_Position = pos.xyww;
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/skybox/skybox.frag" target="_blank">common_assets/src/main/resources/shaders/skybox/skybox.frag</a>
+</h3>
+    <pre><code class="lang-c">#version 300 es
+
+precision mediump float;
+
+in vec3 vTexCoord;
+
+uniform samplerCube uTexDiffuse;
+
+layout (location = 0) out vec4 oFragColor;
+
+void main()
+{
+    oFragColor = texture(uTexDiffuse, vTexCoord);
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Skybox-app">Skybox app</h2>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Skybox.kt#L29" target="_blank">desktop/com.blaster.impl.Skybox::onCreate</a>
+</h3>
+    <pre><code class="lang-kotlin">override fun onCreate() {
+    skyboxTechnique.create(shadersLib, texturesLib, meshLib, &quot;textures/darkskies&quot;)
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Skybox.kt#L44" target="_blank">desktop/com.blaster.impl.Skybox::drawSkybox</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun drawSkybox() {
+    GlState.drawWithNoCulling {
+        skyboxTechnique.skybox(camera)
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Loading-skyboxes">Loading skyboxes</h2>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/TexturesLib.kt#L17" target="_blank">common_gl/com.blaster.assets.TexturesLib::loadSkybox</a>
+</h3>
+    <pre><code class="lang-kotlin">fun loadSkybox(filename: String, unit: Int = 0): GlTexture {
+    val file = File(filename)
+    val right   = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_rt.jpg&quot;), mirrorX = true, mirrorY = true)
+    val left    = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_lf.jpg&quot;), mirrorX = true, mirrorY = true)
+    val top     = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_up.jpg&quot;), mirrorX = true, mirrorY = true)
+    val bottom  = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_dn.jpg&quot;), mirrorX = true, mirrorY = true)
+    val front   = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_ft.jpg&quot;), mirrorX = true, mirrorY = true)
+    val back    = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_bk.jpg&quot;), mirrorX = true, mirrorY = true)
+    return GlTexture(unit = unit, sides = listOf(
+            GlTexData(width = right.width,  height = right.height,  pixels = right.pixels),
+            GlTexData(width = left.width,   height = left.height,   pixels = left.pixels),
+            GlTexData(width = top.width,    height = top.height,    pixels = top.pixels),
+            GlTexData(width = bottom.width, height = bottom.height, pixels = bottom.pixels),
+            GlTexData(width = front.width,  height = front.height,  pixels = front.pixels),
+            GlTexData(width = back.width,   height = back.height,   pixels = back.pixels)))
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">Mention mirrorings <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup>
+</p><p class="text">
+</p><h2 id="Free-stuff-">Free stuff!</h2>
+<p class="text">
+</p><p class="text">    <a class="link" href="https://lvlworld.com/review/id:2023" target="_blank">Quake 3 Arena Skyboxes Collection</a>
+
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/skybox.sh" target="_blank">common_assets/skybox.sh</a>
+</h3>
+    <pre><code class="lang-c">cd src/main/resources/textures/$1
+mogrify -format jpg *.tga;
+mogrify -rotate 90 $1_up.jpg;
+mogrify -rotate -90 $1_dn.jpg;
+rm *tga</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">
+</p><p class="text">
+</p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
+<a id="1" class="link" href="https://en.wikipedia.org/wiki/Skybox_(video_games)" target="_blank">Skybox on Wikipedia</a></li></ul><ul class="list_item"><li>    <a class="link" href="#2_origin">&#8593;[2]: </a>
+<a id="2" class="link" href="https://en.wikipedia.org/wiki/Cube_mapping" target="_blank">Cube mapping on Wikipedia</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
+<a id="3" class="link" href="https://stackoverflow.com/questions/11685608/convention-of-faces-in-opengl-cubemapping" target="_blank">Convention of faces in OpenGL cubemapping</a></li></ul>
+        <br>
+    </body>
+</html>

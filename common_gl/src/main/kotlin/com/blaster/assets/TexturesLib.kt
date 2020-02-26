@@ -2,6 +2,7 @@ package com.blaster.assets
 
 import com.blaster.entity.PbrMaterial
 import com.blaster.gl.GlTexture
+import com.blaster.gl.GlTexData
 import java.io.File
 
 class TexturesLib (
@@ -15,7 +16,6 @@ class TexturesLib (
 
     fun loadSkybox(filename: String, unit: Int = 0): GlTexture {
         val file = File(filename)
-        // crazy cube map texture coordinates: https://stackoverflow.com/questions/11685608/convention-of-faces-in-opengl-cubemapping
         val right   = pixelDecoder.decodePixels(assetStream.openAsset(filename + "/" + file.name + "_rt.jpg"), mirrorX = true, mirrorY = true)
         val left    = pixelDecoder.decodePixels(assetStream.openAsset(filename + "/" + file.name + "_lf.jpg"), mirrorX = true, mirrorY = true)
         val top     = pixelDecoder.decodePixels(assetStream.openAsset(filename + "/" + file.name + "_up.jpg"), mirrorX = true, mirrorY = true)
@@ -23,12 +23,12 @@ class TexturesLib (
         val front   = pixelDecoder.decodePixels(assetStream.openAsset(filename + "/" + file.name + "_ft.jpg"), mirrorX = true, mirrorY = true)
         val back    = pixelDecoder.decodePixels(assetStream.openAsset(filename + "/" + file.name + "_bk.jpg"), mirrorX = true, mirrorY = true)
         return GlTexture(unit = unit, sides = listOf(
-                GlTexture.TexData(width = right.width,  height = right.height,  pixels = right.pixels),
-                GlTexture.TexData(width = left.width,   height = left.height,   pixels = left.pixels),
-                GlTexture.TexData(width = top.width,    height = top.height,    pixels = top.pixels),
-                GlTexture.TexData(width = bottom.width, height = bottom.height, pixels = bottom.pixels),
-                GlTexture.TexData(width = front.width,  height = front.height,  pixels = front.pixels),
-                GlTexture.TexData(width = back.width,   height = back.height,   pixels = back.pixels)))
+                GlTexData(width = right.width,  height = right.height,  pixels = right.pixels),
+                GlTexData(width = left.width,   height = left.height,   pixels = left.pixels),
+                GlTexData(width = top.width,    height = top.height,    pixels = top.pixels),
+                GlTexData(width = bottom.width, height = bottom.height, pixels = bottom.pixels),
+                GlTexData(width = front.width,  height = front.height,  pixels = front.pixels),
+                GlTexData(width = back.width,   height = back.height,   pixels = back.pixels)))
     }
 
     fun loadPbr(directory: String, extension: String = "png",

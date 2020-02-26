@@ -4,6 +4,10 @@ import java.nio.ByteBuffer
 
 private val backend = GlLocator.locate()
 
+data class GlTexData(
+        val internalFormat: Int = backend.GL_RGBA, val pixelFormat: Int = backend.GL_RGBA, val pixelType: Int = backend.GL_UNSIGNED_BYTE,
+        val width: Int, val height: Int, val pixels: ByteBuffer?)
+
 class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GlBindable {
     var handle: Int? = null
 
@@ -31,11 +35,11 @@ class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : Gl
         }
     }
 
-    data class TexData(
-            val internalFormat: Int = backend.GL_RGBA, val pixelFormat: Int = backend.GL_RGBA, val pixelType: Int = backend.GL_UNSIGNED_BYTE,
-            val width: Int, val height: Int, val pixels: ByteBuffer?)
+    constructor(unit: Int = 0, sides: List<GlTexData>) : this(backend.GL_TEXTURE_CUBE_MAP, unit) {
+        loadCubemap(sides)
+    }
 
-    constructor(unit: Int = 0, sides: List<TexData>) : this(backend.GL_TEXTURE_CUBE_MAP, unit) {
+    private fun loadCubemap(sides: List<GlTexData>) {
         glBind(this) {
             sides.forEachIndexed { index, side ->
                 glCheck { backend.glTexImage2D(backend.GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, 0,
