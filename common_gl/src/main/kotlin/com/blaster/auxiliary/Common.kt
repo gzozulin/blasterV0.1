@@ -17,6 +17,7 @@ typealias mat3 = Matrix3f
 typealias mat4 = Matrix4f
 typealias quat = Quaternionf
 typealias aabb = AABBf
+typealias ray = Rayf
 
 private val random = Random()
 
