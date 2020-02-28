@@ -138,6 +138,7 @@ interface GlBackend {
     fun glDeleteTextures(handle: Int)
     fun glBindTexture(target: Int, texture: Int)
     fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?)
+    fun glTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, type: Int, pixels: ByteBuffer)
     fun glTexParameteri(target: Int, pname: Int, param: Int)
     fun glActiveTexture(texture: Int)
     fun glMapBuffer(target: Int, access: Int, oldBuffer: ByteBuffer): ByteBuffer

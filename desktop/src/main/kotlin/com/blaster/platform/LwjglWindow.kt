@@ -170,7 +170,7 @@ abstract class LwjglWindow(
     }
 
     protected abstract fun onCreate()
-    protected abstract fun onResize(width: Int, height: Int)
+    protected open fun onResize(width: Int, height: Int) {}
     protected abstract fun onTick()
 
     open fun mouseBtnPressed(btn: Int) {}

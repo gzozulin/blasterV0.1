@@ -151,6 +151,8 @@ class GlBackendImpl : GlBackend {
     override fun glBindTexture(target: Int, texture: Int) = GL11.glBindTexture(target, texture)
     override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?) =
         GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
+    override fun glTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, type: Int, pixels: ByteBuffer) =
+            GL11.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels)
     override fun glTexParameteri(target: Int, pname: Int, param: Int) = GL11.glTexParameteri(target, pname, param)
     override fun glActiveTexture(texture: Int) = GL13.glActiveTexture(texture)
     override fun glMapBuffer(target: Int, access: Int, oldBuffer: ByteBuffer) =

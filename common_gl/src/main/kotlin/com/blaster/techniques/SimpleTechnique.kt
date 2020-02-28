@@ -1,6 +1,7 @@
 package com.blaster.techniques
 
 import com.blaster.assets.ShadersLib
+import com.blaster.auxiliary.mat4
 import com.blaster.gl.*
 import com.blaster.entity.Camera
 import com.blaster.gl.GlMesh
@@ -17,12 +18,16 @@ class SimpleTechnique {
     }
 
     // While drawing, we pass the uniforms for the whole pass
-    fun draw(camera: Camera, draw: () -> Unit) {
+    fun draw(viewM: mat4, projectionM: mat4, draw: () -> Unit) {
         glBind(listOf(program)) {
-            program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
-            program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+            program.setUniform(GlUniform.UNIFORM_VIEW_M, viewM)
+            program.setUniform(GlUniform.UNIFORM_PROJ_M, projectionM)
             draw.invoke()
         }
+    }
+
+    fun draw(camera: Camera, draw: () -> Unit) {
+        draw(camera.calculateViewM(), camera.projectionM, draw)
     }
 
     fun instance(model: Model, modelM: Matrix4f) {

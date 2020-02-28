@@ -86,6 +86,7 @@ data class Controller(
         forward.x = cos(yaw) * cos(pitch)
         forward.y = sin(pitch)
         forward.z = sin(yaw) * cos(pitch)
+        forward.normalize()
     }
 
     fun apply(apply: (position: Vector3f, direction: Vector3f) -> Unit) {

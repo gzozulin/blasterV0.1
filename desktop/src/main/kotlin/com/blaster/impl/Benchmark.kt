@@ -14,10 +14,10 @@ data class AllocatingVec(val x: Float, val y: Float, val z: Float) {
             x * allocating.y - y * allocating.x)
 }
 
-val vectors1 = mutableListOf<vec3>()
-val vectors2 = mutableListOf<vec3>()
-val vectors3 = mutableListOf<vec3>()
-val vectorsResult = mutableListOf<vec3>()
+private val vectors1 = mutableListOf<vec3>()
+private val vectors2 = mutableListOf<vec3>()
+private val vectors3 = mutableListOf<vec3>()
+private val vectorsResult = mutableListOf<vec3>()
 
 fun generateVectors() {
     for (i in 0..CNT) {
@@ -45,10 +45,10 @@ fun benchmarkVectors() {
     }
 }
 
-val others1 = mutableListOf<AllocatingVec>()
-val others2 = mutableListOf<AllocatingVec>()
-val others3 = mutableListOf<AllocatingVec>()
-val othersResult = mutableListOf<AllocatingVec>()
+private val others1 = mutableListOf<AllocatingVec>()
+private val others2 = mutableListOf<AllocatingVec>()
+private val others3 = mutableListOf<AllocatingVec>()
+private val othersResult = mutableListOf<AllocatingVec>()
 
 fun generateOthers() {
     for (i in 0..CNT) {

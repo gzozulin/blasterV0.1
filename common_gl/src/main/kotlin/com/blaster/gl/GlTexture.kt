@@ -48,6 +48,12 @@ class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : Gl
         }
     }
 
+    fun updatePixels(xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, type: Int, pixels: ByteBuffer) {
+        glBind(this) {
+            glCheck { backend.glTexSubImage2D(target, 0, xoffset, yoffset, width, height, format, type, pixels) }
+        }
+    }
+
     fun free() {
         glCheck { backend.glDeleteTextures(handle!!) }
         handle = null

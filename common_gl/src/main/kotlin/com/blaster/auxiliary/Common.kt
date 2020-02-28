@@ -29,6 +29,7 @@ fun degf(radians: Float) = Math.toDegrees(radians.toDouble()).toFloat()
 fun sinf(value: Float) = sin(value.toDouble()).toFloat()
 fun cosf(value: Float) = cos(value.toDouble()).toFloat()
 fun lerpf(from: Float, to: Float, t: Float) = (1f - t) * from + t * to
+fun powf(base: Float, p: Float) = Math.pow(base.toDouble(), p.toDouble()).toFloat()
 
 fun randf(min: Float = Float.MIN_VALUE, max: Float = Float.MAX_VALUE) = min + random.nextFloat() * (max - min)
 fun randi(min: Int = Integer.MIN_VALUE, max: Int = Integer.MAX_VALUE) = random.nextInt((max - min) + 1) + min
@@ -63,6 +64,10 @@ fun parseColor(hex: String): color {
     val bIntValue = (integerHex            ) % 256
     return color(rIntValue / 255.0f, gIntValue / 255.0f, bIntValue / 255.0f)
 }
+
+fun ray.origin() = vec3(oX, oY, oZ)
+fun ray.dir() = vec3(dX, dY, dZ)
+fun ray.pointAt(t: Float) = dir().mul(t).add(oX, oY, oZ)
 
 // region -------------------------- AABB --------------------------
 
