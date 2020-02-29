@@ -65,9 +65,9 @@ fun parseColor(hex: String): color {
     return color(rIntValue / 255.0f, gIntValue / 255.0f, bIntValue / 255.0f)
 }
 
-fun ray.origin() = vec3(oX, oY, oZ)
-fun ray.dir() = vec3(dX, dY, dZ)
-fun ray.pointAt(t: Float) = dir().mul(t).add(oX, oY, oZ)
+fun vec3.asOrigin(ray: ray): vec3 = set(ray.oX, ray.oY, ray.oZ)
+fun vec3.asDirection(ray: ray): vec3 = set(ray.dX, ray.dY, ray.dZ)
+fun vec3.pointAt(t: Float, ray: ray): vec3 = set(ray.dX, ray.dY, ray.dZ).mul(t).add(ray.oX, ray.oY, ray.oZ)
 
 // region -------------------------- AABB --------------------------
 
