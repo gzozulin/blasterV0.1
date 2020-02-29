@@ -11,15 +11,14 @@ import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.SimpleTechnique
-import org.joml.Vector2f
+import org.joml.Intersectionf
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import kotlin.math.sqrt
 
 private val backend = GlLocator.locate()
 
-private const val VIEWPORT_WIDTH = 800
-private const val VIEWPORT_HEIGHT = 600
+private const val VIEWPORT_WIDTH = 640
+private const val VIEWPORT_HEIGHT = 480
 
 private const val VIEWPORT_LEFT = -VIEWPORT_WIDTH / 2f
 private const val VIEWPORT_BOTTOM = -VIEWPORT_HEIGHT / 2f
@@ -42,7 +41,7 @@ private class RtrCamera {
         basisY.normalize()
     }
 
-    fun ray(x: Int, y: Int): ray {
+    fun ray(x: Float, y: Float): ray {
         val u = VIEWPORT_LEFT + x + 0.5f
         val v = VIEWPORT_BOTTOM + y + 0.5f
         val direction = vec3(direction).mul(FOCUS_DISTANCE)
@@ -62,23 +61,18 @@ private interface Hitable {
     fun hit(ray: ray, t0: Float, t1: Float): HitResult?
 }
 
-private class Sphere(private val center: vec3, private val radius: Float, private val material: RtrMaterial) : Hitable {
+private class HitableSphere(private val center: vec3, private val radius: Float, private val material: RtrMaterial) : Hitable {
+
+    private val sphere = sphere(center, radius)
+
     override fun hit(ray: ray, t0: Float, t1: Float): HitResult? {
-        val ec = vec3().asOrigin(ray).sub(center)
-        val d = vec3().asDirection(ray)
-        val d2 = d.dot(d)
-        val discriminant = powf(d.dot(ec), 2f) - d2 * (ec.dot(ec) - powf(radius, 2f))
-        if (discriminant > 0) {
-            val discriminantSqrt = sqrt(discriminant)
-            val b2 = -d.dot(ec)
-            var t = (b2 - discriminantSqrt) / d2
-            if (t in t0..t1) {
-                // lower t means closer to the origin
-                return hitResult(t, ray)
+        val result = vec2()
+        if (Intersectionf.intersectRaySphere(ray, sphere, result)) {
+            if (result.x in t0..t1) {
+                return hitResult(result.x, ray)
             }
-            t = (b2 + discriminantSqrt) / d2
-            if (t in t0..t1) {
-                return hitResult(t, ray)
+            if (result.y in t0..t1) {
+                return hitResult(result.y, ray)
             }
         }
         return null
@@ -93,7 +87,7 @@ private class Sphere(private val center: vec3, private val radius: Float, privat
 
 private val upVec = vec3().up()
 private val viewM = mat4().identity()
-private val projectionM = mat4().ortho(-1f, 1f, -1f, 1f, 1f, -1f)
+private val projectionM = mat4().identity()
 private val modelM = mat4().identity()
 
 private var mouseControl = false
@@ -112,7 +106,29 @@ private val viewportBuffer = ByteBuffer.allocateDirect(VIEWPORT_WIDTH * VIEWPORT
 
 private val simpleTechnique = SimpleTechnique()
 
-private val scene = Sphere(vec3(0f, 0f, -11f), 10f, RtrMaterial())
+private val scene = HitableSphere(vec3(0f, 0f, -20f), 19.9f, RtrMaterial())
+
+private fun updateRegion(xOffset: Int, yOffset: Int, width: Int, height: Int, xStep: Int, yStep: Int) {
+    viewportBuffer.rewind()
+    for (y in VIEWPORT_HEIGHT - 1 downTo 0) {
+        for (x in 0 until VIEWPORT_WIDTH) {
+            val ray = camera.ray(x.toFloat(), y.toFloat())
+            val result = scene.hit(ray, 0f, Float.MAX_VALUE)
+            if (result != null) {
+                viewportBuffer.put(127)
+                viewportBuffer.put(0)
+                viewportBuffer.put(0)
+            } else {
+                viewportBuffer.put(0)
+                viewportBuffer.put(0)
+                viewportBuffer.put(127)
+            }
+        }
+    }
+    viewportBuffer.position(0)
+    viewportTexture.updatePixels(xoffset = 0, yoffset = 0, width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
+            format = backend.GL_RGB, type = backend.GL_UNSIGNED_BYTE, pixels = viewportBuffer)
+}
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
@@ -126,26 +142,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     }
 
     private fun renderScene() {
-        viewportBuffer.rewind()
         camera.updateBasis()
-        for (y in VIEWPORT_HEIGHT - 1 downTo 0) {
-            for (x in 0 until VIEWPORT_WIDTH) {
-                val ray = camera.ray(x, y)
-                val result = scene.hit(ray, 0f, Float.MAX_VALUE)
-                if (result != null) {
-                    viewportBuffer.put(127)
-                    viewportBuffer.put(0)
-                    viewportBuffer.put(0)
-                } else {
-                    viewportBuffer.put(0)
-                    viewportBuffer.put(0)
-                    viewportBuffer.put(0)
-                }
-            }
-        }
-        viewportBuffer.position(0)
-        viewportTexture.updatePixels(xoffset = 0, yoffset = 0, width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
-                format = backend.GL_RGB, type = backend.GL_UNSIGNED_BYTE, pixels = viewportBuffer)
+        updateRegion(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, 1)
     }
 
     override fun onTick() {
@@ -157,7 +155,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         }
     }
 
-    override fun onCursorDelta(delta: Vector2f) {
+    override fun onCursorDelta(delta: vec2) {
         if (mouseControl) {
             wasdInput.onCursorDelta(delta)
         }

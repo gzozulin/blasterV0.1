@@ -179,6 +179,6 @@ abstract class LwjglWindow(
     open fun keyPressed(key: Int) {}
     open fun keyReleased(key: Int) {}
 
-    open fun onCursorPos(position: Vector2f) {}
-    open fun onCursorDelta(delta: Vector2f) {}
+    open fun onCursorPos(position: vec2) {}
+    open fun onCursorDelta(delta: vec2) {}
 }
