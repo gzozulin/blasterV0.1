@@ -42,8 +42,8 @@ private class RtrCamera {
     }
 
     fun ray(x: Float, y: Float): ray {
-        val u = VIEWPORT_LEFT + x + 0.5f
-        val v = VIEWPORT_BOTTOM + y + 0.5f
+        val u = VIEWPORT_LEFT + x
+        val v = VIEWPORT_BOTTOM + y
         val direction = vec3(direction).mul(FOCUS_DISTANCE)
         val uComp = vec3(basisX).mul(u)
         val vComp = vec3(basisY).mul(v)
@@ -102,32 +102,53 @@ private val wasdInput = WasdInput(controller)
 
 private lateinit var viewportRect: GlMesh
 private lateinit var viewportTexture: GlTexture
-private val viewportBuffer = ByteBuffer.allocateDirect(VIEWPORT_WIDTH * VIEWPORT_HEIGHT * 3).order(ByteOrder.nativeOrder())
+private val viewportBuffer = ByteBuffer
+        .allocateDirect(VIEWPORT_WIDTH * VIEWPORT_HEIGHT * 3 * 4)
+        .order(ByteOrder.nativeOrder())
 
 private val simpleTechnique = SimpleTechnique()
 
 private val scene = HitableSphere(vec3(0f, 0f, -20f), 19.9f, RtrMaterial())
 
+private fun calculateColor(x: Float, y: Float): color {
+    val ray = camera.ray(x, y)
+    val result = scene.hit(ray, 0f, Float.MAX_VALUE)
+    return if (result != null) {
+        color().red()
+    } else {
+        color().blue()
+    }
+}
+
 private fun updateRegion(xOffset: Int, yOffset: Int, width: Int, height: Int, xStep: Int, yStep: Int) {
+
+    val floatBuffer = viewportBuffer.asFloatBuffer()
+    check(xStep % 2 == 0 && xStep <= width)
+    check(yStep % 2 == 0 && yStep <= height)
+
     viewportBuffer.rewind()
-    for (y in VIEWPORT_HEIGHT - 1 downTo 0) {
-        for (x in 0 until VIEWPORT_WIDTH) {
-            val ray = camera.ray(x.toFloat(), y.toFloat())
-            val result = scene.hit(ray, 0f, Float.MAX_VALUE)
-            if (result != null) {
-                viewportBuffer.put(127)
-                viewportBuffer.put(0)
-                viewportBuffer.put(0)
-            } else {
-                viewportBuffer.put(0)
-                viewportBuffer.put(0)
-                viewportBuffer.put(127)
-            }
+
+    val xHalf = xStep / 2f
+    val yHalf = yStep / 2f
+
+    val xFrom = xOffset
+    val xTo = xOffset + width
+
+    val yFrom = yOffset + height - 1
+    val yTo = yOffset
+
+    for (y in yFrom downTo yTo step yStep) {
+        for (x in xFrom until xTo step  xStep) {
+            val color = calculateColor(x + xHalf, y + yHalf)
+
+            floatBuffer.put(color.x)
+            floatBuffer.put(color.y)
+            floatBuffer.put(color.z)
         }
     }
     viewportBuffer.position(0)
-    viewportTexture.updatePixels(xoffset = 0, yoffset = 0, width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
-            format = backend.GL_RGB, type = backend.GL_UNSIGNED_BYTE, pixels = viewportBuffer)
+    viewportTexture.updatePixels(xoffset = xOffset, yoffset = yOffset, width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
+            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = viewportBuffer)
 }
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
@@ -135,7 +156,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         viewportTexture = GlTexture(
                 unit = 0,
                 width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
-                internalFormat = backend.GL_RGB, pixelFormat = backend.GL_RGB, pixelType = backend.GL_UNSIGNED_BYTE)
+                internalFormat = backend.GL_RGB, pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         viewportRect = GlMesh.rect()
         simpleTechnique.create(shadersLib)
         renderScene()
@@ -143,7 +164,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun renderScene() {
         camera.updateBasis()
-        updateRegion(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, 1)
+        updateRegion(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, 2, 2)
     }
 
     override fun onTick() {
