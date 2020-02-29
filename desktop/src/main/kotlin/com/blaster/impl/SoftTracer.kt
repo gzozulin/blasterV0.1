@@ -14,11 +14,12 @@ import com.blaster.techniques.SimpleTechnique
 import org.joml.Intersectionf
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.FloatBuffer
 
 private val backend = GlLocator.locate()
 
-private const val VIEWPORT_WIDTH = 640
-private const val VIEWPORT_HEIGHT = 480
+private const val VIEWPORT_WIDTH = 256
+private const val VIEWPORT_HEIGHT = 256
 
 private const val VIEWPORT_LEFT = -VIEWPORT_WIDTH / 2f
 private const val VIEWPORT_BOTTOM = -VIEWPORT_HEIGHT / 2f
@@ -120,33 +121,42 @@ private fun calculateColor(x: Float, y: Float): color {
     }
 }
 
-private fun updateRegion(xOffset: Int, yOffset: Int, width: Int, height: Int, xStep: Int, yStep: Int) {
+private fun fillRegion(xOffset: Int, yOffset: Int, width: Int, height: Int, fullWidth: Int, color: color, buffer: FloatBuffer) {
 
-    val floatBuffer = viewportBuffer.asFloatBuffer()
-    check(xStep % 2 == 0 && xStep <= width)
-    check(yStep % 2 == 0 && yStep <= height)
+    var offset = (xOffset + yOffset * fullWidth) * 3
 
-    viewportBuffer.rewind()
+    for (y in 0 until height) {
+        for (x in 0 until width) {
+            buffer.position(offset)
+            buffer.put(color)
+            offset += 3
+        }
+        offset -= fullWidth * 3
+    }
+}
+
+private fun updateRegion(xOffset: Int, yOffset: Int, regWidth: Int, regHeight: Int, xStep: Int, yStep: Int) {
+
+    val floatBuffer = viewportBuffer.asFloatBuffer() // constant size for all ops
+
+    check(regWidth % xStep == 0 && xStep <= regWidth)
+    check(regHeight % yStep == 0 && yStep <= regHeight)
 
     val xHalf = xStep / 2f
     val yHalf = yStep / 2f
 
     val xFrom = xOffset
-    val xTo = xOffset + width
+    val xTo = xOffset + regWidth
 
-    val yFrom = yOffset + height - 1
+    val yFrom = yOffset + regHeight - 1
     val yTo = yOffset
 
     for (y in yFrom downTo yTo step yStep) {
         for (x in xFrom until xTo step  xStep) {
             val color = calculateColor(x + xHalf, y + yHalf)
-
-            floatBuffer.put(color.x)
-            floatBuffer.put(color.y)
-            floatBuffer.put(color.z)
+            fillRegion(x, y, xStep, yStep, regWidth, color, floatBuffer)
         }
     }
-    viewportBuffer.position(0)
     viewportTexture.updatePixels(xoffset = xOffset, yoffset = yOffset, width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
             format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = viewportBuffer)
 }
@@ -164,11 +174,10 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun renderScene() {
         camera.updateBasis()
-        updateRegion(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, 2, 2)
+        updateRegion(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, 8, 8)
     }
 
     override fun onTick() {
-        renderScene()
         GlState.drawWithNoCulling {
             simpleTechnique.draw(viewM, projectionM) {
                 simpleTechnique.instance(viewportRect, viewportTexture, modelM)

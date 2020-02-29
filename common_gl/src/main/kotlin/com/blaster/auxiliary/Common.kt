@@ -4,6 +4,7 @@ import org.joml.*
 import java.lang.Math
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.FloatBuffer
 import java.util.Random
 import java.util.regex.Pattern
 import kotlin.math.cos
@@ -190,6 +191,8 @@ fun String.toAabb(): aabb {
     }
 }
 
+// region -------------------------- NIO --------------------------
+
 fun toByteBufferFloat(list: List<Float>): ByteBuffer {
     val buffer = ByteBuffer.allocateDirect(list.size * 4).order(ByteOrder.nativeOrder())
     val typed = buffer.asFloatBuffer()
@@ -205,3 +208,11 @@ fun toByteBufferInt(list: List<Int>): ByteBuffer {
     buffer.position(0)
     return buffer
 }
+
+fun FloatBuffer.put(color: color) {
+    put(color.x)
+    put(color.y)
+    put(color.z)
+}
+
+// endregion -------------------------- NIO --------------------------
