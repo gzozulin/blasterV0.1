@@ -52,32 +52,60 @@
     <body>
         <p class="text">Hello, and welcome to Greg's Journal!
 </p><p class="text">
-</p><p class="text">Intro and giffy goes here
+</p><p class="text">There are a lot of ways to overcome or at least hide the currently impossible in Computer Graphics. Computers, even today, have a very limited computational power. Frankly, the whole idea of rasterization revolves around the fact that real light simulation on the computer is not yet possible.
 </p><p class="text">
+</p><p class="text">Today I would like to touch one of the techniques, which in my opinion have the greatest value to cost ratio. What? PBR? Nooo, skyboxes<sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>, of course! :)
 </p><p class="text">
-</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/02/skybox.png" alt="Attacking Saucers" align="middle">
+</p><p class="text">In short, skyboxes allow you to add an immersive background to the scene, expand it, and give a sense of great depth. And they are almost free in terms of work required.
+</p><p class="text">
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/skyboxes_combined.png" alt="Quake 3 Arena Skyboxes" align="middle">
 <p class="text">
+</p><p class="text">If you are tired of:
+</p><p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlState.kt#L41" target="_blank">common_gl/com.blaster.gl.GlState::setClearColor</a>
+</h3>
+    <pre><code class="lang-kotlin">fun setClearColor(color: color) {
+    glCheck { backend.glClearColor(color.x, color.y, color.z, 1f) }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><p class="text">Then read on!
+</p><p class="text">
 </p><h2 id="In-this-post">In this post</h2><ul class="list_item"><li>    <a class="link" href="#Cube-mapping">Cube mapping</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Cube-object-itself">Cube object itself</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Skybox-technique">Skybox technique</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Skybox-shader">Skybox shader</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Skybox-app">Skybox app</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Loading-skyboxes">Loading skyboxes</a>
-</li></ul><ul class="list_item"><li>    <a class="link" href="#Free-stuff-">Free stuff!</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Quake-3-Arena-Skyboxes">Quake 3 Arena Skyboxes</a>
 </li></ul><p class="text">
 </p><h2 id="Cube-mapping">Cube mapping</h2>
 <p class="text">
+</p><p class="text">To create skyboxes, we need to make our GlTexture class cube map <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup> ready.
+</p><p class="text">
+</p><p class="text">Cubemap is a special kind of texture, which internally represented by six textures. Here is an example <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup>:
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/cube_map_example.png" alt="Cubemap example" align="middle">
+<p class="text">
+</p><p class="text">It works by putting the camera inside of the cube and covering this cube with a set of textures. The important part is to remove any lighting while rendering the cube. Otherwise, we will have an unwelcome ambient occlusion in corners.
+</p><p class="text">
+</p><p class="text">Since I will be sending data about six different textures, which represents the sides of the cube, I have a class, which holds the information in a neat package:
 </p><p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlTexture.kt#L7" target="_blank">common_gl/com.blaster.gl.GlTexture::GlTexData</a>
 </h3>
     <pre><code class="lang-kotlin">data class GlTexData(
-        val internalFormat: Int = backend.GL_RGBA, val pixelFormat: Int = backend.GL_RGBA, val pixelType: Int = backend.GL_UNSIGNED_BYTE,
+        val internalFormat: Int = backend.GL_RGBA,
+        val pixelFormat: Int = backend.GL_RGBA,
+        val pixelType: Int = backend.GL_UNSIGNED_BYTE,
         val width: Int, val height: Int, val pixels: ByteBuffer?)</code></pre>
 
 </div>
-<div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlTexture.kt#L42" target="_blank">common_gl/com.blaster.gl.GlTexture::loadCubemap</a>
+<p class="text">
+</p><p class="text">Uploading the maps to the GPU is straightforward. We are iterating through the sides and upload them one-by-one. The order is important here. <span style="font-weight:bold">GL_TEXTURE_CUBE_MAP_POSITIVE_X</span> is the first index; consecutive indices are calculated by incrementing it:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlTexture.kt#L44" target="_blank">common_gl/com.blaster.gl.GlTexture::loadCubemap</a>
 </h3>
     <pre><code class="lang-kotlin">private fun loadCubemap(sides: List&lt;GlTexData&gt;) {
     glBind(this) {
@@ -90,8 +118,27 @@
 
 </div>
 <p class="text">
+</p><p class="text">The order is:
+</p><p class="text">
+</p><p class="text"><ul class="list_item"><li>GL_TEXTURE_CUBE_MAP_POSITIVE_X = 0x8515,
+</li></ul>
+</p><p class="text"><ul class="list_item"><li>GL_TEXTURE_CUBE_MAP_NEGATIVE_X = 0x8516,
+</li></ul>
+</p><p class="text"><ul class="list_item"><li>GL_TEXTURE_CUBE_MAP_POSITIVE_Y = 0x8517,
+</li></ul>
+</p><p class="text"><ul class="list_item"><li>GL_TEXTURE_CUBE_MAP_NEGATIVE_Y = 0x8518,
+</li></ul>
+</p><p class="text"><ul class="list_item"><li>GL_TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519,
+</li></ul>
+</p><p class="text"><ul class="list_item"><li>GL_TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851A;
+</li></ul>
+</p><p class="text">
+</p><p class="text">The actual constants might be different for your implementation.
+</p><p class="text">
 </p><h2 id="Cube-object-itself">Cube object itself</h2>
-<div class="child">
+<p class="text">
+</p><p class="text">There are multiple ways how we can create the cube for mapping, and I am just loading an OBJ file with the appropriate cube. We are only interested in positions and texture coordinates:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/models/cube/cube.obj" target="_blank">common_assets/src/main/resources/models/cube/cube.obj</a>
 </h3>
     <pre><code class="lang-c">o cube
@@ -139,6 +186,7 @@ f 5/3/6 1/2/6 3/4/6</code></pre>
 <p class="text">
 </p><h2 id="Skybox-technique">Skybox technique</h2>
 <p class="text">
+</p><p class="text">Creating the SkyboxTechnique is straightforward as well. We need to load cube map shader, the texture itself, and the cube to render:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SkyboxTechnique.kt#L20" target="_blank">common_gl/com.blaster.techniques.SkyboxTechnique::create</a>
 </h3>
@@ -150,7 +198,9 @@ f 5/3/6 1/2/6 3/4/6</code></pre>
 }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">
+</p><p class="text">Rendering of the skybox is trivial. The only thing to note here is the operations on matrices. We are copying the "full" transformation matrix into the 3x3 rotation-only matrix, and then we are copying it back to 4x4 to remove the translation and scale components. The camera in the skybox technique is always at the origin of the scene:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SkyboxTechnique.kt#L30" target="_blank">common_gl/com.blaster.techniques.SkyboxTechnique::skybox</a>
 </h3>
     <pre><code class="lang-kotlin">fun skybox(camera: Camera) {
@@ -168,43 +218,19 @@ f 5/3/6 1/2/6 3/4/6</code></pre>
 <p class="text">
 </p><h2 id="Skybox-shader">Skybox shader</h2>
 <p class="text">
+</p><p class="text">Shaders are really similar to SimpleTechnique, the only difference is that the cube map is represented by <span style="font-weight:bold">samplerCube</span> uniform. The math of calculating of the view ray intersection with the cube is conveniently hidden in <span style="font-weight:bold">texture(uTexDiffuse, vTexCoord)</span> call:
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/skybox/skybox.vert" target="_blank">common_assets/src/main/resources/shaders/skybox/skybox.vert</a>
-</h3>
-    <pre><code class="lang-c">#version 300 es
-
-precision mediump float;
-
-layout (location = 0) in vec3 aPosition;
-
-uniform mat4 uProjectionM;
-uniform mat4 uViewM;
-
-out vec3 vTexCoord;
-
-void main()
-{
-    vTexCoord = aPosition;
-    vec4 pos = uProjectionM * uViewM * vec4(aPosition, 1.0);
-    gl_Position = pos.xyww;
-}</code></pre>
-
-</div>
-<div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/skybox/skybox.frag" target="_blank">common_assets/src/main/resources/shaders/skybox/skybox.frag</a>
 </h3>
     <pre><code class="lang-c">#version 300 es
-
 precision mediump float;
 
 in vec3 vTexCoord;
-
 uniform samplerCube uTexDiffuse;
 
 layout (location = 0) out vec4 oFragColor;
 
-void main()
-{
+void main() {
     oFragColor = texture(uTexDiffuse, vTexCoord);
 }</code></pre>
 
@@ -212,6 +238,8 @@ void main()
 <p class="text">
 </p><h2 id="Skybox-app">Skybox app</h2>
 <p class="text">
+</p><p class="text">I am using skyboxes all over the place because of convenience and value, which they immediately add to the scene. Still, to showcase and tune the technique separately, I created a standalone app specifically for skyboxes:
+</p><p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Skybox.kt#L29" target="_blank">desktop/com.blaster.impl.Skybox::onCreate</a>
 </h3>
@@ -220,7 +248,9 @@ void main()
 }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">
+</p><p class="text">We use the <span style="font-weight:bold">GlState.drawWithNoCulling</span> since we will render the skybox from inside of the cube:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Skybox.kt#L44" target="_blank">desktop/com.blaster.impl.Skybox::drawSkybox</a>
 </h3>
     <pre><code class="lang-kotlin">private fun drawSkybox() {
@@ -233,17 +263,24 @@ void main()
 <p class="text">
 </p><h2 id="Loading-skyboxes">Loading skyboxes</h2>
 <p class="text">
+</p><p class="text">I am loading the skyboxes altogether from a single folder, and I also expect a certain naming inside of this folder. That makes the technique simpler to use later on:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/TexturesLib.kt#L17" target="_blank">common_gl/com.blaster.assets.TexturesLib::loadSkybox</a>
 </h3>
     <pre><code class="lang-kotlin">fun loadSkybox(filename: String, unit: Int = 0): GlTexture {
     val file = File(filename)
-    val right   = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_rt.jpg&quot;), mirrorX = true, mirrorY = true)
-    val left    = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_lf.jpg&quot;), mirrorX = true, mirrorY = true)
-    val top     = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_up.jpg&quot;), mirrorX = true, mirrorY = true)
-    val bottom  = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_dn.jpg&quot;), mirrorX = true, mirrorY = true)
-    val front   = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_ft.jpg&quot;), mirrorX = true, mirrorY = true)
-    val back    = pixelDecoder.decodePixels(assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_bk.jpg&quot;), mirrorX = true, mirrorY = true)
+    val right   = pixelDecoder.decodePixels(
+            assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_rt.jpg&quot;), mirrorX = true, mirrorY = true)
+    val left    = pixelDecoder.decodePixels(
+            assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_lf.jpg&quot;), mirrorX = true, mirrorY = true)
+    val top     = pixelDecoder.decodePixels(
+            assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_up.jpg&quot;), mirrorX = true, mirrorY = true)
+    val bottom  = pixelDecoder.decodePixels(
+            assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_dn.jpg&quot;), mirrorX = true, mirrorY = true)
+    val front   = pixelDecoder.decodePixels(
+            assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_ft.jpg&quot;), mirrorX = true, mirrorY = true)
+    val back    = pixelDecoder.decodePixels(
+            assetStream.openAsset(filename + &quot;/&quot; + file.name + &quot;_bk.jpg&quot;), mirrorX = true, mirrorY = true)
     return GlTexture(unit = unit, sides = listOf(
             GlTexData(width = right.width,  height = right.height,  pixels = right.pixels),
             GlTexData(width = left.width,   height = left.height,   pixels = left.pixels),
@@ -255,12 +292,22 @@ void main()
 
 </div>
 <p class="text">
-</p><p class="text">Mention mirrorings <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup>
+</p><p class="text">One can notice the weird mirroring in the loading code. That is due to how the cube mapping coordinate system works:
 </p><p class="text">
-</p><h2 id="Free-stuff-">Free stuff!</h2>
+</p><p class="text">"Cube Maps have been specified to follow the RenderMan specification (for whatever reason), and RenderMan assumes the images origin is in the upper left, contrary to the usual OpenGL behavior of having the image origin in the lower left. That is why things get swapped in the Y direction. It totally breaks with the usual OpenGL semantics and does not make sense at all. But now we are stuck with it." <sup id="4_origin"><a href="#4">&#91;4&#93;</a></sup>
+</p><p class="text">
+</p><h2 id="Quake-3-Arena-Skyboxes">Quake 3 Arena Skyboxes</h2>
 <p class="text">
+</p><p class="text">I also wanted to mention a great pack of Quake 3 Arena skyboxes floating around the Internet. They are old, low-res, amateur, and retro - just how I like it :)
+</p><p class="text">
+</p><p class="text">A bunch of alien Saucers is making short work of our home planet:
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/skybox.png" alt="Attacking Saucers" align="middle">
+<p class="text">
+</p><p class="text">Here is a link to one of the known mirrors of the collection:
 </p><p class="text">    <a class="link" href="https://lvlworld.com/review/id:2023" target="_blank">Quake 3 Arena Skyboxes Collection</a>
 
+</p><p class="text">
+</p><p class="text">And with this handy script, I can convert them to jpeg as a batch and rotate the up and down textures:
 </p><p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/skybox.sh" target="_blank">common_assets/skybox.sh</a>
@@ -273,12 +320,17 @@ rm *tga</code></pre>
 
 </div>
 <p class="text">
+</p><p class="text">Okay, that was a lot to mention :)
 </p><p class="text">
+</p><p class="text">Skyboxes are a great way to fill the void in the scene. They immediately can raise the level of presentation from a homebrew "tutorial" to something more digestible. With a clean abstraction, they are also highly reusable, since they do not require any integration with the rest of the scene.
+</p><p class="text">
+</p><p class="text">That was it for today, hope you liked it. Will see you in the next posts, have a great day!
 </p><p class="text">
 </p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
 <a id="1" class="link" href="https://en.wikipedia.org/wiki/Skybox_(video_games)" target="_blank">Skybox on Wikipedia</a></li></ul><ul class="list_item"><li>    <a class="link" href="#2_origin">&#8593;[2]: </a>
 <a id="2" class="link" href="https://en.wikipedia.org/wiki/Cube_mapping" target="_blank">Cube mapping on Wikipedia</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
-<a id="3" class="link" href="https://stackoverflow.com/questions/11685608/convention-of-faces-in-opengl-cubemapping" target="_blank">Convention of faces in OpenGL cubemapping</a></li></ul>
+<a id="3" class="link" href="https://commons.wikimedia.org/wiki/File:Panorama_cube_map.png" target="_blank">Cubemap example on Wiki</a></li></ul><ul class="list_item"><li>    <a class="link" href="#4_origin">&#8593;[4]: </a>
+<a id="4" class="link" href="https://stackoverflow.com/questions/11685608/convention-of-faces-in-opengl-cubemapping" target="_blank">Convention of faces in OpenGL cube mapping</a></li></ul>
         <br>
     </body>
 </html>

@@ -1,6 +1,6 @@
 package com.blaster.gl
 
-import org.joml.Vector3f
+import com.blaster.auxiliary.color
 
 private val backend = GlLocator.locate()
 
@@ -38,10 +38,14 @@ class GlState private constructor() {
             enableCulling()
         }
 
-        fun apply(width: Int, height: Int, color: Vector3f = Vector3f(0.9f, 9.9f, 1f)) {
+        fun setClearColor(color: color) {
+            glCheck { backend.glClearColor(color.x, color.y, color.z, 1f) }
+        }
+
+        fun apply(width: Int, height: Int, color: color = color(0.9f, 9.9f, 1f)) {
             glCheck { backend.glViewport(0, 0, width, height) }
-            glCheck { backend.glClearColor(color.x, color.y, color.z, 0f) }
             glCheck { backend.glEnable(backend.GL_MULTISAMPLE) }
+            setClearColor(color)
             enableDepthTest()
             enableCulling()
         }

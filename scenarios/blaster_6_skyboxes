@@ -1,49 +1,104 @@
 Hello, and welcome to Greg's Journal!
 
-Intro and giffy goes here
+There are a lot of ways to overcome or at least hide the currently impossible in Computer Graphics. Computers, even today, have a very limited computational power. Frankly, the whole idea of rasterization revolves around the fact that real light simulation on the computer is not yet possible.
 
+Today I would like to touch one of the techniques, which in my opinion have the greatest value to cost ratio. What? PBR? Nooo, skyboxes\1\, of course! :)
 #cite; 1; Skybox on Wikipedia; https://en.wikipedia.org/wiki/Skybox_(video_games)
 
-#picture; Attacking Saucers; http://gzozulin.com/wp-content/uploads/2020/02/skybox.png
+In short, skyboxes allow you to add an immersive background to the scene, expand it, and give a sense of great depth. And they are almost free in terms of work required.
+
+#picture; Quake 3 Arena Skyboxes; http://gzozulin.com/wp-content/uploads/2020/03/skyboxes_combined.png
+
+If you are tired of:
+
+#include; def; common_gl/com.blaster.gl.GlState::setClearColor
+
+Then read on!
 
 #content; In this post
 
 #header; Cube mapping
 
+To create skyboxes, we need to make our GlTexture class cube map \2\ ready.
 #cite; 2; Cube mapping on Wikipedia; https://en.wikipedia.org/wiki/Cube_mapping
 
+Cubemap is a special kind of texture, which internally represented by six textures. Here is an example \3\:
+#picture; Cubemap example; http://gzozulin.com/wp-content/uploads/2020/03/cube_map_example.png
+#cite; 3; Cubemap example on Wiki; https://commons.wikimedia.org/wiki/File:Panorama_cube_map.png
+
+It works by putting the camera inside of the cube and covering this cube with a set of textures. The important part is to remove any lighting while rendering the cube. Otherwise, we will have an unwelcome ambient occlusion in corners.
+
+Since I will be sending data about six different textures, which represents the sides of the cube, I have a class, which holds the information in a neat package:
+
 #include; decl; common_gl/com.blaster.gl.GlTexture::GlTexData
+
+Uploading the maps to the GPU is straightforward. We are iterating through the sides and upload them one-by-one. The order is important here. 'GL_TEXTURE_CUBE_MAP_POSITIVE_X' is the first index; consecutive indices are calculated by incrementing it:
 #include; def; common_gl/com.blaster.gl.GlTexture::loadCubemap
 
+The order is:
+
+~ GL_TEXTURE_CUBE_MAP_POSITIVE_X = 0x8515,
+~ GL_TEXTURE_CUBE_MAP_NEGATIVE_X = 0x8516,
+~ GL_TEXTURE_CUBE_MAP_POSITIVE_Y = 0x8517,
+~ GL_TEXTURE_CUBE_MAP_NEGATIVE_Y = 0x8518,
+~ GL_TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519,
+~ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851A;
+
+The actual constants might be different for your implementation.
+
 #header; Cube object itself
+
+There are multiple ways how we can create the cube for mapping, and I am just loading an OBJ file with the appropriate cube. We are only interested in positions and texture coordinates:
 #include; glsl; common_assets/src/main/resources/models/cube/cube.obj
 
 #header; Skybox technique
 
+Creating the SkyboxTechnique is straightforward as well. We need to load cube map shader, the texture itself, and the cube to render:
 #include; def; common_gl/com.blaster.techniques.SkyboxTechnique::create
+
+Rendering of the skybox is trivial. The only thing to note here is the operations on matrices. We are copying the "full" transformation matrix into the 3x3 rotation-only matrix, and then we are copying it back to 4x4 to remove the translation and scale components. The camera in the skybox technique is always at the origin of the scene:
 #include; def; common_gl/com.blaster.techniques.SkyboxTechnique::skybox
 
 #header; Skybox shader
 
-#include; glsl; common_assets/src/main/resources/shaders/skybox/skybox.vert
+Shaders are really similar to SimpleTechnique, the only difference is that the cube map is represented by 'samplerCube' uniform. The math of calculating of the view ray intersection with the cube is conveniently hidden in 'texture(uTexDiffuse, vTexCoord)' call:
 #include; glsl; common_assets/src/main/resources/shaders/skybox/skybox.frag
 
 #header; Skybox app
 
+I am using skyboxes all over the place because of convenience and value, which they immediately add to the scene. Still, to showcase and tune the technique separately, I created a standalone app specifically for skyboxes:
+
 #include; def; desktop/com.blaster.impl.Skybox::onCreate
+
+We use the 'GlState.drawWithNoCulling' since we will render the skybox from inside of the cube:
 #include; def; desktop/com.blaster.impl.Skybox::drawSkybox
 
 #header; Loading skyboxes
 
+I am loading the skyboxes altogether from a single folder, and I also expect a certain naming inside of this folder. That makes the technique simpler to use later on:
 #include; def; common_gl/com.blaster.assets.TexturesLib::loadSkybox
 
-Mention mirrorings \3\
-#cite; 3; Convention of faces in OpenGL cubemapping; https://stackoverflow.com/questions/11685608/convention-of-faces-in-opengl-cubemapping
+One can notice the weird mirroring in the loading code. That is due to how the cube mapping coordinate system works:
 
-#header; Free stuff!
+"Cube Maps have been specified to follow the RenderMan specification (for whatever reason), and RenderMan assumes the images origin is in the upper left, contrary to the usual OpenGL behavior of having the image origin in the lower left. That is why things get swapped in the Y direction. It totally breaks with the usual OpenGL semantics and does not make sense at all. But now we are stuck with it." \4\
+#cite; 4; Convention of faces in OpenGL cube mapping; https://stackoverflow.com/questions/11685608/convention-of-faces-in-opengl-cubemapping
 
+#header; Quake 3 Arena Skyboxes
+
+I also wanted to mention a great pack of Quake 3 Arena skyboxes floating around the Internet. They are old, low-res, amateur, and retro - just how I like it :)
+
+A bunch of alien Saucers is making short work of our home planet:
+#picture; Attacking Saucers; http://gzozulin.com/wp-content/uploads/2020/03/skybox.png
+
+Here is a link to one of the known mirrors of the collection:
 [Quake 3 Arena Skyboxes Collection; https://lvlworld.com/review/id:2023]
+
+And with this handy script, I can convert them to jpeg as a batch and rotate the up and down textures:
 
 #include; glsl; common_assets/skybox.sh
 
+Okay, that was a lot to mention :)
 
+Skyboxes are a great way to fill the void in the scene. They immediately can raise the level of presentation from a homebrew "tutorial" to something more digestible. With a clean abstraction, they are also highly reusable, since they do not require any integration with the rest of the scene.
+
+That was it for today, hope you liked it. Will see you in the next posts, have a great day!

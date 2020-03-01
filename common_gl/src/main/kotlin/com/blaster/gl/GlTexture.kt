@@ -5,7 +5,9 @@ import java.nio.ByteBuffer
 private val backend = GlLocator.locate()
 
 data class GlTexData(
-        val internalFormat: Int = backend.GL_RGBA, val pixelFormat: Int = backend.GL_RGBA, val pixelType: Int = backend.GL_UNSIGNED_BYTE,
+        val internalFormat: Int = backend.GL_RGBA,
+        val pixelFormat: Int = backend.GL_RGBA,
+        val pixelType: Int = backend.GL_UNSIGNED_BYTE,
         val width: Int, val height: Int, val pixels: ByteBuffer?)
 
 class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : GlBindable {

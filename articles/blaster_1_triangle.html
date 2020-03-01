@@ -199,8 +199,7 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L11" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
 </h3>
-    <pre><code class="lang-kotlin"></code></pre>
-<pre><code class="lang-kotlin">class ShadersLib(private val assetStream: AssetStream) {
+    <pre><code class="lang-kotlin">class ShadersLib(private val assetStream: AssetStream) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
             GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
             GlShader(GlShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
@@ -330,10 +329,9 @@
 </p><p class="text">
 </p><p class="text">Here is the SimpleTechnique, which we will use for this demo:
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SimpleTechnique.kt#L11" target="_blank">common_gl/com.blaster.techniques.SimpleTechnique</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SimpleTechnique.kt#L12" target="_blank">common_gl/com.blaster.techniques.SimpleTechnique</a>
 </h3>
-    <pre><code class="lang-kotlin"></code></pre>
-<p class="text_child">A most straightforward technique: no lighting, just diffuse from textures
+    <p class="text_child">A most straightforward technique: no lighting, just diffuse from textures
 </p><pre><code class="lang-kotlin">class SimpleTechnique {
     private lateinit var program: GlProgram</code></pre>
 <p class="text_child">Compiling and storing shader program
@@ -341,12 +339,16 @@
         program = shadersLib.loadProgram(&quot;shaders/simple/no_lighting.vert&quot;, &quot;shaders/simple/no_lighting.frag&quot;)
     }</code></pre>
 <p class="text_child">While drawing, we pass the uniforms for the whole pass
-</p><pre><code class="lang-kotlin">    fun draw(camera: Camera, draw: () -&gt; Unit) {
+</p><pre><code class="lang-kotlin">    fun draw(viewM: mat4, projectionM: mat4, draw: () -&gt; Unit) {
         glBind(listOf(program)) {
-            program.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
-            program.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+            program.setUniform(GlUniform.UNIFORM_VIEW_M, viewM)
+            program.setUniform(GlUniform.UNIFORM_PROJ_M, projectionM)
             draw.invoke()
         }
+    }
+
+    fun draw(camera: Camera, draw: () -&gt; Unit) {
+        draw(camera.calculateViewM(), camera.projectionM, draw)
     }
 
     fun instance(model: Model, modelM: Matrix4f) {
