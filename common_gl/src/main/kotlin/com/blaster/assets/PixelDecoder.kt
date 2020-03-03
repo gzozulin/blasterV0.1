@@ -13,34 +13,20 @@ open class PixelDecoder {
         val bufferedImage = ImageIO.read(inputStream)
         val pixelNum = bufferedImage.width * bufferedImage.height
         val byteBuffer = ByteBuffer.allocateDirect(pixelNum * 4).order(ByteOrder.nativeOrder())
-        // todo: lots of repetition
-        if (mirrorY) {
-            for (y in 0 until bufferedImage.height) {
-                if (mirrorX) {
-                    for (x in bufferedImage.width - 1 downTo 0) {
-                        val color = Color(bufferedImage.getRGB(x, y), true)
-                        addColor(color, byteBuffer)
-                    }
-                } else {
-                    for (x in 0 until bufferedImage.width) {
-                        val color = Color(bufferedImage.getRGB(x, y), true)
-                        addColor(color, byteBuffer)
-                    }
-                }
-            }
+        val xRange = if (mirrorX) {
+            bufferedImage.width - 1 downTo 0
         } else {
-            for (y in bufferedImage.height - 1 downTo 0) { // image has different coord. system
-                if (mirrorX) {
-                    for (x in bufferedImage.width - 1 downTo 0) {
-                        val color = Color(bufferedImage.getRGB(x, y), true)
-                        addColor(color, byteBuffer)
-                    }
-                } else {
-                    for (x in 0 until bufferedImage.width) {
-                        val color = Color(bufferedImage.getRGB(x, y), true)
-                        addColor(color, byteBuffer)
-                    }
-                }
+            0 until bufferedImage.width
+        }
+        val yRange = if (mirrorY) {
+            0 until bufferedImage.height
+        } else {
+            bufferedImage.height - 1 downTo 0
+        }
+        for (y in yRange) {
+            for (x in xRange) {
+                val color = Color(bufferedImage.getRGB(x, y), true)
+                addColor(color, byteBuffer)
             }
         }
         byteBuffer.position(0)

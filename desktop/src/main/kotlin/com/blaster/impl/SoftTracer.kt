@@ -18,13 +18,26 @@ import java.nio.FloatBuffer
 
 private val backend = GlLocator.locate()
 
-private const val VIEWPORT_WIDTH = 256
-private const val VIEWPORT_HEIGHT = 256
+private const val VIEWPORT_WIDTH = 10
+private const val VIEWPORT_HEIGHT = 10
 
-private const val VIEWPORT_LEFT = -VIEWPORT_WIDTH / 2f
-private const val VIEWPORT_BOTTOM = -VIEWPORT_HEIGHT / 2f
+private const val VIEWPORT_LEFT = (-VIEWPORT_WIDTH / 2f).toInt()
+private const val VIEWPORT_BOTTOM = (-VIEWPORT_HEIGHT / 2f).toInt()
 
 private const val FOCUS_DISTANCE = 10.0f
+
+private const val RESOLUTION_WIDTH = 1024
+private const val RESOLUTION_HEIGHT = 1024
+
+private const val PIXEL_SIZE = 3
+
+private lateinit var viewportRect: GlMesh
+private lateinit var viewportTexture: GlTexture
+private val viewportBuffer = ByteBuffer
+        .allocateDirect(RESOLUTION_WIDTH * RESOLUTION_HEIGHT * PIXEL_SIZE * 4)
+        .order(ByteOrder.nativeOrder())
+
+private val floatBuffer = viewportBuffer.asFloatBuffer()
 
 private class RtrCamera {
     val position: vec3 = vec3().zero()
@@ -42,15 +55,16 @@ private class RtrCamera {
         basisY.normalize()
     }
 
-    fun ray(x: Float, y: Float): ray {
-        val u = VIEWPORT_LEFT + x
-        val v = VIEWPORT_BOTTOM + y
-        val direction = vec3(direction).mul(FOCUS_DISTANCE)
+    fun ray(i: Float, j: Float): ray {
+        // assuming viewport w and h are equal to the image w and h
+        val u = VIEWPORT_LEFT + VIEWPORT_WIDTH * (i + 0.5f) / RESOLUTION_WIDTH
+        val v = VIEWPORT_BOTTOM + VIEWPORT_HEIGHT * (j +0.5f) / RESOLUTION_HEIGHT
+        val dir = vec3(direction).mul(FOCUS_DISTANCE)
         val uComp = vec3(basisX).mul(u)
         val vComp = vec3(basisY).mul(v)
-        direction.add(uComp).add(vComp)
-        direction.normalize()
-        return ray(position, direction)
+        dir.add(uComp).add(vComp)
+        dir.normalize()
+        return ray(position, dir)
     }
 }
 
@@ -63,7 +77,6 @@ private interface Hitable {
 }
 
 private class HitableSphere(private val center: vec3, private val radius: Float, private val material: RtrMaterial) : Hitable {
-
     private val sphere = sphere(center, radius)
 
     override fun hit(ray: ray, t0: Float, t1: Float): HitResult? {
@@ -101,15 +114,9 @@ private val camera = RtrCamera()
 private val controller = Controller()
 private val wasdInput = WasdInput(controller)
 
-private lateinit var viewportRect: GlMesh
-private lateinit var viewportTexture: GlTexture
-private val viewportBuffer = ByteBuffer
-        .allocateDirect(VIEWPORT_WIDTH * VIEWPORT_HEIGHT * 3 * 4)
-        .order(ByteOrder.nativeOrder())
-
 private val simpleTechnique = SimpleTechnique()
 
-private val scene = HitableSphere(vec3(0f, 0f, -20f), 19.9f, RtrMaterial())
+private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 
 private fun calculateColor(x: Float, y: Float): color {
     val ray = camera.ray(x, y)
@@ -121,51 +128,40 @@ private fun calculateColor(x: Float, y: Float): color {
     }
 }
 
-private fun fillRegion(xOffset: Int, yOffset: Int, width: Int, height: Int, fullWidth: Int, color: color, buffer: FloatBuffer) {
-
-    var offset = (xOffset + yOffset * fullWidth) * 3
-
-    for (y in 0 until height) {
-        for (x in 0 until width) {
-            buffer.position(offset)
-            buffer.put(color)
-            offset += 3
-        }
-        offset -= fullWidth * 3
-    }
-}
-
-private fun updateRegion(xOffset: Int, yOffset: Int, regWidth: Int, regHeight: Int, xStep: Int, yStep: Int) {
-
-    val floatBuffer = viewportBuffer.asFloatBuffer() // constant size for all ops
-
-    check(regWidth % xStep == 0 && xStep <= regWidth)
-    check(regHeight % yStep == 0 && yStep <= regHeight)
-
+private fun updateRegion(fromX: Int, fromY: Int, width: Int, height: Int, xStep: Int, yStep: Int) {
+    check(width % xStep == 0 && xStep <= width)
+    check(height % yStep == 0 && yStep <= height)
+    val xRange = fromX until fromX + width
+    val yRange = fromY until fromY + height
     val xHalf = xStep / 2f
     val yHalf = yStep / 2f
-
-    val xFrom = xOffset
-    val xTo = xOffset + regWidth
-
-    val yFrom = yOffset + regHeight - 1
-    val yTo = yOffset
-
-    for (y in yFrom downTo yTo step yStep) {
-        for (x in xFrom until xTo step  xStep) {
+    for (y in yRange step yStep) {
+        for (x in xRange step  xStep) {
             val color = calculateColor(x + xHalf, y + yHalf)
-            fillRegion(x, y, xStep, yStep, regWidth, color, floatBuffer)
+            fillRegion(x, y, xStep, yStep, width, color, floatBuffer)
         }
     }
-    viewportTexture.updatePixels(xoffset = xOffset, yoffset = yOffset, width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
+    viewportTexture.updatePixels(xoffset = fromX, yoffset = fromY, width = width, height = height,
             format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = viewportBuffer)
+}
+
+private fun fillRegion(fromX: Int, fromY: Int, width: Int, height: Int, line: Int, color: color, buffer: FloatBuffer) {
+    val xRange = fromX until fromX + width
+    val yRange = fromY until fromY + height
+    for (y in yRange) {
+        for (x in xRange) {
+            val offset = (x + y * line) * PIXEL_SIZE
+            buffer.position(offset)
+            buffer.put(color)
+        }
+    }
 }
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
         viewportTexture = GlTexture(
                 unit = 0,
-                width = VIEWPORT_WIDTH, height = VIEWPORT_HEIGHT,
+                width = RESOLUTION_WIDTH, height = RESOLUTION_HEIGHT,
                 internalFormat = backend.GL_RGB, pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         viewportRect = GlMesh.rect()
         simpleTechnique.create(shadersLib)
@@ -174,7 +170,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun renderScene() {
         camera.updateBasis()
-        updateRegion(0, 0, VIEWPORT_WIDTH, VIEWPORT_HEIGHT, 8, 8)
+        updateRegion(0, 0, RESOLUTION_WIDTH/2, RESOLUTION_HEIGHT/2, 16, 16)
+        updateRegion(RESOLUTION_WIDTH/2, RESOLUTION_HEIGHT/2, RESOLUTION_WIDTH/2, RESOLUTION_HEIGHT/2, 1, 1)
     }
 
     override fun onTick() {
