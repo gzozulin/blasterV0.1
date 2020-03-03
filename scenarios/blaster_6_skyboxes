@@ -23,7 +23,7 @@ To create skyboxes, we need to make our GlTexture class cube map \2\ ready.
 #cite; 2; Cube mapping on Wikipedia; https://en.wikipedia.org/wiki/Cube_mapping
 
 Cubemap is a special kind of texture, which internally represented by six textures. Here is an example \3\:
-#picture; Cubemap example; http://gzozulin.com/wp-content/uploads/2020/03/cube_map_example.png
+#picture; Cubemap example; http://gzozulin.com/wp-content/uploads/2020/03/cube_map_example_2.png
 #cite; 3; Cubemap example on Wiki; https://commons.wikimedia.org/wiki/File:Panorama_cube_map.png
 
 It works by putting the camera inside of the cube and covering this cube with a set of textures. The important part is to remove any lighting while rendering the cube. Otherwise, we will have an unwelcome ambient occlusion in corners.
