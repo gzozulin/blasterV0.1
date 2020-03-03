@@ -5,7 +5,8 @@ There are a lot of ways to overcome or at least hide the currently impossible in
 Today I would like to touch one of the techniques, which in my opinion have the greatest value to cost ratio. What? PBR? Nooo, skyboxes\1\, of course! :)
 #cite; 1; Skybox on Wikipedia; https://en.wikipedia.org/wiki/Skybox_(video_games)
 
-In short, skyboxes allow you to add an immersive background to the scene, expand it, and give a sense of great depth. And they are almost free in terms of work required.
+In short, skyboxes allows you to add an immersive backgrounds to the scene, expand it, and give a sense of great depth. And they are almost
+free in terms of work required.
 
 #picture; Quake 3 Arena Skyboxes; http://gzozulin.com/wp-content/uploads/2020/03/skyboxes_combined.png
 
@@ -22,13 +23,15 @@ Then read on!
 To create skyboxes, we need to make our GlTexture class cube map \2\ ready.
 #cite; 2; Cube mapping on Wikipedia; https://en.wikipedia.org/wiki/Cube_mapping
 
-Cubemap is a special kind of texture, which internally represented by six textures. Here is an example \3\:
+Cubemap is a special kind of texture, which internally represented by six texture maps. Here is how it works \3\:
 #picture; Cubemap example; http://gzozulin.com/wp-content/uploads/2020/03/cube_map_example_2.png
 #cite; 3; Cubemap example on Wiki; https://commons.wikimedia.org/wiki/File:Panorama_cube_map.png
 
-It works by putting the camera inside of the cube and covering this cube with a set of textures. The important part is to remove any lighting while rendering the cube. Otherwise, we will have an unwelcome ambient occlusion in corners.
+We are putting the camera inside of the cube and covering this cube with a set of textures. The important part is to remove any lighting
+while rendering the cube. Otherwise, we will have an unwelcome ambient occlusion at corners.
 
-Since I will be sending data about six different textures, which represents the sides of the cube, I have a class, which holds the information in a neat package:
+Since I will be sending data about six different texture maps, which represents the sides of the cube, I have a class, which holds the
+information in a neat package:
 
 #include; decl; common_gl/com.blaster.gl.GlTexture::GlTexData
 
@@ -44,7 +47,7 @@ The order is:
 ~ GL_TEXTURE_CUBE_MAP_POSITIVE_Z = 0x8519,
 ~ GL_TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851A;
 
-The actual constants might be different for your implementation.
+The actual constants might be different for your OpenGL driver.
 
 #header; Cube object itself
 
@@ -96,6 +99,8 @@ Here is a link to one of the known mirrors of the collection:
 And with this handy script, I can convert them to jpeg as a batch and rotate the up and down textures:
 
 #include; glsl; common_assets/skybox.sh
+
+#header; Conclusion
 
 Okay, that was a lot to mention :)
 

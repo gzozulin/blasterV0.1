@@ -56,7 +56,8 @@
 </p><p class="text">
 </p><p class="text">Today I would like to touch one of the techniques, which in my opinion have the greatest value to cost ratio. What? PBR? Nooo, skyboxes<sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>, of course! :)
 </p><p class="text">
-</p><p class="text">In short, skyboxes allow you to add an immersive background to the scene, expand it, and give a sense of great depth. And they are almost free in terms of work required.
+</p><p class="text">In short, skyboxes allows you to add an immersive backgrounds to the scene, expand it, and give a sense of great depth. And they are almost
+</p><p class="text">free in terms of work required.
 </p><p class="text">
 </p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/skyboxes_combined.png" alt="Quake 3 Arena Skyboxes" align="middle">
 <p class="text">
@@ -80,6 +81,7 @@
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Skybox-app">Skybox app</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Loading-skyboxes">Loading skyboxes</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Quake-3-Arena-Skyboxes">Quake 3 Arena Skyboxes</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Conclusion">Conclusion</a>
 </li></ul><p class="text">
 </p><h2 id="Cube-mapping">Cube mapping</h2>
 <p class="text">
@@ -88,9 +90,11 @@
 </p><p class="text">Cubemap is a special kind of texture, which internally represented by six textures. Here is an example <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup>:
 </p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/cube_map_example_2.png" alt="Cubemap example" align="middle">
 <p class="text">
-</p><p class="text">It works by putting the camera inside of the cube and covering this cube with a set of textures. The important part is to remove any lighting while rendering the cube. Otherwise, we will have an unwelcome ambient occlusion in corners.
+</p><p class="text">We are putting the camera inside of the cube and covering this cube with a set of textures. The important part is to remove any lighting
+</p><p class="text">while rendering the cube. Otherwise, we will have an unwelcome ambient occlusion at corners.
 </p><p class="text">
-</p><p class="text">Since I will be sending data about six different textures, which represents the sides of the cube, I have a class, which holds the information in a neat package:
+</p><p class="text">Since I will be sending data about six different texture maps, which represents the sides of the cube, I have a class, which holds the
+</p><p class="text">information in a neat package:
 </p><p class="text">
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlTexture.kt#L7" target="_blank">common_gl/com.blaster.gl.GlTexture::GlTexData</a>
@@ -111,7 +115,8 @@
     glBind(this) {
         sides.forEachIndexed { index, side -&gt;
             glCheck { backend.glTexImage2D(backend.GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, 0,
-                    side.internalFormat, side.width, side.height, 0, side.pixelFormat, side.pixelType, side.pixels) }
+                    side.internalFormat, side.width, side.height, 0,
+                    side.pixelFormat, side.pixelType, side.pixels) }
         }
     }
 }</code></pre>
@@ -133,7 +138,7 @@
 </p><p class="text"><ul class="list_item"><li>GL_TEXTURE_CUBE_MAP_NEGATIVE_Z = 0x851A;
 </li></ul>
 </p><p class="text">
-</p><p class="text">The actual constants might be different for your implementation.
+</p><p class="text">The actual constants might be different for your OpenGL driver.
 </p><p class="text">
 </p><h2 id="Cube-object-itself">Cube object itself</h2>
 <p class="text">
@@ -319,6 +324,8 @@ mogrify -rotate -90 $1_dn.jpg;
 rm *tga</code></pre>
 
 </div>
+<p class="text">
+</p><h2 id="Conclusion">Conclusion</h2>
 <p class="text">
 </p><p class="text">Okay, that was a lot to mention :)
 </p><p class="text">

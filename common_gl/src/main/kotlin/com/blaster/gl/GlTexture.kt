@@ -45,7 +45,8 @@ class GlTexture(val target: Int = backend.GL_TEXTURE_2D, val unit: Int = 0) : Gl
         glBind(this) {
             sides.forEachIndexed { index, side ->
                 glCheck { backend.glTexImage2D(backend.GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, 0,
-                        side.internalFormat, side.width, side.height, 0, side.pixelFormat, side.pixelType, side.pixels) }
+                        side.internalFormat, side.width, side.height, 0,
+                        side.pixelFormat, side.pixelType, side.pixels) }
             }
         }
     }

@@ -249,7 +249,8 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/assets/ShadersLib.kt#L11" target="_blank">common_gl/com.blaster.assets.ShadersLib</a>
 </h3>
-    <pre><code class="lang-kotlin">class ShadersLib(private val assetStream: AssetStream) {
+    <pre><code class="lang-kotlin"></code></pre>
+<pre><code class="lang-kotlin">class ShadersLib(private val assetStream: AssetStream) {
     fun loadProgram(vertShaderAsset: String, fragShaderAsset: String) : GlProgram = GlProgram(
             GlShader(GlShaderType.VERTEX_SHADER, slurpAsset(vertShaderAsset)),
             GlShader(GlShaderType.FRAGMENT_SHADER, slurpAsset(fragShaderAsset)))
@@ -275,7 +276,8 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/SimpleTechnique.kt#L16" target="_blank">common_gl/com.blaster.techniques.SimpleTechnique::create</a>
 </h3>
-    <p class="text_child">Compiling and storing shader program
+    <pre><code class="lang-kotlin"></code></pre>
+<p class="text_child">Compiling and storing shader program
 </p><pre><code class="lang-kotlin">fun create(shadersLib: ShadersLib) {
     program = shadersLib.loadProgram(&quot;shaders/simple/no_lighting.vert&quot;, &quot;shaders/simple/no_lighting.frag&quot;)
 }</code></pre>
