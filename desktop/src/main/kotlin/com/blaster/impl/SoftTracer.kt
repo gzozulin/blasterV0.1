@@ -33,11 +33,6 @@ private const val PIXEL_SIZE = 3
 
 private lateinit var viewportRect: GlMesh
 private lateinit var viewportTexture: GlTexture
-private val viewportBuffer = ByteBuffer
-        .allocateDirect(RESOLUTION_WIDTH * RESOLUTION_HEIGHT * PIXEL_SIZE * 4)
-        .order(ByteOrder.nativeOrder())
-
-private val floatBuffer = viewportBuffer.asFloatBuffer()
 
 private class RtrCamera {
     val position: vec3 = vec3().zero()
@@ -55,13 +50,13 @@ private class RtrCamera {
         basisY.normalize()
     }
 
-    fun ray(i: Float, j: Float): ray {
+    fun ray(u: Float, v: Float): ray {
         // assuming viewport w and h are equal to the image w and h
-        val u = VIEWPORT_LEFT + VIEWPORT_WIDTH * (i + 0.5f) / RESOLUTION_WIDTH
-        val v = VIEWPORT_BOTTOM + VIEWPORT_HEIGHT * (j +0.5f) / RESOLUTION_HEIGHT
+        val x = VIEWPORT_LEFT + VIEWPORT_WIDTH * (u + 0.5f) / RESOLUTION_WIDTH
+        val y = VIEWPORT_BOTTOM + VIEWPORT_HEIGHT * (v +0.5f) / RESOLUTION_HEIGHT
         val dir = vec3(direction).mul(FOCUS_DISTANCE)
-        val uComp = vec3(basisX).mul(u)
-        val vComp = vec3(basisY).mul(v)
+        val uComp = vec3(basisX).mul(x)
+        val vComp = vec3(basisY).mul(y)
         dir.add(uComp).add(vComp)
         dir.normalize()
         return ray(position, dir)
@@ -118,8 +113,8 @@ private val simpleTechnique = SimpleTechnique()
 
 private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 
-private fun calculateColor(x: Float, y: Float): color {
-    val ray = camera.ray(x, y)
+private fun calculateColor(u: Float, v: Float): color {
+    val ray = camera.ray(u, v)
     val result = scene.hit(ray, 0f, Float.MAX_VALUE)
     return if (result != null) {
         color().red()
@@ -128,29 +123,36 @@ private fun calculateColor(x: Float, y: Float): color {
     }
 }
 
-private fun updateRegion(fromX: Int, fromY: Int, width: Int, height: Int, xStep: Int, yStep: Int) {
-    check(width % xStep == 0 && xStep <= width)
-    check(height % yStep == 0 && yStep <= height)
-    val xRange = fromX until fromX + width
-    val yRange = fromY until fromY + height
-    val xHalf = xStep / 2f
-    val yHalf = yStep / 2f
-    for (y in yRange step yStep) {
-        for (x in xRange step  xStep) {
-            val color = calculateColor(x + xHalf, y + yHalf)
-            fillRegion(x, y, xStep, yStep, width, color, floatBuffer)
+private fun updateRegion(fromU: Int, fromV: Int, width: Int, height: Int, uStep: Int, vStep: Int) {
+
+    val byteBuffer = ByteBuffer
+            .allocateDirect(width * height * PIXEL_SIZE * 4)
+            .order(ByteOrder.nativeOrder())
+
+    val floatBuffer = byteBuffer.asFloatBuffer()
+
+    check(width % uStep == 0 && uStep <= width)
+    check(height % vStep == 0 && vStep <= height)
+    val uRange = fromU until fromU + width
+    val yRange = fromV until fromV + height
+    val uHalf = uStep / 2f
+    val vHalf = vStep / 2f
+    for (v in yRange step vStep) {
+        for (u in uRange step  uStep) {
+            val color = calculateColor(u + uHalf, v + vHalf)
+            fillRegion(u, v, uStep, vStep, width, color, floatBuffer)
         }
     }
-    viewportTexture.updatePixels(xoffset = fromX, yoffset = fromY, width = width, height = height,
-            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = viewportBuffer)
+    viewportTexture.updatePixels(uOffset = fromU, vOffset = fromV, width = width, height = height,
+            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = byteBuffer)
 }
 
-private fun fillRegion(fromX: Int, fromY: Int, width: Int, height: Int, line: Int, color: color, buffer: FloatBuffer) {
-    val xRange = fromX until fromX + width
-    val yRange = fromY until fromY + height
-    for (y in yRange) {
-        for (x in xRange) {
-            val offset = (x + y * line) * PIXEL_SIZE
+private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, line: Int, color: color, buffer: FloatBuffer) {
+    val uRange = fromU until fromU + width
+    val vRange = fromV until fromV + height
+    for (v in vRange) {
+        for (u in uRange) {
+            val offset = (u + v * line) * PIXEL_SIZE
             buffer.position(offset)
             buffer.put(color)
         }
