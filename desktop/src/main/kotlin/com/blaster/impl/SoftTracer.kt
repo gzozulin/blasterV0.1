@@ -123,20 +123,25 @@ private fun calculateColor(u: Float, v: Float): color {
     }
 }
 
+val byteBuffer = ByteBuffer
+        .allocateDirect(RESOLUTION_WIDTH * RESOLUTION_HEIGHT * PIXEL_SIZE * 4)
+        .order(ByteOrder.nativeOrder())
+
+val floatBuffer = byteBuffer.asFloatBuffer()
+
 private fun updateRegion(fromU: Int, fromV: Int, width: Int, height: Int, uStep: Int, vStep: Int) {
 
-    val byteBuffer = ByteBuffer
-            .allocateDirect(width * height * PIXEL_SIZE * 4)
-            .order(ByteOrder.nativeOrder())
 
-    val floatBuffer = byteBuffer.asFloatBuffer()
 
     check(width % uStep == 0 && uStep <= width)
     check(height % vStep == 0 && vStep <= height)
-    val uRange = fromU until fromU + width
-    val yRange = fromV until fromV + height
+
     val uHalf = uStep / 2f
     val vHalf = vStep / 2f
+
+    val uRange = fromU until fromU + width
+    val yRange = fromV until fromV + height
+
     for (v in yRange step vStep) {
         for (u in uRange step  uStep) {
             val color = calculateColor(u + uHalf, v + vHalf)
@@ -167,7 +172,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 internalFormat = backend.GL_RGB, pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         viewportRect = GlMesh.rect()
         simpleTechnique.create(shadersLib)
-        renderScene()
+
     }
 
     private fun renderScene() {
@@ -177,6 +182,12 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     }
 
     override fun onTick() {
+        GlState.clear()
+        controller.apply { position, direction ->
+            camera.position.set(position)
+            camera.direction.set(direction)
+        }
+        renderScene()
         GlState.drawWithNoCulling {
             simpleTechnique.draw(viewM, projectionM) {
                 simpleTechnique.instance(viewportRect, viewportTexture, modelM)
