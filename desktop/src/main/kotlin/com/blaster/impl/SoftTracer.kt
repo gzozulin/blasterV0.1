@@ -108,7 +108,7 @@ private val shadersLib = ShadersLib(assetStream)
 
 private val camera = RtrCamera()
 
-private val controller = Controller()
+private val controller = Controller(velocity = 0.1f, position = vec3().back())
 private val wasdInput = WasdInput(controller)
 
 private val simpleTechnique = SimpleTechnique()
