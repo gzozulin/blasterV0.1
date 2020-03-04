@@ -32,8 +32,10 @@ private const val RESOLUTION_HEIGHT = 768
 private const val REGION_WIDTH = 32
 private const val REGION_HEIGHT = 32
 
-private const val REGIONS_CNT_U = RESOLUTION_WIDTH / RESOLUTION_WIDTH
-private const val REGIONS_CNT_V = RESOLUTION_HEIGHT / RESOLUTION_HEIGHT
+private const val REGIONS_CNT_U = RESOLUTION_WIDTH / REGION_WIDTH
+private const val REGIONS_CNT_V = RESOLUTION_HEIGHT / REGION_HEIGHT
+
+private const val REGIONS_CNT = REGIONS_CNT_U * REGIONS_CNT_V
 
 private const val PIXEL_SIZE = 3 // r, g, b
 
@@ -60,17 +62,35 @@ private val simpleTechnique = SimpleTechnique()
 
 private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 
+private val jobs = mutableListOf<RegionJob>()
+
 private class RegionJob(index: Int, val uStep: Int, val vStep: Int) {
     val byteBuffer: ByteBuffer = ByteBuffer
             .allocateDirect(REGION_WIDTH * REGION_HEIGHT * PIXEL_SIZE * 4)
             .order(ByteOrder.nativeOrder())
     val floatBuffer: FloatBuffer = byteBuffer.asFloatBuffer()
 
-    val uFrom = (index / REGIONS_CNT_U) * REGION_WIDTH
-    val vFrom = (index % REGIONS_CNT_U) * REGION_WIDTH
+    val uFrom = (index % REGIONS_CNT_U) * REGION_WIDTH
+    val vFrom = (index / REGIONS_CNT_U) * REGION_HEIGHT
 }
 
-private val jobs = listOf(RegionJob(0, 1, 1))
+private fun createRegionJobs() {
+    for (i in 0 until REGIONS_CNT) {
+        jobs.add(RegionJob(i, 16, 16))
+    }
+    for (i in 0 until REGIONS_CNT) {
+        jobs.add(RegionJob(i, 8, 8))
+    }
+    for (i in 0 until REGIONS_CNT) {
+        jobs.add(RegionJob(i, 4, 4))
+    }
+    for (i in 0 until REGIONS_CNT) {
+        jobs.add(RegionJob(i, 2, 2))
+    }
+    for (i in 0 until REGIONS_CNT) {
+        jobs.add(RegionJob(i, 1, 1))
+    }
+}
 
 private class RtrCamera {
     val position: vec3 = vec3().zero()
@@ -89,9 +109,8 @@ private class RtrCamera {
     }
 
     fun ray(u: Float, v: Float): ray {
-        // assuming viewport w and h are equal to the image w and h
         val x = VIEWPORT_LEFT + VIEWPORT_WIDTH * (u + 0.5f) / RESOLUTION_WIDTH
-        val y = VIEWPORT_BOTTOM + VIEWPORT_HEIGHT * (v +0.5f) / RESOLUTION_HEIGHT
+        val y = VIEWPORT_BOTTOM + VIEWPORT_HEIGHT * (v + 0.5f) / RESOLUTION_HEIGHT
         val dir = vec3(direction).mul(FOCUS_DISTANCE)
         val uComp = vec3(basisX).mul(x)
         val vComp = vec3(basisY).mul(y)
@@ -180,6 +199,7 @@ private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, line: In
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
+        createRegionJobs()
         viewportTexture = GlTexture(
                 unit = 0,
                 width = RESOLUTION_WIDTH, height = RESOLUTION_HEIGHT,
