@@ -11,6 +11,9 @@ import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.SimpleTechnique
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.joml.Intersectionf
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -21,10 +24,10 @@ private val backend = GlLocator.locate()
 private const val VIEWPORT_WIDTH = 10
 private const val VIEWPORT_HEIGHT = 10
 
+private const val FOCUS_DISTANCE = 10.0f
+
 private const val VIEWPORT_LEFT = (-VIEWPORT_WIDTH / 2f).toInt()
 private const val VIEWPORT_BOTTOM = (-VIEWPORT_HEIGHT / 2f).toInt()
-
-private const val FOCUS_DISTANCE = 10.0f
 
 private const val RESOLUTION_WIDTH = 1024
 private const val RESOLUTION_HEIGHT = 768
@@ -163,8 +166,13 @@ private fun calculateColor(u: Float, v: Float): color {
 
 private fun renderScene() {
     camera.updateBasis()
-    for (job in jobs) {
-        updateRegion(job)
+    val task = runBlocking {
+        for (job in jobs) {
+            withContext(Dispatchers.Default) {
+                updateRegion(job)
+            }
+            updateViewportTexture(job)
+        }
     }
 }
 
@@ -178,19 +186,22 @@ private fun updateRegion(regionJob: RegionJob) {
     for (v in yRange step regionJob.vStep) {
         for (u in uRange step  regionJob.uStep) {
             val color = calculateColor(regionJob.uFrom + u + uHalf, regionJob.vFrom + v + vHalf)
-            fillRegion(u, v, regionJob.uStep, regionJob.vStep, REGION_WIDTH, color, regionJob.floatBuffer)
+            fillRegion(u, v, regionJob.uStep, regionJob.vStep, color, regionJob.floatBuffer)
         }
     }
+}
+
+private fun updateViewportTexture(regionJob: RegionJob) {
     viewportTexture.updatePixels(uOffset = regionJob.uFrom, vOffset = regionJob.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
             format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionJob.byteBuffer)
 }
 
-private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, line: Int, color: color, buffer: FloatBuffer) {
+private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: color, buffer: FloatBuffer) {
     val uRange = fromU until fromU + width
     val vRange = fromV until fromV + height
     for (v in vRange) {
         for (u in uRange) {
-            val offset = (u + v * line) * PIXEL_SIZE
+            val offset = (u + v * REGION_WIDTH) * PIXEL_SIZE
             buffer.position(offset)
             buffer.put(color)
         }
