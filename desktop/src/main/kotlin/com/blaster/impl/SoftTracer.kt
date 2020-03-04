@@ -27,14 +27,50 @@ private const val VIEWPORT_BOTTOM = (-VIEWPORT_HEIGHT / 2f).toInt()
 private const val FOCUS_DISTANCE = 10.0f
 
 private const val RESOLUTION_WIDTH = 1024
-private const val RESOLUTION_HEIGHT = 1024
+private const val RESOLUTION_HEIGHT = 768
 
-private const val PIXEL_SIZE = 3
+private const val REGION_WIDTH = 32
+private const val REGION_HEIGHT = 32
+
+private const val REGIONS_CNT_U = RESOLUTION_WIDTH / RESOLUTION_WIDTH
+private const val REGIONS_CNT_V = RESOLUTION_HEIGHT / RESOLUTION_HEIGHT
+
+private const val PIXEL_SIZE = 3 // r, g, b
 
 private lateinit var viewportRect: GlMesh
 private lateinit var viewportTexture: GlTexture
 
-// todo: static list of predefined jobs (byte buff, float buff, region, steps)
+private val upVec = vec3().up()
+private val viewM = mat4().identity()
+private val projectionM = mat4().identity()
+private val modelM = mat4().identity()
+
+private var mouseControl = false
+
+private val assetStream = AssetStream()
+private val shadersLib = ShadersLib(assetStream)
+
+private val camera = RtrCamera()
+private val cameraVersion = Version()
+
+private val controller = Controller(velocity = 0.1f, position = vec3().back())
+private val wasdInput = WasdInput(controller)
+
+private val simpleTechnique = SimpleTechnique()
+
+private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
+
+private class RegionJob(index: Int, val uStep: Int, val vStep: Int) {
+    val byteBuffer: ByteBuffer = ByteBuffer
+            .allocateDirect(REGION_WIDTH * REGION_HEIGHT * PIXEL_SIZE * 4)
+            .order(ByteOrder.nativeOrder())
+    val floatBuffer: FloatBuffer = byteBuffer.asFloatBuffer()
+
+    val uFrom = (index / REGIONS_CNT_U) * REGION_WIDTH
+    val vFrom = (index % REGIONS_CNT_U) * REGION_WIDTH
+}
+
+private val jobs = listOf(RegionJob(0, 1, 1))
 
 private class RtrCamera {
     val position: vec3 = vec3().zero()
@@ -96,25 +132,6 @@ private class HitableSphere(private val center: vec3, private val radius: Float,
     }
 }
 
-private val upVec = vec3().up()
-private val viewM = mat4().identity()
-private val projectionM = mat4().identity()
-private val modelM = mat4().identity()
-
-private var mouseControl = false
-
-private val assetStream = AssetStream()
-private val shadersLib = ShadersLib(assetStream)
-
-private val camera = RtrCamera()
-
-private val controller = Controller(velocity = 0.1f, position = vec3().back())
-private val wasdInput = WasdInput(controller)
-
-private val simpleTechnique = SimpleTechnique()
-
-private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
-
 private fun calculateColor(u: Float, v: Float): color {
     val ray = camera.ray(u, v)
     val result = scene.hit(ray, 0f, Float.MAX_VALUE)
@@ -125,33 +142,28 @@ private fun calculateColor(u: Float, v: Float): color {
     }
 }
 
-val byteBuffer = ByteBuffer
-        .allocateDirect(RESOLUTION_WIDTH * RESOLUTION_HEIGHT * PIXEL_SIZE * 4)
-        .order(ByteOrder.nativeOrder())
+private fun renderScene() {
+    camera.updateBasis()
+    for (job in jobs) {
+        updateRegion(job)
+    }
+}
 
-val floatBuffer = byteBuffer.asFloatBuffer()
-
-private fun updateRegion(fromU: Int, fromV: Int, width: Int, height: Int, uStep: Int, vStep: Int) {
-
-
-
-    check(width % uStep == 0 && uStep <= width)
-    check(height % vStep == 0 && vStep <= height)
-
-    val uHalf = uStep / 2f
-    val vHalf = vStep / 2f
-
-    val uRange = fromU until fromU + width
-    val yRange = fromV until fromV + height
-
-    for (v in yRange step vStep) {
-        for (u in uRange step  uStep) {
-            val color = calculateColor(u + uHalf, v + vHalf)
-            fillRegion(u, v, uStep, vStep, width, color, floatBuffer)
+private fun updateRegion(regionJob: RegionJob) {
+    check(REGION_WIDTH % regionJob.uStep == 0 && regionJob.uStep <= REGION_WIDTH)
+    check(REGION_HEIGHT % regionJob.vStep == 0 && regionJob.vStep <= REGION_HEIGHT)
+    val uHalf = regionJob.uStep / 2f
+    val vHalf = regionJob.vStep / 2f
+    val uRange = 0 until REGION_WIDTH
+    val yRange = 0 until REGION_HEIGHT
+    for (v in yRange step regionJob.vStep) {
+        for (u in uRange step  regionJob.uStep) {
+            val color = calculateColor(regionJob.uFrom + u + uHalf, regionJob.vFrom + v + vHalf)
+            fillRegion(u, v, regionJob.uStep, regionJob.vStep, REGION_WIDTH, color, regionJob.floatBuffer)
         }
     }
-    viewportTexture.updatePixels(uOffset = fromU, vOffset = fromV, width = width, height = height,
-            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = byteBuffer)
+    viewportTexture.updatePixels(uOffset = regionJob.uFrom, vOffset = regionJob.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
+            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionJob.byteBuffer)
 }
 
 private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, line: Int, color: color, buffer: FloatBuffer) {
@@ -174,22 +186,17 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 internalFormat = backend.GL_RGB, pixelFormat = backend.GL_RGB, pixelType = backend.GL_FLOAT)
         viewportRect = GlMesh.rect()
         simpleTechnique.create(shadersLib)
-
-    }
-
-    private fun renderScene() {
-        camera.updateBasis()
-        updateRegion(0, 0, RESOLUTION_WIDTH/2, RESOLUTION_HEIGHT/2, 16, 16)
-        updateRegion(RESOLUTION_WIDTH/2, RESOLUTION_HEIGHT/2, RESOLUTION_WIDTH/2, RESOLUTION_HEIGHT/2, 1, 1)
     }
 
     override fun onTick() {
         GlState.clear()
-        controller.apply { position, direction ->
-            camera.position.set(position)
-            camera.direction.set(direction)
+        if (cameraVersion.check()) {
+            controller.apply { position, direction ->
+                camera.position.set(position)
+                camera.direction.set(direction)
+            }
+            renderScene()
         }
-        renderScene()
         GlState.drawWithNoCulling {
             simpleTechnique.draw(viewM, projectionM) {
                 simpleTechnique.instance(viewportRect, viewportTexture, modelM)
@@ -200,6 +207,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCursorDelta(delta: vec2) {
         if (mouseControl) {
             wasdInput.onCursorDelta(delta)
+            cameraVersion.increment()
         }
     }
 
@@ -213,10 +221,12 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun keyPressed(key: Int) {
         wasdInput.keyPressed(key)
+        cameraVersion.increment()
     }
 
     override fun keyReleased(key: Int) {
         wasdInput.keyReleased(key)
+        cameraVersion.increment()
     }
 }
 
