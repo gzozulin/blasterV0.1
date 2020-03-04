@@ -34,6 +34,8 @@ private const val PIXEL_SIZE = 3
 private lateinit var viewportRect: GlMesh
 private lateinit var viewportTexture: GlTexture
 
+// todo: static list of predefined jobs (byte buff, float buff, region, steps)
+
 private class RtrCamera {
     val position: vec3 = vec3().zero()
     val direction: vec3 = vec3().back()
