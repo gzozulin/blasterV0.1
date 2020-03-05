@@ -11,9 +11,8 @@ import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.SimpleTechnique
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import jdk.nashorn.internal.objects.Global
+import kotlinx.coroutines.*
 import org.joml.Intersectionf
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -66,6 +65,7 @@ private val simpleTechnique = SimpleTechnique()
 private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 
 private val jobs = mutableListOf<RegionJob>()
+private val jobsDone = mutableListOf<RegionJob>()
 
 private class RegionJob(index: Int, val uStep: Int, val vStep: Int) {
     val byteBuffer: ByteBuffer = ByteBuffer
@@ -166,17 +166,15 @@ private fun calculateColor(u: Float, v: Float): color {
 
 private fun renderScene() {
     camera.updateBasis()
-    val task = runBlocking {
+    GlobalScope.launch {
         for (job in jobs) {
-            withContext(Dispatchers.Default) {
-                updateRegion(job)
-            }
-            updateViewportTexture(job)
+            val done = async { updateRegion(job) }
+            jobsDone.add(done.await())
         }
     }
 }
 
-private fun updateRegion(regionJob: RegionJob) {
+private fun updateRegion(regionJob: RegionJob): RegionJob {
     check(REGION_WIDTH % regionJob.uStep == 0 && regionJob.uStep <= REGION_WIDTH)
     check(REGION_HEIGHT % regionJob.vStep == 0 && regionJob.vStep <= REGION_HEIGHT)
     val uHalf = regionJob.uStep / 2f
@@ -189,6 +187,7 @@ private fun updateRegion(regionJob: RegionJob) {
             fillRegion(u, v, regionJob.uStep, regionJob.vStep, color, regionJob.floatBuffer)
         }
     }
+    return regionJob
 }
 
 private fun updateViewportTexture(regionJob: RegionJob) {
@@ -227,6 +226,10 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 camera.direction.set(direction)
             }
             renderScene()
+        }
+        if (jobsDone.isNotEmpty()) {
+            val first = jobsDone.removeAt(0)
+            updateViewportTexture(first)
         }
         GlState.drawWithNoCulling {
             simpleTechnique.draw(viewM, projectionM) {
