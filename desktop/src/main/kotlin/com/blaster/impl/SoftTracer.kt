@@ -11,7 +11,6 @@ import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.SimpleTechnique
-import jdk.nashorn.internal.objects.Global
 import kotlinx.coroutines.*
 import org.joml.Intersectionf
 import java.nio.ByteBuffer
@@ -41,6 +40,8 @@ private const val REGIONS_CNT = REGIONS_CNT_U * REGIONS_CNT_V
 
 private const val PIXEL_SIZE = 3 // r, g, b
 
+private const val JOBS_PER_TICK = 10
+
 private lateinit var viewportRect: GlMesh
 private lateinit var viewportTexture: GlTexture
 
@@ -64,10 +65,12 @@ private val simpleTechnique = SimpleTechnique()
 
 private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 
-private val jobs = mutableListOf<RegionJob>()
-private val jobsDone = mutableListOf<RegionJob>()
+private val tasks = mutableListOf<RegionTask>()
+private val tasksDone = mutableListOf<RegionTask>()
 
-private class RegionJob(index: Int, val uStep: Int, val vStep: Int) {
+private var currentJob: Job = GlobalScope.launch { }
+
+private class RegionTask(index: Int, val uStep: Int, val vStep: Int) {
     val byteBuffer: ByteBuffer = ByteBuffer
             .allocateDirect(REGION_WIDTH * REGION_HEIGHT * PIXEL_SIZE * 4)
             .order(ByteOrder.nativeOrder())
@@ -77,21 +80,21 @@ private class RegionJob(index: Int, val uStep: Int, val vStep: Int) {
     val vFrom = (index / REGIONS_CNT_U) * REGION_HEIGHT
 }
 
-private fun createRegionJobs() {
+private fun createRegionTasks() {
     for (i in 0 until REGIONS_CNT) {
-        jobs.add(RegionJob(i, 16, 16))
+        tasks.add(RegionTask(i, 16, 16))
     }
     for (i in 0 until REGIONS_CNT) {
-        jobs.add(RegionJob(i, 8, 8))
+        tasks.add(RegionTask(i, 8, 8))
     }
     for (i in 0 until REGIONS_CNT) {
-        jobs.add(RegionJob(i, 4, 4))
+        tasks.add(RegionTask(i, 4, 4))
     }
     for (i in 0 until REGIONS_CNT) {
-        jobs.add(RegionJob(i, 2, 2))
+        tasks.add(RegionTask(i, 2, 2))
     }
     for (i in 0 until REGIONS_CNT) {
-        jobs.add(RegionJob(i, 1, 1))
+        tasks.add(RegionTask(i, 1, 1))
     }
 }
 
@@ -164,35 +167,57 @@ private fun calculateColor(u: Float, v: Float): color {
     }
 }
 
-private fun renderScene() {
-    camera.updateBasis()
-    GlobalScope.launch {
-        for (job in jobs) {
-            val done = async { updateRegion(job) }
-            jobsDone.add(done.await())
+private fun updateSceneIfNeeded() {
+    if (cameraVersion.check()) {
+        GlobalScope.launch {
+            currentJob.cancelAndJoin()
+            controller.apply { position, direction ->
+                camera.position.set(position)
+                camera.direction.set(direction)
+            }
+            camera.updateBasis()
+            currentJob = launch {
+                for (task in tasks) {
+                    val done = async { updateRegion(task) }
+                    val result = done.await()
+                    if (isActive) {
+                        tasksDone.add(result)
+                    }
+                }
+            }
         }
     }
 }
 
-private fun updateRegion(regionJob: RegionJob): RegionJob {
-    check(REGION_WIDTH % regionJob.uStep == 0 && regionJob.uStep <= REGION_WIDTH)
-    check(REGION_HEIGHT % regionJob.vStep == 0 && regionJob.vStep <= REGION_HEIGHT)
-    val uHalf = regionJob.uStep / 2f
-    val vHalf = regionJob.vStep / 2f
+private fun partiallyUpdateViewport() {
+    for (i in 0 until JOBS_PER_TICK) {
+        if (tasksDone.isEmpty()) {
+            break
+        }
+        val first = tasksDone.removeAt(0)
+        updateViewportTexture(first)
+    }
+}
+
+private fun updateRegion(regionTask: RegionTask): RegionTask {
+    check(REGION_WIDTH % regionTask.uStep == 0 && regionTask.uStep <= REGION_WIDTH)
+    check(REGION_HEIGHT % regionTask.vStep == 0 && regionTask.vStep <= REGION_HEIGHT)
+    val uHalf = regionTask.uStep / 2f
+    val vHalf = regionTask.vStep / 2f
     val uRange = 0 until REGION_WIDTH
     val yRange = 0 until REGION_HEIGHT
-    for (v in yRange step regionJob.vStep) {
-        for (u in uRange step  regionJob.uStep) {
-            val color = calculateColor(regionJob.uFrom + u + uHalf, regionJob.vFrom + v + vHalf)
-            fillRegion(u, v, regionJob.uStep, regionJob.vStep, color, regionJob.floatBuffer)
+    for (v in yRange step regionTask.vStep) {
+        for (u in uRange step  regionTask.uStep) {
+            val color = calculateColor(regionTask.uFrom + u + uHalf, regionTask.vFrom + v + vHalf)
+            fillRegion(u, v, regionTask.uStep, regionTask.vStep, color, regionTask.floatBuffer)
         }
     }
-    return regionJob
+    return regionTask
 }
 
-private fun updateViewportTexture(regionJob: RegionJob) {
-    viewportTexture.updatePixels(uOffset = regionJob.uFrom, vOffset = regionJob.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
-            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionJob.byteBuffer)
+private fun updateViewportTexture(regionTask: RegionTask) {
+    viewportTexture.updatePixels(uOffset = regionTask.uFrom, vOffset = regionTask.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
+            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionTask.byteBuffer)
 }
 
 private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: color, buffer: FloatBuffer) {
@@ -209,7 +234,7 @@ private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: c
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
-        createRegionJobs()
+        createRegionTasks()
         viewportTexture = GlTexture(
                 unit = 0,
                 width = RESOLUTION_WIDTH, height = RESOLUTION_HEIGHT,
@@ -220,17 +245,8 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun onTick() {
         GlState.clear()
-        if (cameraVersion.check()) {
-            controller.apply { position, direction ->
-                camera.position.set(position)
-                camera.direction.set(direction)
-            }
-            renderScene()
-        }
-        if (jobsDone.isNotEmpty()) {
-            val first = jobsDone.removeAt(0)
-            updateViewportTexture(first)
-        }
+        updateSceneIfNeeded()
+        partiallyUpdateViewport()
         GlState.drawWithNoCulling {
             simpleTechnique.draw(viewM, projectionM) {
                 simpleTechnique.instance(viewportRect, viewportTexture, modelM)
