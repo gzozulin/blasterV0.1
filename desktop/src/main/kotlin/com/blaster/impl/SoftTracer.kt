@@ -205,8 +205,8 @@ private fun updateRegion(regionTask: RegionTask): RegionTask {
     val uHalf = regionTask.uStep / 2f
     val vHalf = regionTask.vStep / 2f
     val uRange = 0 until REGION_WIDTH
-    val yRange = 0 until REGION_HEIGHT
-    for (v in yRange step regionTask.vStep) {
+    val vRange = 0 until REGION_HEIGHT
+    for (v in vRange step regionTask.vStep) {
         for (u in uRange step  regionTask.uStep) {
             val color = calculateColor(regionTask.uFrom + u + uHalf, regionTask.vFrom + v + vHalf)
             fillRegion(u, v, regionTask.uStep, regionTask.vStep, color, regionTask.floatBuffer)
