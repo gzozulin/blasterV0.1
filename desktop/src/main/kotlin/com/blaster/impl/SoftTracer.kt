@@ -12,6 +12,8 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.SimpleTechnique
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.joml.Intersectionf
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -40,7 +42,7 @@ private const val REGIONS_CNT = REGIONS_CNT_U * REGIONS_CNT_V
 
 private const val PIXEL_SIZE = 3 // r, g, b
 
-private const val JOBS_PER_TICK = 10
+private const val REGIONS_PER_TICK = 50
 
 private lateinit var viewportRect: GlMesh
 private lateinit var viewportTexture: GlTexture
@@ -56,7 +58,7 @@ private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 
 private val camera = RtrCamera()
-private val cameraVersion = Version()
+private val sceneVersion = Version()
 
 private val controller = Controller(velocity = 0.1f, position = vec3().back())
 private val wasdInput = WasdInput(controller)
@@ -65,8 +67,9 @@ private val simpleTechnique = SimpleTechnique()
 
 private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 
-private val tasks = mutableListOf<RegionTask>()
-private val tasksDone = mutableListOf<RegionTask>()
+private val regions = mutableListOf<RegionTask>()
+private val regionsDone = mutableListOf<RegionTask>()
+private val regionMutex = Mutex()
 
 private var currentJob: Job = Job()
 
@@ -82,19 +85,13 @@ private class RegionTask(index: Int, val uStep: Int, val vStep: Int) {
 
 private fun createRegionTasks() {
     for (i in 0 until REGIONS_CNT) {
-        tasks.add(RegionTask(i, 16, 16))
+        regions.add(RegionTask(i, 32, 32))
     }
     for (i in 0 until REGIONS_CNT) {
-        tasks.add(RegionTask(i, 8, 8))
+        regions.add(RegionTask(i, 8, 8))
     }
     for (i in 0 until REGIONS_CNT) {
-        tasks.add(RegionTask(i, 4, 4))
-    }
-    for (i in 0 until REGIONS_CNT) {
-        tasks.add(RegionTask(i, 2, 2))
-    }
-    for (i in 0 until REGIONS_CNT) {
-        tasks.add(RegionTask(i, 1, 1))
+        regions.add(RegionTask(i, 1, 1))
     }
 }
 
@@ -168,41 +165,40 @@ private fun calculateColor(u: Float, v: Float): color {
 }
 
 private fun updateSceneIfNeeded() {
-    if (cameraVersion.check()) {
-
+    if (sceneVersion.check()) {
         runBlocking {
             currentJob.cancel()
-            controller.apply { position, direction ->
-                camera.position.set(position)
-                camera.direction.set(direction)
+            regionMutex.withLock {
+                regionsDone.clear()
             }
             camera.updateBasis()
             currentJob = launch {
-
-
-                for (task in tasks) {
-                    val done = async(Dispatchers.Default) { updateRegion(task) }
-                    val result = done.await()
-                    if (isActive) {
-                        tasksDone.add(result)
+                for (task in regions) {
+                    withContext(Dispatchers.Default) {
+                        val result = updateRegion(task)
+                        if (isActive) {
+                            regionMutex.withLock {
+                                regionsDone.add(result)
+                            }
+                        }
                     }
                 }
             }
-        }
-
-        GlobalScope.launch {
-
         }
     }
 }
 
 private fun partiallyUpdateViewport() {
-    for (i in 0 until JOBS_PER_TICK) {
-        if (tasksDone.isEmpty()) {
-            break
+    runBlocking {
+        regionMutex.withLock {
+            for (i in 0 until REGIONS_PER_TICK) {
+                if (regionsDone.isEmpty()) {
+                    break
+                }
+                val first = regionsDone.removeAt(0)
+                updateViewportTexture(first)
+            }
         }
-        val first = tasksDone.removeAt(0)
-        updateViewportTexture(first)
     }
 }
 
@@ -252,6 +248,10 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun onTick() {
         GlState.clear()
+        controller.apply { position, direction ->
+            camera.position.set(position)
+            camera.direction.set(direction)
+        }
         updateSceneIfNeeded()
         partiallyUpdateViewport()
         GlState.drawWithNoCulling {
@@ -264,7 +264,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCursorDelta(delta: vec2) {
         if (mouseControl) {
             wasdInput.onCursorDelta(delta)
-            cameraVersion.increment()
+            sceneVersion.increment()
         }
     }
 
@@ -278,12 +278,12 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     override fun keyPressed(key: Int) {
         wasdInput.keyPressed(key)
-        cameraVersion.increment()
+        sceneVersion.increment()
     }
 
     override fun keyReleased(key: Int) {
         wasdInput.keyReleased(key)
-        cameraVersion.increment()
+        sceneVersion.increment()
     }
 }
 
