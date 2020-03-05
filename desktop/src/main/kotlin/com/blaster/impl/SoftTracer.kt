@@ -68,7 +68,7 @@ private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 private val tasks = mutableListOf<RegionTask>()
 private val tasksDone = mutableListOf<RegionTask>()
 
-private var currentJob: Job = GlobalScope.launch { }
+private var currentJob: Job = Job()
 
 private class RegionTask(index: Int, val uStep: Int, val vStep: Int) {
     val byteBuffer: ByteBuffer = ByteBuffer
@@ -169,22 +169,29 @@ private fun calculateColor(u: Float, v: Float): color {
 
 private fun updateSceneIfNeeded() {
     if (cameraVersion.check()) {
-        GlobalScope.launch {
-            currentJob.cancelAndJoin()
+
+        runBlocking {
+            currentJob.cancel()
             controller.apply { position, direction ->
                 camera.position.set(position)
                 camera.direction.set(direction)
             }
             camera.updateBasis()
             currentJob = launch {
+
+
                 for (task in tasks) {
-                    val done = async { updateRegion(task) }
+                    val done = async(Dispatchers.Default) { updateRegion(task) }
                     val result = done.await()
                     if (isActive) {
                         tasksDone.add(result)
                     }
                 }
             }
+        }
+
+        GlobalScope.launch {
+
         }
     }
 }
