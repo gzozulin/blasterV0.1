@@ -23,8 +23,8 @@ import kotlin.system.measureNanoTime
 
 private val backend = GlLocator.locate()
 
-private const val VIEWPORT_WIDTH = 10
-private const val VIEWPORT_HEIGHT = 10
+private const val VIEWPORT_WIDTH = 10.2
+private const val VIEWPORT_HEIGHT = 7.6
 
 private const val FOCUS_DISTANCE = 10.0f
 
