@@ -18,6 +18,8 @@ import org.joml.Intersectionf
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+import java.util.concurrent.TimeUnit
+import kotlin.system.measureNanoTime
 
 private val backend = GlLocator.locate()
 
@@ -40,9 +42,9 @@ private const val REGIONS_CNT_V = RESOLUTION_HEIGHT / REGION_HEIGHT
 
 private const val REGIONS_CNT = REGIONS_CNT_U * REGIONS_CNT_V
 
-private const val PIXEL_SIZE = 3 // r, g, b
+private val NANOS_PER_FRAME = TimeUnit.MILLISECONDS.toNanos(16)
 
-private const val REGIONS_PER_TICK = 50
+private const val PIXEL_SIZE = 3 // r, g, b
 
 private lateinit var viewportRect: GlMesh
 private lateinit var viewportTexture: GlTexture
@@ -67,7 +69,9 @@ private val simpleTechnique = SimpleTechnique()
 
 private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 
-private val regions = mutableListOf<RegionTask>()
+private val regionsLow = mutableListOf<RegionTask>()
+private val regionsMed = mutableListOf<RegionTask>()
+private val regionsHgh = mutableListOf<RegionTask>()
 private val regionsDone = mutableListOf<RegionTask>()
 private val regionMutex = Mutex()
 
@@ -96,13 +100,13 @@ private class RegionTask(index: Int, val uStep: Int, val vStep: Int) {
 
 private fun createRegionTasks() {
     for (i in 0 until REGIONS_CNT) {
-        regions.add(RegionTask(i, 32, 32))
+        regionsLow.add(RegionTask(i, 32, 32))
     }
     for (i in 0 until REGIONS_CNT) {
-        regions.add(RegionTask(i, 8, 8))
+        regionsMed.add(RegionTask(i, 8, 8))
     }
     for (i in 0 until REGIONS_CNT) {
-        regions.add(RegionTask(i, 1, 1))
+        regionsHgh.add(RegionTask(i, 1, 1))
     }
 }
 
@@ -179,35 +183,41 @@ private fun updateSceneIfNeeded() {
     if (sceneVersion.check()) {
         runBlocking {
             currentJob.cancel()
-            regionMutex.withLock {
-                regionsDone.clear()
-            }
+            regionMutex.withLock { regionsDone.clear() }
             camera.updateBasis()
             currentJob = launch {
-                for (task in regions) {
-                    withContext(Dispatchers.Default) {
-                        val result = updateRegion(task)
-                        if (isActive) {
-                            regionMutex.withLock {
-                                regionsDone.add(result)
-                            }
-                        }
-                    }
+                updateRegions(regionsLow)
+                if (isActive) {
+                    updateRegions(regionsMed)
+                }
+                if (isActive) {
+                    updateRegions(regionsHgh)
                 }
             }
         }
     }
 }
 
-private fun partiallyUpdateViewport() {
+private suspend fun updateRegions(regions: List<RegionTask>) {
+    for (task in regions) {
+        withContext(Dispatchers.Default) {
+            val result = updateRegion(task)
+            if (isActive) {
+                regionMutex.withLock { regionsDone.add(result) }
+            }
+        }
+    }
+}
+
+private fun partiallyUpdateViewport(left: Long) {
+    var time = left
     runBlocking {
         regionMutex.withLock {
-            for (i in 0 until REGIONS_PER_TICK) {
-                if (regionsDone.isEmpty()) {
-                    break
+            while (time > 0 && regionsDone.isNotEmpty()) {
+                val elapsed = measureNanoTime {
+                    updateViewportTexture(regionsDone.removeAt(0))
                 }
-                val first = regionsDone.removeAt(0)
-                updateViewportTexture(first)
+                time -= elapsed
             }
         }
     }
@@ -259,18 +269,20 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     }
 
     override fun onTick() {
-        GlState.clear()
-        controller.apply { position, direction ->
-            camera.position.set(position)
-            camera.direction.set(direction)
-        }
-        updateSceneIfNeeded()
-        partiallyUpdateViewport()
-        GlState.drawWithNoCulling {
-            simpleTechnique.draw(viewM, projectionM) {
-                simpleTechnique.instance(viewportRect, viewportTexture, modelM)
+        val elapsed = measureNanoTime {
+            GlState.clear()
+            controller.apply { position, direction ->
+                camera.position.set(position)
+                camera.direction.set(direction)
+            }
+            updateSceneIfNeeded()
+            GlState.drawWithNoCulling {
+                simpleTechnique.draw(viewM, projectionM) {
+                    simpleTechnique.instance(viewportRect, viewportTexture, modelM)
+                }
             }
         }
+        partiallyUpdateViewport(NANOS_PER_FRAME - elapsed)
     }
 
     override fun onCursorDelta(delta: vec2) {
