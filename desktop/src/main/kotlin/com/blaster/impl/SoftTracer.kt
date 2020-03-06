@@ -40,8 +40,6 @@ private const val REGION_HEIGHT = 32
 private const val REGIONS_CNT_U = RESOLUTION_WIDTH / REGION_WIDTH
 private const val REGIONS_CNT_V = RESOLUTION_HEIGHT / REGION_HEIGHT
 
-private const val REGIONS_CNT = REGIONS_CNT_U * REGIONS_CNT_V
-
 private val NANOS_PER_FRAME = TimeUnit.MILLISECONDS.toNanos(16)
 
 private const val PIXEL_SIZE = 3 // r, g, b
@@ -72,6 +70,7 @@ private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
 private val regionsLow = mutableListOf<RegionTask>()
 private val regionsMed = mutableListOf<RegionTask>()
 private val regionsHgh = mutableListOf<RegionTask>()
+
 private val regionsDone = mutableListOf<RegionTask>()
 private val regionMutex = Mutex()
 
@@ -88,26 +87,42 @@ private fun createBackground() {
     }
 }
 
-private class RegionTask(index: Int, val uStep: Int, val vStep: Int) {
+private class RegionTask(val u: Int, val v: Int, val uStep: Int, val vStep: Int) : Comparable<RegionTask> {
     val byteBuffer: ByteBuffer = ByteBuffer
             .allocateDirect(REGION_WIDTH * REGION_HEIGHT * PIXEL_SIZE * 4)
             .order(ByteOrder.nativeOrder())
     val floatBuffer: FloatBuffer = byteBuffer.asFloatBuffer()
 
-    val uFrom = (index % REGIONS_CNT_U) * REGION_WIDTH
-    val vFrom = (index / REGIONS_CNT_U) * REGION_HEIGHT
+    val uFrom = u * REGION_WIDTH
+    val vFrom = v * REGION_HEIGHT
+
+    override fun compareTo(other: RegionTask): Int {
+        val center = vec2(REGIONS_CNT_U / 2f, REGIONS_CNT_V / 2f)
+        val thisSqDist = vec2(u.toFloat(), v.toFloat()).distanceSquared(center).toInt()
+        val otherSqDist = vec2(other.u.toFloat(), other.v.toFloat()).distanceSquared(center).toInt()
+        return thisSqDist - otherSqDist
+    }
 }
 
 private fun createRegionTasks() {
-    for (i in 0 until REGIONS_CNT) {
-        regionsLow.add(RegionTask(i, 32, 32))
+    for (u in 0 until REGIONS_CNT_U) {
+        for (v in 0 until REGIONS_CNT_V) {
+            regionsLow.add(RegionTask(u, v, 32, 32))
+        }
     }
-    for (i in 0 until REGIONS_CNT) {
-        regionsMed.add(RegionTask(i, 8, 8))
+    regionsLow.sort()
+    for (u in 0 until REGIONS_CNT_U) {
+        for (v in 0 until REGIONS_CNT_V) {
+            regionsMed.add(RegionTask(u, v, 8, 8))
+        }
     }
-    for (i in 0 until REGIONS_CNT) {
-        regionsHgh.add(RegionTask(i, 1, 1))
+    regionsMed.sort()
+    for (u in 0 until REGIONS_CNT_U) {
+        for (v in 0 until REGIONS_CNT_V) {
+            regionsHgh.add(RegionTask(u, v, 1, 1))
+        }
     }
+    regionsHgh.sort()
 }
 
 private class RtrCamera {
