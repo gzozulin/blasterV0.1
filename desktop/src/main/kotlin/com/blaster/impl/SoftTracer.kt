@@ -73,6 +73,17 @@ private val regionMutex = Mutex()
 
 private var currentJob: Job = Job()
 
+private val background = mutableListOf<color>()
+
+private fun createBackground() {
+    for (v in 0 until RESOLUTION_HEIGHT) {
+        val color = color().cian().mul(v.toFloat() / RESOLUTION_HEIGHT)
+        for (u in 0 until RESOLUTION_WIDTH) {
+            background.add(color)
+        }
+    }
+}
+
 private class RegionTask(index: Int, val uStep: Int, val vStep: Int) {
     val byteBuffer: ByteBuffer = ByteBuffer
             .allocateDirect(REGION_WIDTH * REGION_HEIGHT * PIXEL_SIZE * 4)
@@ -160,7 +171,7 @@ private fun calculateColor(u: Float, v: Float): color {
     return if (result != null) {
         color().red()
     } else {
-        color().blue()
+        background[u.toInt() + v.toInt() * RESOLUTION_WIDTH]
     }
 }
 
@@ -237,6 +248,7 @@ private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: c
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
+        createBackground()
         createRegionTasks()
         viewportTexture = GlTexture(
                 unit = 0,
