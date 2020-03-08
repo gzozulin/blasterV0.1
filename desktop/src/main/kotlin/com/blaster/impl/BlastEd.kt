@@ -149,7 +149,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     }
 
     override fun onResize(width: Int, height: Int) {
-        GlState.apply(width, height)
+        GlState.apply(width, height, color = color().blue())
         camera.setPerspective(width.toFloat() / height.toFloat())
         deferredTechnique.resize(width, height)
         immediateTechnique.resize(camera)
@@ -184,7 +184,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun draw() {
         GlState.clear()
-        deferredTechnique.draw(camera, meshes =  {
+        deferredTechnique.draw(camera, instances =  {
             for (node in teapotNodes.values) {
                 val model = node.payload()
                 deferredTechnique.instance(model.mesh, node.calculateM(), model.diffuse, model.material)

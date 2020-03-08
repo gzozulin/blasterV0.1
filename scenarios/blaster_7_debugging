@@ -1,0 +1,36 @@
+Interesting intro goes here
+
+#content; Today we will discuss
+
+#header; Console
+
+#include; def; common_gl/com.blaster.toolbox.Console::line
+#include; def; common_gl/com.blaster.toolbox.Console::Level
+#include; def; common_gl/com.blaster.toolbox.Console::tick
+#include; def; common_gl/com.blaster.toolbox.Console::render
+
+#header; Text technique
+
+#include; def; common_gl/com.blaster.techniques.TextTechnique::create
+#include; def; common_gl/com.blaster.techniques.TextTechnique::draw
+#include; def; common_gl/com.blaster.techniques.TextTechnique::text
+#include; def; common_gl/com.blaster.techniques.TextTechnique::character
+
+#header; Text font and shader
+
+#picture; Retro Font; http://gzozulin.com/wp-content/uploads/2020/03/font.png
+#include; glsl; common_assets/src/main/resources/shaders/text/text.vert
+#picture; Debug text; http://gzozulin.com/wp-content/uploads/2020/03/text.png
+
+#header; Immediate Mode
+
+#include; def; common_gl/com.blaster.techniques.ImmediateTechnique::resize
+#include; def; common_gl/com.blaster.techniques.ImmediateTechnique::aabb
+#include; def; common_gl/com.blaster.techniques.ImmediateTechnique::marker
+#include; def; common_gl/com.blaster.techniques.ImmediateTechnique::line
+
+#picture; Debugging visually; http://gzozulin.com/wp-content/uploads/2020/03/immediate.png
+
+#header; Debugging visually
+
+Outro

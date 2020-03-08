@@ -81,7 +81,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 textTechnique.text(text, pos, scale, color)
             }
         }
-        deferredTechnique.draw(camera, meshes =  {
+        deferredTechnique.draw(camera, instances =  {
             deferredTechnique.instance(model.mesh, mat4(), model.diffuse, currentMaterial.value)
         }, lights = {
             deferredTechnique.light(sunlight, sunlightNode.calculateM())

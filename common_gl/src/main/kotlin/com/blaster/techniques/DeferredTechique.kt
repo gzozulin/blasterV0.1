@@ -102,16 +102,19 @@ class DeferredTechnique {
 
     private var pointLightCnt = 0
     private var dirLightCnt = 0
-    fun draw(camera: Camera, meshes: () -> Unit, lights: () -> Unit) {
+    fun draw(camera: Camera, instances: () -> Unit, lights: () -> Unit) {
         pointLightCnt = 0
         dirLightCnt = 0
-        glBind(listOf(programGeomPass, framebuffer)) {
-            programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
-            programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+        glBind(framebuffer) {
             glCheck { backend.glClear(backend.GL_COLOR_BUFFER_BIT or backend.GL_DEPTH_BUFFER_BIT) }
-            meshes.invoke()
+            glBind(programGeomPass) {
+                programGeomPass.setUniform(GlUniform.UNIFORM_VIEW_M, camera.calculateViewM())
+                programGeomPass.setUniform(GlUniform.UNIFORM_PROJ_M, camera.projectionM)
+                instances.invoke()
+            }
         }
-        glBind(listOf(programLightPass, quadMesh, positionStorage, normalStorage, diffuseStorage, depthBuffer,
+        glBind(listOf(programLightPass, quadMesh, depthBuffer,
+                positionStorage, normalStorage, diffuseStorage,
                 matAmbShineStorage, matDiffTranspStorage, matSpecularStorage)) {
             lights.invoke()
             programLightPass.setUniform(GlUniform.UNIFORM_EYE, camera.position)

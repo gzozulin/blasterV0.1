@@ -1,0 +1,302 @@
+<html>
+    <style>
+
+        .code,.child {
+                    border-radius: 3px;
+                    display: block;
+                    max-width: 100%;
+                    overflow: auto;
+                    color: #666;
+                    page-break-inside: avoid;
+                    font: normal 15px/1.6 monospace;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                    word-wrap: break-word;
+                }
+
+                .child {
+                    border-radius: 3px;
+                    background: #F1ECEC;
+                    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+                }
+
+                .code {
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                }
+
+                .code_child {
+                    border-radius: 3px;
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                }
+
+                .text {}
+                .text_child {}
+
+                .link {}
+                .link_child {}
+
+                .picture {
+                    display: block;
+                    margin: 30px auto 45px auto;
+                    max-height: 50%;
+                }
+                .picture_child {}
+
+                .list_item {}
+                .list_item_child {}
+    </style>
+    <body>
+        <p class="text">Interesting intro goes here
+</p><p class="text">
+</p><h2 id="Today-we-will-discuss">Today we will discuss</h2><ul class="list_item"><li>    <a class="link" href="#Console">Console</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Text-technique">Text technique</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Text-font-and-shader">Text font and shader</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Immediate-Mode">Immediate Mode</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Debugging-visually">Debugging visually</a>
+</li></ul><p class="text">
+</p><h2 id="Console">Console</h2>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L25" target="_blank">common_gl/com.blaster.toolbox.Console::line</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun line(text: String, level: Level) {
+    lines.add(Line(text, System.currentTimeMillis(), level))
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L21" target="_blank">common_gl/com.blaster.toolbox.Console::Level</a>
+</h3>
+    <pre><code class="lang-kotlin">enum class Level { FAILURE, INFO, SUCCESS }</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L41" target="_blank">common_gl/com.blaster.toolbox.Console::tick</a>
+</h3>
+    <pre><code class="lang-kotlin">fun tick() {
+    val current = System.currentTimeMillis()
+    val iterator = lines.iterator()
+    while (iterator.hasNext()) {
+        val line = iterator.next()
+        if (current - line.timestamp &gt; timeout) {
+            iterator.remove()
+        }
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L52" target="_blank">common_gl/com.blaster.toolbox.Console::render</a>
+</h3>
+    <pre><code class="lang-kotlin">fun render(callback: (position: Vector2f, text: String, color: Vector3f, scale: Float) -&gt; Unit) {
+    lines.forEachIndexed { index, line -&gt;
+        val color = when (line.level) {
+            Level.FAILURE -&gt; COLOR_FAILURE
+            Level.INFO -&gt; COLOR_INFO
+            Level.SUCCESS -&gt; COLOR_SUCCESS
+        }
+        POSITION.set(START_X, START_Y - TEXT_SCALE * index * 2f)
+        callback.invoke(POSITION, line.text, color, TEXT_SCALE)
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Text-technique">Text technique</h2>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L15" target="_blank">common_gl/com.blaster.techniques.TextTechnique::create</a>
+</h3>
+    <pre><code class="lang-kotlin">fun create(shadersLib: ShadersLib, textureLib: TexturesLib) {
+    program = shadersLib.loadProgram(&quot;shaders/text/text.vert&quot;, &quot;shaders/text/text.frag&quot;)
+    font = textureLib.loadTexture(&quot;textures/font.png&quot;)
+    rect = GlMesh.rect()
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L21" target="_blank">common_gl/com.blaster.techniques.TextTechnique::draw</a>
+</h3>
+    <pre><code class="lang-kotlin">fun draw(call: () -&gt; Unit) {
+    glBind(listOf(program, font, rect)) {
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, font)
+        call.invoke()
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L37" target="_blank">common_gl/com.blaster.techniques.TextTechnique::text</a>
+</h3>
+    <pre><code class="lang-kotlin">fun text(text: String, start: Vector2f, scale: Float, color: Vector3f) {
+    text.forEachIndexed { index, ch -&gt;
+        startBuf.set(start.x + index * scale, start.y)
+        character(ch, startBuf, scale, color)
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L28" target="_blank">common_gl/com.blaster.techniques.TextTechnique::character</a>
+</h3>
+    <pre><code class="lang-kotlin">fun character(ch: Char, start: Vector2f, scale: Float, color: Vector3f) {
+    program.setUniform(GlUniform.UNIFORM_CHAR_INDEX, ch.toInt())
+    program.setUniform(GlUniform.UNIFORM_CHAR_START, start)
+    program.setUniform(GlUniform.UNIFORM_CHAR_SCALE, scale)
+    program.setUniform(GlUniform.UNIFORM_COLOR, color)
+    rect.draw()
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Text-font-and-shader">Text font and shader</h2>
+<p class="text">
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/font.png" alt="Retro Font" align="middle">
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/text/text.vert" target="_blank">common_assets/src/main/resources/shaders/text/text.vert</a>
+</h3>
+    <pre><code class="lang-c">#version 300 es
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+layout (location = 1) in vec2 aTexCoord;
+
+uniform int uCharIndex;
+uniform vec2 uCharStart;
+uniform float uCharScale;
+
+out vec2 vTexCoord;
+
+const float CHAR_STEP = 16.0 / 256.0;
+const int CHARS_IN_ROW  = 16;
+
+void calculateTexCoords() {
+    float charIndexX = float(uCharIndex % CHARS_IN_ROW);
+    float charIndexY = float(CHARS_IN_ROW) - float(uCharIndex / CHARS_IN_ROW) - 1.0;
+    float texCoordX = (charIndexX + aTexCoord.x) * CHAR_STEP;
+    float texCoordY = (charIndexY + aTexCoord.y) * CHAR_STEP;
+    vTexCoord = vec2(texCoordX, texCoordY);
+}
+
+void calculatePosition() {
+    float positionX = uCharStart.x + aPosition.x * uCharScale;
+    float positionY = uCharStart.y + aPosition.y * uCharScale;
+    gl_Position = vec4(positionX, positionY, 0.0, 1.0);
+}
+
+void main() {
+    calculateTexCoords();
+    calculatePosition();
+}</code></pre>
+
+</div>
+<img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/text.png" alt="Debug text" align="middle">
+<p class="text">
+</p><h2 id="Immediate-Mode">Immediate Mode</h2>
+<p class="text">
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L18" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::resize</a>
+</h3>
+    <pre><code class="lang-kotlin">fun resize(camera: Camera) {
+    glCheck {
+        backend.glMatrixMode(backend.GL_PROJECTION)
+        camera.projectionM.get(bufferMat4)
+        backend.glLoadMatrix(bufferMat4)
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L32" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::aabb</a>
+</h3>
+    <pre><code class="lang-kotlin">fun aabb(camera: Camera, aabb: AABBf, modelM: mat4, color: vec3 = vec3(1f)) {
+    glCheck {
+        backend.glMatrixMode(backend.GL_MODELVIEW)
+        val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
+        modelViewM.get(bufferMat4)
+        val bottomLeftBack = vec3(aabb.minX, aabb.minY, aabb.minZ)
+        val bottomLeftFront = vec3(aabb.minX, aabb.minY, aabb.maxZ)
+        val bottomRightBack = vec3(aabb.maxX, aabb.minY, aabb.minZ)
+        val bottomRightFront = vec3(aabb.maxX, aabb.minY, aabb.maxZ)
+        val topLeftBack = vec3(aabb.minX, aabb.maxY, aabb.minZ)
+        val topLeftFront = vec3(aabb.minX, aabb.maxY, aabb.maxZ)
+        val topRightBack = vec3(aabb.maxX, aabb.maxY, aabb.minZ)
+        val topRightFront = vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
+        backend.glLoadMatrix(bufferMat4)
+        backend.glBegin(backend.GL_LINES)
+        line(bottomLeftBack, bottomLeftFront, color)
+        line(bottomLeftFront, bottomRightFront, color)
+        line(bottomRightFront, bottomRightBack, color)
+        line(bottomRightBack, bottomLeftBack, color)
+        line(topLeftBack, topLeftFront, color)
+        line(topLeftFront, topRightFront, color)
+        line(topRightFront, topRightBack, color)
+        line(topRightBack, topLeftBack, color)
+        line(bottomLeftBack, topLeftBack, color)
+        line(bottomLeftFront, topLeftFront, color)
+        line(bottomRightBack, topRightBack, color)
+        line(bottomRightFront, topRightFront, color)
+        backend.glEnd()
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L63" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::marker</a>
+</h3>
+    <pre><code class="lang-kotlin">fun marker(camera: Camera, modelM: mat4, color1: vec3, color2: vec3, color3: vec3, scale: Float = 1f) {
+    val half = scale / 2f
+    glCheck {
+        backend.glMatrixMode(backend.GL_MODELVIEW)
+        val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
+        modelViewM.get(bufferMat4)
+        backend.glLoadMatrix(bufferMat4)
+        backend.glBegin(backend.GL_LINES)
+        val center = vec3()
+        modelM.translation(center)
+        val start = vec3()
+        val end = vec3()
+        start.set(center)
+        start.x -= half
+        end.set(center)
+        end.x += half
+        line(start, end, color1)
+        start.set(center)
+        start.y -= half
+        end.set(center)
+        end.y += half
+        line(start, end, color2)
+        start.set(center)
+        start.z -= half
+        end.set(center)
+        end.z += half
+        line(start, end, color3)
+        backend.glEnd()
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L26" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::line</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun line(from: vec3, to: vec3, color: color) {
+    backend.glColor3f(color.x, color.y, color.z)
+    backend.glVertex3f(from)
+    backend.glVertex3f(to)
+}</code></pre>
+
+</div>
+<p class="text">
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/immediate.png" alt="Debugging visually" align="middle">
+<p class="text">
+</p><h2 id="Debugging-visually">Debugging visually</h2>
+<p class="text">
+</p><p class="text">Outro
+</p>
+        <br>
+    </body>
+</html>

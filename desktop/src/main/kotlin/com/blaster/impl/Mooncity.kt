@@ -113,7 +113,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
 
     private fun draw() {
         GlState.clear()
-        deferredTechnique.draw(camera, meshes =  {
+        deferredTechnique.draw(camera, instances =  {
             cubeNodes.forEach {
                 val model = it.payload()
                 deferredTechnique.instance(model.mesh, it.calculateM(), model.diffuse, model.material)

@@ -63,6 +63,8 @@ private val wasd = WasdInput(controller)
 
 private val identityM = mat4()
 
+private var mouseControl = false
+
 class Snowflake(origin: Vector3f) : Particle(origin) {
     val origin = Vector3f(origin)
     val randomness = random.nextFloat()
@@ -132,17 +134,20 @@ private fun updateSmoke(particle: Particle): Boolean {
     return particle.position.y < 2f
 }
 
-private val window = object : LwjglWindow() {
+private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
         billboardsTechnique.prepare(shadersLib)
         console.info("Particles ready..")
         textTechnique.create(shadersLib, texturesLib)
         console.info("Techniques ready..")
         snowflakeDiffuse = texturesLib.loadTexture("textures/snowflake.png")
+        console.info("Texture loaded: textures/snowflake.png")
         flameDiffuse = texturesLib.loadTexture("textures/flame.png")
         flameDiffuse2 = texturesLib.loadTexture("textures/flame.png", mirror = true)
+        console.info("Texture loaded: textures/flame.png")
         smokeDiffuse = texturesLib.loadTexture("textures/smoke.png")
         smokeDiffuse2 = texturesLib.loadTexture("textures/smoke.png", mirror = true)
+        console.info("Texture loaded: textures/smoke.png")
         console.success("All ready..")
     }
 
@@ -184,7 +189,17 @@ private val window = object : LwjglWindow() {
     }
 
     override fun onCursorDelta(delta: Vector2f) {
-        wasd.onCursorDelta(delta)
+        if (mouseControl) {
+            wasd.onCursorDelta(delta)
+        }
+    }
+
+    override fun mouseBtnPressed(btn: Int) {
+        mouseControl = true
+    }
+
+    override fun mouseBtnReleased(btn: Int) {
+        mouseControl = false
     }
 
     override fun keyPressed(key: Int) {

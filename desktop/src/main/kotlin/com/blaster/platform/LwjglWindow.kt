@@ -2,7 +2,6 @@ package com.blaster.platform
 
 import com.blaster.auxiliary.Once
 import com.blaster.auxiliary.vec2
-import org.joml.Vector2f
 import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*
 import org.lwjgl.glfw.GLFWKeyCallback
@@ -134,34 +133,33 @@ abstract class LwjglWindow(
     }
 
     private fun createWindow(): Long {
-        val new = if (isFullscreen) {
+        val result = if (isFullscreen) {
             glfwCreateWindow(fullWidth, fullHeight, "Blaster!", glfwGetPrimaryMonitor(), window)
         } else {
             glfwCreateWindow(winWidth, winHeight, "Blaster!", NULL, window)
         }
         if (!isFullscreen) {
-            glfwSetWindowPos(new, winX, winY)
+            glfwSetWindowPos(result, winX, winY)
         }
         if (isHoldingCursor) {
-            glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+            glfwSetInputMode(result, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
         }
         if (isMultisampled) {
             glfwWindowHint(GLFW_SAMPLES, 4)
         }
-        glfwSetWindowSizeCallback(new, windowSizeCallback)
-        glfwSetMouseButtonCallback(new, mouseBtnCallback)
-        glfwSetKeyCallback(new, keyCallback)
-        glfwMakeContextCurrent(new)
+        glfwSetWindowSizeCallback(result, windowSizeCallback)
+        glfwSetMouseButtonCallback(result, mouseBtnCallback)
+        glfwSetKeyCallback(result, keyCallback)
+        glfwMakeContextCurrent(result)
         glfwSwapInterval(1)
         GLContext.createFromCurrent()
-        glfwShowWindow(new)
+        glfwShowWindow(result)
         if (contextCreated.check()) {
             onCreate()
         }
-        onResize(
-                if (isFullscreen) fullWidth else winWidth,
+        onResize(if (isFullscreen) fullWidth else winWidth,
                 if (isFullscreen) fullHeight else winHeight)
-        return new
+        return result
     }
 
     private fun destroyWindow(handle: Long) {
