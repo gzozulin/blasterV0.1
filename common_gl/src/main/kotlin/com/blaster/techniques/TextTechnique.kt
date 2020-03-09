@@ -9,19 +9,27 @@ import org.joml.Vector3f
 
 class TextTechnique {
     private lateinit var program: GlProgram
-    private lateinit var font: GlTexture
+    private lateinit var diffuse: GlTexture
     private lateinit var rect: GlMesh
 
-    fun create(shadersLib: ShadersLib, textureLib: TexturesLib) {
+    fun create(shadersLib: ShadersLib, textureLib: TexturesLib, font: String = "textures/font.png") {
         program = shadersLib.loadProgram("shaders/text/text.vert", "shaders/text/text.frag")
-        font = textureLib.loadTexture("textures/font.png")
+        diffuse = textureLib.loadTexture(font)
         rect = GlMesh.rect()
     }
 
     fun draw(call: () -> Unit) {
-        glBind(listOf(program, font, rect)) {
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, font)
+        glBind(listOf(program, diffuse, rect)) {
+            program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
             call.invoke()
+        }
+    }
+
+    private val startBuf = Vector2f()
+    fun text(text: String, start: Vector2f, scale: Float, color: Vector3f) {
+        text.forEachIndexed { index, ch ->
+            startBuf.set(start.x + index * scale, start.y)
+            character(ch, startBuf, scale, color)
         }
     }
 
@@ -31,13 +39,5 @@ class TextTechnique {
         program.setUniform(GlUniform.UNIFORM_CHAR_SCALE, scale)
         program.setUniform(GlUniform.UNIFORM_COLOR, color)
         rect.draw()
-    }
-
-    private val startBuf = Vector2f()
-    fun text(text: String, start: Vector2f, scale: Float, color: Vector3f) {
-        text.forEachIndexed { index, ch ->
-            startBuf.set(start.x + index * scale, start.y)
-            character(ch, startBuf, scale, color)
-        }
     }
 }

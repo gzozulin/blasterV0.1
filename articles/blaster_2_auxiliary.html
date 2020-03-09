@@ -99,8 +99,8 @@
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L21" target="_blank">common_gl/com.blaster.techniques.TextTechnique::draw</a>
 </h3>
     <pre><code class="lang-kotlin">fun draw(call: () -&gt; Unit) {
-    glBind(listOf(program, font, rect)) {
-        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, font)
+    glBind(listOf(program, diffuse, rect)) {
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
         call.invoke()
     }
 }</code></pre>

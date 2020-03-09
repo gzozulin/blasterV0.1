@@ -78,7 +78,7 @@
 </p><p class="text">I should probably start by explaining the basics. To hide OpenGL boilerplate code for desktop, I created a class called LwjglWindow:
 </p><p class="text">
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L26" target="_blank">desktop/com.blaster.platform.LwjglWindow</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L25" target="_blank">desktop/com.blaster.platform.LwjglWindow</a>
 </h3>
     <pre><code class="lang-kotlin">abstract class LwjglWindow(
         private val isHoldingCursor: Boolean = true,
@@ -92,37 +92,36 @@
 </p><p class="text">Probably the most interesting part of it is the creation of the window:
 </p><p class="text">
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L136" target="_blank">desktop/com.blaster.platform.LwjglWindow::createWindow</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L135" target="_blank">desktop/com.blaster.platform.LwjglWindow::createWindow</a>
 </h3>
     <pre><code class="lang-kotlin">private fun createWindow(): Long {
-    val new = if (isFullscreen) {
+    val result = if (isFullscreen) {
         glfwCreateWindow(fullWidth, fullHeight, &quot;Blaster!&quot;, glfwGetPrimaryMonitor(), window)
     } else {
         glfwCreateWindow(winWidth, winHeight, &quot;Blaster!&quot;, NULL, window)
     }
     if (!isFullscreen) {
-        glfwSetWindowPos(new, winX, winY)
+        glfwSetWindowPos(result, winX, winY)
     }
     if (isHoldingCursor) {
-        glfwSetInputMode(new, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
+        glfwSetInputMode(result, GLFW_CURSOR, GLFW_CURSOR_DISABLED)
     }
     if (isMultisampled) {
         glfwWindowHint(GLFW_SAMPLES, 4)
     }
-    glfwSetWindowSizeCallback(new, windowSizeCallback)
-    glfwSetMouseButtonCallback(new, mouseBtnCallback)
-    glfwSetKeyCallback(new, keyCallback)
-    glfwMakeContextCurrent(new)
+    glfwSetWindowSizeCallback(result, windowSizeCallback)
+    glfwSetMouseButtonCallback(result, mouseBtnCallback)
+    glfwSetKeyCallback(result, keyCallback)
+    glfwMakeContextCurrent(result)
     glfwSwapInterval(1)
     GLContext.createFromCurrent()
-    glfwShowWindow(new)
+    glfwShowWindow(result)
     if (contextCreated.check()) {
         onCreate()
     }
-    onResize(
-            if (isFullscreen) fullWidth else winWidth,
+    onResize(if (isFullscreen) fullWidth else winWidth,
             if (isFullscreen) fullHeight else winHeight)
-    return new
+    return result
 }</code></pre>
 
 </div>
@@ -130,7 +129,7 @@
 </p><p class="text">One more thing to note is that we also load corresponding OpenGl binary libraries here:
 </p><p class="text">
 </p><div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L50" target="_blank">desktop/com.blaster.platform.LwjglWindow::loadSharedLibs</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/platform/LwjglWindow.kt#L49" target="_blank">desktop/com.blaster.platform.LwjglWindow::loadSharedLibs</a>
 </h3>
     <pre><code class="lang-kotlin">private fun loadSharedLibs() {
     SharedLibraryLoader.load()

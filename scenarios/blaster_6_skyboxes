@@ -67,6 +67,9 @@ Rendering of the skybox is trivial. The only thing to note here is the operation
 Shaders are really similar to SimpleTechnique, the only difference is that the cube map is represented by 'samplerCube' uniform. The math of calculating of the view ray intersection with the cube is conveniently hidden in 'texture(uTexDiffuse, vTexCoord)' call:
 #include; glsl; common_assets/src/main/resources/shaders/skybox/skybox.frag
 
+One neat trick is hidden in skybox vertex calculation, though:
+#include; glsl; common_assets/src/main/resources/shaders/skybox/skybox.vert
+
 #header; Skybox app
 
 I am using skyboxes all over the place because of convenience and value, which they immediately add to the scene. Still, to showcase and tune the technique separately, I created a standalone app specifically for skyboxes:

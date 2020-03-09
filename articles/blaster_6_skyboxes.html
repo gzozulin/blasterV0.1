@@ -241,6 +241,30 @@ void main() {
 
 </div>
 <p class="text">
+</p><p class="text">One neat trick is hidden in skybox vertex calculation, though:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/skybox/skybox.vert" target="_blank">common_assets/src/main/resources/shaders/skybox/skybox.vert</a>
+</h3>
+    <pre><code class="lang-c">#version 300 es
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+
+uniform mat4 uProjectionM;
+uniform mat4 uViewM;
+
+out vec3 vTexCoord;
+
+void main() {
+    vTexCoord = aPosition;
+    vec4 pos = uProjectionM * uViewM * vec4(aPosition, 1.0);</code></pre>
+<p class="text_child">Setting the vertex z == w, "The depth of a fragment in the Z-buffer is computed as z/w. If z==w, then you get a depth of 1.0, or 100%."     <a class="link_child" href="https://www.gamedev.net/forums/topic/577973-skybox-and-depth-buffer/4683037/" target="_blank">explanation</a>
+
+</p><pre><code class="lang-c">    gl_Position = pos.xyzz;
+}</code></pre>
+
+</div>
+<p class="text">
 </p><h2 id="Skybox-app">Skybox app</h2>
 <p class="text">
 </p><p class="text">I am using skyboxes all over the place because of convenience and value, which they immediately add to the scene. Still, to showcase and tune the technique separately, I created a standalone app specifically for skyboxes:

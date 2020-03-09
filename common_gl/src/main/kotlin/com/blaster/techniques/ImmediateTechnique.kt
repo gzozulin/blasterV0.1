@@ -31,9 +31,15 @@ class ImmediateTechnique {
 
     fun aabb(camera: Camera, aabb: AABBf, modelM: mat4, color: vec3 = vec3(1f)) {
         glCheck {
+
+            // Setting matrices, mode
             backend.glMatrixMode(backend.GL_MODELVIEW)
             val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
             modelViewM.get(bufferMat4)
+            backend.glLoadMatrix(bufferMat4)
+            backend.glBegin(backend.GL_LINES)
+
+            // Calculating the vertices of our AABB
             val bottomLeftBack = vec3(aabb.minX, aabb.minY, aabb.minZ)
             val bottomLeftFront = vec3(aabb.minX, aabb.minY, aabb.maxZ)
             val bottomRightBack = vec3(aabb.maxX, aabb.minY, aabb.minZ)
@@ -42,8 +48,8 @@ class ImmediateTechnique {
             val topLeftFront = vec3(aabb.minX, aabb.maxY, aabb.maxZ)
             val topRightBack = vec3(aabb.maxX, aabb.maxY, aabb.minZ)
             val topRightFront = vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
-            backend.glLoadMatrix(bufferMat4)
-            backend.glBegin(backend.GL_LINES)
+
+            // Drawing the lines of AABB
             line(bottomLeftBack, bottomLeftFront, color)
             line(bottomLeftFront, bottomRightFront, color)
             line(bottomRightFront, bottomRightBack, color)
@@ -63,11 +69,14 @@ class ImmediateTechnique {
     fun marker(camera: Camera, modelM: mat4, color1: vec3, color2: vec3, color3: vec3, scale: Float = 1f) {
         val half = scale / 2f
         glCheck {
+            // Usual Immediate Mode setup
             backend.glMatrixMode(backend.GL_MODELVIEW)
             val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
             modelViewM.get(bufferMat4)
             backend.glLoadMatrix(bufferMat4)
             backend.glBegin(backend.GL_LINES)
+
+            // Drawing each line with respect to the center of the marker
             val center = vec3()
             modelM.translation(center)
             val start = vec3()

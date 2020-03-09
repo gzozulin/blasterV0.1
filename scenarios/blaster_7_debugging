@@ -1,36 +1,103 @@
-Interesting intro goes here
+Hello, and welcome to the pages of my weekly journal!
+
+There are multiple ways of how you can approach the debugging of visual applications. Some of those ways are more convenient than the conventional approach with the debugger. In this article, I will highlight some of the tools I am using to convey debugging information visually. We will be talking about presenting text on the screen and, also, briefly, I will touch on OpenGL Immediate Mode \1\.
+#cite; 1;  Legacy OpenGL; https://www.khronos.org/opengl/wiki/Legacy_OpenGL
 
 #content; Today we will discuss
 
+#header; Presenting text
+
+Let us start with the most ubiquitous way of presenting information - the text.
+
+There are several ways of how characters on the screen can be rendered. Roughly, we can split them into two approaches.
+
+In the first one is a "retro" approach - all glyphs are pre-rendered to a texture, and then we select characters from this texture with texture coordinates.
+
+The second approach allows for customizing glyphs. With the help of third-party code \2\ we can render each character with parameters and of variable size.
+#cite; 2; TrueType on Wiki; https://en.wikipedia.org/wiki/TrueType
+
+Since the first approach is quick, dirty, and also look dated - that is my way, of course.
+
+Here is the font I am using in Blaster:
+#picture; Retro Font; http://gzozulin.com/wp-content/uploads/2020/03/font.png
+
+It reminds me about simpler times in programming when you were able to control your IDE, not the other way around :)
+
+We will be discussing the code top to bottom - this way, we can highlight the high-level ideas before jumping into the details of the implementation.
+
 #header; Console
 
+Just rendering the text is not enough. Usually, we want facilities which all the complexities behind the easy to use interfaces. In my case, this is achieved with the 'Console' class.
+
+The Console is a helper class, which allows printing the debug information in a line-by-line fashion.
+
+We need to add the class to the app, and then we can send the logs to be printed:
 #include; def; common_gl/com.blaster.toolbox.Console::line
+
+As in most of the logging frameworks, each line has its level:
 #include; def; common_gl/com.blaster.toolbox.Console::Level
+A different color reflects each level.
+
+Since console also tracks the time to live for each line, we need to throttle it:
 #include; def; common_gl/com.blaster.toolbox.Console::tick
+
+To print the current buffer of the console, we can use the following:
 #include; def; common_gl/com.blaster.toolbox.Console::render
+
+Here is the example:
+#include; def; desktop/com.blaster.impl.Text::onTick
 
 #header; Text technique
 
+To render the text, I am using TextTechnique.
+
+We will start by creating a shader, a font texture and a rect:
 #include; def; common_gl/com.blaster.techniques.TextTechnique::create
+
+Draw call will bind the necessary resources:
 #include; def; common_gl/com.blaster.techniques.TextTechnique::draw
+
+When the resources are bound, we can render characters:
 #include; def; common_gl/com.blaster.techniques.TextTechnique::text
 #include; def; common_gl/com.blaster.techniques.TextTechnique::character
 
-#header; Text font and shader
+We are passing the character color, position, and the index in ASCII table \3\ into the shader.
+#cite; 3; ASCII Table; http://www.asciitable.com/
 
-#picture; Retro Font; http://gzozulin.com/wp-content/uploads/2020/03/font.png
+#header; Text font and shader
+The shader program is where all the actual work happen:
 #include; glsl; common_assets/src/main/resources/shaders/text/text.vert
+
+And here is the result - we can output the necessary information on the screen:
 #picture; Debug text; http://gzozulin.com/wp-content/uploads/2020/03/text.png
 
 #header; Immediate Mode
+Since we are talking about debugging tools, I also wanted to mention OpenGL Immediate Mode briefly.
+While it is not recommended due to its low performance, it is quite useful with outputting additional information about the scene. This additional information is never meant to be in the release anyway - therefore, the performance impact is not that noticeable.
 
+But the debug output can simplify life significantly. Imagine debugging scene partitioning solution without seeing the actual intersection between camera frustum and AABBs.
+
+Since the technique is camera based, we need to update the matrices in case the window is resized:
 #include; def; common_gl/com.blaster.techniques.ImmediateTechnique::resize
+
+One of the most used methods - drawing of the AABB of the object. Helps in setting the scene correctly:
 #include; def; common_gl/com.blaster.techniques.ImmediateTechnique::aabb
+
+Markers can be used to identify invisible points in the scene - cameras, light sources:
 #include; def; common_gl/com.blaster.techniques.ImmediateTechnique::marker
+
+Each line is drawn with vertices. That is why the mode is called Immediate - we are sending the information about geometry each frame. The GPU bus is smoking hot:
 #include; def; common_gl/com.blaster.techniques.ImmediateTechnique::line
 
+The Teapots scene from the previous post with the debug output enabled:
 #picture; Debugging visually; http://gzozulin.com/wp-content/uploads/2020/03/immediate.png
 
 #header; Debugging visually
 
-Outro
+In this article, we discussed the most versatile ways to add information about your scene to the output.
+
+TextTechnique and Console classes allow us to hide the details of drawing fonts in Blaster, and with ImmediateMode, we can quickly draw points and boundaries.
+
+There are many more tricks out there: for example, you can modify the shader output to include the information about the surface: position, normal, time to render, etc. But that approach is more situational.
+
+And that is it - I hope you liked it. Leave your comments below if you want me to cover a topic or to discuss the article. Will see you in the next posts, have a great day!

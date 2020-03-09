@@ -50,16 +50,43 @@
                 .list_item_child {}
     </style>
     <body>
-        <p class="text">Interesting intro goes here
+        <p class="text">Hello, and welcome to the pages of my weekly journal!
 </p><p class="text">
-</p><h2 id="Today-we-will-discuss">Today we will discuss</h2><ul class="list_item"><li>    <a class="link" href="#Console">Console</a>
+</p><p class="text">There are multiple ways of how you can approach the debugging of visual applications. Some of those ways are more convenient than the conventional approach with the debugger. In this article, I will highlight some of the tools I am using to convey debugging information visually. We will be talking about presenting text on the screen and, also, briefly, I will touch on OpenGL Immediate Mode <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>.
+</p><p class="text">
+</p><h2 id="Today-we-will-discuss">Today we will discuss</h2><ul class="list_item"><li>    <a class="link" href="#Presenting-text">Presenting text</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Console">Console</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Text-technique">Text technique</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Text-font-and-shader">Text font and shader</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Immediate-Mode">Immediate Mode</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Debugging-visually">Debugging visually</a>
 </li></ul><p class="text">
+</p><h2 id="Presenting-text">Presenting text</h2>
+<p class="text">
+</p><p class="text">Let us start with the most ubiquitous way of presenting information - the text.
+</p><p class="text">
+</p><p class="text">There are several ways of how characters on the screen can be rendered. Roughly, we can split them into two approaches.
+</p><p class="text">
+</p><p class="text">In the first one is a "retro" approach - all glyphs are pre-rendered to a texture, and then we select characters from this texture with texture coordinates.
+</p><p class="text">
+</p><p class="text">The second approach allows for customizing glyphs. With the help of third-party code <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup> we can render each character with parameters and of variable size.
+</p><p class="text">
+</p><p class="text">Since the first approach is quick, dirty, and also look dated - that is my way, of course.
+</p><p class="text">
+</p><p class="text">Here is the font I am using in Blaster:
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/font.png" alt="Retro Font" align="middle">
+<p class="text">
+</p><p class="text">It reminds me about simpler times in programming when you were able to control your IDE, not the other way around :)
+</p><p class="text">
+</p><p class="text">We will be discussing the code top to bottom - this way, we can highlight the high-level ideas before jumping into the details of the implementation.
+</p><p class="text">
 </p><h2 id="Console">Console</h2>
 <p class="text">
+</p><p class="text">Just rendering the text is not enough. Usually, we want facilities which all the complexities behind the easy to use interfaces. In my case, this is achieved with the <span style="font-weight:bold">Console</span> class.
+</p><p class="text">
+</p><p class="text">The Console is a helper class, which allows printing the debug information in a line-by-line fashion.
+</p><p class="text">
+</p><p class="text">We need to add the class to the app, and then we can send the logs to be printed:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L25" target="_blank">common_gl/com.blaster.toolbox.Console::line</a>
 </h3>
@@ -68,13 +95,18 @@
 }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">
+</p><p class="text">As in most of the logging frameworks, each line has its level:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L21" target="_blank">common_gl/com.blaster.toolbox.Console::Level</a>
 </h3>
     <pre><code class="lang-kotlin">enum class Level { FAILURE, INFO, SUCCESS }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">A different color reflects each level.
+</p><p class="text">
+</p><p class="text">Since console also tracks the time to live for each line, we need to throttle it:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L41" target="_blank">common_gl/com.blaster.toolbox.Console::tick</a>
 </h3>
     <pre><code class="lang-kotlin">fun tick() {
@@ -89,7 +121,9 @@
 }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">
+</p><p class="text">To print the current buffer of the console, we can use the following:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L52" target="_blank">common_gl/com.blaster.toolbox.Console::render</a>
 </h3>
     <pre><code class="lang-kotlin">fun render(callback: (position: Vector2f, text: String, color: Vector3f, scale: Float) -&gt; Unit) {
@@ -106,31 +140,54 @@
 
 </div>
 <p class="text">
+</p><p class="text">Here is the example:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Text.kt#L32" target="_blank">desktop/com.blaster.impl.Text::onTick</a>
+</h3>
+    <pre><code class="lang-kotlin">override fun onTick() {
+    GlState.clear()
+    console.tick()
+    technique.draw {
+        console.render { position, text, color, scale -&gt;
+            technique.text(text, position, scale, color)
+        }
+    }
+}</code></pre>
+
+</div>
+<p class="text">
 </p><h2 id="Text-technique">Text technique</h2>
 <p class="text">
+</p><p class="text">To render the text, I am using TextTechnique.
+</p><p class="text">
+</p><p class="text">We will start by creating a shader, a font texture and a rect:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L15" target="_blank">common_gl/com.blaster.techniques.TextTechnique::create</a>
 </h3>
-    <pre><code class="lang-kotlin">fun create(shadersLib: ShadersLib, textureLib: TexturesLib) {
+    <pre><code class="lang-kotlin">fun create(shadersLib: ShadersLib, textureLib: TexturesLib, font: String = &quot;textures/font.png&quot;) {
     program = shadersLib.loadProgram(&quot;shaders/text/text.vert&quot;, &quot;shaders/text/text.frag&quot;)
-    font = textureLib.loadTexture(&quot;textures/font.png&quot;)
+    diffuse = textureLib.loadTexture(font)
     rect = GlMesh.rect()
 }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">
+</p><p class="text">Draw call will bind the necessary resources:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L21" target="_blank">common_gl/com.blaster.techniques.TextTechnique::draw</a>
 </h3>
     <pre><code class="lang-kotlin">fun draw(call: () -&gt; Unit) {
-    glBind(listOf(program, font, rect)) {
-        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, font)
+    glBind(listOf(program, diffuse, rect)) {
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
         call.invoke()
     }
 }</code></pre>
 
 </div>
-<div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L37" target="_blank">common_gl/com.blaster.techniques.TextTechnique::text</a>
+<p class="text">
+</p><p class="text">When the resources are bound, we can render characters:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L29" target="_blank">common_gl/com.blaster.techniques.TextTechnique::text</a>
 </h3>
     <pre><code class="lang-kotlin">fun text(text: String, start: Vector2f, scale: Float, color: Vector3f) {
     text.forEachIndexed { index, ch -&gt;
@@ -141,7 +198,7 @@
 
 </div>
 <div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L28" target="_blank">common_gl/com.blaster.techniques.TextTechnique::character</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L36" target="_blank">common_gl/com.blaster.techniques.TextTechnique::character</a>
 </h3>
     <pre><code class="lang-kotlin">fun character(ch: Char, start: Vector2f, scale: Float, color: Vector3f) {
     program.setUniform(GlUniform.UNIFORM_CHAR_INDEX, ch.toInt())
@@ -153,10 +210,11 @@
 
 </div>
 <p class="text">
+</p><p class="text">We are passing the character color, position, and the index in ASCII table <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup> into the shader.
+</p><p class="text">
 </p><h2 id="Text-font-and-shader">Text font and shader</h2>
-<p class="text">
-</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/font.png" alt="Retro Font" align="middle">
-<div class="child">
+<p class="text">The shader program is where all the actual work happen:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/text/text.vert" target="_blank">common_assets/src/main/resources/shaders/text/text.vert</a>
 </h3>
     <pre><code class="lang-c">#version 300 es
@@ -169,20 +227,20 @@ uniform int uCharIndex;
 uniform vec2 uCharStart;
 uniform float uCharScale;
 
-out vec2 vTexCoord;
-
-const float CHAR_STEP = 16.0 / 256.0;
-const int CHARS_IN_ROW  = 16;
-
-void calculateTexCoords() {
+out vec2 vTexCoord;</code></pre>
+<p class="text_child">Shader works only with 256x256 textures, but I am not using others, at least for now
+</p><pre><code class="lang-c">const float CHAR_STEP = 16.0 / 256.0;
+const int CHARS_IN_ROW  = 16;</code></pre>
+<p class="text_child">This method will calculate the texture coordinates based on the index in the ASCII table and font texture parameters
+</p><pre><code class="lang-c">void calculateTexCoords() {
     float charIndexX = float(uCharIndex % CHARS_IN_ROW);
     float charIndexY = float(CHARS_IN_ROW) - float(uCharIndex / CHARS_IN_ROW) - 1.0;
     float texCoordX = (charIndexX + aTexCoord.x) * CHAR_STEP;
     float texCoordY = (charIndexY + aTexCoord.y) * CHAR_STEP;
     vTexCoord = vec2(texCoordX, texCoordY);
-}
-
-void calculatePosition() {
+}</code></pre>
+<p class="text_child">The position of the characters on the screen is calculated based on the font scaling
+</p><pre><code class="lang-c">void calculatePosition() {
     float positionX = uCharStart.x + aPosition.x * uCharScale;
     float positionY = uCharStart.y + aPosition.y * uCharScale;
     gl_Position = vec4(positionX, positionY, 0.0, 1.0);
@@ -194,10 +252,17 @@ void main() {
 }</code></pre>
 
 </div>
-<img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/text.png" alt="Debug text" align="middle">
+<p class="text">
+</p><p class="text">And here is the result - we can output the necessary information on the screen:
+</p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/text.png" alt="Debug text" align="middle">
 <p class="text">
 </p><h2 id="Immediate-Mode">Immediate Mode</h2>
-<p class="text">
+<p class="text">Since we are talking about debugging tools, I also wanted to mention OpenGL Immediate Mode briefly.
+</p><p class="text">While it is not recommended due to its low performance, it is quite useful with outputting additional information about the scene. This additional information is never meant to be in the release anyway - therefore, the performance impact is not that noticeable.
+</p><p class="text">
+</p><p class="text">But the debug output can simplify life significantly. Imagine debugging scene partitioning solution without seeing the actual intersection between camera frustum and AABBs.
+</p><p class="text">
+</p><p class="text">Since the technique is camera based, we need to update the matrices in case the window is resized:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L18" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::resize</a>
 </h3>
@@ -210,25 +275,30 @@ void main() {
 }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">
+</p><p class="text">One of the most used methods - drawing of the AABB of the object. Helps in setting the scene correctly:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L32" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::aabb</a>
 </h3>
     <pre><code class="lang-kotlin">fun aabb(camera: Camera, aabb: AABBf, modelM: mat4, color: vec3 = vec3(1f)) {
-    glCheck {
-        backend.glMatrixMode(backend.GL_MODELVIEW)
+    glCheck {</code></pre>
+<p class="text_child">Setting matrices, mode
+</p><pre><code class="lang-kotlin">        backend.glMatrixMode(backend.GL_MODELVIEW)
         val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
         modelViewM.get(bufferMat4)
-        val bottomLeftBack = vec3(aabb.minX, aabb.minY, aabb.minZ)
+        backend.glLoadMatrix(bufferMat4)
+        backend.glBegin(backend.GL_LINES)</code></pre>
+<p class="text_child">Calculating the vertices of our AABB
+</p><pre><code class="lang-kotlin">        val bottomLeftBack = vec3(aabb.minX, aabb.minY, aabb.minZ)
         val bottomLeftFront = vec3(aabb.minX, aabb.minY, aabb.maxZ)
         val bottomRightBack = vec3(aabb.maxX, aabb.minY, aabb.minZ)
         val bottomRightFront = vec3(aabb.maxX, aabb.minY, aabb.maxZ)
         val topLeftBack = vec3(aabb.minX, aabb.maxY, aabb.minZ)
         val topLeftFront = vec3(aabb.minX, aabb.maxY, aabb.maxZ)
         val topRightBack = vec3(aabb.maxX, aabb.maxY, aabb.minZ)
-        val topRightFront = vec3(aabb.maxX, aabb.maxY, aabb.maxZ)
-        backend.glLoadMatrix(bufferMat4)
-        backend.glBegin(backend.GL_LINES)
-        line(bottomLeftBack, bottomLeftFront, color)
+        val topRightFront = vec3(aabb.maxX, aabb.maxY, aabb.maxZ)</code></pre>
+<p class="text_child">Drawing the lines of AABB
+</p><pre><code class="lang-kotlin">        line(bottomLeftBack, bottomLeftFront, color)
         line(bottomLeftFront, bottomRightFront, color)
         line(bottomRightFront, bottomRightBack, color)
         line(bottomRightBack, bottomLeftBack, color)
@@ -245,18 +315,22 @@ void main() {
 }</code></pre>
 
 </div>
-<div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L63" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::marker</a>
+<p class="text">
+</p><p class="text">Markers can be used to identify invisible points in the scene - cameras, light sources:
+</p><div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L69" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::marker</a>
 </h3>
     <pre><code class="lang-kotlin">fun marker(camera: Camera, modelM: mat4, color1: vec3, color2: vec3, color3: vec3, scale: Float = 1f) {
     val half = scale / 2f
-    glCheck {
-        backend.glMatrixMode(backend.GL_MODELVIEW)
+    glCheck {</code></pre>
+<p class="text_child">Usual Immediate Mode setup
+</p><pre><code class="lang-kotlin">        backend.glMatrixMode(backend.GL_MODELVIEW)
         val modelViewM = mat4(camera.calculateViewM()).mul(modelM)
         modelViewM.get(bufferMat4)
         backend.glLoadMatrix(bufferMat4)
-        backend.glBegin(backend.GL_LINES)
-        val center = vec3()
+        backend.glBegin(backend.GL_LINES)</code></pre>
+<p class="text_child">Drawing each line with respect to the center of the marker
+</p><pre><code class="lang-kotlin">        val center = vec3()
         modelM.translation(center)
         val start = vec3()
         val end = vec3()
@@ -280,7 +354,9 @@ void main() {
 }</code></pre>
 
 </div>
-<div class="child">
+<p class="text">
+</p><p class="text">Each line is drawn with vertices. That is why the mode is called Immediate - we are sending the information about geometry each frame. The GPU bus is smoking hot:
+</p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L26" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::line</a>
 </h3>
     <pre><code class="lang-kotlin">private fun line(from: vec3, to: vec3, color: color) {
@@ -291,12 +367,23 @@ void main() {
 
 </div>
 <p class="text">
+</p><p class="text">The Teapots scene from the previous post with the debug output enabled:
 </p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/immediate.png" alt="Debugging visually" align="middle">
 <p class="text">
 </p><h2 id="Debugging-visually">Debugging visually</h2>
 <p class="text">
-</p><p class="text">Outro
-</p>
+</p><p class="text">In this article, we discussed the most versatile ways to add information about your scene to the output.
+</p><p class="text">
+</p><p class="text">TextTechnique and Console classes allow us to hide the details of drawing fonts in Blaster, and with ImmediateMode, we can quickly draw points and boundaries.
+</p><p class="text">
+</p><p class="text">There are many more tricks out there: for example, you can modify the shader output to include the information about the surface: position, normal, time to render, etc. But that approach is more situational.
+</p><p class="text">
+</p><p class="text">And that is it - I hope you liked it. Leave your comments below if you want me to cover a topic or to discuss the article. Will see you in the next posts, have a great day!
+</p><p class="text">
+</p><h2 id="References">References</h2><ul class="list_item"><li>    <a class="link" href="#1_origin">&#8593;[1]: </a>
+<a id="1" class="link" href="https://www.khronos.org/opengl/wiki/Legacy_OpenGL" target="_blank"> Legacy OpenGL</a></li></ul><ul class="list_item"><li>    <a class="link" href="#2_origin">&#8593;[2]: </a>
+<a id="2" class="link" href="https://en.wikipedia.org/wiki/TrueType" target="_blank">TrueType on Wiki</a></li></ul><ul class="list_item"><li>    <a class="link" href="#3_origin">&#8593;[3]: </a>
+<a id="3" class="link" href="http://www.asciitable.com/" target="_blank">ASCII Table</a></li></ul>
         <br>
     </body>
 </html>
