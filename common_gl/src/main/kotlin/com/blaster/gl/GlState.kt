@@ -39,7 +39,7 @@ class GlState private constructor() {
         }
 
         fun setClearColor(color: color) {
-            glCheck { backend.glClearColor(color.x, color.y, color.z, 1f) }
+            glCheck { backend.glClearColor(color.x, color.y, color.z, 0f) }
         }
 
         fun apply(width: Int, height: Int, color: color = color(0.9f, 9.9f, 1f)) {
