@@ -74,7 +74,8 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlBuffer.kt#L9" target="_blank">common_gl/com.blaster.gl.GlBuffer</a>
 </h3>
-    <pre><code class="lang-kotlin">class GlBuffer(
+    <pre><code class="lang-kotlin"></code></pre>
+<pre><code class="lang-kotlin">class GlBuffer(
         private val target: Int,
         private val buffer: ByteBuffer,
         private val usage: Int = backend.GL_STATIC_DRAW) : GlBindable</code></pre>
@@ -125,7 +126,8 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/BillboardsTechnique.kt#L61" target="_blank">common_gl/com.blaster.techniques.BillboardsTechnique::updatePositions</a>
 </h3>
-    <p class="text_child">Mapping the buffer with positions, updating the buffer from provider
+    <pre><code class="lang-kotlin"></code></pre>
+<p class="text_child">Mapping the buffer with positions, updating the buffer from provider
 </p><pre><code class="lang-kotlin">private fun updatePositions(provider: BillboardsProvider) {
     glBind(positions) {
         positions.updateBuffer {
@@ -155,7 +157,8 @@
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/gl/GlAttribute.kt#L4" target="_blank">common_gl/com.blaster.gl.GlAttribute</a>
 </h3>
-    <p class="text_child">divisor - how many attributes per draw call for instancing (0 - default == 1 item per vertex)
+    <pre><code class="lang-kotlin"></code></pre>
+<p class="text_child">divisor - how many attributes per draw call for instancing (0 - default == 1 item per vertex)
 </p><pre><code class="lang-kotlin">enum class GlAttribute(val size: Int, val location: Int, val divisor: Int = 0) {
     ATTRIBUTE_POSITION  (3, 0),
     ATTRIBUTE_TEXCOORD  (2, 1),
