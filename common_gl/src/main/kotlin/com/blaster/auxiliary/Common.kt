@@ -6,9 +6,11 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 import java.util.Random
+import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlin.system.measureNanoTime
 
 typealias vec3 = Vector3f
 typealias euler3 = Vector3f
@@ -22,6 +24,10 @@ typealias ray = Rayf
 typealias sphere = Spheref
 
 private val random = Random()
+
+fun printMillis(work: () -> Unit) {
+    println(TimeUnit.NANOSECONDS.toMillis(measureNanoTime(work)))
+}
 
 fun fail(th: Throwable): Nothing = throw th
 fun fail(reason: String = "wtf?!"): Nothing = fail(IllegalStateException(reason))
