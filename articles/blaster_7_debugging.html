@@ -52,7 +52,9 @@
     <body>
         <p class="text">Hello, and welcome to the pages of my weekly journal!
 </p><p class="text">
-</p><p class="text">There are multiple ways of how you can approach the debugging of visual applications. Some of those ways are more convenient than the conventional approach with the debugger. In this article, I will highlight some of the tools I am using to convey debugging information visually. We will be talking about presenting text on the screen and, also, briefly, I will touch on OpenGL Immediate Mode <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>.
+</p><p class="text">Today I would like to talk about debugging.
+</p><p class="text">
+</p><p class="text">There are multiple ways of how you can approach the debugging of visual applications. Some of those ways are more convenient than the conventional approach with the debugger. In this article, I will highlight some of the tools I am using to convey information visually. We will be talking about presenting text on the screen and, also, briefly, I will touch on OpenGL Immediate Mode <sup id="1_origin"><a href="#1">&#91;1&#93;</a></sup>.
 </p><p class="text">
 </p><h2 id="Today-we-will-discuss">Today we will discuss</h2><ul class="list_item"><li>    <a class="link" href="#Presenting-text">Presenting text</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Console">Console</a>
@@ -65,26 +67,26 @@
 <p class="text">
 </p><p class="text">Let us start with the most ubiquitous way of presenting information - the text.
 </p><p class="text">
-</p><p class="text">There are several ways of how characters on the screen can be rendered. Roughly, we can split them into two approaches.
+</p><p class="text">There are roughly two ways of how characters on the screen can be rendered.
 </p><p class="text">
-</p><p class="text">In the first one is a "retro" approach - all glyphs are pre-rendered to a texture, and then we select characters from this texture with texture coordinates.
+</p><p class="text">The first one is a "retro" approach - all characters are pre-rendered to a texture, and then we select glyphs from this texture with texture coordinates.
 </p><p class="text">
-</p><p class="text">The second approach allows for customizing glyphs. With the help of third-party code <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup> we can render each character with parameters and of variable size.
+</p><p class="text">The second approach allows for customizations. With the help of third-party code <sup id="2_origin"><a href="#2">&#91;2&#93;</a></sup> we can render each character with parameters and of variable size.
 </p><p class="text">
-</p><p class="text">Since the first approach is quick, dirty, and also look dated - that is my way, of course.
+</p><p class="text">Since the first approach is quick, dirty, and also look dated - it is obviously my favorite :)
 </p><p class="text">
 </p><p class="text">Here is the font I am using in Blaster:
 </p><img class="picture" src="http://gzozulin.com/wp-content/uploads/2020/03/font.png" alt="Retro Font" align="middle">
 <p class="text">
-</p><p class="text">It reminds me about simpler times in programming when you were able to control your IDE, not the other way around :)
+</p><p class="text">It reminds me of simpler times in programming when you were able to control your IDE, not the other way around.
 </p><p class="text">
-</p><p class="text">We will be discussing the code top to bottom - this way, we can highlight the high-level ideas before jumping into the details of the implementation.
+</p><p class="text">We will be discussing the code top to bottom - this way, I can highlight the high-level ideas before jumping into the details of the implementation.
 </p><p class="text">
 </p><h2 id="Console">Console</h2>
 <p class="text">
-</p><p class="text">Just rendering the text is not enough. Usually, we want facilities which all the complexities behind the easy to use interfaces. In my case, this is achieved with the <span style="font-weight:bold">Console</span> class.
+</p><p class="text">Just rendering the text is not enough. Usually, we want classes which hide all the complexities behind the easy to use interfaces. In my case,  this is achieved with the <span style="font-weight:bold">Console</span> class.
 </p><p class="text">
-</p><p class="text">The Console is a helper class, which allows printing the debug information in a line-by-line fashion.
+</p><p class="text">The Console is a helper class, which allows printing the debugging information in a line-by-line fashion.
 </p><p class="text">
 </p><p class="text">We need to add the class to the app, and then we can send the logs to be printed:
 </p><div class="child">
@@ -96,14 +98,14 @@
 
 </div>
 <p class="text">
-</p><p class="text">As in most of the logging frameworks, each line has its level:
+</p><p class="text">As in most of the logging frameworks, each line has its level of priority:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Console.kt#L21" target="_blank">common_gl/com.blaster.toolbox.Console::Level</a>
 </h3>
     <pre><code class="lang-kotlin">enum class Level { FAILURE, INFO, SUCCESS }</code></pre>
 
 </div>
-<p class="text">A different color reflects each level.
+<p class="text">Each level is reflected by its color in text.
 </p><p class="text">
 </p><p class="text">Since console also tracks the time to live for each line, we need to throttle it:
 </p><div class="child">
@@ -160,7 +162,7 @@
 <p class="text">
 </p><p class="text">To render the text, I am using TextTechnique.
 </p><p class="text">
-</p><p class="text">We will start by creating a shader, a font texture and a rect:
+</p><p class="text">First, we need to create a shader, a font texture and a rect:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/TextTechnique.kt#L15" target="_blank">common_gl/com.blaster.techniques.TextTechnique::create</a>
 </h3>
@@ -213,7 +215,7 @@
 </p><p class="text">We are passing the character color, position, and the index in ASCII table <sup id="3_origin"><a href="#3">&#91;3&#93;</a></sup> into the shader.
 </p><p class="text">
 </p><h2 id="Text-font-and-shader">Text font and shader</h2>
-<p class="text">The shader program is where all the actual work happen:
+<p class="text">The shader program is where all the actual work happens:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/text/text.vert" target="_blank">common_assets/src/main/resources/shaders/text/text.vert</a>
 </h3>
@@ -258,6 +260,7 @@ void main() {
 <p class="text">
 </p><h2 id="Immediate-Mode">Immediate Mode</h2>
 <p class="text">Since we are talking about debugging tools, I also wanted to mention OpenGL Immediate Mode briefly.
+</p><p class="text">
 </p><p class="text">While it is not recommended due to its low performance, it is quite useful with outputting additional information about the scene. This additional information is never meant to be in the release anyway - therefore, the performance impact is not that noticeable.
 </p><p class="text">
 </p><p class="text">But the debug output can simplify life significantly. Imagine debugging scene partitioning solution without seeing the actual intersection between camera frustum and AABBs.
@@ -355,7 +358,7 @@ void main() {
 
 </div>
 <p class="text">
-</p><p class="text">Each line is drawn with vertices. That is why the mode is called Immediate - we are sending the information about geometry each frame. The GPU bus is smoking hot:
+</p><p class="text">Each line is drawn with vertices. That is why the mode is called Immediate - we are sending the information about geometry each frame - hence the inefficiency:
 </p><div class="child">
     <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/ImmediateTechnique.kt#L26" target="_blank">common_gl/com.blaster.techniques.ImmediateTechnique::line</a>
 </h3>

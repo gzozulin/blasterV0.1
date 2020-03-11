@@ -1,6 +1,8 @@
 Hello, and welcome to the pages of my weekly journal!
 
-There are multiple ways of how you can approach the debugging of visual applications. Some of those ways are more convenient than the conventional approach with the debugger. In this article, I will highlight some of the tools I am using to convey debugging information visually. We will be talking about presenting text on the screen and, also, briefly, I will touch on OpenGL Immediate Mode \1\.
+Today I would like to talk about debugging.
+
+There are multiple ways of how you can approach the debugging of visual applications. Some of those ways are more convenient than the conventional approach with the debugger. In this article, I will highlight some of the tools I am using to convey information visually. We will be talking about presenting text on the screen and, also, briefly, I will touch on OpenGL Immediate Mode \1\.
 #cite; 1;  Legacy OpenGL; https://www.khronos.org/opengl/wiki/Legacy_OpenGL
 
 #content; Today we will discuss
@@ -9,34 +11,34 @@ There are multiple ways of how you can approach the debugging of visual applicat
 
 Let us start with the most ubiquitous way of presenting information - the text.
 
-There are several ways of how characters on the screen can be rendered. Roughly, we can split them into two approaches.
+There are roughly two ways of how characters on the screen can be rendered.
 
-In the first one is a "retro" approach - all glyphs are pre-rendered to a texture, and then we select characters from this texture with texture coordinates.
+The first one is a "retro" approach - all characters are pre-rendered to a texture, and then we select glyphs from this texture with texture coordinates.
 
-The second approach allows for customizing glyphs. With the help of third-party code \2\ we can render each character with parameters and of variable size.
+The second approach allows for customizations. With the help of third-party code \2\ we can render each character with parameters and of variable size.
 #cite; 2; TrueType on Wiki; https://en.wikipedia.org/wiki/TrueType
 
-Since the first approach is quick, dirty, and also look dated - that is my way, of course.
+Since the first approach is quick, dirty, and also look dated - it is obviously my favorite :)
 
 Here is the font I am using in Blaster:
 #picture; Retro Font; http://gzozulin.com/wp-content/uploads/2020/03/font.png
 
-It reminds me about simpler times in programming when you were able to control your IDE, not the other way around :)
+It reminds me of simpler times in programming when you were able to control your IDE, not the other way around.
 
-We will be discussing the code top to bottom - this way, we can highlight the high-level ideas before jumping into the details of the implementation.
+We will be discussing the code top to bottom - this way, I can highlight the high-level ideas before jumping into the details of the implementation.
 
 #header; Console
 
-Just rendering the text is not enough. Usually, we want facilities which all the complexities behind the easy to use interfaces. In my case, this is achieved with the 'Console' class.
+Just rendering the text is not enough. Usually, we want classes which hide all the complexities behind the easy to use interfaces. In my case,  this is achieved with the 'Console' class.
 
-The Console is a helper class, which allows printing the debug information in a line-by-line fashion.
+The Console is a helper class, which allows printing the debugging information in a line-by-line fashion.
 
 We need to add the class to the app, and then we can send the logs to be printed:
 #include; def; common_gl/com.blaster.toolbox.Console::line
 
-As in most of the logging frameworks, each line has its level:
+As in most of the logging frameworks, each line has its level of priority:
 #include; def; common_gl/com.blaster.toolbox.Console::Level
-A different color reflects each level.
+Each level is reflected by its color in text.
 
 Since console also tracks the time to live for each line, we need to throttle it:
 #include; def; common_gl/com.blaster.toolbox.Console::tick
@@ -51,7 +53,7 @@ Here is the example:
 
 To render the text, I am using TextTechnique.
 
-We will start by creating a shader, a font texture and a rect:
+First, we need to create a shader, a font texture and a rect:
 #include; def; common_gl/com.blaster.techniques.TextTechnique::create
 
 Draw call will bind the necessary resources:
@@ -65,7 +67,7 @@ We are passing the character color, position, and the index in ASCII table \3\ i
 #cite; 3; ASCII Table; http://www.asciitable.com/
 
 #header; Text font and shader
-The shader program is where all the actual work happen:
+The shader program is where all the actual work happens:
 #include; glsl; common_assets/src/main/resources/shaders/text/text.vert
 
 And here is the result - we can output the necessary information on the screen:
@@ -73,6 +75,7 @@ And here is the result - we can output the necessary information on the screen:
 
 #header; Immediate Mode
 Since we are talking about debugging tools, I also wanted to mention OpenGL Immediate Mode briefly.
+
 While it is not recommended due to its low performance, it is quite useful with outputting additional information about the scene. This additional information is never meant to be in the release anyway - therefore, the performance impact is not that noticeable.
 
 But the debug output can simplify life significantly. Imagine debugging scene partitioning solution without seeing the actual intersection between camera frustum and AABBs.
@@ -86,7 +89,7 @@ One of the most used methods - drawing of the AABB of the object. Helps in setti
 Markers can be used to identify invisible points in the scene - cameras, light sources:
 #include; def; common_gl/com.blaster.techniques.ImmediateTechnique::marker
 
-Each line is drawn with vertices. That is why the mode is called Immediate - we are sending the information about geometry each frame. The GPU bus is smoking hot:
+Each line is drawn with vertices. That is why the mode is called Immediate - we are sending the information about geometry each frame - hence the inefficiency:
 #include; def; common_gl/com.blaster.techniques.ImmediateTechnique::line
 
 The Teapots scene from the previous post with the debug output enabled:
