@@ -65,7 +65,8 @@ private val wasdInput = WasdInput(controller)
 
 private val simpleTechnique = SimpleTechnique()
 
-private val scene = HitableSphere(vec3(0f, 0f, -12f), 2f, RtrMaterial())
+private val spheres = (1..10).map { HitableSphere(vec3(0f, 0f, -10f * it), 2f, RtrMaterial()) }.toList()
+private val scene = HitableGroup(spheres)
 
 private val regionsLow = mutableListOf<RegionTask>()
 private val regionsMed = mutableListOf<RegionTask>()
@@ -155,13 +156,28 @@ private class RtrCamera {
 
 private class RtrMaterial
 
-private class HitResult(t: Float, point: vec3, normal: vec3, material: RtrMaterial)
+private data class HitResult(val t: Float, val point: vec3, val normal: vec3, val material: RtrMaterial)
 
 private interface Hitable {
     fun hit(ray: ray, t0: Float, t1: Float): HitResult?
 }
 
-private class HitableSphere(private val center: vec3, private val radius: Float, private val material: RtrMaterial) : Hitable {
+private data class HitableGroup(val hitables: List<Hitable>) : Hitable {
+    override fun hit(ray: ray, t0: Float, t1: Float): HitResult? {
+        var tMax = t1
+        var result: HitResult? = null
+        for (hitable in hitables) {
+            val hit = hitable.hit(ray, t0, tMax)
+            if (hit != null) {
+                tMax = hit.t
+                result = hit
+            }
+        }
+        return result
+    }
+}
+
+private data class HitableSphere(private val center: vec3, private val radius: Float, private val material: RtrMaterial) : Hitable {
     private val sphere = sphere(center, radius)
 
     override fun hit(ray: ray, t0: Float, t1: Float): HitResult? {
