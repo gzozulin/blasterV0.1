@@ -24,7 +24,6 @@ import java.nio.FloatBuffer
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureNanoTime
 
-// todo: shadows
 // todo: ideal specular reflections
 // todo: accelerating structures
 
@@ -76,6 +75,7 @@ private val spheres = (1..10).map { HitableSphere(vec3(0f, 0f, -10f * it), 2f, M
 private val scene = HitableGroup(spheres)
 
 private val light = Light(color().yellow(), true)
+private val lightPos = vec3().back()
 
 private val regionsLow = mutableListOf<RegionTask>()
 private val regionsMed = mutableListOf<RegionTask>()
@@ -172,33 +172,36 @@ private class BlinnPhongRtrTechnique {
         val ray = camera.ray(u, v)
         val result = scene.hit(ray, 0f, Float.MAX_VALUE)
         return if (result != null) {
-
-
-            //val shadowray = ray(result.point, )
-
-
-
-            computeColor(camera.position, result.point, result.normal, result.material, camera.position, light)
+            val lightDir = vec3()
+            lightDir.sub(result.point, lightDir).normalize()
+            val color = color().set(computeAmbient(result.material))
+            val shadowray = ray(result.point, lightDir)
+            if (scene.hit(shadowray, 0.001f, Float.MAX_VALUE) == null) {
+                color.add(computeDiffuseSpecular(camera.position, result.point, result.normal, result.material, lightDir, light))
+            }
+            color
         } else {
             background[u.toInt() + v.toInt() * RESOLUTION_WIDTH]
         }
     }
 
-    private fun computeColor(eye: vec3, point: vec3, normal: vec3, material: Material, lightPos: vec3, light: Light): color {
+    private fun computeAmbient(material: Material) : color {
+        val ambientContrib = vec3()
+        material.ambient.mul(light.intensity, ambientContrib)
+        return ambientContrib
+    }
+
+    private fun computeDiffuseSpecular(eye: vec3, point: vec3, normal: vec3, material: Material, lightDir: vec3, light: Light): color {
         val result = color()
         val viewDir = vec3()
-        val lightDir = vec3()
         val halfVec = vec3()
         eye.sub(point, viewDir).normalize()
-        lightPos.sub(point, lightDir).normalize()
         viewDir.add(lightDir, halfVec).normalize()
-        val ambientContrib = vec3()
         val diffuseContrib = vec3()
         val specularContrib = vec3()
-        material.ambient.mul(light.intensity, ambientContrib)
         diffuseContrib.set(material.diffuse).mul(light.intensity).mul(max(0f, normal.dot(lightDir)))
         specularContrib.set(material.specular).mul(light.intensity).mul(powf(max(0f, normal.dot(halfVec)), material.shine))
-        result.set(ambientContrib).add(diffuseContrib).add(specularContrib)
+        result.add(diffuseContrib).add(specularContrib)
         return result
     }
 }
