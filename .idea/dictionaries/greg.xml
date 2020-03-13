@@ -5,6 +5,7 @@
       <w>aabbs</w>
       <w>bindable</w>
       <w>bindables</w>
+      <w>blinn</w>
       <w>coord</w>
       <w>coords</w>
       <w>darkskies</w>
@@ -19,6 +20,7 @@
       <w>mooncity</w>
       <w>multisample</w>
       <w>multisampled</w>
+      <w>phong</w>
       <w>proj</w>
       <w>quat</w>
       <w>radf</w>

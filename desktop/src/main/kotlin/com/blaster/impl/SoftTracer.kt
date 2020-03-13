@@ -4,6 +4,8 @@ import com.blaster.assets.AssetStream
 import com.blaster.assets.ShadersLib
 import com.blaster.auxiliary.*
 import com.blaster.entity.Controller
+import com.blaster.entity.Light
+import com.blaster.entity.Material
 import com.blaster.gl.GlLocator
 import com.blaster.gl.GlMesh
 import com.blaster.gl.GlState
@@ -15,11 +17,16 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.joml.Intersectionf
+import java.lang.Float.max
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureNanoTime
+
+// todo: shadows
+// todo: ideal specular reflections
+// todo: accelerating structures
 
 private val backend = GlLocator.locate()
 
@@ -65,8 +72,10 @@ private val wasdInput = WasdInput(controller)
 
 private val simpleTechnique = SimpleTechnique()
 
-private val spheres = (1..10).map { HitableSphere(vec3(0f, 0f, -10f * it), 2f, RtrMaterial()) }.toList()
+private val spheres = (1..10).map { HitableSphere(vec3(0f, 0f, -10f * it), 2f, Material.POLISHED_GOLD) }.toList()
 private val scene = HitableGroup(spheres)
+
+private val light = Light(color().yellow(), true)
 
 private val regionsLow = mutableListOf<RegionTask>()
 private val regionsMed = mutableListOf<RegionTask>()
@@ -77,6 +86,7 @@ private val regionMutex = Mutex()
 
 private var currentJob: Job = Job()
 
+private val blinnPhongRtrTechnique = BlinnPhongRtrTechnique()
 private val background = mutableListOf<color>()
 
 private fun createBackground() {
@@ -154,9 +164,46 @@ private class RtrCamera {
     }
 }
 
-private class RtrMaterial
+private class BlinnPhongRtrTechnique {
+    // halfvector = (v + l) / |v + l||
+    // kA * I + kD * I * max(0f, n.dot(l)) + kS * I max(0, n.dot(h))^p
 
-private data class HitResult(val t: Float, val point: vec3, val normal: vec3, val material: RtrMaterial)
+    fun computeColor(u: Float, v: Float): color {
+        val ray = camera.ray(u, v)
+        val result = scene.hit(ray, 0f, Float.MAX_VALUE)
+        return if (result != null) {
+
+
+            //val shadowray = ray(result.point, )
+
+
+
+            computeColor(camera.position, result.point, result.normal, result.material, camera.position, light)
+        } else {
+            background[u.toInt() + v.toInt() * RESOLUTION_WIDTH]
+        }
+    }
+
+    private fun computeColor(eye: vec3, point: vec3, normal: vec3, material: Material, lightPos: vec3, light: Light): color {
+        val result = color()
+        val viewDir = vec3()
+        val lightDir = vec3()
+        val halfVec = vec3()
+        eye.sub(point, viewDir).normalize()
+        lightPos.sub(point, lightDir).normalize()
+        viewDir.add(lightDir, halfVec).normalize()
+        val ambientContrib = vec3()
+        val diffuseContrib = vec3()
+        val specularContrib = vec3()
+        material.ambient.mul(light.intensity, ambientContrib)
+        diffuseContrib.set(material.diffuse).mul(light.intensity).mul(max(0f, normal.dot(lightDir)))
+        specularContrib.set(material.specular).mul(light.intensity).mul(powf(max(0f, normal.dot(halfVec)), material.shine))
+        result.set(ambientContrib).add(diffuseContrib).add(specularContrib)
+        return result
+    }
+}
+
+private data class HitResult(val t: Float, val point: vec3, val normal: vec3, val material: Material)
 
 private interface Hitable {
     fun hit(ray: ray, t0: Float, t1: Float): HitResult?
@@ -177,7 +224,7 @@ private data class HitableGroup(val hitables: List<Hitable>) : Hitable {
     }
 }
 
-private data class HitableSphere(private val center: vec3, private val radius: Float, private val material: RtrMaterial) : Hitable {
+private data class HitableSphere(private val center: vec3, private val radius: Float, private val material: Material) : Hitable {
     private val sphere = sphere(center, radius)
 
     override fun hit(ray: ray, t0: Float, t1: Float): HitResult? {
@@ -197,16 +244,6 @@ private data class HitableSphere(private val center: vec3, private val radius: F
         val point = vec3().pointAt(t, ray)
         val normal = vec3(point).sub(center).div(radius)
         return HitResult(t, point, normal, material)
-    }
-}
-
-private fun computeColor(u: Float, v: Float): color {
-    val ray = camera.ray(u, v)
-    val result = scene.hit(ray, 0f, Float.MAX_VALUE)
-    return if (result != null) {
-        color().red()
-    } else {
-        background[u.toInt() + v.toInt() * RESOLUTION_WIDTH]
     }
 }
 
@@ -263,7 +300,7 @@ private fun updateRegion(regionTask: RegionTask): RegionTask {
     val vRange = 0 until REGION_HEIGHT
     for (v in vRange step regionTask.vStep) {
         for (u in uRange step  regionTask.uStep) {
-            val color = computeColor(regionTask.uFrom + u + uHalf, regionTask.vFrom + v + vHalf)
+            val color = blinnPhongRtrTechnique.computeColor(regionTask.uFrom + u + uHalf, regionTask.vFrom + v + vHalf)
             fillRegion(u, v, regionTask.uStep, regionTask.vStep, color, regionTask.floatBuffer)
         }
     }
@@ -313,7 +350,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 }
             }
         }
-        check(measureNanoTime { partiallyUpdateViewport(NANOS_PER_FRAME - elapsed) } < NANOS_PER_FRAME) { "Exceeded the frame threshold!" }
+        if (measureNanoTime { partiallyUpdateViewport(NANOS_PER_FRAME - elapsed) } > NANOS_PER_FRAME) {
+            println("Exceeded the frame threshold!")
+        }
     }
 
     override fun onCursorDelta(delta: vec2) {
