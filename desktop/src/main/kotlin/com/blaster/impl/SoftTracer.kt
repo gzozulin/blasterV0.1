@@ -24,6 +24,7 @@ import java.nio.FloatBuffer
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureNanoTime
 
+// todo: draw while moving too!
 // todo: ideal specular reflections
 // todo: accelerating structures
 
@@ -71,7 +72,7 @@ private val wasdInput = WasdInput(controller)
 
 private val simpleTechnique = SimpleTechnique()
 
-private val spheres = (1..10).map { HitableSphere(vec3(0f, 0f, -10f * it), 2f, Material.POLISHED_GOLD) }.toList()
+private val spheres = (1..10).map { HitableSphere(vec3(0f, 0f, -10f * it), 2f, Material.CIAN_PLASTIC) }.toList()
 private val scene = HitableGroup(spheres)
 
 private val light = Light(color().yellow(), true)
@@ -173,7 +174,7 @@ private class BlinnPhongRtrTechnique {
         val result = scene.hit(ray, 0f, Float.MAX_VALUE)
         return if (result != null) {
             val lightDir = vec3()
-            lightDir.sub(result.point, lightDir).normalize()
+            lightPos.sub(result.point, lightDir).normalize()
             val color = color().set(computeAmbient(result.material))
             val shadowray = ray(result.point, lightDir)
             if (scene.hit(shadowray, 0.001f, Float.MAX_VALUE) == null) {
@@ -227,7 +228,10 @@ private data class HitableGroup(val hitables: List<Hitable>) : Hitable {
     }
 }
 
-private data class HitableSphere(private val center: vec3, private val radius: Float, private val material: Material) : Hitable {
+private data class HitableSphere(
+        private val center: vec3, private val radius: Float, private val material: Material
+) : Hitable {
+
     private val sphere = sphere(center, radius)
 
     override fun hit(ray: ray, t0: Float, t1: Float): HitResult? {
