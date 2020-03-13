@@ -200,7 +200,7 @@ private data class HitableSphere(private val center: vec3, private val radius: F
     }
 }
 
-private fun calculateColor(u: Float, v: Float): color {
+private fun computeColor(u: Float, v: Float): color {
     val ray = camera.ray(u, v)
     val result = scene.hit(ray, 0f, Float.MAX_VALUE)
     return if (result != null) {
@@ -263,7 +263,7 @@ private fun updateRegion(regionTask: RegionTask): RegionTask {
     val vRange = 0 until REGION_HEIGHT
     for (v in vRange step regionTask.vStep) {
         for (u in uRange step  regionTask.uStep) {
-            val color = calculateColor(regionTask.uFrom + u + uHalf, regionTask.vFrom + v + vHalf)
+            val color = computeColor(regionTask.uFrom + u + uHalf, regionTask.vFrom + v + vHalf)
             fillRegion(u, v, regionTask.uStep, regionTask.vStep, color, regionTask.floatBuffer)
         }
     }
@@ -313,7 +313,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 }
             }
         }
-        partiallyUpdateViewport(NANOS_PER_FRAME - elapsed)
+        check(measureNanoTime { partiallyUpdateViewport(NANOS_PER_FRAME - elapsed) } < NANOS_PER_FRAME) { "Exceeded the frame threshold!" }
     }
 
     override fun onCursorDelta(delta: vec2) {

@@ -281,6 +281,11 @@ class GlBackendImpl : GlBackend {
     override fun glBindTexture(target: Int, texture: Int) = GLES30.glBindTexture(target, texture)
     override fun glTexImage2D(target: Int, level: Int, internalformat: Int, width: Int, height: Int, border: Int, format: Int, type: Int, pixels: ByteBuffer?) =
             GLES30.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels)
+
+    override fun glTexSubImage2D(target: Int, level: Int, xoffset: Int, yoffset: Int, width: Int, height: Int, format: Int, type: Int, pixels: ByteBuffer) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun glTexParameteri(target: Int, pname: Int, param: Int) =
             GLES30.glTexParameteri(target, pname, param)
     override fun glActiveTexture(texture: Int) = GLES30.glActiveTexture(texture)
