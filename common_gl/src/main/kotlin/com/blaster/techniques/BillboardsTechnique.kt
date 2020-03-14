@@ -32,14 +32,14 @@ class BillboardsTechnique(private val max: Int) {
     private lateinit var scale: GlBuffer
     private lateinit var transparency: GlBuffer
 
-    fun prepare(shadersLib: ShadersLib) {
+    fun create(shadersLib: ShadersLib) {
         program = shadersLib.loadProgram(
                 "shaders/billboards/billboards.vert", "shaders/billboards/billboards.frag")
-        positions = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 3 * 4) // max * vec3f
+        positions = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 3 * 4)
                 .order(ByteOrder.nativeOrder()), backend.GL_STREAM_DRAW)
-        scale = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 4) // max * float
+        scale = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 4)
                 .order(ByteOrder.nativeOrder()), backend.GL_STREAM_DRAW)
-        transparency = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 4) // max * float
+        transparency = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 4)
                 .order(ByteOrder.nativeOrder()), backend.GL_STREAM_DRAW)
         val additional = listOf(
                 GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positions,

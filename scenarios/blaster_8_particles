@@ -1,0 +1,29 @@
+Hello, and welcome to the pages of my weekly journal!
+
+#content; In today's post
+
+#header; Fast vs. Flexible: CPU, GPU, instancing, billboards
+
+#header; Particles: emitter function, particle function
+#include; def; desktop/com.blaster.impl.Particles::emitSnowflake
+#include; def; desktop/com.blaster.impl.Particles::updateSnowflake
+
+#header; Updating Particle System
+#include; def; common_gl/com.blaster.toolbox.Particles::tick
+
+#header; Passing data for rendering
+#include; def; common_gl/com.blaster.techniques.BillboardsTechnique::BillboardsProvider
+#include; def; common_gl/com.blaster.toolbox.Particles::flushPositions
+
+#header; Billboards Technique and shader
+#include; def; common_gl/com.blaster.techniques.BillboardsTechnique::create
+#include; glsl; common_assets/src/main/resources/shaders/billboards/billboards.vert
+
+#header; Drawing billboards with instancing
+#include; def; common_gl/com.blaster.techniques.BillboardsTechnique::instance
+#include; def; common_gl/com.blaster.techniques.BillboardsTechnique::updatePositions
+
+#header; Combining the two
+#include; def; desktop/com.blaster.impl.Particles::drawParticles
+
+#header; Outro

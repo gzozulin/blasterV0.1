@@ -24,7 +24,6 @@ import java.nio.FloatBuffer
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureNanoTime
 
-// todo: draw while moving too!
 // todo: ideal specular reflections
 // todo: accelerating structures
 
@@ -167,8 +166,8 @@ private class RtrCamera {
 }
 
 private class BlinnPhongRtrTechnique {
-    // halfvector = (v + l) / |v + l||
-    // kA * I + kD * I * max(0f, n.dot(l)) + kS * I max(0, n.dot(h))^p
+    // h = (v + l) / |v + l|
+    // L = kA * Ia + kD * Id * max(0f, n.dot(l)) + kS * Is max(0, n.dot(h))^p
 
     fun computeColor(u: Float, v: Float): color {
         val ray = camera.ray(u, v)

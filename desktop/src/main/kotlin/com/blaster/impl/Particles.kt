@@ -7,6 +7,7 @@ import com.blaster.toolbox.Console
 import com.blaster.auxiliary.center
 import com.blaster.auxiliary.lerpf
 import com.blaster.auxiliary.mat4
+import com.blaster.auxiliary.vec3
 import com.blaster.gl.GlState
 import com.blaster.gl.GlTexture
 import com.blaster.platform.LwjglWindow
@@ -50,15 +51,13 @@ private val textTechnique = TextTechnique()
 private val snow = Particles(BILLBOARDS_MAX, snowflakeEmitters(), ::emitSnowflake, ::updateSnowflake)
 private val flame = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center()), ::emitFlame, ::updateFlame)
 private val flame2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center()), ::emitFlame, ::updateFlame)
-private val smoke = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vector3f(0f, 0.5f, 0f))),
-        ::emitSmoke, ::updateSmoke)
-private val smoke2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vector3f(0f, 0.5f, 0f))),
-        ::emitSmoke, ::updateSmoke)
+private val smoke = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vector3f(0f, 0.5f, 0f))), ::emitSmoke, ::updateSmoke)
+private val smoke2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vector3f(0f, 0.5f, 0f))), ::emitSmoke, ::updateSmoke)
 
 private val console = Console(1000L)
 
 private val camera = Camera()
-private val controller = Controller(Vector3f(0f, 0f, 3f), velocity = 0.05f)
+private val controller = Controller(vec3(0f, 0f, 3f), velocity = 0.05f)
 private val wasd = WasdInput(controller)
 
 private val identityM = mat4()
@@ -92,9 +91,11 @@ private fun emitSnowflake(emitter: Vector3f, particles: MutableList<Particle>) {
 
 private fun updateSnowflake(particle: Particle): Boolean {
     val snowflake = particle as Snowflake
-    snowflake.position.y -= 0.01f
-    snowflake.position.x = snowflake.origin.x + sin((snowflake.randomness + snowflake.position.y) * 2f) * 0.5f
-    snowflake.position.z = snowflake.origin.z + sin((snowflake.randomness + snowflake.position.y) * 4f) * 0.2f
+    snowflake.position.set(
+            snowflake.origin.x + sin((snowflake.randomness + snowflake.position.y) * 2f) * 0.5f,
+            snowflake.position.y - 0.01f,
+            snowflake.origin.z + sin((snowflake.randomness + snowflake.position.y) * 4f) * 0.2f
+    )
     return particle.position.y > sceneAABB.minY
 }
 
@@ -136,7 +137,7 @@ private fun updateSmoke(particle: Particle): Boolean {
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
-        billboardsTechnique.prepare(shadersLib)
+        billboardsTechnique.create(shadersLib)
         console.info("Particles ready..")
         textTechnique.create(shadersLib, texturesLib)
         console.info("Techniques ready..")
@@ -157,8 +158,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         immediateTechnique.resize(camera)
     }
 
-    override fun onTick() {
-        GlState.clear()
+    private fun tickScene() {
         snow.tick()
         flame.tick()
         flame2.tick()
@@ -169,12 +169,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
             camera.lookAlong(direction)
         }
         console.tick()
-        immediateTechnique.aabb(camera, sceneAABB, mat4())
-        textTechnique.draw {
-            console.render { position, text, color, scale ->
-                textTechnique.text(text, position, scale, color)
-            }
-        }
+    }
+
+    private fun drawParticles() {
         billboardsTechnique.draw(camera) {
             GlState.drawTransparent {
                 billboardsTechnique.instance(snow, identityM, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE, updateScale = false)
@@ -186,6 +183,18 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 }
             }
         }
+    }
+
+    override fun onTick() {
+        tickScene()
+        GlState.clear()
+        //immediateTechnique.aabb(camera, sceneAABB, mat4())
+        textTechnique.draw {
+            console.render { position, text, color, scale ->
+                textTechnique.text(text, position, scale, color)
+            }
+        }
+        drawParticles()
     }
 
     override fun onCursorDelta(delta: Vector2f) {

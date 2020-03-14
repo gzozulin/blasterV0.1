@@ -1,0 +1,296 @@
+<html>
+    <style>
+
+        .code,.child {
+                    border-radius: 3px;
+                    display: block;
+                    max-width: 100%;
+                    overflow: auto;
+                    color: #666;
+                    page-break-inside: avoid;
+                    font: normal 15px/1.6 monospace;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                    word-wrap: break-word;
+                }
+
+                .child {
+                    border-radius: 3px;
+                    background: #F1ECEC;
+                    box-shadow: -5px 5px 10px rgba(0,0,0,0.3);
+                }
+
+                .code {
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                }
+
+                .code_child {
+                    border-radius: 3px;
+                    white-space: pre-wrap;
+                    background: #EBFCE3;
+                    padding: 1em 1.5em;
+                    margin: 1.6em 0;
+                }
+
+                .text {}
+                .text_child {}
+
+                .link {}
+                .link_child {}
+
+                .picture {
+                    display: block;
+                    margin: 30px auto 45px auto;
+                    max-height: 50%;
+                }
+                .picture_child {}
+
+                .list_item {}
+                .list_item_child {}
+    </style>
+    <body>
+        <p class="text">Hello, and welcome to the pages of my weekly journal!
+</p><p class="text">
+</p><h2 id="In-today-s-post">In today&#39;s post</h2><ul class="list_item"><li>    <a class="link" href="#Fast-vs--Flexible--CPU--GPU--instancing--billboards">Fast vs. Flexible: CPU, GPU, instancing, billboards</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Particles--emitter-function--particle-function">Particles: emitter function, particle function</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Updating-Particle-System">Updating Particle System</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Passing-data-for-rendering">Passing data for rendering</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Billboards-Technique-and-shader">Billboards Technique and shader</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Drawing-billboards-with-instancing">Drawing billboards with instancing</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Combining-the-two">Combining the two</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Outro">Outro</a>
+</li></ul><p class="text">
+</p><h2 id="Fast-vs--Flexible--CPU--GPU--instancing--billboards">Fast vs. Flexible: CPU, GPU, instancing, billboards</h2>
+<p class="text">
+</p><h2 id="Particles--emitter-function--particle-function">Particles: emitter function, particle function</h2>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L86" target="_blank">desktop/com.blaster.impl.Particles::emitSnowflake</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun emitSnowflake(emitter: Vector3f, particles: MutableList&lt;Particle&gt;) {
+    if (random.nextInt(50) == 1) {
+        particles.add(Snowflake(emitter))
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L92" target="_blank">desktop/com.blaster.impl.Particles::updateSnowflake</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun updateSnowflake(particle: Particle): Boolean {
+    val snowflake = particle as Snowflake
+    snowflake.position.set(
+            snowflake.origin.x + sin((snowflake.randomness + snowflake.position.y) * 2f) * 0.5f,
+            snowflake.position.y - 0.01f,
+            snowflake.origin.z + sin((snowflake.randomness + snowflake.position.y) * 4f) * 0.2f
+    )
+    return particle.position.y &gt; sceneAABB.minY
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Updating-Particle-System">Updating Particle System</h2>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Particles.kt#L21" target="_blank">common_gl/com.blaster.toolbox.Particles::tick</a>
+</h3>
+    <pre><code class="lang-kotlin">fun tick() {
+    emitters.forEach {
+        if (particles.size &lt; max) {
+            emitterFunction.invoke(it, particles)
+        }
+    }
+    val particlesIterator = particles.iterator()
+    while (particlesIterator.hasNext()) {
+        val isAlive = particleFunction.invoke(particlesIterator.next())
+        if (!isAlive) {
+            particlesIterator.remove()
+        }
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Passing-data-for-rendering">Passing data for rendering</h2>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/BillboardsTechnique.kt#L15" target="_blank">common_gl/com.blaster.techniques.BillboardsTechnique::BillboardsProvider</a>
+</h3>
+    <pre><code class="lang-kotlin">interface BillboardsProvider {
+    fun flushPositions(position: FloatBuffer)
+    fun flushScale(scale: FloatBuffer)
+    fun flushTransparency(transparency: FloatBuffer)
+    fun count(): Int
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/toolbox/Particles.kt#L36" target="_blank">common_gl/com.blaster.toolbox.Particles::flushPositions</a>
+</h3>
+    <pre><code class="lang-kotlin">override fun flushPositions(position: FloatBuffer) {
+    position.rewind()
+    particles.forEachIndexed { index, particle -&gt;
+        if (index &gt;= max) {
+            return
+        }
+        position.put(particle.position.x)
+        position.put(particle.position.y)
+        position.put(particle.position.z)
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Billboards-Technique-and-shader">Billboards Technique and shader</h2>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/BillboardsTechnique.kt#L35" target="_blank">common_gl/com.blaster.techniques.BillboardsTechnique::create</a>
+</h3>
+    <pre><code class="lang-kotlin">fun create(shadersLib: ShadersLib) {
+    program = shadersLib.loadProgram(
+            &quot;shaders/billboards/billboards.vert&quot;, &quot;shaders/billboards/billboards.frag&quot;)
+    positions = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 3 * 4)
+            .order(ByteOrder.nativeOrder()), backend.GL_STREAM_DRAW)
+    scale = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 4)
+            .order(ByteOrder.nativeOrder()), backend.GL_STREAM_DRAW)
+    transparency = GlBuffer(backend.GL_ARRAY_BUFFER, ByteBuffer.allocateDirect(max * 4)
+            .order(ByteOrder.nativeOrder()), backend.GL_STREAM_DRAW)
+    val additional = listOf(
+            GlAttribute.ATTRIBUTE_BILLBOARD_POSITION to positions,
+            GlAttribute.ATTRIBUTE_BILLBOARD_SCALE to scale,
+            GlAttribute.ATTRIBUTE_BILLBOARD_TRANSPARENCY to transparency)
+    rect = GlMesh.rect(additionalAttributes = additional)
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_assets/src/main/resources/shaders/billboards/billboards.vert" target="_blank">common_assets/src/main/resources/shaders/billboards/billboards.vert</a>
+</h3>
+    <pre><code class="lang-c">#version 300 es
+
+precision mediump float;
+
+layout (location = 0) in vec3 aPosition;
+layout (location = 1) in vec2 aTexCoord;
+layout (location = 4) in vec3 aBillbPos;
+layout (location = 5) in float aBillbScale;
+layout (location = 6) in float aBillbTransparency;
+
+uniform mat4 uModelM;
+uniform mat4 uProjectionM;
+uniform mat4 uViewM;
+
+uniform int uScaleFlag;
+uniform int uTransparencyFlag;
+
+uniform vec3 uEye;
+uniform float uWidth;
+uniform float uHeight;
+
+out vec2 vTexCoord;
+out float vBillbTransparency;
+
+mat4 billboardM() {
+    vec3 from = uEye;
+    vec3 to = aBillbPos;
+
+    vec3 forward = normalize(from - to);
+    vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), forward));
+    vec3 up = cross(forward, right);
+
+    mat4 matrix = mat4(1.0);
+    matrix[0][0] = right.x;
+    matrix[0][1] = right.y;
+    matrix[0][2] = right.z;
+    matrix[1][0] = up.x;
+    matrix[1][1] = up.y;
+    matrix[1][2] = up.z;
+    matrix[2][0] = forward.x;
+    matrix[2][1] = forward.y;
+    matrix[2][2] = forward.z;
+    matrix[3][0] = to.x;
+    matrix[3][1] = to.y;
+    matrix[3][2] = to.z;
+    return matrix;
+}
+
+void main() {
+    vTexCoord = aTexCoord;
+    vBillbTransparency = uTransparencyFlag == 1 ? aBillbTransparency : 1.0;
+    vec4 position = vec4(0.0);
+    position.x = aPosition.x * uWidth / 2.0;
+    position.y = aPosition.y * uHeight / 2.0;
+    if (uScaleFlag == 1) {
+        position.x *= aBillbScale;
+        position.y *= aBillbScale;
+    }
+    position.z = aPosition.z;
+    position.w = 1.0;
+    gl_Position = uProjectionM * uViewM * uModelM * billboardM() * position;
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Drawing-billboards-with-instancing">Drawing billboards with instancing</h2>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/BillboardsTechnique.kt#L85" target="_blank">common_gl/com.blaster.techniques.BillboardsTechnique::instance</a>
+</h3>
+    <pre><code class="lang-kotlin">fun instance(provider: BillboardsProvider, modelM: mat4, diffuse: GlTexture, width: Float, height: Float,
+             updateScale: Boolean = true, updateTransparency: Boolean = true) {
+    updatePositions(provider)</code></pre>
+<p class="text_child">Scale and transparency updated conditionally
+</p><pre><code class="lang-kotlin">    if (updateScale) {
+        updateScales(provider)
+    }
+    if (updateTransparency) {
+        updateTransparency(provider)
+    }</code></pre>
+<p class="text_child">After data is uploaded, performing an instanced draw pass
+</p><pre><code class="lang-kotlin">    glBind(listOf(diffuse, positions, scale, transparency)) {
+        program.setUniform(GlUniform.UNIFORM_SCALE_FLAG, if (updateScale) 1 else 0)
+        program.setUniform(GlUniform.UNIFORM_TRANSPARENCY_FLAG, if (updateTransparency) 1 else 0)
+        program.setUniform(GlUniform.UNIFORM_MODEL_M, modelM)
+        program.setUniform(GlUniform.UNIFORM_WIDTH, width)
+        program.setUniform(GlUniform.UNIFORM_HEIGHT, height)
+        program.setTexture(GlUniform.UNIFORM_TEXTURE_DIFFUSE, diffuse)
+        rect.drawInstanced(instances = provider.count())
+    }
+}</code></pre>
+
+</div>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//common_gl/src/main/kotlin/com/blaster/techniques/BillboardsTechnique.kt#L61" target="_blank">common_gl/com.blaster.techniques.BillboardsTechnique::updatePositions</a>
+</h3>
+    <p class="text_child">Mapping the buffer with positions, updating the buffer from provider
+</p><pre><code class="lang-kotlin">private fun updatePositions(provider: BillboardsProvider) {
+    glBind(positions) {
+        positions.updateBuffer {
+            provider.flushPositions(it.asFloatBuffer())
+        }
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Combining-the-two">Combining the two</h2>
+<div class="child">
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L174" target="_blank">desktop/com.blaster.impl.Particles::drawParticles</a>
+</h3>
+    <pre><code class="lang-kotlin">private fun drawParticles() {
+    billboardsTechnique.draw(camera) {
+        GlState.drawTransparent {
+            billboardsTechnique.instance(snow, identityM, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE, updateScale = false)
+            GlState.drawWithNoDepth {
+                billboardsTechnique.instance(flame, identityM, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(smoke, identityM, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(flame2, identityM, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(smoke2, identityM, smokeDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
+            }
+        }
+    }
+}</code></pre>
+
+</div>
+<p class="text">
+</p><h2 id="Outro">Outro</h2>
+
+        <br>
+    </body>
+</html>
