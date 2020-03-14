@@ -72,7 +72,7 @@ private val wasdInput = WasdInput(controller)
 
 private val simpleTechnique = SimpleTechnique()
 
-private val spheres = (1..10).map { HitableSphere(vec3(0f, 0f, -10f * it), 2f, Material.CIAN_PLASTIC) }.toList()
+private val spheres = (1..100).map { HitableSphere(vec3(randf(-50f, 50f), randf(-50f, 50f), randf(0f, -100f)), randf(1f, 5f), Material.MATERIALS.values.random()) }.toList()
 private val scene = HitableGroup(spheres)
 
 private val light = Light(color().yellow(), true)
