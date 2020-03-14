@@ -84,7 +84,7 @@ private val regionsMed = mutableListOf<RegionTask>()
 private val regionsHgh = mutableListOf<RegionTask>()
 
 private val regionsDone = mutableListOf<RegionTask>()
-private val regionMutex = Mutex()
+private val regionsMutex = Mutex()
 
 private var currentJob: Job = Job()
 
@@ -260,7 +260,7 @@ private fun updateRegions() {
         camera.updateBasis()
         updateLowRegionsSync()
         GlobalScope.launch {
-            regionMutex.withLock {
+            regionsMutex.withLock {
                 currentJob.cancel()
                 regionsDone.clear()
                 currentJob = GlobalScope.launch {
@@ -283,7 +283,7 @@ private suspend fun updateHighRegionsAsync(regions: List<RegionTask>) {
         withContext(Dispatchers.Default) {
             val result = updateRegion(task) // todo: region calculation is canceled only when done
             if (isActive) {
-                regionMutex.withLock { regionsDone.add(result) }
+                regionsMutex.withLock { regionsDone.add(result) }
             }
         }
     }
@@ -292,7 +292,7 @@ private suspend fun updateHighRegionsAsync(regions: List<RegionTask>) {
 private fun updateViewport(left: Long) {
     var time = left
     runBlocking {
-        regionMutex.withLock {
+        regionsMutex.withLock {
             while (time > 0 && regionsDone.isNotEmpty()) {
                 val elapsed = measureNanoTime {
                     updateViewportTexture(regionsDone.removeAt(0))
