@@ -60,6 +60,7 @@ private val projectionM = mat4().identity()
 private val modelM = mat4().identity()
 
 private var mouseControl = false
+private var keyPressed = false
 
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
@@ -280,7 +281,7 @@ private fun updateLowRegionsSync() {
 private suspend fun updateHighRegionsAsync(regions: List<RegionTask>) {
     for (task in regions) {
         withContext(Dispatchers.Default) {
-            val result = updateRegion(task)
+            val result = updateRegion(task) // todo: region calculation is canceled only when done
             if (isActive) {
                 regionMutex.withLock { regionsDone.add(result) }
             }
@@ -348,6 +349,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     }
 
     override fun onTick() {
+        if (keyPressed || mouseControl) {
+            sceneVersion.increment()
+        }
         val elapsed = measureNanoTime {
             GlState.clear()
             GlState.drawWithNoCulling {
@@ -369,7 +373,6 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCursorDelta(delta: vec2) {
         if (mouseControl) {
             wasdInput.onCursorDelta(delta)
-            sceneVersion.increment()
         }
     }
 
@@ -380,15 +383,14 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun mouseBtnReleased(btn: Int) {
         mouseControl = false
     }
-
     override fun keyPressed(key: Int) {
         wasdInput.keyPressed(key)
-        sceneVersion.increment()
+        keyPressed = true
     }
 
     override fun keyReleased(key: Int) {
         wasdInput.keyReleased(key)
-        sceneVersion.increment()
+        keyPressed = false
     }
 }
 
