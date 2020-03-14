@@ -254,26 +254,30 @@ private data class HitableSphere(
     }
 }
 
-private fun updateSceneIfNeeded() {
+private fun updateRegions() {
     if (sceneVersion.check()) {
-        runBlocking {
-            currentJob.cancel()
-            regionMutex.withLock { regionsDone.clear() }
-            camera.updateBasis()
-            currentJob = launch {
-                updateRegions(regionsLow)
-                if (isActive) {
-                    updateRegions(regionsMed)
-                }
-                if (isActive) {
-                    updateRegions(regionsHgh)
+        camera.updateBasis()
+        updateLowRegionsSync()
+        GlobalScope.launch {
+            regionMutex.withLock {
+                currentJob.cancel()
+                regionsDone.clear()
+                currentJob = GlobalScope.launch {
+                    updateHighRegionsAsync(regionsMed)
+                    updateHighRegionsAsync(regionsHgh)
                 }
             }
         }
     }
 }
 
-private suspend fun updateRegions(regions: List<RegionTask>) {
+private fun updateLowRegionsSync() {
+    for (task in regionsLow) {
+        regionsDone.add(updateRegion(task))
+    }
+}
+
+private suspend fun updateHighRegionsAsync(regions: List<RegionTask>) {
     for (task in regions) {
         withContext(Dispatchers.Default) {
             val result = updateRegion(task)
@@ -284,7 +288,7 @@ private suspend fun updateRegions(regions: List<RegionTask>) {
     }
 }
 
-private fun partiallyUpdateViewport(left: Long) {
+private fun updateViewport(left: Long) {
     var time = left
     runBlocking {
         regionMutex.withLock {
@@ -346,18 +350,18 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onTick() {
         val elapsed = measureNanoTime {
             GlState.clear()
-            controller.apply { position, direction ->
-                camera.position.set(position)
-                camera.direction.set(direction)
-            }
-            updateSceneIfNeeded()
             GlState.drawWithNoCulling {
                 simpleTechnique.draw(viewM, projectionM) {
                     simpleTechnique.instance(viewportRect, viewportTexture, modelM)
                 }
             }
+            controller.apply { position, direction ->
+                camera.position.set(position)
+                camera.direction.set(direction)
+            }
+            updateRegions()
         }
-        if (measureNanoTime { partiallyUpdateViewport(NANOS_PER_FRAME - elapsed) } > NANOS_PER_FRAME) {
+        if (measureNanoTime { updateViewport(NANOS_PER_FRAME - elapsed) } > NANOS_PER_FRAME) {
             println("Exceeded the frame threshold!")
         }
     }
