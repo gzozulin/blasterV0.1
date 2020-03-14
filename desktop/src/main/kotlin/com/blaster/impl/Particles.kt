@@ -57,7 +57,8 @@ private val smoke2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vec
 private val console = Console(1000L)
 
 private val camera = Camera()
-private val controller = Controller(vec3(0f, 0f, 3f), velocity = 0.05f)
+// todo: velocity =
+private val controller = Controller(vec3(0f, 0f, 3f), 0.05f)
 private val wasd = WasdInput(controller)
 
 private val identityM = mat4()
