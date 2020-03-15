@@ -67,7 +67,7 @@
 <p class="text">
 </p><h2 id="Particles--emitter-function--particle-function">Particles: emitter function, particle function</h2>
 <div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L84" target="_blank">desktop/com.blaster.impl.Particles::emitSnowflake</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L86" target="_blank">desktop/com.blaster.impl.Particles::emitSnowflake</a>
 </h3>
     <pre><code class="lang-kotlin">private fun emitSnowflake(emitter: Vector3f, particles: MutableList&lt;Particle&gt;) {
     if (random.nextInt(50) == 1) {
@@ -77,7 +77,7 @@
 
 </div>
 <div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L90" target="_blank">desktop/com.blaster.impl.Particles::updateSnowflake</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L92" target="_blank">desktop/com.blaster.impl.Particles::updateSnowflake</a>
 </h3>
     <pre><code class="lang-kotlin">private fun updateSnowflake(particle: Particle): Boolean {
     val snowflake = particle as Snowflake
@@ -273,10 +273,21 @@ void main() {
 <p class="text">
 </p><h2 id="Combining-the-two">Combining the two</h2>
 <div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L172" target="_blank">desktop/com.blaster.impl.Particles::drawParticles</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L174" target="_blank">desktop/com.blaster.impl.Particles::drawParticles</a>
 </h3>
     <pre><code class="lang-kotlin">private fun drawParticles() {
-    billboardsTechnique.draw(camera)</code></pre>
+    billboardsTechnique.draw(camera) {
+        GlState.drawTransparent {
+            billboardsTechnique.instance(snow, identityM, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE, updateScale = false)
+            GlState.drawWithNoDepth {
+                billboardsTechnique.instance(flame, identityM, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(smoke, identityM, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(flame2, identityM, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
+                billboardsTechnique.instance(smoke2, identityM, smokeDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
+            }
+        }
+    }
+}</code></pre>
 
 </div>
 <p class="text">
