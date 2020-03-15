@@ -1,3 +1,4 @@
+#header; Welcome and intro.
 Hello, and welcome to the pages of my weekly journal!
 
 #content; In today's post
@@ -26,4 +27,4 @@ Hello, and welcome to the pages of my weekly journal!
 #header; Combining the two
 #include; def; desktop/com.blaster.impl.Particles::drawParticles
 
-#header; Outro
+#header; Outro and sign off

@@ -25,6 +25,11 @@ import org.joml.Vector3f
 import java.util.*
 import kotlin.math.sin
 
+private const val BILLBOARDS_MAX = 2500
+
+private const val SNOWFLAKE_SIDE = 0.1f
+private const val FLAMES_SIDE = 1.5f
+
 private val assetStream = AssetStream()
 private val shadersLib = ShadersLib(assetStream)
 private val texturesLib = TexturesLib(assetStream)
@@ -36,11 +41,6 @@ private lateinit var smokeDiffuse: GlTexture
 private lateinit var smokeDiffuse2: GlTexture
 
 private val sceneAABB = AABBf(Vector3f(-5f), Vector3f(5f))
-
-const val BILLBOARDS_MAX = 2500
-
-const val SNOWFLAKE_SIDE = 0.1f
-const val FLAMES_SIDE = 1.5f
 
 private val random = Random()
 
@@ -57,8 +57,7 @@ private val smoke2 = Particles(BILLBOARDS_MAX, listOf(sceneAABB.center().add(Vec
 private val console = Console(1000L)
 
 private val camera = Camera()
-// todo: velocity =
-private val controller = Controller(vec3(0f, 0f, 3f), 0.05f)
+private val controller = Controller(vec3(0f, 0f, 3f), velocity = 0.05f)
 private val wasd = WasdInput(controller)
 
 private val identityM = mat4()

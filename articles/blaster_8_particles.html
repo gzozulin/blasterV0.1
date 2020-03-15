@@ -50,22 +50,24 @@
                 .list_item_child {}
     </style>
     <body>
-        <p class="text">Hello, and welcome to the pages of my weekly journal!
+        <h2 id="Welcome-and-intro-">Welcome and intro.</h2>
+<p class="text">Hello, and welcome to the pages of my weekly journal!
 </p><p class="text">
-</p><h2 id="In-today-s-post">In today&#39;s post</h2><ul class="list_item"><li>    <a class="link" href="#Fast-vs--Flexible--CPU--GPU--instancing--billboards">Fast vs. Flexible: CPU, GPU, instancing, billboards</a>
+</p><h2 id="In-today-s-post">In today&#39;s post</h2><ul class="list_item"><li>    <a class="link" href="#Welcome-and-intro-">Welcome and intro.</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Fast-vs--Flexible--CPU--GPU--instancing--billboards">Fast vs. Flexible: CPU, GPU, instancing, billboards</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Particles--emitter-function--particle-function">Particles: emitter function, particle function</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Updating-Particle-System">Updating Particle System</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Passing-data-for-rendering">Passing data for rendering</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Billboards-Technique-and-shader">Billboards Technique and shader</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Drawing-billboards-with-instancing">Drawing billboards with instancing</a>
 </li></ul><ul class="list_item"><li>    <a class="link" href="#Combining-the-two">Combining the two</a>
-</li></ul><ul class="list_item"><li>    <a class="link" href="#Outro">Outro</a>
+</li></ul><ul class="list_item"><li>    <a class="link" href="#Outro-and-sign-off">Outro and sign off</a>
 </li></ul><p class="text">
 </p><h2 id="Fast-vs--Flexible--CPU--GPU--instancing--billboards">Fast vs. Flexible: CPU, GPU, instancing, billboards</h2>
 <p class="text">
 </p><h2 id="Particles--emitter-function--particle-function">Particles: emitter function, particle function</h2>
 <div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L87" target="_blank">desktop/com.blaster.impl.Particles::emitSnowflake</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L84" target="_blank">desktop/com.blaster.impl.Particles::emitSnowflake</a>
 </h3>
     <pre><code class="lang-kotlin">private fun emitSnowflake(emitter: Vector3f, particles: MutableList&lt;Particle&gt;) {
     if (random.nextInt(50) == 1) {
@@ -75,7 +77,7 @@
 
 </div>
 <div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L93" target="_blank">desktop/com.blaster.impl.Particles::updateSnowflake</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L90" target="_blank">desktop/com.blaster.impl.Particles::updateSnowflake</a>
 </h3>
     <pre><code class="lang-kotlin">private fun updateSnowflake(particle: Particle): Boolean {
     val snowflake = particle as Snowflake
@@ -271,25 +273,14 @@ void main() {
 <p class="text">
 </p><h2 id="Combining-the-two">Combining the two</h2>
 <div class="child">
-    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L175" target="_blank">desktop/com.blaster.impl.Particles::drawParticles</a>
+    <h3>    <a class="link_child" href="https://github.com/madeinsoviets/blaster/blob/master//desktop/src/main/kotlin/com/blaster/impl/Particles.kt#L172" target="_blank">desktop/com.blaster.impl.Particles::drawParticles</a>
 </h3>
     <pre><code class="lang-kotlin">private fun drawParticles() {
-    billboardsTechnique.draw(camera) {
-        GlState.drawTransparent {
-            billboardsTechnique.instance(snow, identityM, snowflakeDiffuse, SNOWFLAKE_SIDE, SNOWFLAKE_SIDE, updateScale = false)
-            GlState.drawWithNoDepth {
-                billboardsTechnique.instance(flame, identityM, flameDiffuse, FLAMES_SIDE, FLAMES_SIDE)
-                billboardsTechnique.instance(smoke, identityM, smokeDiffuse, FLAMES_SIDE, FLAMES_SIDE)
-                billboardsTechnique.instance(flame2, identityM, flameDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
-                billboardsTechnique.instance(smoke2, identityM, smokeDiffuse2, FLAMES_SIDE, FLAMES_SIDE)
-            }
-        }
-    }
-}</code></pre>
+    billboardsTechnique.draw(camera)</code></pre>
 
 </div>
 <p class="text">
-</p><h2 id="Outro">Outro</h2>
+</p><h2 id="Outro-and-sign-off">Outro and sign off</h2>
 
         <br>
     </body>
