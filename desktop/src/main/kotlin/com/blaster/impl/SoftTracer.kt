@@ -14,13 +14,13 @@ import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.SimpleTechnique
 import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.joml.Intersectionf
 import java.lang.Float.max
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.FloatBuffer
+import java.util.*
+import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureNanoTime
 
@@ -40,8 +40,8 @@ private const val VIEWPORT_BOTTOM = (-VIEWPORT_HEIGHT / 2f).toInt()
 private const val RESOLUTION_WIDTH = 1024
 private const val RESOLUTION_HEIGHT = 768
 
-private const val REGION_WIDTH = 32
-private const val REGION_HEIGHT = 32
+private const val REGION_WIDTH = 128
+private const val REGION_HEIGHT = 128
 
 private const val REGIONS_CNT_U = RESOLUTION_WIDTH / REGION_WIDTH
 private const val REGIONS_CNT_V = RESOLUTION_HEIGHT / REGION_HEIGHT
@@ -67,12 +67,12 @@ private val shadersLib = ShadersLib(assetStream)
 private val camera = RtrCamera()
 private val sceneVersion = Version()
 
-private val controller = Controller(velocity = 0.1f, position = vec3().back())
+private val controller = Controller(velocity = 1f, position = vec3().back())
 private val wasdInput = WasdInput(controller)
 
 private val simpleTechnique = SimpleTechnique()
 
-private val spheres = (1..100).map { HitableSphere(vec3(randf(-50f, 50f), randf(-50f, 50f), randf(0f, -100f)), randf(1f, 5f), Material.MATERIALS.values.random()) }.toList()
+private val spheres = (1..100).map { HitableSphere(vec3(randf(-30f, 30f), randf(-30f, 30f), randf(0f, -50f)), randf(1f, 5f), Material.MATERIALS.values.random()) }.toList()
 private val scene = HitableGroup(spheres)
 
 private val light = Light(color().yellow(), true)
@@ -82,13 +82,14 @@ private val regionsLow = mutableListOf<RegionTask>()
 private val regionsMed = mutableListOf<RegionTask>()
 private val regionsHgh = mutableListOf<RegionTask>()
 
-private val regionsDone = mutableListOf<RegionTask>()
-private val regionsMutex = Mutex()
+private val regionsDone = Collections.synchronizedList(mutableListOf<RegionTask>())
 
 private var currentJob: Job = Job()
 
 private val blinnPhongRtrTechnique = BlinnPhongRtrTechnique()
 private val background = mutableListOf<color>()
+
+private val mainDispatcher = Executor { runnable -> runnable.run() }.asCoroutineDispatcher()
 
 private fun createBackground() {
     for (v in 0 until RESOLUTION_HEIGHT) {
@@ -125,7 +126,7 @@ private fun createRegionTasks() {
     regionsLow.sort()
     for (u in 0 until REGIONS_CNT_U) {
         for (v in 0 until REGIONS_CNT_V) {
-            regionsMed.add(RegionTask(u, v, 8, 8))
+            regionsMed.add(RegionTask(u, v, 4, 4))
         }
     }
     regionsMed.sort()
@@ -176,8 +177,8 @@ private class BlinnPhongRtrTechnique {
             val lightDir = vec3()
             lightPos.sub(result.point, lightDir).normalize()
             val color = color().set(computeAmbient(result.material))
-            val shadowray = ray(result.point, lightDir)
-            if (scene.hit(shadowray, 0.001f, Float.MAX_VALUE) == null) {
+            val shadowRay = ray(result.point, lightDir)
+            if (scene.hit(shadowRay, 0.1f, Float.MAX_VALUE) == null) {
                 color.add(computeDiffuseSpecular(camera.position, result.point, result.normal, result.material, lightDir, light))
             }
             color
@@ -229,8 +230,7 @@ private data class HitableGroup(val hitables: List<Hitable>) : Hitable {
 }
 
 private data class HitableSphere(
-        private val center: vec3, private val radius: Float, private val material: Material
-) : Hitable {
+        private val center: vec3, private val radius: Float, private val material: Material) : Hitable {
 
     private val sphere = sphere(center, radius)
 
@@ -254,73 +254,44 @@ private data class HitableSphere(
     }
 }
 
-private fun updateRegions() {
-    if (sceneVersion.check()) {
-        camera.updateBasis()
-        updateLowRegionsSync()
-        GlobalScope.launch {
-            regionsMutex.withLock {
-                currentJob.cancel()
-                regionsDone.clear()
-                currentJob = GlobalScope.launch {
-                    updateHighRegionsAsync(regionsMed)
-                    updateHighRegionsAsync(regionsHgh)
-                }
+private fun updateRegions() = runBlocking(mainDispatcher) {
+    currentJob.cancel()
+    regionsDone.clear()
+    camera.updateBasis()
+    regionsLow.forEach {
+        updateRegion(it, this)
+    }
+    currentJob = GlobalScope.launch {
+        regionsMed.forEach {
+            launch(Dispatchers.Default) {
+                updateRegion(it, this)
+            }
+        }
+        regionsHgh.forEach {
+            launch(Dispatchers.Default) {
+                updateRegion(it, this)
             }
         }
     }
 }
 
-private fun updateLowRegionsSync() {
-    for (task in regionsLow) {
-        regionsDone.add(updateRegion(task))
-    }
-}
-
-private suspend fun updateHighRegionsAsync(regions: List<RegionTask>) {
-    for (task in regions) {
-        withContext(Dispatchers.Default) {
-            val result = updateRegion(task) // todo: region calculation is canceled only when done
-            if (isActive) {
-                regionsMutex.withLock { regionsDone.add(result) }
-            }
-        }
-    }
-}
-
-private fun updateViewport(left: Long) {
-    var time = left
-    runBlocking {
-        regionsMutex.withLock {
-            while (time > 0 && regionsDone.isNotEmpty()) {
-                val elapsed = measureNanoTime {
-                    updateViewportTexture(regionsDone.removeAt(0))
-                }
-                time -= elapsed
-            }
-        }
-    }
-}
-
-private fun updateRegion(regionTask: RegionTask): RegionTask {
-    check(REGION_WIDTH % regionTask.uStep == 0 && regionTask.uStep <= REGION_WIDTH)
-    check(REGION_HEIGHT % regionTask.vStep == 0 && regionTask.vStep <= REGION_HEIGHT)
-    val uHalf = regionTask.uStep / 2f
-    val vHalf = regionTask.vStep / 2f
+private fun updateRegion(task: RegionTask, scope: CoroutineScope) {
+    check(REGION_WIDTH % task.uStep == 0 && task.uStep <= REGION_WIDTH)
+    check(REGION_HEIGHT % task.vStep == 0 && task.vStep <= REGION_HEIGHT)
+    val uHalf = task.uStep / 2f
+    val vHalf = task.vStep / 2f
     val uRange = 0 until REGION_WIDTH
     val vRange = 0 until REGION_HEIGHT
-    for (v in vRange step regionTask.vStep) {
-        for (u in uRange step  regionTask.uStep) {
-            val color = blinnPhongRtrTechnique.computeColor(regionTask.uFrom + u + uHalf, regionTask.vFrom + v + vHalf)
-            fillRegion(u, v, regionTask.uStep, regionTask.vStep, color, regionTask.floatBuffer)
+    for (v in vRange step task.vStep) {
+        for (u in uRange step  task.uStep) {
+            if (!scope.isActive) {
+                return
+            }
+            val color = blinnPhongRtrTechnique.computeColor(task.uFrom + u + uHalf, task.vFrom + v + vHalf)
+            fillRegion(u, v, task.uStep, task.vStep, color, task.floatBuffer)
         }
     }
-    return regionTask
-}
-
-private fun updateViewportTexture(regionTask: RegionTask) {
-    viewportTexture.updatePixels(uOffset = regionTask.uFrom, vOffset = regionTask.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
-            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionTask.byteBuffer)
+    regionsDone.add(task)
 }
 
 private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: color, buffer: FloatBuffer) {
@@ -333,6 +304,21 @@ private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: c
             buffer.put(color)
         }
     }
+}
+
+private fun updateViewport(left: Long) = runBlocking(mainDispatcher) {
+    var accum = left
+    while (accum > 0 && regionsDone.isNotEmpty()) {
+        val elapsed = measureNanoTime {
+            updateViewportTexture(regionsDone.removeAt(0))
+        }
+        accum -= elapsed
+    }
+}
+
+private fun updateViewportTexture(regionTask: RegionTask) {
+    viewportTexture.updatePixels(uOffset = regionTask.uFrom, vOffset = regionTask.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
+            format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionTask.byteBuffer)
 }
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
@@ -362,7 +348,9 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 camera.position.set(position)
                 camera.direction.set(direction)
             }
-            updateRegions()
+            if (sceneVersion.check()) {
+                updateRegions()
+            }
         }
         if (measureNanoTime { updateViewport(NANOS_PER_FRAME - elapsed) } > NANOS_PER_FRAME) {
             println("Exceeded the frame threshold!")
