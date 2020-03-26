@@ -306,16 +306,6 @@ private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: c
     }
 }
 
-private fun updateViewport(left: Long) = runBlocking(mainDispatcher) {
-    var accum = left
-    while (accum > 0 && regionsDone.isNotEmpty()) {
-        val elapsed = measureNanoTime {
-            updateViewportTexture(regionsDone.removeAt(0))
-        }
-        accum -= elapsed
-    }
-}
-
 private fun updateViewportTexture(regionTask: RegionTask) {
     viewportTexture.updatePixels(uOffset = regionTask.uFrom, vOffset = regionTask.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
             format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionTask.byteBuffer)
@@ -352,8 +342,12 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
                 updateRegions()
             }
         }
-        if (measureNanoTime { updateViewport(NANOS_PER_FRAME - elapsed) } > NANOS_PER_FRAME) {
-            println("Exceeded the frame threshold!")
+        var left = NANOS_PER_FRAME - elapsed
+        while (left > 0 && regionsDone.isNotEmpty()) {
+            val bite = measureNanoTime {
+                updateViewportTexture(regionsDone.removeAt(0))
+            }
+            left -= bite
         }
     }
 
