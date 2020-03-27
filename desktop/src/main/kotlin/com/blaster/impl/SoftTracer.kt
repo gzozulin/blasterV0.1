@@ -24,9 +24,6 @@ import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import kotlin.system.measureNanoTime
 
-// todo: ideal specular reflections
-// todo: accelerating structures
-
 private val backend = GlLocator.locate()
 
 private const val VIEWPORT_WIDTH = 10.2f
@@ -72,7 +69,15 @@ private val wasdInput = WasdInput(controller)
 
 private val simpleTechnique = SimpleTechnique()
 
-private val spheres = (1..100).map { HitableSphere(vec3(randf(-30f, 30f), randf(-30f, 30f), randf(0f, -50f)), randf(1f, 5f), Material.MATERIALS.values.random()) }.toList()
+private val spheres = (1..100)
+        .map {
+            HitableSphere(
+                vec3().rand(vec3(-50f), vec3(50f)),
+                randf(1f, 5f),
+                Material.MATERIALS.values.random())
+        }
+        .toList()
+
 private val scene = HitableGroup(spheres)
 
 private val light = Light(color().yellow(), true)
@@ -86,7 +91,7 @@ private val regionsDone = Collections.synchronizedList(mutableListOf<RegionTask>
 
 private var currentJob: Job = Job()
 
-private val blinnPhongRtrTechnique = BlinnPhongRtrTechnique()
+private val blinnPhongRtrTechnique = RtrBlinnPhongTechnique()
 private val background = mutableListOf<color>()
 
 private val mainDispatcher = Executor { runnable -> runnable.run() }.asCoroutineDispatcher()
@@ -166,11 +171,11 @@ private class RtrCamera {
     }
 }
 
-private class BlinnPhongRtrTechnique {
+private class RtrBlinnPhongTechnique {
     // h = (v + l) / |v + l|
     // L = kA * Ia + kD * Id * max(0f, n.dot(l)) + kS * Is max(0, n.dot(h))^p
 
-    fun computeColor(u: Float, v: Float): color {
+    fun compute(u: Float, v: Float): color {
         val ray = camera.ray(u, v)
         val result = scene.hit(ray, 0f, Float.MAX_VALUE)
         return if (result != null) {
@@ -287,7 +292,7 @@ private fun updateRegion(task: RegionTask, scope: CoroutineScope) {
             if (!scope.isActive) {
                 return
             }
-            val color = blinnPhongRtrTechnique.computeColor(task.uFrom + u + uHalf, task.vFrom + v + vHalf)
+            val color = blinnPhongRtrTechnique.compute(task.uFrom + u + uHalf, task.vFrom + v + vHalf)
             fillRegion(u, v, task.uStep, task.vStep, color, task.floatBuffer)
         }
     }
@@ -295,19 +300,35 @@ private fun updateRegion(task: RegionTask, scope: CoroutineScope) {
 }
 
 private fun fillRegion(fromU: Int, fromV: Int, width: Int, height: Int, color: color, buffer: FloatBuffer) {
-    val uRange = fromU until fromU + width
+
+    val line = ByteBuffer.allocateDirect(width * PIXEL_SIZE * 4).order(ByteOrder.nativeOrder()).asFloatBuffer()
+    (0 until width).forEach {
+        line.put(color)
+    }
+
+
+    //val uRange = fromU until fromU + width
     val vRange = fromV until fromV + height
     for (v in vRange) {
-        for (u in uRange) {
+        val offset = (fromU + v * REGION_WIDTH) * PIXEL_SIZE
+        buffer.position(offset)
+        buffer.put(line)
+
+
+
+        /*for (u in uRange) {
+            // todo: lines by copying readily available line of color in FloatBuffer
             val offset = (u + v * REGION_WIDTH) * PIXEL_SIZE
             buffer.position(offset)
             buffer.put(color)
-        }
+        }*/
     }
 }
 
 private fun updateViewportTexture(regionTask: RegionTask) {
-    viewportTexture.updatePixels(uOffset = regionTask.uFrom, vOffset = regionTask.vFrom, width = REGION_WIDTH, height = REGION_HEIGHT,
+    viewportTexture.updatePixels(
+            uOffset = regionTask.uFrom, vOffset = regionTask.vFrom,
+            width = REGION_WIDTH, height = REGION_HEIGHT,
             format = backend.GL_RGB, type = backend.GL_FLOAT, pixels = regionTask.byteBuffer)
 }
 

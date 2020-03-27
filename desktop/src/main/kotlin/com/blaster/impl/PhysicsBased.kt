@@ -6,14 +6,13 @@ import com.blaster.assets.ShadersLib
 import com.blaster.assets.TexturesLib
 import com.blaster.auxiliary.*
 import com.blaster.entity.*
-import com.blaster.gl.*
+import com.blaster.gl.GlMesh
+import com.blaster.gl.GlState
 import com.blaster.platform.LwjglWindow
 import com.blaster.platform.WasdInput
 import com.blaster.techniques.ImmediateTechnique
-import com.blaster.techniques.MAX_LIGHTS
+import com.blaster.techniques.PbrTechnique
 import com.blaster.techniques.SkyboxTechnique
-import org.joml.Matrix4f
-import org.joml.Vector2f
 import org.lwjgl.glfw.GLFW
 
 private val vecUp = vec3().up()
@@ -46,60 +45,11 @@ private val skyboxTechnique = SkyboxTechnique()
 private var mouseControl = false
 private var showImmediate = false
 
-class PbrTechnique {
-    private lateinit var program: GlProgram
-
-    fun create() {
-        program = shadersLib.loadProgram("shaders/pbr/pbr.vert", "shaders/pbr/pbr.frag")
-    }
-
-    private var pointLightCnt = 0
-    private var dirLightCnt = 0
-    fun draw(camera: Camera, lights: () -> Unit, meshes: () -> Unit) {
-        glBind(program) {
-            program.setUniform(GlUniform.UNIFORM_VIEW_M,    camera.calculateViewM())
-            program.setUniform(GlUniform.UNIFORM_PROJ_M,    camera.projectionM)
-            program.setUniform(GlUniform.UNIFORM_EYE,       camera.position)
-            lights.invoke()
-            program.setUniform(GlUniform.UNIFORM_LIGHTS_POINT_CNT, pointLightCnt)
-            //program.setUniform(GlUniform.UNIFORM_LIGHTS_DIR_CNT, dirLightCnt)
-            meshes.invoke()
-        }
-        pointLightCnt = 0
-        dirLightCnt = 0
-    }
-
-    private val lightVectorBuf = vec3()
-    fun light(light: Light, modelM: Matrix4f) {
-        if (light.point) {
-            modelM.getColumn(3, lightVectorBuf)
-            program.setArrayUniform(GlUniform.UNIFORM_LIGHT_VECTOR, pointLightCnt, lightVectorBuf)
-            program.setArrayUniform(GlUniform.UNIFORM_LIGHT_INTENSITY, pointLightCnt, light.intensity)
-            pointLightCnt++
-        } else {
-            TODO()
-        }
-        check(pointLightCnt + dirLightCnt < MAX_LIGHTS) { "More lights than defined in shader!" }
-    }
-
-    fun instance(mesh: GlMesh, modelM: Matrix4f, material: PbrMaterial) {
-        glBind(listOf(mesh, material.albedo, material.normal, material.metallic, material.roughness, material.ao)) {
-            program.setUniform(GlUniform.UNIFORM_MODEL_M,           modelM)
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_ALBEDO,    material.albedo)
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_NORMAL,    material.normal)
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_METALLIC,  material.metallic)
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_ROUGHNESS, material.roughness)
-            program.setTexture(GlUniform.UNIFORM_TEXTURE_AO,        material.ao)
-            mesh.draw()
-        }
-    }
-}
-
 private val pbrTechnique = PbrTechnique()
 
 private val window = object : LwjglWindow(isHoldingCursor = false) {
     override fun onCreate() {
-        pbrTechnique.create()
+        pbrTechnique.create(shadersLib)
         skyboxTechnique.create(shadersLib, texturesLib, meshLib, "textures/miramar")
         val (mesh, aabb) = meshLib.loadMesh("models/lantern/lantern.obj")
         model = mesh
@@ -138,7 +88,7 @@ private val window = object : LwjglWindow(isHoldingCursor = false) {
         }
     }
 
-    override fun onCursorDelta(delta: Vector2f) {
+    override fun onCursorDelta(delta: vec2) {
         if (mouseControl) {
             wasdInput.onCursorDelta(delta)
         }

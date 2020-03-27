@@ -1,6 +1,6 @@
 package com.blaster.platform
 
-import com.blaster.auxiliary.Once
+import com.blaster.auxiliary.Version
 import com.blaster.auxiliary.vec2
 import org.lwjgl.glfw.Callbacks.errorCallbackPrint
 import org.lwjgl.glfw.GLFW.*
@@ -32,7 +32,7 @@ abstract class LwjglWindow(
     }
 
     private var window = NULL
-    private val contextCreated = Once()
+    private val contextCreated = Version()
 
     private val xbuf = ByteBuffer.allocateDirect(8).order(ByteOrder.nativeOrder())
     private val xbufDouble = xbuf.asDoubleBuffer()
